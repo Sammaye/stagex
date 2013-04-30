@@ -1,0 +1,1 @@
+/home/sam/sphinx/bin/indexer main_delta --config /home/sam/sphinx/etc/sphinx.conf --rotate

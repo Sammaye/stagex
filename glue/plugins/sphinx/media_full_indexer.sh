@@ -1,0 +1,2 @@
+/home/ubuntu/sphinx/bin/indexer --merge main main_delta --rotate --config /home/ubuntu/sphinx/etc/sphinx.conf --merge-dst-range deleted 0 0
+/home/ubuntu/sphinx/bin/indexer main_delta --config /home/ubuntu/sphinx/etc/sphinx.conf --rotate
