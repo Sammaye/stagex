@@ -1,6 +1,6 @@
 <?php
 
-class GValidators{
+class CoreValidators{
 
 	public static $codes = array();
 

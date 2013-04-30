@@ -1,5 +1,7 @@
 <?php
 
+namespace glue;
+
 /**
  * HTML constructor class
  *

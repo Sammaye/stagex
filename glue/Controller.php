@@ -1,5 +1,8 @@
 <?php
-class GController {
+
+namespace glue;
+
+class Controller {
 
 	public $layout = "blank_page";
 	public $pageTitle;

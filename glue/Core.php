@@ -1,11 +1,10 @@
 <?php
-//\Glue\Core::view()->openJSBlock('', )
-namespace Glue;
+namespace glue;
+
 setlocale(LC_ALL, 'en_GB.UTF8');
 
 class Core{
-//class Glue{
-fffff
+
 	public static $params = array();
 
 	public static $action;

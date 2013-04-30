@@ -1,6 +1,8 @@
 <?php
 
-class GJSON{
+namespace glue\util;
+
+class JSON{
 
 	const DENIED = 1;
 	const LOGIN = 2;

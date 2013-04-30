@@ -1,5 +1,7 @@
 <?php
 
+namespace glue;
+
 /**
  * Main widget class for the handling and production of widgets allowing for a base template of accesible functions with which to effectively build
  * widgets with RAD in mind.
@@ -10,7 +12,7 @@
  * @author Sam Millman
  *
  */
-abstract class GWidget{
+abstract class Widget{
 
 	public $id;
 

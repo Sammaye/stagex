@@ -1,4 +1,7 @@
 <?php
+
+namespace glue\util;
+
 /**
  * jsmin.php - PHP implementation of Douglas Crockford's JSMin.
  *

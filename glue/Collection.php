@@ -1,5 +1,5 @@
 <?php
-class GListProvider implements ArrayAccess, Iterator, Countable{
+class Collection implements Iterator,IteratorAggregate,ArrayAccess,Countable{
 
 	private $_container;
 	private $_class;
@@ -93,4 +93,61 @@ class GListProvider implements ArrayAccess, Iterator, Countable{
     public function valid() {
         return $this->current() !== false;
     }
+
+	function filter_array_fields($ar, $fields = array()){
+		$new = null;
+		foreach($ar as $k => $v){
+			if(array_search($k, $fields) !== null){
+				$new[$k] = !is_array($v) && preg_match('/^[0-9]+$/', $v) > 0 ? (int)$v : $v;
+			}
+		}
+		return $new;
+	}
+
+	function farray_merge_recursive() {
+
+	    if (func_num_args() < 2) {
+	        trigger_error(__FUNCTION__ .' needs two or more array arguments', E_USER_WARNING);
+	        return;
+	    }
+	    $arrays = func_get_args();
+	    $merged = array();
+
+	    while ($arrays) {
+	        $array = array_shift($arrays);
+	        if (!is_array($array)) {
+	            trigger_error(__FUNCTION__ .' encountered a non array argument', E_USER_WARNING);
+	            return;
+	        }
+	        if (!$array)
+	            continue;
+	        foreach ($array as $key => $value)
+	            if (is_string($key))
+	                if (is_array($value) && array_key_exists($key, $merged) && is_array($merged[$key]))
+	                    $merged[$key] = call_user_func(__FUNCTION__, $merged[$key], $value);
+	                else
+	                    $merged[$key] = $value;
+	            else
+	                $merged[] = $value;
+	    }
+	    return $merged;
+	}
+
+	function summarise_array_row($new_array, $old_array){
+		$ret = array();
+		foreach($old_array as $k=>$v){
+			if(isset($new_array[$k])){
+				$ret[$k] = $v+$new_array[$k];
+			}else{
+				$ret[$k] = 0;
+			}
+			unset($new_array[$k]);
+		}
+
+		if(!is_array($new_array))
+			$new_array = array();
+
+		$ret = array_merge($ret, $new_array);
+		return $ret;
+	}
 }

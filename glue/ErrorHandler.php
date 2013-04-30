@@ -16,7 +16,7 @@
  */
 
 /** Main error handler function. Call this on set_error_handler **/
-function GErrorHandler($errno, $errstr='', $errfile='', $errline=''){
+function ErrorHandler($errno, $errstr='', $errfile='', $errline=''){
 
 	$handlers = ob_list_handlers();
 	while ( ! empty($handlers) )    {

@@ -1,5 +1,7 @@
 <?php
 
+namespace glue\util;
+
 /**
  * GCrypt Extension for the Glue Framework
  *
@@ -8,7 +10,7 @@
  * I couldn't be bothered to make this myself so I stole it from some user on stackoverflow. I modified it to be able to accept both blowfish and sha512
  *
  */
-class GCrypt{
+class Crypt{
 
 	public $rounds;
 	public $mode;
@@ -127,5 +129,44 @@ class GCrypt{
 		} while (1);
 
 		return $output;
+	}
+
+	function generate_new_pass(){
+
+		$length=9; // Length of the returned password
+		$strength=8; // A strength denominator
+
+		$vowels = 'aeuy'; // Vowels to use
+		$consonants = 'bdghjmnpqrstvz'; // Consonants to use
+
+		// Repitition throughout the strengths to make the new password
+		if ($strength & 1) {
+			$consonants .= 'BDGHJLMNPQRSTVWXZ';
+		}
+		if ($strength & 2) {
+			$vowels .= "AEUY";
+		}
+		if ($strength & 4) {
+			$consonants .= '23456789';
+		}
+		if ($strength & 8) {
+			$consonants .= '@#$%';
+		}
+
+		// Randomise the placement of text entities
+		$password = '';
+		$alt = time() % 2;
+		for ($i = 0; $i < $length; $i++) {
+			if ($alt == 1) {
+				$password .= $consonants[(rand() % strlen($consonants))];
+				$alt = 0;
+			} else {
+				$password .= $vowels[(rand() % strlen($vowels))];
+				$alt = 1;
+			}
+		}
+
+		// Return the password
+		return $password;
 	}
 }
