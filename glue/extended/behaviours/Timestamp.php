@@ -1,5 +1,7 @@
 <?php
 
+namespace glue\extended\behaviours;
+
 /**
  * An Example of how a behaviour works
  * @author Sam
