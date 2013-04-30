@@ -1,5 +1,7 @@
 <?php
-class GClientScript{
+namespace glue;
+
+class View{
 
 	const HEAD = 1;
 	const BODY_END = 2;

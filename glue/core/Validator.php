@@ -3,7 +3,7 @@
 /**
  * Extend this class to add your own validators
  */
-class GValidationComponent{
+class Validator{
 	function attributes($a){
 		if(is_array($a)){
 			foreach($a as $k => $v){

@@ -1,5 +1,7 @@
 <?php
 
+namespace glue\common;
+
 function filter_array_fields($ar, $fields = array()){
 	$new = null;
 	foreach($ar as $k => $v){

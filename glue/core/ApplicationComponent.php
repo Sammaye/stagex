@@ -1,5 +1,8 @@
 <?php
-class GApplicationComponent{
+
+namespace glue;
+
+class ApplicationComponent{
 
 	function init(){ return true; }
 
