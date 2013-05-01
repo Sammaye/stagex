@@ -1,5 +1,7 @@
 <?php
 
+namespace \glue\widgets;
+
 /**
  * GListView Widget
  *
@@ -8,7 +10,7 @@
  *
  * @author Sam Millman
  */
-class GGridView extends GWidget{
+class GGridView extends \glue\Widget{
 
 	public $id; // The id of the widget, mostly used for AJAX and JQuery stuff
 
@@ -21,7 +23,7 @@ class GGridView extends GWidget{
 	 * @example array('upload_date' => -1)
 	 */
 	public $sort; // This will either be current sort from $_GET or default sort
-	public $sortableAttributes; 
+	public $sortableAttributes;
 
 	public $enableSorting = true;
 	public $enablePagination = true;
@@ -48,7 +50,7 @@ class GGridView extends GWidget{
 
 	protected $itemCount = 0;
 	protected $pageItemCount = 0; // This is the amount of items really on the page
-	
+
 	private $currentRow = 0;
 
 	function pages(){
@@ -144,46 +146,46 @@ class GGridView extends GWidget{
 	    $ret .= "</div>";
 	    return $ret;
 	}
-	
+
 	function renderTableHeader(){
 		echo "<thead><tr>";
 			foreach($this->columns as $k => $v){
-	
+
 				$label = $v;
 				if(is_array($v)){
 					$label = isset($v['label']) ? $v['label'] : '';
-					
+
 					if(isset($v['type']) && $v['type'] == 'checkbox'){
 						if(isset($v['showHeader']) && $v['showHeader'] === false){ }else{
-							$label = '<input type="checkbox" value="1" id="'.$this->getId().'_cl_all" name="'.$this->getId().'_cl_all"/>';							
+							$label = '<input type="checkbox" value="1" id="'.$this->getId().'_cl_all" name="'.$this->getId().'_cl_all"/>';
 						}
 					}
-					
+
 				}elseif(is_numeric($k)){
 					$label = ucwords(str_replace('_', ' ', $v));
-				}					
+				}
 				echo html::openTag('th', array('class' => null)) . $label . html::closeTag('th');
 			}
 		echo "</tr>";
-			
+
 		if($this->filter!==null){
 			echo "<tr>";
 				foreach($this->columns as $k => $v){
-								
-				}					
-			echo "</tr>";	
+
+				}
+			echo "</tr>";
 		}
-		echo "</thead>"; 		
+		echo "</thead>";
 	}
-	
-	function renderTableBody(){		
+
+	function renderTableBody(){
 		echo "<tbody>";
 			foreach($this->cursor as $_id => $doc){
-				
+
 				if($this->rowCssClassExpression===null) $this->rowCssClassExpression = 	'$i%2!=0 ? "grid-odd-row" : ""';
 				$classString = $this->evaluateExpression($this->rowCssClassExpression, array('doc' => $doc, 'i' => $this->currentRow));
 				if(strlen($classString) > 0) $classString = ' class="'.$classString.'"';
-				
+
 				echo "<tr$classString>";
 				foreach($this->columns as $k => $v){
 					echo "<td>{$this->getColumnValue($doc, $k, $v)}</td>";
@@ -213,7 +215,7 @@ class GGridView extends GWidget{
 			), $morph
 		)));
 	}
-	
+
 	public function getColumnValue($doc, $k, $v){
 		if(is_string($v) || (is_numeric($k) && !is_array($v))){
 			$value = $doc->getAttribute(is_numeric($k) ? $v : $k);
@@ -231,9 +233,9 @@ class GGridView extends GWidget{
 				$value = $this->evaluateExpression(isset($v['value']) ? $v['value'] : null, array('doc' => $doc));
 			}
 		}
-		return $value;		
+		return $value;
 	}
-	
+
 	public function evaluateExpression($_expression_,$_data_=array()){
 		if(is_string($_expression_)){
 			extract($_data_);
@@ -245,35 +247,35 @@ class GGridView extends GWidget{
 	}
 
 	function getButtonColumnValue($doc, $opts = array()){
-		
+
 		$opts = array_merge(array(
 			'template' => '{update} {delete}',
 			'buttons' => array(
 				'update' => array(
 					'label' => 'Update',
 					'image' => null,
-					'url' => 'glue::url()->create("/".str_replace("Controller", "", 
+					'url' => 'glue::url()->create("/".str_replace("Controller", "",
 								isset(glue::$action["controller"]) ? glue::$action["controller"] : "siteController")."/update", array("id" => $doc->_id))',
 					'visible' => null
 				),
 				'delete' => array(
 					'label' => 'Delete',
 					'image' => null,
-					'url' => 'glue::url()->create("/".str_replace("Controller", "", 
+					'url' => 'glue::url()->create("/".str_replace("Controller", "",
 								isset(glue::$action["controller"]) ? glue::$action["controller"] : "siteController")."/delete", array("id" => $doc->_id))',
 					'visible' => null
-				)		
-			)				
+				)
+			)
 		), $opts);
 
 		$html = $opts['template'];
 		foreach($opts['buttons'] as $k => $v){
-			
+
 			$buttonHtml = '';
 			if(isset($v['visible']) && $v['visible']!==null && !$this->evaluateExpression($v['visible'], array('doc' => $doc))){ }else{
 				// Lets proceed getting the button
 				$buttonHtml .= '<a class="'.$k.'" href="'.$this->evaluateExpression(isset($v['url']) ? $v['url'] : null, array('doc' => $doc)).'">';
-				
+
 				$clearTextId = ucwords(str_replace('_', ' ', $k));
 				if(isset($v['label']) && $v['label'] !== null){
 					$buttonHtml .= $v['label'];
@@ -282,19 +284,19 @@ class GGridView extends GWidget{
 				}else{
 					$buttonHtml .= $clearTextId;
 				}
-				
+
 				$buttonHtml .= '</a>';
 			}
-			
+
 			$html = preg_replace('/{'.$k.'}/', $buttonHtml, $html);
 		}
 		return $html;
 	}
-	
+
 	function getCheckboxColumnValue($doc, $opts = array()){
 		$opts = array_merge(array('checked' => null), $opts);
 		return '<input type="checkbox" value="'.$doc->_id.'" id="'.$this->getId().'_cl_'.$this->currentRow.'" name="'.$this->getId().'_cl[]" '.(
-			$opts['checked'] !== null && $this->evaluateExpression($opts['checked'], array('doc' => $doc, 'i' => $this->currentRow)) ? 'checked="checked" ' : ''		
+			$opts['checked'] !== null && $this->evaluateExpression($opts['checked'], array('doc' => $doc, 'i' => $this->currentRow)) ? 'checked="checked" ' : ''
 		).'/>';
 	}
 

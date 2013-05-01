@@ -1,5 +1,7 @@
 <?php
 
+namespace glue\widgets;
+
 /**
  * GListView Widget
  *
@@ -8,7 +10,7 @@
  *
  * @author Sam Millman
  */
-class GListView extends GWidget{
+class GListView extends \glue\Widget{
 
 	public $id; // The id of the widget, mostly used for AJAX and JQuery stuff
 
