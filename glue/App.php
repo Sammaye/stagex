@@ -3,7 +3,7 @@ namespace glue;
 
 setlocale(LC_ALL, 'en_GB.UTF8');
 
-class Core{
+class App{
 
 	public static $params = array();
 
@@ -13,26 +13,22 @@ class Core{
 	 * Not all of these classes are loaded! Merely mapped.
 	 */
 	private static $_classMapper = array(
-		"GClientScript"			=> "glue/core/GClientScript.php",
-		"GCommon" 				=> "glue/core/GCommon.php",
-		"GCommandLine"			=> "glue/core/GCommandLine.php",
-		"GController"			=> "glue/core/GController.php",
-		"GErrorHandler" 		=> "glue/core/GErrorHandler.php",
-		"GListProvider"			=> "glue/core/GListProvider.php",
-		"GModel"				=> "glue/core/GModel.php",
-		"GModelBehaviour"		=> "glue/core/GModelBehaviour.php",
-		"GValidators"			=> "glue/core/GValidators.php",
-		"GValidationComponent"	=> "glue/core/GValidationComponent.php",
-		"GUrlManager"			=> "glue/core/GUrlManager.php",
-		"GHttp"					=> "glue/core/GHttp.php",
-		"GCrypt"				=> "glue/core/GCrypt.php",
-		"GWidget" 				=> "glue/core/GWidget.php",
-		"GApplicationComponent" => 'glue/core/GApplicationComponent.php',
-		"GJSON" 				=> 'glue/core/GJSON.php',
-		"html"					=> "glue/core/html.php",
+		"Globals" 				=> "glue/Globals.php",
+		"\\glue\\Controller"	=> "glue/Controller.php",
+		"\\glue\\View"			=> "glue/View.php",
+		"\\glue\\ErrorHandler" 	=> "glue/ErrorHandler.php",
+		"\\glue\\Collection"	=> "glue/Collection.php",
+		"\\glue\\Model"			=> "glue/Model.php",
+		"\\Glue\\ModelBehaviour"=> "glue/Model.php",
+		"\\glue\\Validators"	=> "glue/Validators.php",
+		"\\glue\\Validator"		=> "glue/Validator.php",
+		"\\glue\\Http"			=> "glue/Http.php",
+		"\\glue\\Widget" 		=> "glue/Widget.php",
+		"\\glue\\ApplicationComponent" => 'glue/ApplicationComponent.php',
+		"\\glue\\html"			=> "glue/html.php",
 
 		// Core addons
-		"JSMin" 				=> "glue/core/util/JSMin.php"
+		"\\glue\\util\JSMin" 				=> "glue/util/JSMin.php"
 	);
 
 	private static $_components = array();

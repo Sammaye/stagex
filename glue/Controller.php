@@ -2,6 +2,8 @@
 
 namespace glue;
 
+use \glue\core;
+
 class Controller {
 
 	public $layout = "blank_page";
@@ -42,6 +44,8 @@ class Controller {
 	function accessRules(){ return array(); }
 
 	function render($page, $args = null){
+
+		core::view()->render();
 
 		if(isset($args['page']) || isset($args['args'])) throw new Exception("The \$page and \$args variables are reserved variables within the render function.");
 

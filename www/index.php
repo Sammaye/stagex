@@ -1,5 +1,4 @@
 <?php
-
 /**
  * DOCUMENT ROOT Constant
  *
@@ -7,14 +6,14 @@
  * This saves us from having to use insecure header
  * variables to understand where the root is.
  */
-define('ROOT', dirname(__FILE__));
+define('ROOT', dirname(__FILE__).'/..');
 
 /** Include the main point of entry */
-include ROOT."/glue/glue.php";
+include ROOT."/glue/App.php";
+
+use \glue\app;
 
 /** Run the framework */
-Glue::setConfigFile('application/core/config.php');
-Glue::run(isset($_GET['url']) ? $_GET['url'] : null);
-
-
+app::setConfigFile(ROOT.'application/core/config.php');
+app::run(isset($_GET['url']) ? $_GET['url'] : null);
 /** EOF **/

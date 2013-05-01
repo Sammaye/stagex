@@ -294,7 +294,7 @@ function shutdown() {
 	    ?>
 		<div style='wisth:613px; margin:45px auto;'>
 			<h1 style='font-size:16px; color:#333333;'>You have just been the victim of a unforgivable crime</h1>
-			<p style='font-family: arial, sans-serif; font-size:12px; line-height:17px; color:#333333;'>An error we that we just could not fix rose up steal the day!
+			<p style='font-family: arial, sans-serif; font-size:12px; line-height:17px; color:#333333;'>An error we that we just could not fix rose up to steal the day!
 				This might have been temporary and we encourage you to try and refresh your window.</p>
 		</div>
     <?php }

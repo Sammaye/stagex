@@ -1,6 +1,10 @@
 <?php
 
-class autoshareController extends GController{
+namespace \glue\controllers;
+
+use \glue\components\mongodb as mongodb;
+
+class autoshareController extends \glue\Controller{
 
 	public $user;
 	public $socialUser;
@@ -17,6 +21,10 @@ class autoshareController extends GController{
 		);
 	}
 
+	/**
+	 * @type GET,POST
+	 * Enter description here ...
+	 */
 	function action_index(){}
 
 

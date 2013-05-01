@@ -1,16 +1,19 @@
 <?php
+
+namespace glue;
+
 class Collection implements Iterator,IteratorAggregate,ArrayAccess,Countable{
 
 	private $_container;
 	private $_class;
 
-	public function __construct($list_file, $fields, $class = null){
+	public function __construct($list, $fields, $class = null){
 
 		if($class)
 			$this->_class = $class;
 
 		$return_array = array();
-		$list = include ROOT.'/application/lists/'.$list_file.'.php';
+		$list = is_string($list) ? include ROOT.'/application/lists/'.$list_file.'.php' : $list;
 
 		if(count($fields) <= 0)
 			$this->_container = $list;
@@ -104,7 +107,7 @@ class Collection implements Iterator,IteratorAggregate,ArrayAccess,Countable{
 		return $new;
 	}
 
-	function farray_merge_recursive() {
+	static function mergeArray() {
 
 	    if (func_num_args() < 2) {
 	        trigger_error(__FUNCTION__ .' needs two or more array arguments', E_USER_WARNING);
@@ -133,7 +136,7 @@ class Collection implements Iterator,IteratorAggregate,ArrayAccess,Countable{
 	    return $merged;
 	}
 
-	function summarise_array_row($new_array, $old_array){
+	static function aggregate($new_array, $old_array){
 		$ret = array();
 		foreach($old_array as $k=>$v){
 			if(isset($new_array[$k])){
