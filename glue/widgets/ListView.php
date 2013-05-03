@@ -10,7 +10,7 @@ namespace glue\widgets;
  *
  * @author Sam Millman
  */
-class GListView extends \glue\Widget{
+class ListView extends Widget{
 
 	public $id; // The id of the widget, mostly used for AJAX and JQuery stuff
 

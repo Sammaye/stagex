@@ -7,7 +7,7 @@ namespace glue\extended\behaviours;
  * @author Sam
  */
 
-class timestampBehaviour extends GModelBehaviour{
+class Timestamp extends GModelBehaviour{
 	function afterValidate(){
 		$this->owner->ts = new MongoDate();
 	}

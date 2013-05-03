@@ -9,13 +9,6 @@ class App{
 
 	public static $action;
 
-	/**
-	 * Not all of these classes are loaded! Merely mapped.
-	 */
-	private static $_classMapper = array(
-		"Globals" 				=> "glue/Globals.php",
-	);
-
 	private static $_components = array();
 	private static $_componentLoaded = array();
 	private static $_classLoaded = array();

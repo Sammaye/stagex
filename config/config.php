@@ -3,8 +3,6 @@
  * Main configuration
  *
  * This file denotes the configuration for most parts of the framework
- *
- * @author Sam Millman
  */
 
 date_default_timezone_set('UTC');

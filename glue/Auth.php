@@ -1,5 +1,5 @@
 <?php
-class RbamModule extends GApplicationComponent{
+class RbamModule extends ApplicationComponent{
 
 	public $defFile;
 	public $config;
