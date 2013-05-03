@@ -1,9 +1,12 @@
 <?php
+
+namespace Purify;
+
 /**
  * This class is based off the awesome plugin made for Yii: http://www.yiiframework.com/extension/input/
  * 90% of this classes code goes to its @author http://www.yiiframework.com/user/7442/ (twisted1919)
  */
-class purify extends GApplicationComponent
+class purifier extends \glue\ApplicationComponent
 {
     // flag marked true when the $_POST has been globally cleaned.
     protected $cleanPostCompleted   = false;

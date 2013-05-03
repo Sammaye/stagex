@@ -14,21 +14,6 @@ class App{
 	 */
 	private static $_classMapper = array(
 		"Globals" 				=> "glue/Globals.php",
-		"\\glue\\Controller"	=> "glue/Controller.php",
-		"\\glue\\View"			=> "glue/View.php",
-		"\\glue\\ErrorHandler" 	=> "glue/ErrorHandler.php",
-		"\\glue\\Collection"	=> "glue/Collection.php",
-		"\\glue\\Model"			=> "glue/Model.php",
-		"\\Glue\\ModelBehaviour"=> "glue/Model.php",
-		"\\glue\\Validators"	=> "glue/Validators.php",
-		"\\glue\\Validator"		=> "glue/Validator.php",
-		"\\glue\\Http"			=> "glue/Http.php",
-		"\\glue\\Widget" 		=> "glue/Widget.php",
-		"\\glue\\ApplicationComponent" => 'glue/ApplicationComponent.php',
-		"\\glue\\html"			=> "glue/html.php",
-
-		// Core addons
-		"\\glue\\util\JSMin" 				=> "glue/util/JSMin.php"
 	);
 
 	private static $_components = array();

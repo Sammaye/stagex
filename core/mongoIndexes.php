@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * This file is not designed to really be used in huge production envos incase of sudden index change
+ */
 return array(
 	'users' => array(
 		array(array('email' => 1)),

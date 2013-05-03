@@ -7,6 +7,16 @@
  *
  * This data can also be converted to be stored in a DB if you want it to (Will require programming of your own).
  */
+
+
+//Auth::filter('user', function(){
+//
+//});
+//
+//Auth::filter('canViewPost', function($post, $user, $something_else){
+//
+//});
+
 return array(
 	'shortcuts' => array(
 		'@' 	=> 'roleLogged',

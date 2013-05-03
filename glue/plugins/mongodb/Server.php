@@ -1,6 +1,6 @@
 <?php
 
-namespace \glue\mongo;
+namespace \mongoglue;
 
 /**
  * This object represents a server for MongoDB. It can huose a connection pool allowing it to be reused for multiple servers
@@ -10,7 +10,7 @@ namespace \glue\mongo;
  *
  * @example $mongo = new mongoglue\Server(new MongoClient(), array('DocumentDir' => __DIRECTORY__.'/Documents'));
  */
-class MongoClient{
+class Server{
 
 	/**
 	 * Default safe mode unless stated otherwise.

@@ -1,6 +1,6 @@
 <?php
 
-namespace glue\storage;
+namespace mongoglue;
 
 class Cursor implements \Iterator, \Countable{
 
