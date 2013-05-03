@@ -208,12 +208,12 @@ return array(
 		"output" => array("email", "screen"),
 		"emails" => array("sam.millman@googlemail.com"),
 
-		"action"=>"index/error",
+		"action" => "index/error",
 
 		'log' => false,
 
 		// This switches the debug mode
-		"DEBUG"=>true,
+		"DEBUG" => true,
 
 		'logger' => function($exception){
 			return true;

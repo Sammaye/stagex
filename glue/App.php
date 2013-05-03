@@ -12,7 +12,7 @@ class App{
 	private static $_components = array();
 	private static $_componentLoaded = array();
 	private static $_classLoaded = array();
-	private static $_configVars;
+	private static $_config;
 	private static $_GRBAM;
 	private static $_error;
 
@@ -219,9 +219,6 @@ class App{
 	 * @param string $path
 	 */
 	public static function setConfigFile($path){
-
-		glue::import('GCommon');
-
 		$config = self::import($path);
 		if(isset($config['extends'])){
 			$parent_config = self::import($config['extends']);

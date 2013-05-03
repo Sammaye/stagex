@@ -9,7 +9,8 @@
 define('ROOT', dirname(__FILE__).'/..');
 
 /** Include the main point of entry */
-include ROOT."/glue/App.php";
+include_once ROOT."/glue/App.php";
+include_once ROOT."/glue/Globals.php";
 
 use \glue\app;
 
