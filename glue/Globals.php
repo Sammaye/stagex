@@ -18,28 +18,6 @@ function convert_size_human($size){
 	}
 }
 
-function getDirectoryFileList($directory, $exts = array()){
-	$files = array();
-
-	if ($handle = opendir($directory)) {
-		while (false !== ($file = readdir($handle))) {
-			if ($file != "." && $file != "..") {
-				if(count($exts) <= 0){
-					$files[] = $file;
-				}else{
-					foreach($exts as $extension){
-						if(preg_match("/".$extension."/i", $file) > 0){
-							$files[] = $file;
-						}
-					}
-				}
-			}
-		}
-		closedir($handle);
-	}
-	return $files;
-}
-
 /**
  * Strips all from string including symbols and punctuation
  *

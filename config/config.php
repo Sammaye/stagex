@@ -374,7 +374,7 @@ return array(
 	),
 
 	'preLoad' => array(
-		'glue/Globals.php'
+		'glue/Globals'
 	),
 
 	/**

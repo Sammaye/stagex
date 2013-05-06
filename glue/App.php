@@ -3,49 +3,42 @@ namespace glue;
 
 setlocale(LC_ALL, 'en_GB.UTF8');
 
+use \glue\Exception as Exception;
+
 class App{
 
 	public static $params = array();
 
 	public static $action;
+	
+	public static $controller;
+	public static $view;
+	public static $http;
+	public static $session;
+	public static $auth;
+	
+	public static $config;
 
+	private static $_events = array();
+	
+	private static $_namespaces = array();
+	private static $_directories = array();
+	private static $_aliases = array();
+	
 	private static $_components = array();
-	private static $_componentLoaded = array();
-	private static $_classLoaded = array();
-	private static $_config;
-	private static $_GRBAM;
-	private static $_error;
-
-	private static $_http;
-	private static $_user;
-	private static $_clientScript;
-	private static $_url;
+	private static $_imported = array();
 
 	public static function __callStatic($name, $arguments){
-		$compConfig = self::config($name, "components");
+		$config = self::config($name, "components");
 
-		if(!isset($compConfig) && !$compConfig){ // Then lets try the alias
-			$name = self::config($name, "alias");
-			$compConfig = self::config($name, "components");
-		}
-
-		if(isset($compConfig) && $compConfig){ // If is still unset then go to error clause
+		if(isset($config) && $config){ // If is still unset then go to error clause
 			if(isset(self::$_components[$name])){
 				return self::$_components[$name];
 			}else{
-				self::import($compConfig['path']);
-				$o = new $compConfig['class'];
-				unset($compConfig['class']);
-				unset($compConfig['path']);
-
-				foreach($compConfig as $k => $v){
-					$o->$k = $v;
-				}
-				$o->init();
-				return self::$_components[$name] = $o;
+				return self::$_components[$name] = self::createObject($config);
 			}
 		}else{
-			trigger_error("The component or variable or alias of a variable or plugin (".$name.") in the glue class could not be found");
+			throw new Exception("The component or variable or alias of a variable or plugin (".$name.") in the glue class could not be found");
 		}
 	}
 
@@ -57,21 +50,10 @@ class App{
 	public static function run($url = null){
 
 		self::registerAutoloader();
-		self::import("GErrorHandler");
-		self::import("GCommon");
 
-		set_error_handler("GErrorHandler");
-		set_exception_handler("GErrorHandler"); // Exceptions are costly beware!
+		set_error_handler("ErrorHandler");
+		set_exception_handler("ErrorHandler"); // Exceptions are costly beware!
 		register_shutdown_function('shutdown');
-
-		//PRELOAD
-		foreach(self::config('preload') as $k => $path){
-			self::import($path);
-		}
-
-		foreach(self::config('params') as $k => $v){
-			self::$params[$k] = $v;
-		}
 
 		if(php_sapi_name() == 'cli'){
 			$args = self::http()->parseArgs($_SERVER['argv']);
@@ -96,10 +78,8 @@ class App{
 	 * @param string $route
 	 */
 	public static function route($route = null){
-		if(!$route){
-			trigger_error("You cannot get no controller. You must supply a controller to get in the params.", E_USER_ERROR);
-			exit();
-		}
+		if($route===null)
+			throw new Exception("You cannot get no controller. You must supply a controller to get in the params.");
 
 		$route = (empty($route)) || ($route == "/") ? 'index' : $route;
 
@@ -121,7 +101,7 @@ class App{
 		/** Does the page exist? */
 		if(!file_exists($controllerFile)){
 			if(!file_exists(ROOT.'/application/controllers/'.ucfirst($urlParts[0]).'Controller.php')){
-				self::route(self::config("404", "errorPages"));
+				self::trigger('404');
 			}else{
 				$controllerFile = ROOT.'/application/controllers/'.ucfirst($urlParts[0]).'Controller.php';
 			}
@@ -132,16 +112,18 @@ class App{
 		if(is_callable(array($controller_name, 'action_'.$action))){
 			$action = 'action_'.$action;
 		}else{
-			self::route(self::config("404", "errorPages"));
+			self::trigger('404');
 		}
 
-		/** run the action */
+		/** store info about the action */
 		$controller = new $controller_name();
 
 		$reflector = new ReflectionClass($controller_name);
 		$method = $reflector->getMethod($action);
-		self::$action = array('controller' => $method->class, 'name' => str_replace('action_', '', $method->name), 'actionID' => $method->name,  'params' => $method->getParameters());
+		self::$action = array('controller' => $method->class, 'name' => str_replace('action_', '', $method->name), 
+								'actionID' => $method->name,  'params' => $method->getParameters());
 
+		/** run the action */
 		// Now run the filters for the controller
 		$filters = is_array($controller->filters()) ? $controller->filters() : array();
 		$runAction = true;
@@ -173,44 +155,49 @@ class App{
 	 * @param string $cName
 	 * @param string $cPath
 	 */
-	public static function import($path = null, $return_cName = false){
-
-		if(substr($path, -2) == "/*"){
-
-			$d_name = str_replace('/', DIRECTORY_SEPARATOR, ROOT.'/'.substr($path, 0, -2));
-			$d_files = getDirectoryFileList($d_name, array("\.php")); // Currently only accepts .php
-
-			foreach($d_files as $file){
-				self::$_classMapper[pathinfo($file, PATHINFO_FILENAME)] = substr($path, 0, -2).'/'.$file;
-			}
-		}else{
-
-			$pathinfo = pathinfo($path);
-
-			if(!isset(self::$_classLoaded[$pathinfo['filename']])){
-				if(isset(self::$_classMapper[$pathinfo['filename']])){
-					$path = self::$_classMapper[$pathinfo['filename']];
-					$pathinfo = pathinfo(self::$_classMapper[$pathinfo['filename']]);
-				}
-
-				$filepath = str_replace('/', DIRECTORY_SEPARATOR, ROOT.'/'.$path);
-				if(file_exists($filepath)){
-					self::$_classLoaded[$pathinfo['filename']] = true;
-					if($return_cName){
-						include $filepath;
-						return $pathinfo['filename'];
-					}else{
-						return include $filepath;
-					}
-				}
-			}
+	public static function import($class, $return_cName = false){
+		
+		$class = ltrim($class, '\\');
+		$pathinfo = pathinfo($class);
+		
+		if(isset(self::$_aliases[$class])){
+			return class_alias(self::$_aliases[$class],$class);
 		}
+		
+		if(isset($pathinfo['extension'])){
+			// from the best that I can tell this is a normal old file
+			return include str_replace('/', DIRECTORY_SEPARATOR, ROOT.'/'.$class);
+		}		
+		
+		// PSR-0 denotes that classes can be loaded with both \ and _ being translated to / (DIRECTORY_SEPARATOR)
+		$file_name=str_replace(array('\\', '_'), DIRECTORY_SEPARATOR, ROOT.'\\'.$class).'.php';
+		if(file_exists($file_name)){
+			self::$_imported[$class] = $file_name;
+			return include file_name;				
+		}
+
+			// Go through each of the directories			
+			$file_name=str_replace('/', DIRECTORY_SEPARATOR, ROOT.'/'.$class);
+			if(file_exists($file_name)){
+				self::$_imported[$pathinfo['filename']] = $file_name;
+				return include file_name;
+			}
+
+			// Test if the file in one of the other directories
+			foreach(self::$_directories as $directory){
+				$file_name = str_replace('/', DIRECTORY_SEPARATOR, ROOT.'/'.$directory.'/'.$pathinfo['filename'].'.php');
+				if(file_exists($file_name)){
+					self::$_imported[$pathinfo['filename']] = $file_name;
+					return include file_name;
+				}
+			}
+		return false;
 	}
 
 	public static function registerAutoloader($callback = null){
-		spl_autoload_unregister(array('Glue','import'));
+		spl_autoload_unregister(array('App','import'));
 		if($callback) spl_autoload_register($callback);
-		spl_autoload_register(array('Glue','import'));
+		spl_autoload_register(array('App','import'));
 	}
 
 	/**
@@ -218,14 +205,107 @@ class App{
 	 *
 	 * @param string $path
 	 */
-	public static function setConfigFile($path){
-		$config = self::import($path);
+	public static function setConfig($conf){
+		
+		if(is_string($conf))
+			$config = self::import($conf);
+		else
+			$config=$conf;
+		
 		if(isset($config['extends'])){
 			$parent_config = self::import($config['extends']);
-			$config = farray_merge_recursive($parent_config, $config);
+			$config = self::mergeConfiguration($parent_config, $config);
 		}
-		self::$_configVars = $config;
+		
+		self::$_components = array();
+		self::$config = $config;		
+		
+		if(isset($config['params']) && is_array($config['params']))
+			self::$params = $config['params'];	
+		
+		if(isset($config['aliases']) && is_array($config['aliases']))
+			self::$_aliases = $config['aliases'];
+
+		if(isset($config['namespaces']) && is_array($config['namespaces']))
+			self::$_namespaces = $config['namespaces'];
+		
+		if(isset($config['directories']) && is_array($config['directories']))
+			self::$_directories = $config['directories'];		
+
+		foreach($config['preload'] as $k => $path)
+			self::import($path);		
+		
+
 	}
+	
+	public static function mergeConfiguration(){
+		if (func_num_args() < 2) {
+			throw new Exception(__FUNCTION__ .' needs two or more array arguments');
+			return;
+		}
+		$arrays = func_get_args();
+		$merged = array();
+		
+		while ($arrays) {
+			$array = array_shift($arrays);
+			if (!is_array($array)) {
+				throw new Exception(__FUNCTION__ .' encountered a non array argument');
+				return;
+			}
+			if (!$array)
+				continue;
+			foreach ($array as $key => $value)
+				if (is_string($key))
+				if (is_array($value) && array_key_exists($key, $merged) && is_array($merged[$key]))
+				$merged[$key] = call_user_func(__FUNCTION__, $merged[$key], $value);
+			else
+				$merged[$key] = $value;
+			else
+				$merged[] = $value;
+		}
+		return $merged;		
+	}
+	
+	/**
+	 * Creates and initialises a Glue component and returns it.
+	 * @param unknown_type $config
+	 * @throws Exception
+	 */
+	public static function createComponent($config){
+
+		if (is_string($config)) {
+			$class = $config;
+			$config = array();
+		} elseif (isset($config['class'])) {
+			$class = $config['class'];
+			unset($config['class']);
+		} else {
+			throw new Exception('Object configuration must be an array containing a "class" element.');
+		}
+
+		if (!class_exists($class, false)) {
+			$class = self::import($class);
+		}
+
+		$class = ltrim($class, '\\');
+
+		if (self::config($class,'components')!==null) {
+			$config = array_merge(self::config($class,'components'), $config);
+		}
+		return $config === array() ? new $class : new $class($config);
+	}
+	
+	public static function trigger(){
+		
+	}
+	
+	public static function bindEvent($event, $callback){
+		
+	}
+	
+	public static function unbindEvent($event){
+		
+	} 
 
 	/**
 	 * Gets a top level configuration variable
@@ -235,64 +315,13 @@ class App{
 	 */
 	public static function config($key = null, $section = null){
 		if(!$key && !$section){
-			return self::$_configVars;
+			return self::$config;
 		}elseif($key && !$section){
-			return isset(self::$_configVars[$key]) ? self::$_configVars[$key] : null;
+			return isset(self::$config[$key]) ? self::$config[$key] : null;
 		}elseif($key && $section){
-			return isset(self::$_configVars[$section][$key]) ? self::$_configVars[$section][$key] : null;
+			return isset(self::$config[$section][$key]) ? self::$config[$section][$key] : null;
 		}
 	}
-
-	public static function user(){
-		if(self::$_user === null) self::$_user = new User();
-		return self::$_user;
-	}
-
-	/**
-	 * Returns the url manager for the app
-	 */
-	public static function url(){
-		if(self::$_url === null) self::$_url = new GUrlManager();
-		return self::$_url;
-	}
-
-	public static function http(){
-		if(self::$_http === null) self::$_http = new GHttp();
-		return self::$_http;
-	}
-
-	/**
-	 * Returns the client script object for the app
-	 */
-	public static function clientScript(){
-		if(self::$_clientScript === null) self::$_clientScript = new GClientScript();
-		return self::$_clientScript;
-	}
-
-	/**
-	 * Starts a widget but does not run the render() function
-	 *
-	 * @param string $path
-	 * @param array $args
-	 */
-	public static function beginWidget($path, $args = null){
-		$pieces = explode("/", $path);
-		$cName = substr($pieces[sizeof($pieces)-1], 0, strrpos($pieces[sizeof($pieces)-1], "."));
-		Glue::import($path);
-		$widget = new $cName();
-		$widget->attributes($args);
-		$widget->init();
-		return $widget;
-	}
-
-	/**
-	 * Starts a widget and runs the render() function of a widget
-	 *
-	 * @param string $path
-	 * @param array $params
-	 */
-	public static function widget($path, $params = null){
-		$widget = self::beginWidget($path, $params);
-		return $widget->render();
-	}
 }
+
+class Exception extends Exception{}

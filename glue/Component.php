@@ -2,8 +2,14 @@
 
 namespace glue;
 
-class ApplicationComponent{
+class Component{
 
+	public function __construct($config=array()){
+		foreach($config as $k=>$v)
+			$this->$k=$v;
+		$this->init();
+	}
+	
 	function init(){ return true; }
 
 	function attributes($a){

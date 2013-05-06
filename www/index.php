@@ -12,9 +12,9 @@ define('ROOT', dirname(__FILE__).'/..');
 include_once ROOT."/glue/App.php";
 include_once ROOT."/glue/Globals.php";
 
-use \glue\app;
+use \glue\app as app;
 
 /** Run the framework */
-app::setConfigFile(ROOT.'application/core/config.php');
+app::setConfig(ROOT.'application/core/config.php');
 app::run(isset($_GET['url']) ? $_GET['url'] : null);
 /** EOF **/

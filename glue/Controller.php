@@ -135,4 +135,32 @@ class Controller {
 
 		}
 	}
+	
+	
+	/**
+	 * Starts a widget but does not run the render() function
+	 *
+	 * @param string $path
+	 * @param array $args
+	 */
+	public static function beginWidget($path, $args = null){
+		$pieces = explode("/", $path);
+		$cName = substr($pieces[sizeof($pieces)-1], 0, strrpos($pieces[sizeof($pieces)-1], "."));
+		Glue::import($path);
+		$widget = new $cName();
+		$widget->attributes($args);
+		$widget->init();
+		return $widget;
+	}
+	
+	/**
+	 * Starts a widget and runs the render() function of a widget
+	 *
+	 * @param string $path
+	 * @param array $params
+	 */
+	public static function widget($path, $params = null){
+		$widget = self::beginWidget($path, $params);
+		return $widget->render();
+	}	
 }
