@@ -2,11 +2,10 @@
 /**
  * Default Session Class
  *
- * This is the default session clas of the framework.
- *
- * @author Sam Millman
+ * This is the default session class of the framework.
  */
-class session extends GApplicationComponent{
+
+class session extends Component{
 
 	public $timeout = 5;
 	public $allowCookies = true;

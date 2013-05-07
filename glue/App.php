@@ -10,21 +10,21 @@ class App{
 	public static $params = array();
 
 	public static $action;
-	
+
 	public static $controller;
 	public static $view;
 	public static $http;
 	public static $session;
 	public static $auth;
-	
+
 	public static $config;
 
 	private static $_events = array();
-	
+
 	private static $_namespaces = array();
 	private static $_directories = array();
 	private static $_aliases = array();
-	
+
 	private static $_components = array();
 	private static $_imported = array();
 
@@ -35,10 +35,10 @@ class App{
 			if(isset(self::$_components[$name])){
 				return self::$_components[$name];
 			}else{
-				return self::$_components[$name] = self::createObject($config);
+				return self::$_components[$name] = self::createComponent($config);
 			}
 		}else{
-			throw new Exception("The component or variable or alias of a variable or plugin (".$name.") in the glue class could not be found");
+			throw new Exception("The component (".$name.") could not be found");
 		}
 	}
 
@@ -55,18 +55,18 @@ class App{
 		set_exception_handler("ErrorHandler"); // Exceptions are costly beware!
 		register_shutdown_function('shutdown');
 
+		self::$auth = new Auth(self::config('auth'));
+		self::$http = new Http();
+		self::$session = new Session(self::config('session'));
+
 		if(php_sapi_name() == 'cli'){
 			$args = self::http()->parseArgs($_SERVER['argv']);
 
-			if(isset($args[0])):
-				$file_name = ROOT.'/application/cli/'.$args[0];
-				if(file_exists($file_name)): include $file_name; else: trigger_error("Could not find ".$args[0]." for cli"); endif;
-			else:
-				trigger_error("Could not find ".$args[0]." for cli");
-			endif;
-			exit(); // END further processing
+			if(isset($args[0]) && self::import('cli/'.$args[0])){
+			}else
+				throw new Exception("Could not find ".$args[0]." for cli");
 		}else{
-			self::session()->start(); // NO SESSION IN CLI
+			self::$session->start(); // NO SESSION IN CLI
 			$url = (empty($url)) || ($url == "/") ? 'index' : $url;
 			self::route($url);
 		}
@@ -89,26 +89,17 @@ class App{
 		/** Define the controller name as a variable to stop ambiquity within PHP */
 		$controller_name = $urlParts[0]."Controller";
 
-		/** Lets get the controller path ready. */
-		$controllerFile = ROOT.'/application/controllers/'.$urlParts[0].'Controller.php';
-
 		/** Lets see if an action is defined */
 		$action = isset($urlParts[1]) && (string)$urlParts[1] ? $urlParts[1] : "";
 
 		if(!isset($urlParts[1]))
 			$action = 'index';
 
-		/** Does the page exist? */
-		if(!file_exists($controllerFile)){
-			if(!file_exists(ROOT.'/application/controllers/'.ucfirst($urlParts[0]).'Controller.php')){
-				self::trigger('404');
-			}else{
-				$controllerFile = ROOT.'/application/controllers/'.ucfirst($urlParts[0]).'Controller.php';
-			}
+		if(!self::import('controllers/'.$controller_name)){
+			self::trigger('404');
 		}
 
 		/** So lets load the controller now that it exists */
-		include_once $controllerFile;
 		if(is_callable(array($controller_name, 'action_'.$action))){
 			$action = 'action_'.$action;
 		}else{
@@ -120,7 +111,7 @@ class App{
 
 		$reflector = new ReflectionClass($controller_name);
 		$method = $reflector->getMethod($action);
-		self::$action = array('controller' => $method->class, 'name' => str_replace('action_', '', $method->name), 
+		self::$action = array('controller' => $method->class, 'name' => str_replace('action_', '', $method->name),
 								'actionID' => $method->name,  'params' => $method->getParameters());
 
 		/** run the action */
@@ -156,48 +147,44 @@ class App{
 	 * @param string $cPath
 	 */
 	public static function import($class, $return_cName = false){
-		
+
 		$class = ltrim($class, '\\');
 		$pathinfo = pathinfo($class);
-		
+
 		if(isset(self::$_aliases[$class])){
 			return class_alias(self::$_aliases[$class],$class);
 		}
-		
-		if(isset($pathinfo['extension'])){
-			// from the best that I can tell this is a normal old file
-			return include str_replace('/', DIRECTORY_SEPARATOR, ROOT.'/'.$class);
-		}		
-		
+
 		// PSR-0 denotes that classes can be loaded with both \ and _ being translated to / (DIRECTORY_SEPARATOR)
 		$file_name=str_replace(array('\\', '_'), DIRECTORY_SEPARATOR, ROOT.'\\'.$class).'.php';
 		if(file_exists($file_name)){
 			self::$_imported[$class] = $file_name;
-			return include file_name;				
+			return include file_name;
 		}
 
-			// Go through each of the directories			
-			$file_name=str_replace('/', DIRECTORY_SEPARATOR, ROOT.'/'.$class);
+		// Go through each of the directories
+		$file_name=str_replace('/', DIRECTORY_SEPARATOR, ROOT.'/'.$class.'.php');
+		var_dump($file_name);
+		if(file_exists($file_name)){
+			self::$_imported[$pathinfo['filename']] = $file_name;
+			return include file_name;
+		}
+
+		// Test if the file in one of the other directories
+		foreach(self::$_directories as $directory){
+			$file_name = str_replace('/', DIRECTORY_SEPARATOR, ROOT.'/'.$directory.'/'.$pathinfo['filename'].'.php');
 			if(file_exists($file_name)){
 				self::$_imported[$pathinfo['filename']] = $file_name;
 				return include file_name;
 			}
-
-			// Test if the file in one of the other directories
-			foreach(self::$_directories as $directory){
-				$file_name = str_replace('/', DIRECTORY_SEPARATOR, ROOT.'/'.$directory.'/'.$pathinfo['filename'].'.php');
-				if(file_exists($file_name)){
-					self::$_imported[$pathinfo['filename']] = $file_name;
-					return include file_name;
-				}
-			}
+		}
 		return false;
 	}
 
 	public static function registerAutoloader($callback = null){
-		spl_autoload_unregister(array('App','import'));
+		spl_autoload_unregister(array('\glue\App','import'));
 		if($callback) spl_autoload_register($callback);
-		spl_autoload_register(array('App','import'));
+		spl_autoload_register(array('\glue\App','import'));
 	}
 
 	/**
@@ -206,38 +193,26 @@ class App{
 	 * @param string $path
 	 */
 	public static function setConfig($conf){
-		
+var_dump($conf);
 		if(is_string($conf))
 			$config = self::import($conf);
 		else
 			$config=$conf;
-		
+
 		if(isset($config['extends'])){
 			$parent_config = self::import($config['extends']);
 			$config = self::mergeConfiguration($parent_config, $config);
 		}
-		
+
+		self::$config = $config;
+
 		self::$_components = array();
-		self::$config = $config;		
-		
-		if(isset($config['params']) && is_array($config['params']))
-			self::$params = $config['params'];	
-		
-		if(isset($config['aliases']) && is_array($config['aliases']))
-			self::$_aliases = $config['aliases'];
-
-		if(isset($config['namespaces']) && is_array($config['namespaces']))
-			self::$_namespaces = $config['namespaces'];
-		
-		if(isset($config['directories']) && is_array($config['directories']))
-			self::$_directories = $config['directories'];		
-
-		foreach($config['preload'] as $k => $path)
-			self::import($path);		
-		
-
+		self::$params=self::config('params',array());
+var_dump(self::$config);
+		foreach(self::config('preLoad',array()) as $k => $path)
+			self::import($path);
 	}
-	
+
 	public static function mergeConfiguration(){
 		if (func_num_args() < 2) {
 			throw new Exception(__FUNCTION__ .' needs two or more array arguments');
@@ -245,7 +220,7 @@ class App{
 		}
 		$arrays = func_get_args();
 		$merged = array();
-		
+
 		while ($arrays) {
 			$array = array_shift($arrays);
 			if (!is_array($array)) {
@@ -263,9 +238,9 @@ class App{
 			else
 				$merged[] = $value;
 		}
-		return $merged;		
+		return $merged;
 	}
-	
+
 	/**
 	 * Creates and initialises a Glue component and returns it.
 	 * @param unknown_type $config
@@ -294,18 +269,32 @@ class App{
 		}
 		return $config === array() ? new $class : new $class($config);
 	}
-	
-	public static function trigger(){
-		
+
+	public static function trigger($event){
+
+		$events = self::config($events, 'events');
+
+		if($events!==null){
+
+
+
+		}
+		if(isset(self::$_events[$event])){
+			foreach(self::$_events[$event] as $event => $f){
+				//if($f)
+				if($f instanceof Closure || is_function($f))
+					$f();
+			}
+		}
 	}
-	
+
 	public static function bindEvent($event, $callback){
-		
+
 	}
-	
+
 	public static function unbindEvent($event){
-		
-	} 
+
+	}
 
 	/**
 	 * Gets a top level configuration variable
@@ -313,15 +302,17 @@ class App{
 	 * @param string $key
 	 * @param string $section
 	 */
-	public static function config($key = null, $section = null){
-		if(!$key && !$section){
-			return self::$config;
-		}elseif($key && !$section){
-			return isset(self::$config[$key]) ? self::$config[$key] : null;
-		}elseif($key && $section){
-			return isset(self::$config[$section][$key]) ? self::$config[$section][$key] : null;
+	public static function config($path, $default=null){
+		$path_parts = explode('::', $path);
+		$last_part = self::$config;
+		foreach($path_parts as $k){
+			if(!isset($last_part[$k])){
+				return $default;
+			}
+			$last_part = &$last_part[$k];
 		}
+		return $last_part;
 	}
 }
 
-class Exception extends Exception{}
+class Exception extends \Exception{}

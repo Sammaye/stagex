@@ -392,7 +392,7 @@ return array(
 	 * in a eager manner, it will just store these as places to look within the global namespace.
 	 */
 	'dirctories' => array(
-		"models", // Models are added to global scope
+		//"models", // Models are added to global scope
 	),
 
 	/**
