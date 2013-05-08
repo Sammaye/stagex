@@ -28,6 +28,8 @@ class App{
 	private static $_components = array();
 	private static $_imported = array();
 
+	private static $classMap=array();
+
 	public static function __callStatic($name, $arguments){
 		$config = self::config($name, "components");
 
@@ -55,9 +57,15 @@ class App{
 		set_exception_handler("ErrorHandler"); // Exceptions are costly beware!
 		register_shutdown_function('shutdown');
 
-		self::$auth = new Auth(self::config('auth'));
-		self::$http = new Http();
-		self::$session = new Session(self::config('session'));
+		self::registerComponents(array(
+			'auth' => Collection::mergeArray(array(
+				'class' => '\\glue\\Auth'
+			), self::conf('auth')),
+			'session' => self::conf('session'),
+			'http' => array(
+				'class' => '\\glue\\Http'
+			)
+		));
 
 		if(php_sapi_name() == 'cli'){
 			$args = self::http()->parseArgs($_SERVER['argv']);
@@ -74,63 +82,16 @@ class App{
 
 	/**
 	 * Routes a url segment to a controller and displays that controller action
-	 *
 	 * @param string $route
 	 */
 	public static function route($route = null){
-		if($route===null)
-			throw new Exception("You cannot get no controller. You must supply a controller to get in the params.");
-
-		$route = (empty($route)) || ($route == "/") ? 'index' : $route;
-
-		/** Explode the url so we can analyse it */
-		$urlParts = array_merge(array_filter(explode('/', $route)));
-
-		/** Define the controller name as a variable to stop ambiquity within PHP */
-		$controller_name = $urlParts[0]."Controller";
-
-		/** Lets see if an action is defined */
-		$action = isset($urlParts[1]) && (string)$urlParts[1] ? $urlParts[1] : "";
-
-		if(!isset($urlParts[1]))
-			$action = 'index';
-
-		if(!self::import('controllers/'.$controller_name)){
+		self::trigger('beforeRequest');
+		try{
+			self::runAction($route /* Do not yet support params transposed here */);
+		}catch(Exception $e){
 			self::trigger('404');
 		}
-
-		/** So lets load the controller now that it exists */
-		if(is_callable(array($controller_name, 'action_'.$action))){
-			$action = 'action_'.$action;
-		}else{
-			self::trigger('404');
-		}
-
-		/** store info about the action */
-		$controller = new $controller_name();
-
-		$reflector = new ReflectionClass($controller_name);
-		$method = $reflector->getMethod($action);
-		self::$action = array('controller' => $method->class, 'name' => str_replace('action_', '', $method->name),
-								'actionID' => $method->name,  'params' => $method->getParameters());
-
-		/** run the action */
-		// Now run the filters for the controller
-		$filters = is_array($controller->filters()) ? $controller->filters() : array();
-		$runAction = true;
-		foreach($filters as $k => $v){
-			$runAction = glue::$v()->beforeControllerAction($controller, self::$action) && $runAction;
-		}
-
-		if($runAction)
-			$controller->$action();
-
-		foreach($filters as $k => $v){
-			if(!is_numeric($k)){
-				glue::$v()->afterControllerAction($controller, self::$action);
-			}
-		}
-
+		self::trigger('afterRequest');
 //		if(!self::http()->isAjax() && glue::config('DEBUG') === true){
 //			$size = memory_get_peak_usage(true);
 //			$unit=array('','KB','MB','GB','TB','PB');
@@ -138,6 +99,93 @@ class App{
 //			var_dump($size/pow(1024,($i=floor(log($size,1024)))));
 //		}
 		exit(); // Finished rendering exit now
+	}
+
+	/**
+	 * Runs an action according to a route
+	 * @param string $route
+	 * @param array $params
+	 * @throws Exception If the controller could not be resolved.
+	 */
+	static function runAction($route,$params = array()){
+
+		$controller = self::createController($route);
+		if(is_array($controller)){
+			list($controller,$action)=$controller;
+			if(self::trigger('beforeAction')){
+				self::$controller = $controller;
+				$controller->runAction($route,$params);
+			}
+			self::trigger('afterAction');
+		}else
+			throw new Exception('Could not resolve the request: '.$route);
+	}
+
+	/**
+	 * Create a new controller
+	 * @param string $route
+	 */
+	static function createController($route){
+
+		if ($route === '') {
+			$route = self::conf('defaultRoute', 'index');
+		}
+		if (($pos = strpos($route, '/')) !== false) {
+			$id = substr($route, 0, $pos); // Lets get the first bit before the first /
+			$route = substr($route, $pos + 1); // then lets get everything else
+		} else {
+			$id = $route;
+			$route = '';
+		}
+
+		$controllerName = $id."Controller";
+		$controllerFile = self::getBasePath() . ( self::config('controllerRoot')!==null ? self::config('controllerRoot') : 'controllers' ) .
+								$controllerName . '.php';
+		$className = ltrim(self::config('controllerNamespace') . '\\' . $controllerName, '\\');
+
+		if(isset(self::$classMap[$className])){
+			$controller = new self::$classMap[$className]['file'];
+		}elseif(is_file($controllerFile)){
+
+			// cache this response so we don't do it everytime
+			self::$classMap[$className] = array(
+				'class' => $className,
+				'name' => $controllerName,
+				'file' => $controllerFile
+			);
+			$controller = new $className;
+		}
+
+		return isset($controller) ? array($controller,$route) : false;
+	}
+
+	/**
+	 * Creates and initialises a Glue component and returns it.
+	 * @param unknown_type $config
+	 * @throws Exception
+	 */
+	public static function createComponent($config){
+
+		if (is_string($config)) {
+			$class = $config;
+			$config = array();
+		} elseif (isset($config['class'])) {
+			$class = $config['class'];
+			unset($config['class']);
+		} else {
+			throw new Exception('Object configuration must be an array containing a "class" element.');
+		}
+
+		if (!class_exists($class, false)) {
+			$class = self::import($class);
+		}
+
+		$class = ltrim($class, '\\');
+
+		if (self::config($class,'components')!==null) {
+			$config = array_merge(self::config($class,'components'), $config);
+		}
+		return $config === array() ? new $class : new $class($config);
 	}
 
 	/**
@@ -241,35 +289,6 @@ var_dump(self::$config);
 		return $merged;
 	}
 
-	/**
-	 * Creates and initialises a Glue component and returns it.
-	 * @param unknown_type $config
-	 * @throws Exception
-	 */
-	public static function createComponent($config){
-
-		if (is_string($config)) {
-			$class = $config;
-			$config = array();
-		} elseif (isset($config['class'])) {
-			$class = $config['class'];
-			unset($config['class']);
-		} else {
-			throw new Exception('Object configuration must be an array containing a "class" element.');
-		}
-
-		if (!class_exists($class, false)) {
-			$class = self::import($class);
-		}
-
-		$class = ltrim($class, '\\');
-
-		if (self::config($class,'components')!==null) {
-			$config = array_merge(self::config($class,'components'), $config);
-		}
-		return $config === array() ? new $class : new $class($config);
-	}
-
 	public static function trigger($event){
 
 		$events = self::config($events, 'events');
@@ -288,11 +307,11 @@ var_dump(self::$config);
 		}
 	}
 
-	public static function bindEvent($event, $callback){
+	public static function on($event, $callback){
 
 	}
 
-	public static function unbindEvent($event){
+	public static function off($event){
 
 	}
 
