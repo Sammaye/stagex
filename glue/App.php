@@ -121,6 +121,24 @@ class App{
 			throw new Exception('Could not resolve the request: '.$route);
 	}
 
+	static function runCliAction(){
+		if ($route === '') {
+			$route = self::conf('defaultRoute', 'index');
+		}
+		if (($pos = strpos($route, '/')) !== false) {
+			$id = substr($route, 0, $pos); // Lets get the first bit before the first /
+			$route = substr($route, $pos + 1); // then lets get everything else
+		} else {
+			$id = $route;
+			$route = '';
+		}
+
+		$controllerName = $id."Controller";
+		$controllerFile = self::getBasePath() . ( self::config('controllerRoot')!==null ? self::config('controllerRoot') : 'controllers' ) .
+								$controllerName . '.php';
+		include($controllerFile);
+	}
+
 	/**
 	 * Create a new controller
 	 * @param string $route

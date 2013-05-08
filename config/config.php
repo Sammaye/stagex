@@ -384,7 +384,7 @@ return array(
 	 * making your life bareable
 	 */
 	'namespaces' => array(
-		'mongoglue' => 'glue\\plugins\\mongodb'
+		'mongoglue' => '@app/glue/plugins/mongodb'
 	),
 
 	/**

@@ -6,6 +6,24 @@ namespace glue;
  */
 class File extends \glue\Component{
 
+	function open($path){
+
+	}
+
+	function save(){
+
+	}
+
+	function saveAs(){
+
+	}
+
+	static function getInstance($model,$id){
+		if(is_string($model)){
+
+		}
+	}
+
 	// Read a file and display its content chunk by chunk
 	function readfile_chunked($filename, $retbytes = TRUE) {
 		$buffer = '';
