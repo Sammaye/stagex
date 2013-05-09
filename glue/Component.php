@@ -9,7 +9,7 @@ class Component{
 			$this->$k=$v;
 		$this->init();
 	}
-	
+
 	function init(){ return true; }
 
 	function attributes($a){
@@ -20,7 +20,7 @@ class Component{
 		}
 	}
 
-	function beforeControllerAction($controller, $action){ return true; }
+	function beforeAction($controller, $action){ return true; }
 
-	function afterControllerAction($controler, $action){ return true; }
+	function afterAction($controler, $action){ return true; }
 }

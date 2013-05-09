@@ -30,11 +30,18 @@ return array(
 		'Auth'
 	),
 
-	// Defines modules which can be access like parts of the site.
-	'modules' => array(),
-
 	// This part houses all of the configuration settings for framework components
 	'components' => array(
+
+		/**
+		 * Configures the session handler
+		 */
+		"session"=>array(
+			"class" => "glue\\extended\\Session",
+			"timeout"=>5,
+			"allowCookies"=>true,
+			'cookieDomain' => '.stagex-local.co.uk'
+		),
 
 		// MongoDB configuration settings
 		"db"=>array(
@@ -191,15 +198,6 @@ return array(
 	),
 
 	/**
-	 * Configures the session handler
-	 */
-	"session"=>array(
-		"timeout"=>5,
-		"allowCookies"=>true,
-		'cookieDomain' => '.stagex-local.co.uk'
-	),
-
-	/**
 	 * Controls the error handler
 	 */
 	'errors' => array(
@@ -241,8 +239,15 @@ return array(
 		/**
 		 * Hooks for before page load and after page load
 		 */
-		'before' => function(){},
-		'after' => function(){}
+		'beforeRequest' => function(){},
+		'afterRequest' => function(){
+//			if(!glue::http()->isAjax() && glue::config('DEBUG') === true){
+//				$size = memory_get_peak_usage(true);
+//				$unit=array('','KB','MB','GB','TB','PB');
+//				echo '<div class="clearer"></div>';
+//				var_dump($size/pow(1024,($i=floor(log($size,1024)))));
+//			}
+		}
 	),
 
 	/**

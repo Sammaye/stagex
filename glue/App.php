@@ -1,11 +1,16 @@
 <?php
-namespace glue;
-
 setlocale(LC_ALL, 'en_GB.UTF8');
 
 use \glue\Exception as Exception;
 
-class App{
+class glue{
+
+	public static $name;
+	public static $www;
+	public static $root;
+
+	public static $description;
+	public static $keywords;
 
 	public static $params = array();
 
@@ -67,15 +72,12 @@ class App{
 			)
 		));
 
+		self::$session->start(); // I want a session to exist in
+
 		if(php_sapi_name() == 'cli'){
 			$args = self::http()->parseArgs($_SERVER['argv']);
-
-			if(isset($args[0]) && self::import('cli/'.$args[0])){
-			}else
-				throw new Exception("Could not find ".$args[0]." for cli");
+			self::runCliAction();
 		}else{
-			self::$session->start(); // NO SESSION IN CLI
-			$url = (empty($url)) || ($url == "/") ? 'index' : $url;
 			self::route($url);
 		}
 	}
@@ -92,12 +94,6 @@ class App{
 			self::trigger('404');
 		}
 		self::trigger('afterRequest');
-//		if(!self::http()->isAjax() && glue::config('DEBUG') === true){
-//			$size = memory_get_peak_usage(true);
-//			$unit=array('','KB','MB','GB','TB','PB');
-//			echo '<div class="clearer"></div>';
-//			var_dump($size/pow(1024,($i=floor(log($size,1024)))));
-//		}
 		exit(); // Finished rendering exit now
 	}
 
@@ -333,6 +329,33 @@ var_dump(self::$config);
 
 	}
 
+	public static function getRootPath(){
+
+	}
+
+	public static function setRootPath(){
+
+	}
+
+	public static function setControllerPath(){
+
+	}
+
+	public static function getControllerPath(){
+
+	}
+
+	public static function registerComponents($config){
+
+
+
+		//self::$componentConfig
+	}
+
+	public static function unregisterComponents($){
+
+	}
+
 	/**
 	 * Gets a top level configuration variable
 	 *
@@ -351,5 +374,14 @@ var_dump(self::$config);
 		return $last_part;
 	}
 }
+
+class Config extends \glue\Component{
+
+
+
+
+
+}
+
 
 class Exception extends \Exception{}
