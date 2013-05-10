@@ -222,16 +222,7 @@ class ErrorHandler{
 
 	    $attributes = Glue::config("errorHandler", 'components');
 
-	    if ($error = error_get_last()){
-	    	switch($error['type']){
-	        	case E_ERROR:
-	        	case E_CORE_ERROR:
-	        	case E_COMPILE_ERROR:
-	        	case E_USER_ERROR:
-	            	$isError = true;
-	            	break;
-	        }
-	    }
+	    $error = error_get_last();
 
 	    if ($isError){
 

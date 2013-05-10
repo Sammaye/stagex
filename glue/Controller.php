@@ -6,6 +6,9 @@ use glue;
 
 class Controller {
 
+	const HEAD = 1;
+	const BODY_END = 2;
+
 	public $layout = "blank_page";
 	public $pageTitle;
 	public $pageDescription;
@@ -13,24 +16,28 @@ class Controller {
 
 	public function filters(){ return array(); }
 
-	function addCssFile($map, $path){
-		glue::clientScript()->addCssFile($map, $path);
+	function addCssFile($map, $path, $media = null, $POS = 'HEAD', $core=false){
+		$this->cssTags[$map] = array('map' => $map, 'path' => $path, 'type' => 'file', 'media' => $media, 'pos' => $POS);
 	}
 
-	function addCssScript($map, $script){
-		glue::clientScript()->addCssScript($map, $script);
+	function addCssScript($map, $script, $media = null, $POS = 'END'){
+		$this->cssTags[$map] = array( 'script' => $script, 'type' => 'script', 'media' => $media, 'pos' => $POS );
 	}
 
-	function addJsFile($map, $script){
-		glue::clientScript()->addJsFile($map, $script);
+	function addJsFile($map, $path, $POS = 'HEAD', $core=false){
+		if(is_array($this->jsTags)){
+			$this->jsTags = array_merge(array($map => array( 'path' => $path, 'type' => 'file', 'pos' => self::HEAD )), $this->jsTags);
+		}else{
+			$this->jsTags[$map] = array( 'path' => $path, 'type' => 'file', 'pos' => self::HEAD  );
+		}
 	}
 
-	function addJsScript($map, $script){
-		glue::clientScript()->addJsScript($map, $script);
+	function addJsScript($map, $script, $POS = 'END'){
+		$this->jsTags[$map] = array( 'script' => $script, 'type' => 'script', 'pos' => $POS );
 	}
 
-	function addHeadTag($html){
-		glue::clientScript()->addTag($html, GClientScript::HEAD);
+	function addHeadTag($html, $POS = self::HEAD){
+		$this->tags[] = array( 'html' => $html, 'pos' => $POS );
 	}
 
 	function widget($path, $args = array()){
@@ -205,8 +212,7 @@ class Controller {
 		}
 	}
 
-	const HEAD = 1;
-	const BODY_END = 2;
+
 
 	private $coreCSS = array();
 
@@ -214,37 +220,7 @@ class Controller {
 	private $jsTags = array();
 	private $tags = array();
 
-	function addCoreCSSFile($map, $path, $media = null, $POS = self::HEAD){
-		$this->cssTags[$map] = array('map' => $map, 'path' => $path, 'type' => 'file', 'media' => $media, 'pos' => $POS, 'core' => true );
-	}
 
-	function addCssFile($map, $path, $media = null, $POS = self::HEAD){
-		$this->cssTags[$map] = array('map' => $map, 'path' => $path, 'type' => 'file', 'media' => $media, 'pos' => $POS, 'core' => false );
-	}
-
-	function addCssScript($map, $script, $media = null, $POS = self::HEAD){
-		$this->cssTags[$map] = array( 'script' => $script, 'type' => 'script', 'media' => $media, 'pos' => $POS );
-	}
-
-	function addCoreJsFile($map, $path){
-		if(is_array($this->jsTags)){
-			$this->jsTags = array_merge(array($map => array( 'path' => $path, 'type' => 'file', 'pos' => self::HEAD )), $this->jsTags);
-		}else{
-			$this->jsTags[$map] = array( 'path' => $path, 'type' => 'file', 'pos' => self::HEAD  );
-		}
-	}
-
-	function addJsFile($map, $path, $POS = self::HEAD){
-		$this->jsTags[$map] = array( 'path' => $path, 'type' => 'file', 'pos' => $POS  );
-	}
-
-	function addJsScript($map, $script, $POS = self::BODY_END){
-		$this->jsTags[$map] = array( 'script' => $script, 'type' => 'script', 'pos' => $POS );
-	}
-
-	function addTag($html, $POS = self::HEAD){
-		$this->tags[] = array( 'html' => $html, 'pos' => $POS );
-	}
 
 	/**
 	 * Inserts the scripts in the head section.

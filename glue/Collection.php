@@ -2,6 +2,8 @@
 
 namespace glue;
 
+use \glue\Exception;
+
 class Collection implements Iterator,IteratorAggregate,ArrayAccess,Countable{
 
 	private $_container;
@@ -110,7 +112,7 @@ class Collection implements Iterator,IteratorAggregate,ArrayAccess,Countable{
 	static function mergeArray() {
 
 	    if (func_num_args() < 2) {
-	        trigger_error(__FUNCTION__ .' needs two or more array arguments', E_USER_WARNING);
+	    	throw new Exception(__FUNCTION__ .' needs two or more array arguments');
 	        return;
 	    }
 	    $arrays = func_get_args();
@@ -119,7 +121,7 @@ class Collection implements Iterator,IteratorAggregate,ArrayAccess,Countable{
 	    while ($arrays) {
 	        $array = array_shift($arrays);
 	        if (!is_array($array)) {
-	            trigger_error(__FUNCTION__ .' encountered a non array argument', E_USER_WARNING);
+	        	throw new Exception(__FUNCTION__ .' encountered a non array argument');
 	            return;
 	        }
 	        if (!$array)
