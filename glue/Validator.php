@@ -1,5 +1,7 @@
 <?php
 
+namespace glue;
+
 /**
  * Extend this class to add your own validators
  */
