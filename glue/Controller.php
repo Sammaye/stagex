@@ -2,7 +2,7 @@
 
 namespace glue;
 
-use \glue\core;
+use glue;
 
 class Controller {
 

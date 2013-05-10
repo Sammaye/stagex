@@ -57,27 +57,34 @@ class glue{
 	public static function run($url = null){
 
 		self::registerAutoloader();
+		self::registerErrorHandlers();
 
-		set_error_handler("ErrorHandler");
-		set_exception_handler("ErrorHandler"); // Exceptions are costly beware!
-		register_shutdown_function('shutdown');
-
+		// Register the core components
 		self::registerComponents(array(
 			'auth' => Collection::mergeArray(array(
 				'class' => '\\glue\\Auth'
-			), self::conf('auth')),
-			'session' => self::conf('session'),
+			), self::conf('auth',array())),
+			'user' => array(
+				'class' => '\\app\\models\\User'
+			),
+			'errorHandler' => Collection::mergeArray(array(
+				'class' => '\\glue\\ErrorHandler',
+			),self::conf('errors',array())),
 			'http' => array(
 				'class' => '\\glue\\Http'
 			)
 		));
 
-		self::$session->start(); // I want a session to exist in
-
 		if(php_sapi_name() == 'cli'){
 			$args = self::http()->parseArgs($_SERVER['argv']);
 			self::runCliAction();
 		}else{
+
+			// There is no session in CLI...
+			self::registerComponents(array(
+				'session' => self::config('components::session')
+			));
+
 			self::route($url);
 		}
 	}
@@ -93,8 +100,7 @@ class glue{
 		}catch(Exception $e){
 			self::trigger('404');
 		}
-		self::trigger('afterRequest');
-		exit(); // Finished rendering exit now
+		self::end();
 	}
 
 	/**
@@ -171,6 +177,42 @@ class glue{
 		}
 
 		return isset($controller) ? array($controller,$route) : false;
+	}
+
+	static function registerErrorHandlers(){
+		set_error_handler(array(self,'handleError'));
+		set_exception_handler(array(self,'handleException')); // Exceptions are costly beware!
+		register_shutdown_function(array(self,'end'));
+	}
+
+	static function handleException($exception){
+
+		// disable error capturing to avoid recursive errors while handling exceptions
+		restore_error_handler();
+		restore_exception_handler();
+
+		$e=self::getComponent('errorHandler');
+		$e->handleFatal($exception);
+		self::end(1);
+	}
+
+	static function handleError($code, $message, $file, $line, $fatal=false){
+		$e=self::getComponent('errorHandler');
+		if($fatal)
+			$e->handle($code,$message,$file,$line);
+		else
+			$e->handleFatal($code,$message,$file,$line);
+		self::end(1);
+	}
+
+	static function end($status=0,$exit=true){
+
+		if ($error = error_get_last()){
+			self::handleFatal($error['type'], $error['message'], $message['file'], $message['line'], true);
+		}else if ($status<1) // If there was no error
+			self::trigger('afterRequest');
+		if($exit)
+			exit($status);
 	}
 
 	/**
