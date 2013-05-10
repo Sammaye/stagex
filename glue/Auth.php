@@ -1,33 +1,43 @@
 <?php
-class RbamModule extends ApplicationComponent{
 
-	public $defFile;
-	public $config;
+namespace glue;
 
+use \glue\Exception;
+
+class Auth extends \glue\Component{
+
+	public $shortcuts;
+	public $filters; 
+	
 	function init(){
-		$this->config = glue::import($this->defFile);
+		glue::registerEvents(array(
+			'beforeAction' => 'beforeAction'
+		),$this);
+		parent::init();
 	}
 
-	function beforeControllerAction($controller, $action){
-		if(is_callable(array($action['controller'], 'accessRules'))){
-			if($this->hasAccessRights($controller->accessRules(), $action['name'])){
-				//echo "here";
+	function beforeAction($controller,$action){
+		if(is_callable(array($controller, $action))){
+			if($this->hasAccessRights($controller->accessRules(), $action)){
 				return true;
 			}else{
-				glue::route(glue::config("403", "errorPages"));
+				glue::trigger('403');
 				return false;
 			}
 		}else{
-			trigger_error('You defined a filter of RBAM but you did not provide any rules with which to evaluate the access rights. Please provide an accessRules() function.');
+			throw new Exception('You defined a auth filter but you did not provide any rules with which to evaluate the access rights. Please provide an accessRules() function.');
 		}
 	}
 
 	function getShortcut($name){
-		return $this->getRole($this->config['shortcuts'][$name]);
+		return $this->getRole(isset($this->shortcuts[$name])?$this->shortcuts[$name]:null);
 	}
 
-	function getRole($name){
-		return $this->config['roles'][$name];
+	function getFilter($name=null){
+		if(!$name)
+			return null;
+		else
+			return $this->fitlers[$name];
 	}
 
 	/**

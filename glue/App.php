@@ -365,13 +365,13 @@ var_dump(self::$config);
 		return $merged;
 	}
 
-	public static function trigger($event){
+	public static function trigger($event, $data=array()){
 
 		$event_success = true;
 		if(is_array(self::$_events) && isset(self::$_events[$event])){
 			foreach(self::$_events as $i => $f){
 				if(is_array($f)){
-					$event_success=call_user_func_array($f)&&$event_success;
+					$event_success=call_user_func_array($f,$data)&&$event_success;
 				}else{
 					$event_success=$f()&&$event_success;
 				}
