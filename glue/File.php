@@ -6,9 +6,7 @@ use \glue\Exception;
 /**
  * This represents any kind of file, including uploaded ones
  */
-class File extends \glue\Component /*implements Iterator,ArrayAccess,Countable*/{
-
-	private $container;
+class File implements Iterator,IteratorAggregate,ArrayAccess,Countable{
 	
 	public $model;
 	public $name;
@@ -19,23 +17,11 @@ class File extends \glue\Component /*implements Iterator,ArrayAccess,Countable*/
 	
 	public $fh;
 	
-	public $upload = false;
-	
-	//protected static $inst=null;
+	private $upload = false;
+	private $collection = array();
 
-	private function __construct($config=array()){}
+	function __construct(){}
 	
-	/*
-	 * Not currently used due to not really knowing how it will work
-	function populateMany(){
-		$result = array();
-		foreach($vector as $key1 => $value1)
-			foreach($value1 as $key2 => $value2)
-			$result[$key2][$key1] = $value2;
-		return $result;
-	}
-	*/
-
 	function save($path=null){
 
 		if($this->upload){
@@ -84,41 +70,54 @@ class File extends \glue\Component /*implements Iterator,ArrayAccess,Countable*/
 		}		
 	}
 
-	static function populateUpload($model,$id){
+	function populateMultiUpload($model,$id){
+		$vector = $_FILES[$model][$id];
 		
-		static $inst=null;
-		if ($inst === null) {
+		if(is_array($vector)){
+			$result = array();
+			foreach($vector as $key1 => $value1)
+				foreach($value1 as $key2 => $value2)
+				$result[$key2][$key1] = $value2;
 			
-			$file_a = $_FILES[$model][$id];
+			foreach($result as $i => $file){
+				$m=new \glue\File();
+				foreach($file as $f=>$v)
+					$m->$f=$v;
+				$m->upload=true;
+				$m->model=$model;
+				$this->collection[]=$m;
+			}
+		}else
+			throw new Exception("Field $id in $model was not found to have a valid value");
+	}
+
+	function populateUpload($model,$id){
+			
+		$file_a = $_FILES[$model][$id];
 				
-			if(is_array($file_a)){
-				$inst = new \glue\File();
-				$inst->model=$model;
-				$inst->upload=true;
-				foreach($a as $k => $v)
-					$inst->$k=$v;
-			}else
-				throw new Exception("Field $id in $model was not found to have a valid value");			
-		}
-		return $inst;			
+		if(is_array($file_a)){
+			$this->model=$model;
+			$this->upload=true;
+			foreach($a as $k => $v)
+				$this->$k=$v;
+		}else
+			throw new Exception("Field $id in $model was not found to have a valid value");				
 	}
 	
-	static function open($handler,$mode='r'){
-		
-		static $inst=null;
-		if ($inst === null) {		
-			$inst=new \glue\File();
-			if(get_resource_type($handler) == 'file'){
-				$inst->fh=$handler;
-			}elseif(is_string($handler)){
-				if(($handle = fopen($handler, $mode))===false)
-					throw new Exception('Could not open file '.$handler);
-				else
-					$inst->fh=$handle;
-			}else
-				throw new Exception('A file object must be constructed from something');
-		}
-		return $inst;
+	function open($handler,$mode='r'){
+
+		if(get_resource_type($handler) == 'file'){
+			$this->fh=$handler;
+			$this->upload=false;
+		}elseif(is_string($handler)){
+			if(($handle = fopen($handler, $mode))===false)
+				throw new Exception('Could not open file '.$handler);
+			else{
+				$this->fh=$handle;
+				$this->upload=false;
+			}
+		}else
+			throw new Exception('A file object must be constructed from something');
 	}
 
 	// Read a file and display its content chunk by chunk
@@ -143,7 +142,54 @@ class File extends \glue\Component /*implements Iterator,ArrayAccess,Countable*/
 		return $status;
 	}
 	
-	protected function __clone(){
-		throw new Exception('A file object cannot be cloned.');
-	}	
+	public function count(){
+		return count($this->collection);
+	}
+	
+	public function offsetSet($offset, $value) {
+		if (is_null($offset)) {
+			$this->collection[] = $value;
+		} else {
+			$this->collection[$offset] = $value;
+		}
+	}
+	
+	public function offsetExists($offset) {
+		return isset($this->collection[$offset]);
+	}
+	
+	public function offsetUnset($offset) {
+		unset($this->collection[$offset]);
+	}
+	
+	public function offsetGet($offset) {
+		if(isset($this->collection[$offset])){
+			return $this->collection[$offset];
+		}
+		return null; //Else lets just return normal
+	}
+	
+	public function rewind() {
+		reset($this->collection);
+	}
+	
+	public function current() {
+		if(current($this->collection) !== false){
+			return current($this->collection);
+		}else{
+			return false;
+		}
+	}
+	
+	public function key() {
+		return key($this->collection);
+	}
+	
+	public function next() {
+		return next($this->collection);
+	}
+	
+	public function valid() {
+		return $this->current() !== false;
+	}
 }
