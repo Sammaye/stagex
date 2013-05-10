@@ -14,39 +14,27 @@ class glue{
 
 	public static $params = array();
 
-	public static $action;
-
 	public static $controller;
-	public static $view;
-	public static $http;
-	public static $session;
-	public static $auth;
-
 	public static $config;
 
-	private static $_events = array();
+	private static $namespaces = array();
+	private static $directories = array();
+	private static $aliases = array();
 
-	private static $_namespaces = array();
-	private static $_directories = array();
-	private static $_aliases = array();
+	private static $_events = array();
 
 	private static $_components = array();
 	private static $_imported = array();
 
 	private static $classMap=array();
 
+	/**
+	 * This is the magic to return components of the framework
+	 * @param unknown_type $name
+	 * @param unknown_type $arguments
+	 */
 	public static function __callStatic($name, $arguments){
-		$config = self::config($name, "components");
-
-		if(isset($config) && $config){ // If is still unset then go to error clause
-			if(isset(self::$_components[$name])){
-				return self::$_components[$name];
-			}else{
-				return self::$_components[$name] = self::createComponent($config);
-			}
-		}else{
-			throw new Exception("The component (".$name.") could not be found");
-		}
+		return self::getComponent($name, $arguments);
 	}
 
 	/**
@@ -54,19 +42,22 @@ class glue{
 	 *
 	 * @param string $url This is the url defined within the address bar which translates down to $_GET['url']
 	 */
-	public static function run($url = null){
+	public static function run($url = null,$config=array()){
 
 		self::registerAutoloader();
 		self::registerErrorHandlers();
+
+		// Really not sure if this is what I want
+		//self::$conf=new Config($config);
 
 		// Register the core components
 		self::registerComponents(array(
 			'auth' => Collection::mergeArray(array(
 				'class' => '\\glue\\Auth'
 			), self::conf('auth',array())),
-			'user' => array(
-				'class' => '\\app\\models\\User'
-			),
+			'user' => Collection::mergeArray(array(
+				'class' => '\\glue\\User'
+			),self::conf('user',array())),
 			'errorHandler' => Collection::mergeArray(array(
 				'class' => '\\glue\\ErrorHandler',
 			),self::conf('errors',array())),
@@ -75,8 +66,16 @@ class glue{
 			)
 		));
 
+		$root=self::conf('root');
+		if($root){
+			self::$root=$root;
+		}else
+			throw new Exception('The "root" configuration variable must be set.');
+
 		if(php_sapi_name() == 'cli'){
 			$args = self::http()->parseArgs($_SERVER['argv']);
+			self::$www='/cli';
+
 			self::runCliAction();
 		}else{
 
@@ -84,6 +83,7 @@ class glue{
 			self::registerComponents(array(
 				'session' => self::config('components::session')
 			));
+			self::$www = self::conf('www')!==null ? self::conf('www') : self::http()->getBaseUrl();
 
 			self::route($url);
 		}
@@ -229,7 +229,7 @@ class glue{
 			$class = $config['class'];
 			unset($config['class']);
 		} else {
-			throw new Exception('Object configuration must be an array containing a "class" element.');
+			throw new Exception('Component configuration must be an array containing a "class" element.');
 		}
 
 		if (!class_exists($class, false)) {
@@ -242,6 +242,26 @@ class glue{
 			$config = array_merge(self::config($class,'components'), $config);
 		}
 		return $config === array() ? new $class : new $class($config);
+	}
+
+	/**
+	 * Gets a component
+	 * @param string $name
+	 * @param array $config
+	 * @throws Exception
+	 */
+	public static function getComponent($name, $config=array()){
+		$config = Collection::mergeArray(self::config($name, "components"), $config);
+
+		if(!empty($config) && $config){ // If is still unset then go to error clause
+			if(isset(self::$_components[$name])&&self::$_components[$name]===null){
+				return self::$_components[$name];
+			}else{
+				return self::$_components[$name] = self::createComponent($config);
+			}
+		}else{
+			throw new Exception("The component (".$name.") could not be found");
+		}
 	}
 
 	/**
@@ -347,28 +367,54 @@ var_dump(self::$config);
 
 	public static function trigger($event){
 
-		$events = self::config($events, 'events');
-
-		if($events!==null){
-
-
-
-		}
-		if(isset(self::$_events[$event])){
-			foreach(self::$_events[$event] as $event => $f){
-				//if($f)
-				if($f instanceof Closure || is_function($f))
-					$f();
+		$event_success = true;
+		if(is_array(self::$_events) && isset(self::$_events[$event])){
+			foreach(self::$_events as $i => $f){
+				if(is_array($f)){
+					$event_success=call_user_func_array($f)&&$event_success;
+				}else{
+					$event_success=$f()&&$event_success;
+				}
 			}
 		}
+		return $event_success;
 	}
 
 	public static function on($event, $callback){
-
+		self::$_events[$event][] = $callback;
 	}
 
-	public static function off($event){
+	public static function off($event,$handler=null){
 
+		if(isset(self::$_events[$name])){
+			if($handler===null){
+				self::$_events[$name] = array();
+			}else{
+				$removed=false;
+				foreach(self::$_events[$name] as $i => $f){
+					if($f===$handler){
+						unset(self::$_events[$name][$i]);
+						$removed=true;
+						break; // If I have removed it I don't need to carry on removing it
+					}
+				}
+
+				if($removed)
+					self::$_events[$name] = array_values(self::$_events[$name]);
+				return $removed;
+			}
+		}
+		return false;
+	}
+
+	public static function registerEvents($events,$model=null){
+		foreach($events as $k =>$v){
+			if($model)
+				self::on($k,array($model,$v));
+			else
+				self::on($k,$v);
+		}
+		return true;
 	}
 
 	public static function getRootPath(){
@@ -380,6 +426,8 @@ var_dump(self::$config);
 	}
 
 	public static function setControllerPath(){
+
+
 
 	}
 
@@ -394,7 +442,7 @@ var_dump(self::$config);
 		//self::$componentConfig
 	}
 
-	public static function unregisterComponents($){
+	public static function unregisterComponents(){
 
 	}
 
@@ -415,15 +463,10 @@ var_dump(self::$config);
 		}
 		return $last_part;
 	}
+
+	public static function setConfig($path,$value){
+
+	}
 }
-
-class Config extends \glue\Component{
-
-
-
-
-
-}
-
 
 class Exception extends \Exception{}
