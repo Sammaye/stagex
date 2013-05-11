@@ -217,9 +217,9 @@ class Http{
 	function createUrl($path = '/', $params = array(), $host = '/', $scheme = 'http'){
 
 		if($host === null){
-			$host = glue::http()->baseUrl();
+			$host=$this->baseUrl();
 		}else if($host == '/'){
-			$host = glue::http()->baseUrl(true);
+			$host = $this->baseUrl(true);
 		}else{
 			if(strpos($host, 'http')!==0)
 				$host = $scheme.'://'.$host;
@@ -234,7 +234,7 @@ class Http{
 			$params = $_GET;
 			unset($params['url']);
 
-			$path = glue::http()->path();
+			$path = $this->path();
 			return $host.'/'.$path.(sizeof($params) > 0 ? '?'.$this->getParams($params) : '').($fragment ? '#'.$fragment : '');
 		}
 
@@ -247,7 +247,7 @@ class Http{
 			$getParams = $_GET;
 			unset($getParams['url']);
 			$params = array_merge($getParams, $path);
-			$path = '/'.glue::http()->path();
+			$path = '/'.$this->path();
 		}
 		return $host.$path.(sizeof($params) > 0 ? '?'.$this->getParams($params) : '').($fragment ? '#'.$fragment : '');
 	}
@@ -256,12 +256,12 @@ class Http{
 		if($returnObj){
 			return array();
 		}else{
-			return $this->create('SELF');
+			return $this->createUrl('SELF');
 		}
 	}
 
 	function redirect($url, $attr = array()){
-		header("Location: ".glue::url()->create($url, $attr, true));
+		header("Location: ".$this->createUrl($url, $attr, true));
 		exit();
 	}
 
