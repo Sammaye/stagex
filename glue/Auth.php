@@ -9,6 +9,8 @@ class Auth extends \glue\Component{
 	public $shortcuts;
 	public $filters; 
 	
+	private $controller;
+	
 	function init(){
 		glue::registerEvents(array(
 			'beforeAction' => 'beforeAction'
@@ -18,26 +20,27 @@ class Auth extends \glue\Component{
 
 	function beforeAction($controller,$action){
 		if(is_callable(array($controller, $action))){
-			if($this->hasAccessRights($controller->accessRules(), $action)){
+			$this->controller=$controller;
+			if($this->parseControllerRights($controller->authRules(), $action)){
 				return true;
 			}else{
 				glue::trigger('403');
 				return false;
 			}
-		}else{
-			throw new Exception('You defined a auth filter but you did not provide any rules with which to evaluate the access rights. Please provide an accessRules() function.');
 		}
 	}
 
 	function getShortcut($name){
-		return $this->getRole(isset($this->shortcuts[$name])?$this->shortcuts[$name]:null);
+		return isset($this->shortcuts[$name])?$this->shortcuts[$name]:null;
 	}
 
-	function getFilter($name=null){
-		if(!$name)
-			return null;
-		else
+	function getFilter($name){
+		if(($filter=$this->getShortcut($name))!==null)
+			return $filter;
+		elseif(isset($this->filters[$name]))
 			return $this->fitlers[$name];
+		else
+			return null;
 	}
 
 	/**
@@ -46,7 +49,7 @@ class Auth extends \glue\Component{
 	 * @param unknown_type $controllerPermissions
 	 * @param unknown_type $action
 	 */
-	public function hasAccessRights($controllerPermissions, $action){
+	public function parseControllerRights($controllerPermissions, $action){
 
 		foreach($controllerPermissions as $permission){
 
@@ -57,7 +60,10 @@ class Auth extends \glue\Component{
 				//var_dump($users);
 				foreach($users as $role){
 					//var_dump($role);
-					$func = array_key_exists($role, $this->config['shortcuts']) ? $this->getShortcut($role) : $this->getRole($role);
+					
+					if(($func=$this->getFilter($role))===null)
+						throw new Exception("The role based management shortcut: $role you specified within ".get_class($this->controller)." does not exist.");
+					
 					if(is_callable($func)){
 						if($func()){
 							//var_dump($permission);
@@ -70,24 +76,12 @@ class Auth extends \glue\Component{
 						}
 					}else{
 						//var_dump($permission); exit();
-						trigger_error("The role based management shortcut you specified within ".Glue::$action['controller']." does not exist.");
+						throw new Exception("The role based management shortcut you specified within ".get_class($this->controller)." does not exist.");
 					}
 
-					// No Hit. Only do on allow rules
+					// No Hit. Only do on allow rules // This should be returning true shouldn't it??
 					if($permission[0] == "allow" && (array_key_exists($action, array_flip($actions)) || count($actions) <= 0)){
-						if(isset($permission['response']['redirect'])){
-							if($permission['response']['flash'])
-							//glue::setErrorFlashMessage(', $message)()->ERROR($permission['response']['flash']);
-
-							header("Location: ".$permission['response']['redirect']);
-							exit();
-							return false;
-						}else{
-							$f_n = $permission['response'];
-							$f_n();
-							exit();
-							return false;
-						}
+						return false;
 					}
 				}
 			}
@@ -95,6 +89,7 @@ class Auth extends \glue\Component{
 		return true;
 	}
 
+	// This is used as a means to else where
 	public function checkRoles($roles, $all = false){
 		$matched = true;
 		foreach($roles as $role=>$params){
@@ -104,12 +99,14 @@ class Auth extends \glue\Component{
 				$params = null;
 			}
 
-			$func = array_key_exists($role, $this->config['shortcuts']) ? $this->getShortcut($role) : $this->getRole($role);
+			if(($func=$this->getFilter($role))===null)
+				throw new Exception("The role based management shortcut: $role you specified does not exist.");			
+			
 			if(is_callable($func)){
 				$matched = $func($params) && $matched;
 				if(!$all && $matched) return true;
 			}else{
-				trigger_error("The role based management shortcut you specified within ".Glue::$action['controller']." does not exist.");
+				throw new Exception("The role based management shortcut: $role you specified within does not exist.");
 			}
 		}
 		return $matched;

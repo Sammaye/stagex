@@ -93,7 +93,7 @@ class glue{
 	 * Routes a url segment to a controller and displays that controller action
 	 * @param string $route
 	 */
-	public static function route($route = null){
+	public static function route($route = null, $runEvents=true){
 		self::trigger('beforeRequest');
 		try{
 			self::runAction($route /* Do not yet support params transposed here */);

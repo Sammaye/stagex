@@ -17,7 +17,14 @@ namespace glue;
  * so I have made this kinda free standing.
  *
  */
-class ErrorHandler{
+class ErrorHandler extends \glue\Component{
+	
+	public $emails = array();
+	public $action = 'index/error';
+	
+	public $log=false;
+	public $logger=null;
+	
 	function handle($errno, $errstr='', $errfile='', $errline=''){
 
 		$handlers = ob_list_handlers();
@@ -26,22 +33,20 @@ class ErrorHandler{
 			$handlers = ob_list_handlers();
 		}
 
-		$attributes = Glue::config("errors", 'components');
-
 		$CorePHP_errorTypes = array (
-		E_ERROR              => 'ERROR',
-		E_WARNING            => 'WARNING',
-		E_PARSE              => 'PARSING ERROR',
-		E_NOTICE             => 'NOTICE',
-		E_CORE_ERROR         => 'CORE ERROR',
-		E_CORE_WARNING       => 'CORE WARNING',
-		E_COMPILE_ERROR      => 'COMPILE ERROR',
-		E_COMPILE_WARNING    => 'COMPILE WARNING',
-		E_USER_ERROR         => 'USER ERROR',
-		E_USER_WARNING       => 'USER WARNING',
-		E_USER_NOTICE        => 'USER NOTICE',
-		E_STRICT             => 'STRICT NOTICE',
-		E_RECOVERABLE_ERROR  => 'RECOVERABLE ERROR'
+			E_ERROR              => 'ERROR',
+			E_WARNING            => 'WARNING',
+			E_PARSE              => 'PARSING ERROR',
+			E_NOTICE             => 'NOTICE',
+			E_CORE_ERROR         => 'CORE ERROR',
+			E_CORE_WARNING       => 'CORE WARNING',
+			E_COMPILE_ERROR      => 'COMPILE ERROR',
+			E_COMPILE_WARNING    => 'COMPILE WARNING',
+			E_USER_ERROR         => 'USER ERROR',
+			E_USER_WARNING       => 'USER WARNING',
+			E_USER_NOTICE        => 'USER NOTICE',
+			E_STRICT             => 'STRICT NOTICE',
+			E_RECOVERABLE_ERROR  => 'RECOVERABLE ERROR'
 		);
 
 		if (error_reporting() == 0) {
@@ -192,23 +197,27 @@ class ErrorHandler{
 			case E_NOTICE:
 			case E_USER_NOTICE:
 			default:
-
-				if(array_key_exists("email", array_flip($attributes['output']))){
-					foreach($attributes['emailAddresses'] as $k=>$v){
-						mail($v, 'Critical error of type '.$err, $errorText, 'MIME-Version: 1.0'."\r\n".'Content-type: text/html; charset=iso-8859-1'."\r\n");
+				
+				if(!glue::$DEBUG){
+					
+					if(is_array($this->emails) && $this->emails!==array()){
+						foreach($this->emails as $email)
+							mail($v, 'Critical error of type '.$err, 
+									$errorText, 
+									'MIME-Version: 1.0'."\r\n".'Content-type: text/html; charset=iso-8859-1'."\r\n"
+								);
 					}
-				}
-
-				if(!Glue::config("DEBUG")){
-					glue::route(glue::config("*", "errorPages"));
+					
+					glue::route($this->action);
+					
+					if($this->log && ($this->logger instanceof \Closure || is_callable($this->logger)))
+						$this->logger();
 				}else{
-					if(array_key_exists("screen", array_flip($attributes['output']))){
-						if(glue::http()->isAjax()){
-							header("HTTP/1.1 500 Internal Server Error");
-							echo $errorText;
-						}else{
-							echo $errorText;
-						}
+					if(glue::http()->isAjax()){
+						header("HTTP/1.1 500 Internal Server Error");
+						echo $errorText;
+					}else{
+						echo $errorText;
 					}
 				}
 				exit();
@@ -218,37 +227,37 @@ class ErrorHandler{
 	} // end of errorHandler()
 
 	function handleFatal() {
-	    $isError = false;
-
-	    $attributes = Glue::config("errorHandler", 'components');
 
 	    $error = error_get_last();
 
-	    if ($isError){
+	    $text = "<h1>Fatal Error</h1>
+	    	<p>File: ".$error['file']."</p>
+	    	<p>On Line: ".$error['line']."</p>
+	    	<p>Output Message: ".$error['message']."</p>
+	    	<p>On: ".(isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : 'CLI')."</p>
+	    	<h1>Backtrace</h1>
+	    	".printBacktrace();
 
-	    	$text = "<h1>Fatal Error</h1>
-	    		<p>File: ".$error['file']."</p>
-	    		<p>On Line: ".$error['line']."</p>
-	    		<p>Output Message: ".$error['message']."</p>
-	    		<p>On: ".(isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : 'CLI')."</p>
-	    		<h1>Backtrace</h1>
-	    		".printBacktrace();
-			var_dump($text);
-
-			if($attributes){
-		    	if(array_key_exists("email", array_flip($attributes['output']))){
-					foreach($attributes['emailAddresses'] as $k=>$v){
-						mail($v, "FATAL ERROR HAS OCCURRED", $text, 'MIME-Version: 1.0'."\r\n".'Content-type: text/html; charset=iso-8859-1'."\r\n");
-					}
-				}
+		if(!glue::$DEBUG){
+					
+			if(is_array($this->emails) && $this->emails!==array()){
+				foreach($this->emails as $email)
+					mail($v, 'Critical error of type '.$err,
+							$errorText,
+							'MIME-Version: 1.0'."\r\n".'Content-type: text/html; charset=iso-8859-1'."\r\n"
+					);
 			}
-		    ?>
+			
+			// We try to produce as little action as possible in the event of a fatal error
+			?>
 			<div style='wisth:613px; margin:45px auto;'>
 				<h1 style='font-size:16px; color:#333333;'>You have just been the victim of a unforgivable crime</h1>
 				<p style='font-family: arial, sans-serif; font-size:12px; line-height:17px; color:#333333;'>An error we that we just could not fix rose up to steal the day!
 					This might have been temporary and we encourage you to try and refresh your window.</p>
-			</div>
-	    <?php }
+			</div><?php 				
+		}else{
+			echo $text;
+		}
 	}
 
 	/**

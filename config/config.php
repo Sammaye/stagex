@@ -13,6 +13,9 @@ return array(
 	"name"=>'StageX',
 
 	'url' => 'stagex-local.co.uk',
+		
+	// This switches the debug mode
+	"DEBUG" => true,		
 
 	"description" => 'StageX is a video site. Share, enjoy, laugh, cry and remember the good times in life with video.',
 	"keywords" => 'video, sharing, social, watch, free, upload',
@@ -201,17 +204,16 @@ return array(
 	 * Controls the error handler
 	 */
 	'errors' => array(
-		'report' => 'E_ALL',
 
+		// To change error reporting please do it in the php.ini, this will not deal
+		// with the level of error reporting, only how they are displayed
+			
 		"output" => array("email", "screen"),
 		"emails" => array("sam.millman@googlemail.com"),
 
 		"action" => "index/error",
 
 		'log' => false,
-
-		// This switches the debug mode
-		"DEBUG" => true,
 
 		'logger' => function($exception){
 			return true;
@@ -231,9 +233,6 @@ return array(
 		},
 		'403' => function(){
 			\glue\app()->http->redirect('error/forbidden');
-		},
-		'500' => function(){
-			\glue\app()->http->redirect('error');
 		},
 
 		/**
