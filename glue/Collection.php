@@ -2,9 +2,9 @@
 
 namespace glue;
 
-use \glue\Exception;
+//use \glue\Exception;
 
-class Collection implements Iterator,IteratorAggregate,ArrayAccess,Countable{
+class Collection implements \Iterator,\ArrayAccess,\Countable{
 
 	private $_container;
 	private $_class;

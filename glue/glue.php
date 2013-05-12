@@ -1,10 +1,13 @@
 <?php
 setlocale(LC_ALL, 'en_GB.UTF8');
 
-use \glue\Exception as Exception;
+//use \glue\Exception as Exception,
+//	\glue\Collection;
 
 class glue{
 
+	public static $DEBUG=false;
+	
 	public static $name;
 	public static $description;
 	public static $keywords;
@@ -18,6 +21,9 @@ class glue{
 	public static $controller;
 	
 	private static $startUp = array();
+	
+	private static $errors = array();
+	private static $auth=array();
 	
 	private static $components = array();
 	private static $events = array();
@@ -49,7 +55,7 @@ class glue{
 	 */
 	public static function run($url = null,$config=array()){
 
-		self::setConfig($conf);
+		self::setConfig($config);
 		
 		self::registerAutoloader();
 		self::registerErrorHandlers();
@@ -61,18 +67,18 @@ class glue{
 		self::registerComponents(array(
 			'auth' => Collection::mergeArray(array(
 				'class' => '\\glue\\Auth'
-			), self::conf('auth',array())),
+			), is_array(self::$auth)?self::$auth:array()),
 			'user' => Collection::mergeArray(array(
 				'class' => '\\glue\\User'
-			),self::conf('user',array())),
+			),isset(self::$components['user'])&&is_array(self::$components['user'])?self::$components['user']:array()),
 			'errorHandler' => Collection::mergeArray(array(
 				'class' => '\\glue\\ErrorHandler',
-			),self::conf('errors',array())),
+			),is_array(self::$errors)?self::$errors:array()),
 			'http' => array(
 				'class' => '\\glue\\Http'
 			)
 		));
-		
+
 		// Add the alias for the the framework root
 		self::setDirectory('@glue', __DIR__);
 
@@ -85,9 +91,9 @@ class glue{
 			
 			// There is no session in CLI...
 			self::registerComponents(array(
-				'session' => self::config('components::session')
+				'session' => isset(self::$components['session'])&&is_array(self::$components['session'])?self::$components['session']:array()
 			));
-			self::$www = self::conf('www')!==null ? self::conf('www') : self::http()->getBaseUrl();
+			self::$www = self::$www?:self::http()->baseUrl();
 			
 			// since there is no controller as such for CLI atm lets not run the startUp stuff on cli actions
 			// So after that lets touch all startup items and get them to run their contructors and init functions
@@ -196,9 +202,9 @@ class glue{
 	}
 
 	static function registerErrorHandlers(){
-		set_error_handler(array(self,'handleError'));
-		set_exception_handler(array(self,'handleException')); // Exceptions are costly beware!
-		register_shutdown_function(array(self,'end'));
+		set_error_handler(array('glue','handleError'));
+		set_exception_handler(array('glue','handleException')); // Exceptions are costly beware!
+		register_shutdown_function(array('glue','end'));
 	}
 
 	static function handleException($exception){
@@ -208,13 +214,14 @@ class glue{
 		restore_exception_handler();
 
 		$e=self::getComponent('errorHandler');
-		$e->handleFatal($exception);
+		$e->handle($exception);
 		self::end(1);
 	}
 
 	static function handleError($code, $message, $file, $line, $fatal=false){
+		echo "hretjfdgljnfd";
 		$e=self::getComponent('errorHandler');
-		if($fatal)
+		if(!$fatal)
 			$e->handle($code,$message,$file,$line);
 		else
 			$e->handleFatal($code,$message,$file,$line);
@@ -222,9 +229,9 @@ class glue{
 	}
 
 	static function end($status=0,$exit=true){
-
+var_dump(error_get_last());
 		if ($error = error_get_last()){
-			self::handleFatal($error['type'], $error['message'], $message['file'], $message['line'], true);
+			self::handleError($error['type'], $error['message'], $error['file'], $error['line'], true);
 		}else if ($status<1) // If there was no error
 			self::trigger('afterRequest');
 		if($exit)
@@ -237,11 +244,8 @@ class glue{
 	 * @throws Exception
 	 */
 	public static function createComponent($config){
-
-		if (isset(self::$components[$class]) && self::$components[$class]!==null) {
-			$config = array_merge(self::$components[$class], $config);
-		}		
 		
+var_dump($config);
 		if (is_string($config)) {
 			$class = $config;
 			$config = array();
@@ -252,11 +256,14 @@ class glue{
 			throw new Exception('Component configuration must be an array containing a "class" element.');
 		}
 
-		if (!class_exists($class, false)) {
-			$class = self::import($class);
-		}
+		//if (!class_exists($class, false)) {
+			//$class = self::import($class);
+		//}
 
 		$class = ltrim($class, '\\');
+		if (isset(self::$components[$class]) && self::$components[$class]!==null) {
+			$config = array_merge(self::$components[$class], $config);
+		}		
 		return $config === array() ? new $class : new $class($config);
 	}
 
@@ -267,8 +274,9 @@ class glue{
 	 * @throws Exception
 	 */
 	public static function getComponent($name, $config=array()){
+		echo "fkdefjkdsf;fds";
 		$config = Collection::mergeArray(isset(self::$components[$name])&&is_array(self::$components[$name])?self::$components[$name]:array(), $config);
-
+//var_dump($config);
 		if(!empty($config) && $config){ // If is still unset then go to error clause
 			if(isset(self::$_components[$name])&&self::$_components[$name]===null){
 				return self::$_components[$name];
@@ -290,22 +298,25 @@ class glue{
 
 		$class = ltrim($class, '\\');
 		$pathinfo = pathinfo($class);
-
-		if(isset(self::$_aliases[$class])){
-			return class_alias(self::$_aliases[$class],$class);
-		}
-
-		// PSR-0 denotes that classes can be loaded with both \ and _ being translated to / (DIRECTORY_SEPARATOR)
-		$file_name=str_replace(array('\\', '_'), DIRECTORY_SEPARATOR, ROOT.'\\'.$class).'.php';
-		if(file_exists($file_name)){
-			return include file_name;
+		//var_dump($class);
+//var_dump(self::$aliases); 
+		if(isset(self::$aliases[$class])){
+			//echo "infff";
+			return class_alias(self::$aliases[$class],$class);
 		}
 		
+		// PSR-0 denotes that classes can be loaded with both \ and _ being translated to / (DIRECTORY_SEPARATOR)
+		$file_name=self::getDirectory('@app').str_replace(array('\\', '_'), DIRECTORY_SEPARATOR, '\\'.$class).'.php';
+		if(file_exists($file_name)){
+			return include $file_name;
+		}
+//		var_dump($file_name);
+//		exit();
 		foreach(self::$namespaces as $n=>$p){
 			if(!strncmp($class, $n, strlen($n))){
 				$file_name=str_replace(array('\\', '_'), DIRECTORY_SEPARATOR, self::getDirectory('@app').'\\'.str_replace($n,$p.'\\', $class)).'.php';
 				if(file_exists($file_name)){
-					return include file_name;
+					return include $file_name;
 				}			
 			}
 		}
@@ -392,8 +403,8 @@ class glue{
 	public static function trigger($event, $data=array()){
 
 		$event_success = true;
-		if(is_array(self::$_events) && isset(self::$_events[$event])){
-			foreach(self::$_events as $i => $f){
+		if(is_array(self::$events) && isset(self::$events[$event])){
+			foreach(self::$events as $i => $f){
 				if(is_array($f)){
 					$event_success=call_user_func_array($f,$data)&&$event_success;
 				}else{
@@ -405,26 +416,26 @@ class glue{
 	}
 
 	public static function on($event, $callback){
-		self::$_events[$event][] = $callback;
+		self::$events[$event][] = $callback;
 	}
 
 	public static function off($event,$handler=null){
 
-		if(isset(self::$_events[$name])){
+		if(isset(self::$events[$name])){
 			if($handler===null){
-				self::$_events[$name] = array();
+				self::$events[$name] = array();
 			}else{
 				$removed=false;
-				foreach(self::$_events[$name] as $i => $f){
+				foreach(self::$events[$name] as $i => $f){
 					if($f===$handler){
-						unset(self::$_events[$name][$i]);
+						unset(self::$events[$name][$i]);
 						$removed=true;
 						break; // If I have removed it I don't need to carry on removing it
 					}
 				}
 
 				if($removed)
-					self::$_events[$name] = array_values(self::$_events[$name]);
+					self::$events[$name] = array_values(self::$events[$name]);
 				return $removed;
 			}
 		}
@@ -455,8 +466,8 @@ class glue{
 	}
 
 	public static function unregisterComponent($component){
-		unset(self::$component[$component]);
+		unset(self::$components[$component]);
 	}
 }
 
-class Exception extends \Exception{}
+//class Exception extends \Exception{}

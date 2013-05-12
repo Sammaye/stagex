@@ -2,6 +2,8 @@
 
 namespace glue;
 
+use glue;
+
 class Http{
 
 	private $script_url;
@@ -48,13 +50,13 @@ class Http{
 
 	function host(){
 		if(php_sapi_name() == 'cli'){
-			return isset(glue::$params['rootUrl']) ? glue::$params['rootUrl'] : null;
+			return isset(glue::$www) ? glue::$www : null;
 		}
 		return isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME'];
 	}
 
 	function hostInfo($scheme=''){
-		return $this->scheme().'://'.glue::$params['rootUrl'];
+		return $this->scheme().'://'.glue::$www;
 		//$this->host();
 	}
 

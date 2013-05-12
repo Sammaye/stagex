@@ -2,6 +2,8 @@
 
 namespace glue;
 
+use glue;
+
 /**
  * Default Error Handler
  *
@@ -60,7 +62,7 @@ class ErrorHandler extends \glue\Component{
 		 *
 		 * Shouldn't be! Exceptions are costly!
 		 */
-		if(func_num_args() == 5) {
+		if(func_num_args() == 4) {
 
 			// called by trigger_error()
 			$exception = null;
@@ -129,7 +131,7 @@ class ErrorHandler extends \glue\Component{
 								$arg = 'Array';
 							}
 
-							$trace .= "$separator".getArgument($arg);
+							$trace .= "$separator".$this->getArgument($arg);
 							$separator = ', ';
 						}
 					}
@@ -147,7 +149,7 @@ class ErrorHandler extends \glue\Component{
 								$arg = 'Array';
 							}
 
-							$trace .= "$separator".getArgument($arg);
+							$trace .= "$separator".$this->getArgument($arg);
 							$separator = ', ';
 
 						}
@@ -162,6 +164,7 @@ class ErrorHandler extends \glue\Component{
 		}
 
 		$backtracel = '';
+		var_dump(debug_backtrace());
 		foreach(debug_backtrace() as $k=>$v){
 			if($v['function'] == "include" || $v['function'] == "include_once" || $v['function'] == "require_once" || $v['function'] == "require"){
 				$backtracel .= "#".$k." ".$v['function']."(".$v['args'][0].") called at [".$v['file'].":".$v['line']."]<br />";
@@ -176,7 +179,7 @@ class ErrorHandler extends \glue\Component{
 	    				<p>'.nl2br($errMsg).'</p>
 	    				<p>Trace: '.nl2br($trace).'</p>
 	    				<p>Back Trace:</p><p>'.$backtracel.'</p>
-	    				<p>On: '.(php_sapi_name() != 'cli' ? Glue::url()->create('SELF') : $_SERVER['PHP_SELF']).'</p>';
+	    				<p>On: '.(php_sapi_name() != 'cli' ? Glue::http()->createUrl('SELF') : $_SERVER['PHP_SELF']).'</p>';
 
 	    if($errstr == "(SQL)"){
 	    	$errorText .= '<h2>SQL Trace</h2>
@@ -236,7 +239,7 @@ class ErrorHandler extends \glue\Component{
 	    	<p>Output Message: ".$error['message']."</p>
 	    	<p>On: ".(isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : 'CLI')."</p>
 	    	<h1>Backtrace</h1>
-	    	".printBacktrace();
+	    	".$this->printBacktrace();
 
 		if(!glue::$DEBUG){
 					
@@ -258,6 +261,7 @@ class ErrorHandler extends \glue\Component{
 		}else{
 			echo $text;
 		}
+		exit(1);
 	}
 
 	/**

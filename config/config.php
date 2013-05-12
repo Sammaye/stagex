@@ -12,7 +12,7 @@ return array(
 	// App name // Can be used as title at times
 	"name"=>'StageX',
 
-	'url' => 'stagex-local.co.uk',
+	'www' => 'stagex-local.co.uk',
 		
 	// This switches the debug mode
 	"DEBUG" => true,		
@@ -30,7 +30,7 @@ return array(
 	// load startup components. These components will be loaded at the start and always required before execution of any script.
 	// Good for binding things like logs and auth modules etc to before controller actions
 	'startUp' => array(
-		'Auth'
+		'auth'
 	),
 
 	// This part houses all of the configuration settings for framework components
@@ -207,14 +207,12 @@ return array(
 
 		// To change error reporting please do it in the php.ini, this will not deal
 		// with the level of error reporting, only how they are displayed
-			
-		"output" => array("email", "screen"),
+
 		"emails" => array("sam.millman@googlemail.com"),
 
 		"action" => "index/error",
 
 		'log' => false,
-
 		'logger' => function($exception){
 			return true;
 		}
@@ -229,10 +227,11 @@ return array(
 		 * Certain error cases
 		 */
 		'404' => function(){
-			\glue\app()->http->redirect('error/notfound');
+			echo "404";
+			//\glue\app()->http->redirect('error/notfound');
 		},
 		'403' => function(){
-			\glue\app()->http->redirect('error/forbidden');
+			//\glue\app()->http->redirect('error/forbidden');
 		},
 
 		/**
@@ -395,7 +394,7 @@ return array(
 	 * This will catalogue directories for autoloading from. It won't actually read from the directories
 	 * in a eager manner, it will just store these as places to look within the global namespace.
 	 */
-	'dirctories' => array(
+	'directories' => array(
 		'@app' => dirname(__DIR__),
 			
 		// These are not required but are here to show you how it is done

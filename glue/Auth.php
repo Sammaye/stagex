@@ -2,7 +2,8 @@
 
 namespace glue;
 
-use \glue\Exception;
+use glue,
+	\glue\Exception;
 
 class Auth extends \glue\Component{
 
