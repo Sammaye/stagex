@@ -72,6 +72,9 @@ class glue{
 				'class' => '\\glue\\Http'
 			)
 		));
+		
+		// Add the alias for the the framework root
+		self::setDirectory('@glue', __DIR__);
 
 		if(php_sapi_name() == 'cli'){
 			$args = self::http()->parseArgs($_SERVER['argv']);
@@ -91,7 +94,8 @@ class glue{
 			if(is_array(self::$startUp)){
 				foreach(self::$startUp as $c)
 					self::getComponent($c);
-			}			
+			}
+			self::getComponent('user'); // force the user to be inited			
 
 			self::route($url);
 		}
