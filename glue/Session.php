@@ -7,7 +7,8 @@
 
 namespace glue;
 
-use \glue\util\Crypt;
+use \glue\util\Crypt,
+	\glue\Exception;
 
 class Session extends \glue\Component{
 
@@ -106,31 +107,29 @@ class Session extends \glue\Component{
 			array( $this, "gcSession" )
 		);
 
-		$domain = isset($this->cookieDomain) ? $this->cookieDomain : null;
-		if($domain)
-			ini_set("session.cookie_domain", $domain);
-			session_start(); // Start the damn session
+		if($this->domain)
+			ini_set("session.cookie_domain", $this->domain);
+		session_start(); // Start the damn session
 
 		if(!isset($_SESSION['logged']))
 			$this->session_defaults();
 
 		// Are they logged in?
-		if($_SESSION['logged'] && isset($_COOKIE[$this->temp_cookie])) {
+		if($_SESSION['logged'] && isset($_COOKIE[$this->tempCookie])) {
 
 			/** Check session as normal */
-			@$this->_checkSession();
+			$this->_checkSession();
 
-		}elseif(isset($_COOKIE[$this->perm_cookie])){
+		}elseif(isset($_COOKIE[$this->permCookie])){
 
 			$this->session_defaults();
-			$this->_checkCookie($this->perm_cookie);
+			$this->_checkCookie($this->permCookie);
 			$_SESSION['AUTH_TIER2'] = false;
 
 		}else{
 
 			/** Else in any other case default session variables */
-			$this->user = new User();
-			@$this->session_defaults();
+			$this->session_defaults();
 		}
 	}
 
@@ -289,7 +288,8 @@ class Session extends \glue\Component{
 	private function _checkSession() {
 
 		/** Query for the object */
-		$this->user = User::model()->findOne(array('_id' => new MongoId($_SESSION['uid']), 'email' => $_SESSION['email'], 'deleted' => 0));
+		glue::user()->populate(User::model()->findOne(array('_id' => new MongoId($_SESSION['uid']), 'email' => $_SESSION['email'], 'deleted' => 0)));
+		
 
 		//echo "here"; echo session_id();
 		if(isset($this->user->ins[session_id()])){

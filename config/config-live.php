@@ -13,9 +13,6 @@ if (isset($_SERVER['HTTP_CF_CONNECTING_IP'])){
 
 return array(
 
-	// Extends and overwrites some values from previous config
-	'extends' => 'application/core/config.php',
-
 	// This switches the debug mode
 	"DEBUG"=>false,
 

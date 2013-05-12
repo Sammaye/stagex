@@ -377,14 +377,14 @@ return array(
 
 	),
 
-	'preLoad' => array(
+	'include' => array(
 		'glue/Globals'
 	),
 
 	/**
 	 * This will add namespaces as Aliases to our autoloader
 	 *
-	 * Good if you have a complicated folder structure due to composer or something and want to keep Pr0 notation while
+	 * Good if you have a complicated folder structure due to composer or something and want to keep Psr-0 notation while
 	 * making your life bareable
 	 */
 	'namespaces' => array(
@@ -396,7 +396,11 @@ return array(
 	 * in a eager manner, it will just store these as places to look within the global namespace.
 	 */
 	'dirctories' => array(
-		//"models", // Models are added to global scope
+		'@app' => dirname(__DIR__),
+			
+		// These are not required but are here to show you how it is done
+		'@controllers' => 'controllers',
+		"@models" => 'models', // Models are added to global scope
 	),
 
 	/**
