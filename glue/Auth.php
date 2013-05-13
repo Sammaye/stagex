@@ -64,7 +64,7 @@ class Auth extends \glue\Component{
 
 					if(($func=$this->getFilter($role))===null)
 						throw new Exception("The auth shortcut: $role you specified within ".get_class($this->controller)." does not exist.");
-var_dump($func); //exit();
+//var_dump($func); //exit();
 					if(is_callable($func)){
 						if($func()){
 							if($permission[0] == "allow"){

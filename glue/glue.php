@@ -129,7 +129,7 @@ class glue{
 	static function runAction($route,$params = array()){
 
 		$controller = self::createController($route);
-		var_dump($controller);
+		//var_dump($controller);
 		if(is_array($controller)){
 			list($controller,$action)=$controller;
 
@@ -252,11 +252,6 @@ var_dump(error_get_last()); //exit();
 			self::trigger('afterRequest');
 		}
 
-				$size = memory_get_peak_usage(true);
-				$unit=array('','KB','MB','GB','TB','PB');
-				echo '<div class="clearer"></div>';
-				var_dump($size/pow(1024,($i=floor(log($size,1024)))));
-
 		if($exit)
 			exit($status);
 	}
@@ -268,7 +263,7 @@ var_dump(error_get_last()); //exit();
 	 */
 	public static function createComponent($config){
 
-var_dump($config);
+//var_dump($config);
 		if (is_string($config)) {
 			$class = $config;
 			$config = array();
@@ -297,7 +292,7 @@ var_dump($config);
 	 * @throws Exception
 	 */
 	public static function getComponent($name, $config=array()){
-		echo "fkdefjkdsf;fds";
+		//echo "fkdefjkdsf;fds";
 		$config = Collection::mergeArray(isset(self::$components[$name])&&is_array(self::$components[$name])?self::$components[$name]:array(), $config);
 //var_dump($config);
 		if(!empty($config) && $config){ // If is still unset then go to error clause
@@ -440,7 +435,7 @@ var_dump($config);
 	}
 
 	public static function on($event, $callback){
-		echo "bdinging";
+		//echo "bdinging";
 		self::$events[$event][] = $callback;
 	}
 
