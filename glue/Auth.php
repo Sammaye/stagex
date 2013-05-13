@@ -3,15 +3,15 @@
 namespace glue;
 
 use glue,
-	\glue\Exception;
+	glue\Exception;
 
 class Auth extends \glue\Component{
 
 	public $shortcuts;
-	public $filters; 
-	
+	public $filters;
+
 	private $controller;
-	
+
 	function init(){
 		glue::registerEvents(array(
 			'beforeAction' => 'beforeAction'
@@ -29,6 +29,7 @@ class Auth extends \glue\Component{
 				return false;
 			}
 		}
+		return true;
 	}
 
 	function getShortcut($name){
@@ -37,9 +38,10 @@ class Auth extends \glue\Component{
 
 	function getFilter($name){
 		if(($filter=$this->getShortcut($name))!==null)
-			return $filter;
-		elseif(isset($this->filters[$name]))
-			return $this->fitlers[$name];
+			$name=$filter;
+
+		if(isset($this->filters[$name]))
+			return $this->filters[$name];
 		else
 			return null;
 	}
@@ -61,10 +63,10 @@ class Auth extends \glue\Component{
 				//var_dump($users);
 				foreach($users as $role){
 					//var_dump($role);
-					
+
 					if(($func=$this->getFilter($role))===null)
 						throw new Exception("The role based management shortcut: $role you specified within ".get_class($this->controller)." does not exist.");
-					
+var_dump($func); //exit();
 					if(is_callable($func)){
 						if($func()){
 							//var_dump($permission);
@@ -76,7 +78,8 @@ class Auth extends \glue\Component{
 							}
 						}
 					}else{
-						//var_dump($permission); exit();
+						var_dump($permission); //exit();
+						echo "over here";
 						throw new Exception("The role based management shortcut you specified within ".get_class($this->controller)." does not exist.");
 					}
 
@@ -101,8 +104,8 @@ class Auth extends \glue\Component{
 			}
 
 			if(($func=$this->getFilter($role))===null)
-				throw new Exception("The role based management shortcut: $role you specified does not exist.");			
-			
+				throw new Exception("The role based management shortcut: $role you specified does not exist.");
+
 			if(is_callable($func)){
 				$matched = $func($params) && $matched;
 				if(!$all && $matched) return true;

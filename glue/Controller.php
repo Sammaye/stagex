@@ -9,6 +9,8 @@ class Controller {
 	const HEAD = 1;
 	const BODY_END = 2;
 
+	public $defaultAction = 'index';
+
 	public $layout = "blank_page";
 	public $pageTitle;
 	public $pageDescription;
@@ -40,19 +42,11 @@ class Controller {
 		$this->tags[] = array( 'html' => $html, 'pos' => $POS );
 	}
 
-	function widget($path, $args = array()){
-		return glue::widget($path, $args);
-	}
-
-	function beginWidget($path, $args = array()){
-		return glue::beginWidget($path, $args);
-	}
-
-	function accessRules(){ return array(); }
+	function authRules(){ return array(); }
 
 	function render($page, $args = null){
 
-		core::view()->render();
+		//core::view()->render();
 
 		if(isset($args['page']) || isset($args['args'])) throw new Exception("The \$page and \$args variables are reserved variables within the render function.");
 

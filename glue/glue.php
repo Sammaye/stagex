@@ -7,7 +7,7 @@ setlocale(LC_ALL, 'en_GB.UTF8');
 class glue{
 
 	public static $DEBUG=false;
-	
+
 	public static $name;
 	public static $description;
 	public static $keywords;
@@ -16,18 +16,20 @@ class glue{
 
 	public static $www;
 	public static $defaultController;
-	public static $controllerNamespace;	
-	
+	public static $controllerNamespace;
+
+	public static $actionPrefix='action_';
+
 	public static $controller;
-	
+
 	private static $startUp = array();
-	
+
 	private static $errors = array();
 	private static $auth=array();
-	
+
 	private static $components = array();
 	private static $events = array();
-	
+
 	private static $include=array();
 
 	private static $namespaces = array();
@@ -56,12 +58,12 @@ class glue{
 	public static function run($url = null,$config=array()){
 
 		self::setConfig($config);
-		
+
 		self::registerAutoloader();
 		self::registerErrorHandlers();
-		
+
 		if(self::getDirectory('@app')===null)
-			throw new Exception('The "@app" directory within the "directories" configuration variable must be set.');		
+			throw new Exception('The "@app" directory within the "directories" configuration variable must be set.');
 
 		// Register the core components
 		self::registerComponents(array(
@@ -88,21 +90,21 @@ class glue{
 
 			self::runCliAction();
 		}else{
-			
+
 			// There is no session in CLI...
 			self::registerComponents(array(
 				'session' => isset(self::$components['session'])&&is_array(self::$components['session'])?self::$components['session']:array()
 			));
 			self::$www = self::$www?:self::http()->baseUrl();
-			
+
 			// since there is no controller as such for CLI atm lets not run the startUp stuff on cli actions
 			// So after that lets touch all startup items and get them to run their contructors and init functions
 			if(is_array(self::$startUp)){
 				foreach(self::$startUp as $c)
 					self::getComponent($c);
 			}
-			self::getComponent('user'); // force the user to be inited			
-
+			//self::getComponent('user'); // force the user to be inited
+//exit();
 			self::route($url);
 		}
 	}
@@ -113,12 +115,9 @@ class glue{
 	 */
 	public static function route($route = null, $runEvents=true){
 		self::trigger('beforeRequest');
-		try{
-			self::runAction($route /* Do not yet support params transposed here */);
-		}catch(Exception $e){
+		if(self::runAction($route /* Do not yet support params transposed here */) === false)
 			self::trigger('404');
-		}
-		self::end();
+		exit(0);
 	}
 
 	/**
@@ -130,15 +129,22 @@ class glue{
 	static function runAction($route,$params = array()){
 
 		$controller = self::createController($route);
+		var_dump($controller);
 		if(is_array($controller)){
 			list($controller,$action)=$controller;
-			if(self::trigger('beforeAction')){
+
+			if(!is_callable(array($controller,$action)))
+				return false;
+
+			if(self::trigger('beforeAction',array($controller,$action))){
 				self::$controller = $controller;
-				$controller->runAction($route,$params);
+				echo "running action now";
+				call_user_func_array(array($controller,$action),$params);
+				//$controller->runAction($route,$params);
 			}
-			self::trigger('afterAction');
+			self::trigger('afterAction',array($controller,$action));
 		}else
-			throw new Exception('Could not resolve the request: '.$route);
+			return false;
 	}
 
 	/**
@@ -168,8 +174,8 @@ class glue{
 	 * @param string $route
 	 */
 	static function createController($route){
-
-		if ($route === '') {
+var_dump($route);
+		if ($route === ''||$route === null) {
 			$route = self::$defaultController ?: 'index';
 		}
 		if (($pos = strpos($route, '/')) !== false) {
@@ -181,8 +187,10 @@ class glue{
 		}
 
 		$controllerName = $id."Controller";
+		var_dump($controllerName);
 		$controllerFile = self::getDirectory('@app') . DIRECTORY_SEPARATOR . ( self::getDirectory('@controllers')!==null ? self::getDirectory('@controllers') : 'controllers' ) .
 								DIRECTORY_SEPARATOR . $controllerName . '.php';
+		var_dump($controllerFile);
 		$className = ltrim(self::$controllerNamespace . '\\' . $controllerName, '\\');
 
 		if(isset(self::$classMap[$className])){
@@ -195,8 +203,14 @@ class glue{
 				'name' => $controllerName,
 				'file' => $controllerFile
 			);
+			include($controllerFile);
 			$controller = new $className;
 		}
+
+		if($route==='')
+			$route=self::$actionPrefix.$controller->defaultAction;
+		else
+			$route=self::$actionPrefix.$route;
 
 		return isset($controller) ? array($controller,$route) : false;
 	}
@@ -215,25 +229,28 @@ class glue{
 
 		$e=self::getComponent('errorHandler');
 		$e->handle($exception);
-		self::end(1);
+		exit(1);
 	}
 
 	static function handleError($code, $message, $file, $line, $fatal=false){
 		echo "hretjfdgljnfd";
 		$e=self::getComponent('errorHandler');
-		if(!$fatal)
-			$e->handle($code,$message,$file,$line);
-		else
+//		var_dump($fatal);
+		if($fatal===true) // $fatal can sometimes be the symbol table, it depends on what mood PHP is in
 			$e->handleFatal($code,$message,$file,$line);
-		self::end(1);
+		else
+			$e->handle($code,$message,$file,$line);
+		exit(1);
 	}
 
 	static function end($status=0,$exit=true){
-var_dump(error_get_last());
+		echo "in end";
+var_dump(error_get_last()); //exit();
 		if ($error = error_get_last()){
 			self::handleError($error['type'], $error['message'], $error['file'], $error['line'], true);
-		}else if ($status<1) // If there was no error
+		}else if ($status<1){ // If there was no error
 			self::trigger('afterRequest');
+		}
 		if($exit)
 			exit($status);
 	}
@@ -244,7 +261,7 @@ var_dump(error_get_last());
 	 * @throws Exception
 	 */
 	public static function createComponent($config){
-		
+
 var_dump($config);
 		if (is_string($config)) {
 			$class = $config;
@@ -263,7 +280,7 @@ var_dump($config);
 		$class = ltrim($class, '\\');
 		if (isset(self::$components[$class]) && self::$components[$class]!==null) {
 			$config = array_merge(self::$components[$class], $config);
-		}		
+		}
 		return $config === array() ? new $class : new $class($config);
 	}
 
@@ -299,12 +316,12 @@ var_dump($config);
 		$class = ltrim($class, '\\');
 		$pathinfo = pathinfo($class);
 		//var_dump($class);
-//var_dump(self::$aliases); 
+//var_dump(self::$aliases);
 		if(isset(self::$aliases[$class])){
 			//echo "infff";
 			return class_alias(self::$aliases[$class],$class);
 		}
-		
+
 		// PSR-0 denotes that classes can be loaded with both \ and _ being translated to / (DIRECTORY_SEPARATOR)
 		$file_name=self::getDirectory('@app').str_replace(array('\\', '_'), DIRECTORY_SEPARATOR, '\\'.$class).'.php';
 		if(file_exists($file_name)){
@@ -317,41 +334,41 @@ var_dump($config);
 				$file_name=str_replace(array('\\', '_'), DIRECTORY_SEPARATOR, self::getDirectory('@app').'\\'.str_replace($n,$p.'\\', $class)).'.php';
 				if(file_exists($file_name)){
 					return include $file_name;
-				}			
+				}
 			}
 		}
 		return false;
 	}
-	
+
 	public static function import($path){
 
 		$path = ltrim($path, '\\');
-		
+
 		if(strpos('\\', $path)!==false){
 			// Import via PSR-0 notation
 			$file_name=str_replace(array('\\', '_'), DIRECTORY_SEPARATOR, self::getDirectory('@app').'\\'.$class).'.php';
 			if(file_exists($file_name)){
 				self::$_imported[$class] = $file_name;
 				return include file_name;
-			}			
+			}
 		}else{
-			
+
 			if(strpos('@',$path)===1){
-				
+
 				// Then this is aliasing a directory
 				$dir=substr($path,0,strpos('/',$path));
-				$realPath = self::getDirectory('@root') . DIRECTORY_SEPARATOR . self::getDirectory($dir) . DIRECTORY_SEPARATOR . 
+				$realPath = self::getDirectory('@root') . DIRECTORY_SEPARATOR . self::getDirectory($dir) . DIRECTORY_SEPARATOR .
 					str_replace('/',DIRECTORY_SEPARATOR,substr($path,strpos('/',$path)));
 				if(file_exists($realPath)){
 					self::$_imported[$path] = $realPath;
-					return include $realPath;					
+					return include $realPath;
 				}
 			}else{
-				
+
 			}
-			
+
 		}
-		
+
 	}
 
 	public static function registerAutoloader($callback = null){
@@ -403,8 +420,9 @@ var_dump($config);
 	public static function trigger($event, $data=array()){
 
 		$event_success = true;
+		var_dump($event);
 		if(is_array(self::$events) && isset(self::$events[$event])){
-			foreach(self::$events as $i => $f){
+			foreach(self::$events[$event] as $i => $f){
 				if(is_array($f)){
 					$event_success=call_user_func_array($f,$data)&&$event_success;
 				}else{
@@ -416,6 +434,7 @@ var_dump($config);
 	}
 
 	public static function on($event, $callback){
+		echo "bdinging";
 		self::$events[$event][] = $callback;
 	}
 
@@ -451,11 +470,11 @@ var_dump($config);
 		}
 		return true;
 	}
-	
+
 	public static function getDirectory($alias){
 		return isset(self::$directories[$alias]) ? self::$directories[$alias] : null;
 	}
-	
+
 	public static function setDirectory($alias, $path){
 		$alias = strpos('@',$alias)===1?$alias:'@'.$alias;
 		self::$directories[$alias]=$path;
@@ -469,5 +488,3 @@ var_dump($config);
 		unset(self::$components[$component]);
 	}
 }
-
-//class Exception extends \Exception{}

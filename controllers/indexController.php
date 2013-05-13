@@ -1,11 +1,7 @@
 <?php
-class indexController extends GController{
+class indexController extends \glue\Controller{
 
-	public function filters(){
-		return array('rbam');
-	}
-
-	public function accessRules(){
+	public function authRules(){
 		return array(
 			array('allow', 'users' => array('*')),
 			array("deny", "users"=>array("*")),
@@ -13,11 +9,14 @@ class indexController extends GController{
 	}
 
 	public function action_index(){
-		$this->pageTitle = "Welcome to the StageX Beta";
-		if($_SESSION['logged']){
-			glue::route('/stream/news');
-		}else{
-			$this->render('/index');
-		}
+
+		echo "YOOOOOOOOOO";
+		exit();
+//		$this->pageTitle = "Welcome to the StageX Beta";
+//		if($_SESSION['logged']){
+//			glue::route('/stream/news');
+//		}else{
+//			$this->render('/index');
+//		}
 	}
 }

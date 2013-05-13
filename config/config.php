@@ -13,9 +13,9 @@ return array(
 	"name"=>'StageX',
 
 	'www' => 'stagex-local.co.uk',
-		
+
 	// This switches the debug mode
-	"DEBUG" => true,		
+	"DEBUG" => true,
 
 	"description" => 'StageX is a video site. Share, enjoy, laugh, cry and remember the good times in life with video.',
 	"keywords" => 'video, sharing, social, watch, free, upload',
@@ -240,10 +240,10 @@ return array(
 		'beforeRequest' => function(){},
 		'afterRequest' => function(){
 //			if(!glue::http()->isAjax() && glue::config('DEBUG') === true){
-//				$size = memory_get_peak_usage(true);
-//				$unit=array('','KB','MB','GB','TB','PB');
-//				echo '<div class="clearer"></div>';
-//				var_dump($size/pow(1024,($i=floor(log($size,1024)))));
+				$size = memory_get_peak_usage(true);
+				$unit=array('','KB','MB','GB','TB','PB');
+				echo '<div class="clearer"></div>';
+				var_dump($size/pow(1024,($i=floor(log($size,1024)))));
 //			}
 		}
 	),
@@ -396,7 +396,7 @@ return array(
 	 */
 	'directories' => array(
 		'@app' => dirname(__DIR__),
-			
+
 		// These are not required but are here to show you how it is done
 		'@controllers' => 'controllers',
 		"@models" => 'models', // Models are added to global scope
