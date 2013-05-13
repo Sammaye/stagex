@@ -11,7 +11,6 @@ class indexController extends \glue\Controller{
 	public function action_index(){
 
 		echo "YOOOOOOOOOO";
-		exit();
 //		$this->pageTitle = "Welcome to the StageX Beta";
 //		if($_SESSION['logged']){
 //			glue::route('/stream/news');

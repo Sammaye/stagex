@@ -60,27 +60,21 @@ class Auth extends \glue\Component{
 			if((array_key_exists($action, array_flip($actions)) || count($actions) <= 0)){
 
 				$users = isset($permission['users']) ? $permission['users'] : array('*');
-				//var_dump($users);
 				foreach($users as $role){
-					//var_dump($role);
 
 					if(($func=$this->getFilter($role))===null)
-						throw new Exception("The role based management shortcut: $role you specified within ".get_class($this->controller)." does not exist.");
+						throw new Exception("The auth shortcut: $role you specified within ".get_class($this->controller)." does not exist.");
 var_dump($func); //exit();
 					if(is_callable($func)){
 						if($func()){
-							//var_dump($permission);
 							if($permission[0] == "allow"){
-								//echo "here";
 								return true;
 							}elseif($permission[0] == "deny"){
 								return false;
 							}
 						}
 					}else{
-						var_dump($permission); //exit();
-						echo "over here";
-						throw new Exception("The role based management shortcut you specified within ".get_class($this->controller)." does not exist.");
+						throw new Exception("The auth shortcut you specified within ".get_class($this->controller)." does not exist.");
 					}
 
 					// No Hit. Only do on allow rules // This should be returning true shouldn't it??

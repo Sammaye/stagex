@@ -251,6 +251,12 @@ var_dump(error_get_last()); //exit();
 		}else if ($status<1){ // If there was no error
 			self::trigger('afterRequest');
 		}
+
+				$size = memory_get_peak_usage(true);
+				$unit=array('','KB','MB','GB','TB','PB');
+				echo '<div class="clearer"></div>';
+				var_dump($size/pow(1024,($i=floor(log($size,1024)))));
+
 		if($exit)
 			exit($status);
 	}
