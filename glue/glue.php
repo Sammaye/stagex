@@ -15,17 +15,12 @@ class glue{
 	public static $params = array();
 
 	public static $www;
-	public static $defaultController;
+	public static $defaultController='index';
 	public static $controllerNamespace;
 
 	public static $actionPrefix='action_';
 
-	public static $controller;
-
 	private static $startUp = array();
-
-	private static $errors = array();
-	private static $auth=array();
 
 	private static $components = array();
 	private static $events = array();
@@ -35,6 +30,8 @@ class glue{
 	private static $namespaces = array();
 	private static $directories = array();
 	private static $aliases = array();
+
+	public static $controller;
 
 	private static $_components = array();
 	private static $_imported = array();
@@ -57,25 +54,38 @@ class glue{
 	 */
 	public static function run($url = null,$config=array()){
 
-		self::setConfig($config);
+		if(isset($config['events'])&&is_array($config['events'])){
+			foreach($config['events'] as $k => $v){
+				self::on($k,$v);
+			}
+		}
+
+		if(isset($config['errors'])&&is_array($config['errors'])){
+			$errorHandler=$config['errors'];
+		}
+
+		unset($config['events'],$config['errors']);
+		if(is_array($config)){
+			foreach($config as $k => $v)
+				self::$$k=$v;
+		}
+		if(self::getDirectory('@app')===null)
+			throw new Exception('The "@app" directory within the "directories" configuration variable must be set.');
 
 		self::registerAutoloader();
 		self::registerErrorHandlers();
-
-		if(self::getDirectory('@app')===null)
-			throw new Exception('The "@app" directory within the "directories" configuration variable must be set.');
 
 		// Register the core components
 		self::registerComponents(array(
 			'auth' => Collection::mergeArray(array(
 				'class' => '\\glue\\Auth'
-			), is_array(self::$auth)?self::$auth:array()),
+			), isset(self::$components['auth']) && is_array(self::$components['auth'])?self::$components['auth']:array()),
 			'user' => Collection::mergeArray(array(
 				'class' => '\\glue\\User'
 			),isset(self::$components['user'])&&is_array(self::$components['user'])?self::$components['user']:array()),
 			'errorHandler' => Collection::mergeArray(array(
 				'class' => '\\glue\\ErrorHandler',
-			),is_array(self::$errors)?self::$errors:array()),
+			),isset($errorHandler)?$errorHandler:array()),
 			'http' => array(
 				'class' => '\\glue\\Http'
 			)
@@ -176,7 +186,7 @@ class glue{
 	static function createController($route){
 var_dump($route);
 		if ($route === ''||$route === null) {
-			$route = self::$defaultController ?: 'index';
+			$route = self::$defaultController;
 		}
 		if (($pos = strpos($route, '/')) !== false) {
 			$id = substr($route, 0, $pos); // Lets get the first bit before the first /
@@ -376,18 +386,6 @@ var_dump(error_get_last()); //exit();
 		spl_autoload_unregister(array('glue','autoload'));
 		if($callback) spl_autoload_register($callback);
 		spl_autoload_register(array('glue','autoload'));
-	}
-
-	/**
-	 * Sets the current configuration values
-	 *
-	 * @param string $path
-	 */
-	public static function setConfig($conf){
-		if(is_array($conf)){
-			foreach($conf as $k => $v)
-				self::$$k=$v;
-		}
 	}
 
 	public static function mergeConfiguration(){

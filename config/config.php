@@ -198,6 +198,134 @@ return array(
 			'input_queue' => 'https://us-west-2.queue.amazonaws.com/663341881510/stagex-uploadsQueue',
 			'output_queue' => 'https://us-west-2.queue.amazonaws.com/663341881510/stagex-outputsQueue'
 		),
+
+		/**
+		 * This holds the auth configuration. Of course this particular auth module uses programmed auth roles, better to make
+		 * an extension to store this shit in a database...
+		 */
+		'auth' => array(
+
+			/**
+			 * These are shortcuts used to make short hand notation to certain commonly used filters
+			 */
+			'shortcuts' => array(
+				'@' 	=> 'roleLogged',
+				'@*' 	=> "loginRequired",
+				'^@' 	=> "roleAdmin",
+				'*' 	=> "roleUser",
+				'^' 	=> "Owns"
+			),
+
+			/**
+			 * These are the filters used to determine if they are authorised to actually access what they wanna
+			 */
+			'filters' => array(
+				'roleUser' => function(){
+					return true;
+				},
+
+				'roleLogged' => function(){
+					if($_SESSION['logged']){
+						return true;
+					}
+					return false;
+				},
+				'canView' => function($item){
+					if(!$item){
+						return false;
+					}
+
+					if($item->deleted){
+						return false;
+					}
+
+					if($item->author instanceof User){
+						if((bool)$item->author->deleted){
+							return false;
+						}
+					}
+
+					if($item->listing){
+						if($item->listing == 3 && (strval(glue::session()->user->_id) != strval($item->author->_id)))
+							return false;
+					}
+					return true;
+				},
+				'deletedView' => function($item){
+					if(!$item){
+						return false;
+					}
+
+					if($item->deleted){
+						return false;
+					}
+
+					if($item->author instanceof User){
+						if((bool)$item->author->deleted){
+							return false;
+						}
+					}elseif(!$item instanceof User){
+						return false;
+					}
+					return true;
+				},
+				'deniedView' => function($item){
+					if($item->listing){
+						if($item->listing == 3 && strval(glue::session()->user->_id) != strval($item->author->_id))
+							return false;
+					}
+					return true;
+				},
+				'loginRequired' => function(){
+					if($_SESSION['logged']){
+						return true;
+					}
+
+					if(glue::http()->isAjax()){
+						GJSON::kill(GJSON::LOGIN);
+						exit();
+					}else{
+						html::setErrorFlashMessage('You must be logged in to access this page');
+						header('Location: /user/login?nxt='.Glue::url()->create('SELF', array(), ''));
+						exit();
+					}
+					return false;
+				},
+
+				'roleAdmin' => function(){
+				  	if(Glue::session()->user->group == 10 || Glue::session()->user->group == 9){
+				  		return true;
+				  	}
+				  	return false;
+				},
+
+				'Owns' => function($object){
+					if(is_array($object)){
+						foreach($object as $item){
+							if(strval(Glue::session()->user->_id) == strval($item->user_id)){
+								return true;
+							}
+						}
+					}elseif($object instanceof MongoDocument){
+						if(strval(Glue::session()->user->_id) == strval($object->user_id)){
+							return true;
+						}
+					}
+					return false;
+				},
+
+				/**
+				 * Ajax is class as an auth item, note this in case you do not use the inbuilt auth
+				 */
+				'ajax' => function(){
+					if(glue::http()->isAjax()){
+						return true;
+					}
+					return false;
+				}
+			)
+
+		),
 	),
 
 	/**
@@ -239,141 +367,13 @@ return array(
 		 */
 		'beforeRequest' => function(){},
 		'afterRequest' => function(){
-//			if(!glue::http()->isAjax() && glue::config('DEBUG') === true){
+			if(!glue::http()->isAjax()){
 				$size = memory_get_peak_usage(true);
 				$unit=array('','KB','MB','GB','TB','PB');
 				echo '<div class="clearer"></div>';
 				var_dump($size/pow(1024,($i=floor(log($size,1024)))));
-//			}
-		}
-	),
-
-	/**
-	 * This holds the auth configuration. Of course this particular auth module uses programmed auth roles, better to make
-	 * an extension to store this shit in a database...
-	 */
-	'auth' => array(
-
-		/**
-		 * These are shortcuts used to make short hand notation to certain commonly used filters
-		 */
-		'shortcuts' => array(
-			'@' 	=> 'roleLogged',
-			'@*' 	=> "loginRequired",
-			'^@' 	=> "roleAdmin",
-			'*' 	=> "roleUser",
-			'^' 	=> "Owns"
-		),
-
-		/**
-		 * These are the filters used to determine if they are authorised to actually access what they wanna
-		 */
-		'filters' => array(
-			'roleUser' => function(){
-				return true;
-			},
-
-			'roleLogged' => function(){
-				if($_SESSION['logged']){
-					return true;
-				}
-				return false;
-			},
-			'canView' => function($item){
-				if(!$item){
-					return false;
-				}
-
-				if($item->deleted){
-					return false;
-				}
-
-				if($item->author instanceof User){
-					if((bool)$item->author->deleted){
-						return false;
-					}
-				}
-
-				if($item->listing){
-					if($item->listing == 3 && (strval(glue::session()->user->_id) != strval($item->author->_id)))
-						return false;
-				}
-				return true;
-			},
-			'deletedView' => function($item){
-				if(!$item){
-					return false;
-				}
-
-				if($item->deleted){
-					return false;
-				}
-
-				if($item->author instanceof User){
-					if((bool)$item->author->deleted){
-						return false;
-					}
-				}elseif(!$item instanceof User){
-					return false;
-				}
-				return true;
-			},
-			'deniedView' => function($item){
-				if($item->listing){
-					if($item->listing == 3 && strval(glue::session()->user->_id) != strval($item->author->_id))
-						return false;
-				}
-				return true;
-			},
-			'loginRequired' => function(){
-				if($_SESSION['logged']){
-					return true;
-				}
-
-				if(glue::http()->isAjax()){
-					GJSON::kill(GJSON::LOGIN);
-					exit();
-				}else{
-					html::setErrorFlashMessage('You must be logged in to access this page');
-					header('Location: /user/login?nxt='.Glue::url()->create('SELF', array(), ''));
-					exit();
-				}
-				return false;
-			},
-
-			'roleAdmin' => function(){
-			  	if(Glue::session()->user->group == 10 || Glue::session()->user->group == 9){
-			  		return true;
-			  	}
-			  	return false;
-			},
-
-			'Owns' => function($object){
-				if(is_array($object)){
-					foreach($object as $item){
-						if(strval(Glue::session()->user->_id) == strval($item->user_id)){
-							return true;
-						}
-					}
-				}elseif($object instanceof MongoDocument){
-					if(strval(Glue::session()->user->_id) == strval($object->user_id)){
-						return true;
-					}
-				}
-				return false;
-			},
-
-			/**
-			 * Ajax is class as an auth item, note this in case you do not use the inbuilt auth
-			 */
-			'ajax' => function(){
-				if(glue::http()->isAjax()){
-					return true;
-				}
-				return false;
 			}
-		)
-
+		}
 	),
 
 	'include' => array(
@@ -399,7 +399,7 @@ return array(
 
 		// These are not required but are here to show you how it is done
 		'@controllers' => 'controllers',
-		"@models" => 'models', // Models are added to global scope
+		'@models' => 'models', // Models are added to global scope
 	),
 
 	/**
@@ -422,6 +422,8 @@ return array(
 		"ApplicationComponent" 	=> "glue\\ApplicationComponent",
 		"Html"					=> "glue\\Html",
 		"Auth"					=> "glue\\Auth",
+		"Exception"				=> "glue\\Exception",
+		"Config"				=> "glue\\Config",
 
 		/**
 		 * Core utils
