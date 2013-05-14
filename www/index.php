@@ -1,4 +1,24 @@
 <?php
+
+if(strncmp('@fgfgfhf', '@', 1)){
+	echo "poop";
+}else{
+	echo "whoop";
+}
+exit();
+
+
+
+
+
+
+
+
+
+
+
+
+
 /** Include the main point of entry */
 include_once "../glue/glue.php";
 
