@@ -1,8 +1,7 @@
 <?php
 setlocale(LC_ALL, 'en_GB.UTF8');
 
-//use \glue\Exception as Exception,
-//	\glue\Collection;
+use \glue\Exception as Exception;
 
 class glue{
 
@@ -54,6 +53,22 @@ class glue{
 	 */
 	public static function run($url = null,$config=array()){
 
+		// Register the core components
+		self::setComponents(array(
+			'user' => array(
+				'class' => '\\glue\\User'
+			),
+			'session' => array(
+				'class' => '\\glue\\Session'
+			),
+			'errorHandler' => array(
+				'class' => '\\glue\\ErrorHandler',
+			),
+			'http' => array(
+				'class' => '\\glue\\Http'
+			)
+		));
+
 		if(isset($config['events'])&&is_array($config['events'])){
 			foreach($config['events'] as $k => $v){
 				self::on($k,$v);
@@ -64,7 +79,11 @@ class glue{
 			$errorHandler=$config['errors'];
 		}
 
-		unset($config['events'],$config['errors']);
+		if(isset($config['components'])&&is_array($config['components'])){
+			self::setComponents($config['components']);
+		}
+
+		unset($config['events'],$config['errors'], $config['components']);
 		if(is_array($config)){
 			foreach($config as $k => $v)
 				self::$$k=$v;
@@ -75,24 +94,8 @@ class glue{
 		self::registerAutoloader();
 		self::registerErrorHandlers();
 
-		// Register the core components
-		self::registerComponents(array(
-			'auth' => Collection::mergeArray(array(
-				'class' => '\\glue\\Auth'
-			), isset(self::$components['auth']) && is_array(self::$components['auth'])?self::$components['auth']:array()),
-			'user' => Collection::mergeArray(array(
-				'class' => '\\glue\\User'
-			),isset(self::$components['user'])&&is_array(self::$components['user'])?self::$components['user']:array()),
-			'errorHandler' => Collection::mergeArray(array(
-				'class' => '\\glue\\ErrorHandler',
-			),isset($errorHandler)?$errorHandler:array()),
-			'http' => array(
-				'class' => '\\glue\\Http'
-			)
-		));
-
 		// Add the alias for the the framework root
-		self::setDirectory('@glue', __DIR__);
+		self::setDirectories(array( '@glue' => __DIR__ ));
 
 		if(php_sapi_name() == 'cli'){
 			$args = self::http()->parseArgs($_SERVER['argv']);
@@ -100,11 +103,6 @@ class glue{
 
 			self::runCliAction();
 		}else{
-
-			// There is no session in CLI...
-			self::registerComponents(array(
-				'session' => isset(self::$components['session'])&&is_array(self::$components['session'])?self::$components['session']:array()
-			));
 			self::$www = self::$www?:self::http()->baseUrl();
 
 			// since there is no controller as such for CLI atm lets not run the startUp stuff on cli actions
@@ -114,7 +112,6 @@ class glue{
 					self::getComponent($c);
 			}
 			//self::getComponent('user'); // force the user to be inited
-//exit();
 			self::route($url);
 		}
 	}
@@ -134,7 +131,6 @@ class glue{
 	 * Runs an action according to a route
 	 * @param string $route
 	 * @param array $params
-	 * @throws Exception If the controller could not be resolved.
 	 */
 	static function runAction($route,$params = array()){
 
@@ -150,7 +146,6 @@ class glue{
 				self::$controller = $controller;
 				echo "running action now";
 				call_user_func_array(array($controller,$action),$params);
-				//$controller->runAction($route,$params);
 			}
 			self::trigger('afterAction',array($controller,$action));
 		}else
@@ -215,13 +210,12 @@ var_dump($route);
 			);
 			include($controllerFile);
 			$controller = new $className;
+
+			if($route==='')
+				$route=self::$actionPrefix.$controller->defaultAction;
+			else
+				$route=self::$actionPrefix.$route;
 		}
-
-		if($route==='')
-			$route=self::$actionPrefix.$controller->defaultAction;
-		else
-			$route=self::$actionPrefix.$route;
-
 		return isset($controller) ? array($controller,$route) : false;
 	}
 
@@ -416,6 +410,12 @@ var_dump(error_get_last()); //exit();
 		return $merged;
 	}
 
+	/**
+	 * Triggers a new event which will bubble to all attached event handlers
+	 *
+	 * @param string $event
+	 * @param array $data Parameters to be bound to the event call
+	 */
 	public static function trigger($event, $data=array()){
 
 		$event_success = true;
@@ -432,11 +432,28 @@ var_dump(error_get_last()); //exit();
 		return $event_success;
 	}
 
+	/**
+	 * Register a single event either from an anon function or model.
+	 *
+	 * If you are using this function from a model you will want to make the $callback an array of
+	 * array($model,'someFunctionInModel') in order to register the event correctly.
+	 *
+	 * @param string $event
+	 * @param closure|array $callback
+	 */
 	public static function on($event, $callback){
-		//echo "bdinging";
 		self::$events[$event][] = $callback;
 	}
 
+	/**
+	 * Takes off either a set of handlers from an event or an single handler from an event.
+	 *
+	 * If the $handler is null it will remove all handlers under that event otherwise it will
+	 * seek that specific handler and attempt to remove it from the running of the event.
+	 *
+	 * @param string $event
+	 * @param closure|array $handler
+	 */
 	public static function off($event,$handler=null){
 
 		if(isset(self::$events[$name])){
@@ -448,7 +465,7 @@ var_dump(error_get_last()); //exit();
 					if($f===$handler){
 						unset(self::$events[$name][$i]);
 						$removed=true;
-						break; // If I have removed it I don't need to carry on removing it
+						break; // If I have removed it, I don't need to carry on removing it
 					}
 				}
 
@@ -460,6 +477,16 @@ var_dump(error_get_last()); //exit();
 		return false;
 	}
 
+	/**
+	 * Registers a set of events.
+	 *
+	 * This can be called from many places including from models. If it will bind the parameters given to it.
+	 * If a model is supplied it will assume that all event handlers are actually functions of that model and will create
+	 * the event mappings with the model being the super class.
+	 *
+	 * @param array $events
+	 * @param \glue\Model $model
+	 */
 	public static function registerEvents($events,$model=null){
 		foreach($events as $k =>$v){
 			if($model)
@@ -470,20 +497,44 @@ var_dump(error_get_last()); //exit();
 		return true;
 	}
 
-	public static function getDirectory($alias){
-		return isset(self::$directories[$alias]) ? self::$directories[$alias] : null;
+	public static function getNamespace($namespace){
+
 	}
 
-	public static function setDirectory($alias, $path){
-		$alias = strpos('@',$alias)===1?$alias:'@'.$alias;
-		self::$directories[$alias]=$path;
+	public static function getDirectory($alias,$appendApp=true){
+
+		if(strpos('@',$alias)!==0)
+			$alias='@'.$alias;
+		if(!isset(self::$directories[$alias]))
+			return null;
+
+		// Strip out any thing that is not the alias
+		if(($p=strpos('/',$alias))!==false)
+			$alias=substr($alias,0,$p);
+
+		$dalias = self::$directories[$alias];
+		if(strpos('@'.$dalias)!==0||strpos('@'.$dalias)===false)
+			return $appendApp ? self::getDirectory('@app',false).'/'.$dalias : $dalias;
+
+		// Get nested aliases
+		$palias=substr($dalias,0,strpos('/',$dalias));
+		str_replace($palias,self::getDirectory($palias,false),$dalias);
+		return $dalias.'/'.substr($alias,$p);
 	}
 
-	public static function registerComponents($components){
-		self::$components = array_merge(self::$components,$components);
+	public static function setDirectories($directories){
+		foreach($directories as $alias => $path){
+			$alias = strpos('@',$alias)===0?$alias:'@'.$alias;
+			self::$directories[$alias]=$path;
+		}
 	}
 
-	public static function unregisterComponent($component){
-		unset(self::$components[$component]);
+	public static function setComponents($components){
+		foreach ($components as $id => $component) {
+			if (isset(self::$components[$id]['class']) && !isset($component['class'])) {
+				$component['class'] = self::$components[$id]['class'];
+			}
+			self::$components[$id] = $component;
+		}
 	}
 }

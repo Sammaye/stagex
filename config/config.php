@@ -40,7 +40,7 @@ return array(
 		 * Configures the session handler
 		 */
 		"session"=>array(
-			"class" => "glue\\extended\\Session",
+			"class" => "glue\\Session",
 			"timeout"=>5,
 			"allowCookies"=>true,
 			'cookieDomain' => '.stagex-local.co.uk'
@@ -206,6 +206,11 @@ return array(
 		'auth' => array(
 
 			/**
+			 * The location of the auth file
+			 */
+			'class' => '\\glue\\Auth',
+
+			/**
 			 * These are shortcuts used to make short hand notation to certain commonly used filters
 			 */
 			'shortcuts' => array(
@@ -324,7 +329,6 @@ return array(
 					return false;
 				}
 			)
-
 		),
 	),
 
@@ -356,10 +360,10 @@ return array(
 		 */
 		'404' => function(){
 			echo "404";
-			//\glue\app()->http->redirect('error/notfound');
+			glue::http()->redirect('error/notfound');
 		},
 		'403' => function(){
-			//\glue\app()->http->redirect('error/forbidden');
+			glue::http()->redirect('error/forbidden');
 		},
 
 		/**
@@ -440,12 +444,6 @@ return array(
 		 */
 		"GridView"				=> "glue\\widgets\\GridView",
 		"ListView"				=> "glue\\widgets\\ListView",
-
-		/**
-		 * Custom session handling
-		 */
-		'Session' 				=> "extended\\Session",
-		'SessionStore'			=> "extended\\MongoSession"
 	)
 );
 
