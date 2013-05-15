@@ -26,8 +26,9 @@ class glue{
 
 	private static $include=array();
 
-	private static $namespaces = array();
-	private static $directories = array();
+	//private static $namespaces = array();
+	//private static $directories = array();
+	private static $paths = array();
 	private static $aliases = array();
 
 	public static $controller;
@@ -85,10 +86,16 @@ class glue{
 
 		unset($config['events'],$config['errors'], $config['components']);
 		if(is_array($config)){
-			foreach($config as $k => $v)
-				self::$$k=$v;
+			foreach($config as $k => $v){
+				if(method_exists('glue','set'.$k)){
+					$fn='set'.$k;
+					self::$fn($v);
+				}else{
+					self::$$k=$v;
+				}
+			}
 		}
-		if(self::getDirectory('@app')===null)
+		if(self::getPath('@app')===null)
 			throw new Exception('The "@app" directory within the "directories" configuration variable must be set.');
 
 		self::registerAutoloader();
@@ -96,7 +103,7 @@ class glue{
 
 		// Add the alias for the the framework root
 		self::setDirectories(array( '@glue' => __DIR__ ));
-
+var_dump(self::getPath('@mongoglue')); exit();
 		if(php_sapi_name() == 'cli'){
 			$args = self::http()->parseArgs($_SERVER['argv']);
 			self::$www='/cli';
@@ -497,38 +504,74 @@ var_dump(error_get_last()); //exit();
 		return true;
 	}
 
-	public static function getNamespace($namespace){
-
-	}
-
-	public static function getDirectory($alias,$appendApp=true){
-
-		if(strpos('@',$alias)!==0)
-			$alias='@'.$alias;
-		if(!isset(self::$directories[$alias]))
-			return null;
-
-		// Strip out any thing that is not the alias
-		if(($p=strpos('/',$alias))!==false)
-			$alias=substr($alias,0,$p);
-
-		$dalias = self::$directories[$alias];
-		if(strpos('@'.$dalias)!==0||strpos('@'.$dalias)===false)
-			return $appendApp ? self::getDirectory('@app',false).'/'.$dalias : $dalias;
-
-		// Get nested aliases
-		$palias=substr($dalias,0,strpos('/',$dalias));
-		str_replace($palias,self::getDirectory($palias,false),$dalias);
-		return $dalias.'/'.substr($alias,$p);
-	}
-
-	public static function setDirectories($directories){
-		foreach($directories as $alias => $path){
-			$alias = strpos('@',$alias)===0?$alias:'@'.$alias;
-			self::$directories[$alias]=$path;
+	/**
+	 * Sets namespaces within the configuration
+	 * @param array $namespaces
+	 */
+	public static function setNamespaces($namespaces){
+		foreach($namespaces as $name => $path){
+			$name = trim(strtr($name, array('\\' => '/', '_' => '/')), '/');
+			self::$paths['@'.$name]=rtrim($path, '/\\');
 		}
 	}
 
+	/**
+	 * Translate a directory alias into a real path.
+	 *
+	 * As an example it will transalte @glue/app into path/to/framework/glue/app.
+	 * If the alias path begins with / it will treat as a true path.
+	 * If the alias path does not begin with / or @ then it will be treated as a relative path and the @app alias will
+	 * be used to root the path.
+	 * @param string $alias
+	 */
+	public static function getPath($alias){
+
+		// If the @ is not there lets add it
+		if(strncmp($alias, '@', 1))
+			$alias='@'.$alias;
+		if(!isset(self::$paths[$alias]))
+			return null;
+
+		$dir=self::$paths[$alias];
+
+		if(strncmp($dir, '@', 1)===0){ // Maybe this SHOULD be a /?
+			$pos = strpos($dir, '/');
+			$root = $pos === false ? $dir : substr($dir, 0, $pos); // Lets get the root alias of this path
+			//var_dump($root); var_dump(self::$directories['@glue']); exit();
+			$rootAlias = self::getPath($root);
+
+			return $pos === false || $rootAlias===null ? $dir : $rootAlias . substr($dir, $pos);
+		}elseif(strncmp($dir, '/', 1)){
+
+			// Then this is a relative path
+			return self::getPath('@app').'/'.trim($dir, '\\/');
+
+		}else{
+			return rtrim($dir,'\\/'); // This is a real path
+		}
+	}
+
+	/**
+	 * Registers a set of directories within the configuration
+	 * @param array $directories
+	 */
+	public static function setDirectories($directories){
+		foreach($directories as $alias => $path){
+
+			// If the @ is not there lets add it
+			if(strncmp($alias, '@', 1))
+				$alias='@'.$alias;
+
+			// Lets strip trailing /
+			$path=rtrim($path,'\\/');
+			self::$paths[$alias]=$path;
+		}
+	}
+
+	/**
+	 * Registers a set of components within the configuration
+	 * @param array $components
+	 */
 	public static function setComponents($components){
 		foreach ($components as $id => $component) {
 			if (isset(self::$components[$id]['class']) && !isset($component['class'])) {
