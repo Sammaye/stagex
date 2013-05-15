@@ -106,7 +106,6 @@ class glue{
 
 		// Add the alias for the the framework root
 		self::setDirectories(array( '@glue' => __DIR__ ));
-		//self::autoload('Collection');
 //var_dump(self::getPath('@controllers')); exit();
 		if(php_sapi_name() == 'cli'){
 			$args = self::http()->parseArgs($_SERVER['argv']);
@@ -342,6 +341,11 @@ var_dump(error_get_last()); //exit();
 		if(isset(self::$aliases[$class])){
 			//echo "infff";
 			return class_alias(self::$aliases[$class],$class);
+		}elseif (isset(self::$classMap[$class])) {
+			$fullPath = self::$classMap[$className]['file'];
+			if (is_file($fullPath)) {
+				$classFile=$fullPath;
+			}
 		}else{
 
 			// follow PSR-0 to determine the class file
@@ -371,11 +375,11 @@ var_dump($path);
 			if (!isset($classFile) && self::$enableIncludePath && ($fullPath = stream_resolve_include_path($path)) !== false) {
 				$classFile = $fullPath;
 			}
+		}
 
-			if (!isset($classFile)) {
-				// return false to let other autoloaders to try loading the class
-				return false;
-			}
+		if (!isset($classFile)) {
+			// return false to let other autoloaders to try loading the class
+			return false;
 		}
 var_dump($classFile);
 		include $classFile;
@@ -418,17 +422,41 @@ var_dump($classFile);
 	 */
 	public static function import($path, $include=false, $op='include'){
 
-		if (strncmp($alias, '@', 1)) {
-			return $alias;
-		} else {
-			$alias = static::getAlias($alias);
-			if (!isset(self::$_imported[$alias])) {
-				$className = basename($alias);
-				self::$_imported[$alias] = $className;
-				self::$classMap[$className] = $alias . '.php';
-			}
-			return self::$_imported[$alias];
+		if (strncmp($path, '@', 1))
+			$path='@'.$path;
+
+		$pos = strpos($path,'/');
+		$filePath=$pos!==false?self::getPath(substr($path,0,$pos+1)) . substr($path,$pos):$path;
+		$className = basename($alias);
+
+		if (!isset(self::$classMap[$className])) {
+			self::$classMap[$className] = array(
+				'class' => $className,
+				'name' => $path,
+				'file' => $filePath
+			);
+		}else{
+			$filePath=self::$classMap[$className]['file'];
 		}
+
+		if (!isset(self::$_imported[$className])&&$include&&isset($filePath)) {
+			switch($op){
+				case "include_once":
+					include_once $filePath;
+					break;
+				case "require":
+					require $filePath;
+					break;
+				case "require_once":
+					require_once $filePath;
+					break;
+				default:
+					include $filePath;
+					break;
+			}
+			self::$_imported[$className]=true;
+		}
+
 
 //		$path = ltrim($path, '\\');
 //
