@@ -13,7 +13,7 @@ class Auth extends \glue\Component{
 	private $controller;
 
 	function init(){
-		glue::registerEvents(array(
+		glue::setEvents(array(
 			'beforeAction' => 'beforeAction'
 		),$this);
 		parent::init();

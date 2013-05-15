@@ -330,24 +330,24 @@ return array(
 				}
 			)
 		),
-	),
 
-	/**
-	 * Controls the error handler
-	 */
-	'errors' => array(
+		/**
+		 * Controls the error handler
+		 */
+		'errorHandler' => array(
 
-		// To change error reporting please do it in the php.ini, this will not deal
-		// with the level of error reporting, only how they are displayed
+			// To change error reporting please do it in the php.ini, this will not deal
+			// with the level of error reporting, only how they are displayed
 
-		"emails" => array("sam.millman@googlemail.com"),
+			"emails" => array("sam.millman@googlemail.com"),
 
-		"action" => "index/error",
+			"action" => "index/error",
 
-		'log' => false,
-		'logger' => function($exception){
-			return true;
-		}
+			'log' => false,
+			'logger' => function($exception){
+				return true;
+			}
+		),
 	),
 
 	/**

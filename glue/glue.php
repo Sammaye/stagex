@@ -31,6 +31,8 @@ class glue{
 	private static $paths = array();
 	private static $aliases = array();
 
+	private static $enableIncludePath=false;
+
 	public static $controller;
 
 	private static $_components = array();
@@ -70,21 +72,22 @@ class glue{
 			)
 		));
 
-		if(isset($config['events'])&&is_array($config['events'])){
-			foreach($config['events'] as $k => $v){
-				self::on($k,$v);
-			}
-		}
+//		if(isset($config['events'])&&is_array($config['events'])){
+//			foreach($config['events'] as $k => $v){
+//				self::on($k,$v);
+//			}
+//		}
 
-		if(isset($config['errors'])&&is_array($config['errors'])){
-			$errorHandler=$config['errors'];
-		}
+//		if(isset($config['errors'])&&is_array($config['errors'])){
+//			$errorHandler=$config['errors'];
+//		}
 
-		if(isset($config['components'])&&is_array($config['components'])){
-			self::setComponents($config['components']);
-		}
+//		if(isset($config['components'])&&is_array($config['components'])){
+//			self::setComponents($config['components']);
+//		}
 
-		unset($config['events'],$config['errors'], $config['components']);
+		//unset($config['errors']);
+		//unset($config['events'],$config['errors'], $config['components']);
 		if(is_array($config)){
 			foreach($config as $k => $v){
 				if(method_exists('glue','set'.$k)){
@@ -97,13 +100,14 @@ class glue{
 		}
 		if(self::getPath('@app')===null)
 			throw new Exception('The "@app" directory within the "directories" configuration variable must be set.');
-
-		self::registerAutoloader();
+		spl_autoload_register(array('glue','autoload'));
+		//self::registerAutoloader();
 		self::registerErrorHandlers();
 
 		// Add the alias for the the framework root
 		self::setDirectories(array( '@glue' => __DIR__ ));
-var_dump(self::getPath('@mongoglue')); exit();
+		//self::autoload('Collection');
+//var_dump(self::getPath('@controllers')); exit();
 		if(php_sapi_name() == 'cli'){
 			$args = self::http()->parseArgs($_SERVER['argv']);
 			self::$www='/cli';
@@ -176,7 +180,7 @@ var_dump(self::getPath('@mongoglue')); exit();
 		}
 
 		$controllerName = $id;
-		$controllerFile = self::getDirectory('@app') . DIRECTORY_SEPARATOR . ( self::getDirectory('@cli')!==null ? self::getDirectory('@cli') : 'cli' ) . DIRECTORY_SEPARATOR .
+		$controllerFile = ( self::getPath('@cli')!==null ? self::getPath('@cli') : self::getPath('@app'). DRIECTORY_SEPARATOR . 'cli' ) . DIRECTORY_SEPARATOR .
 								$controllerName . '.php';
 		include($controllerFile);
 	}
@@ -200,7 +204,7 @@ var_dump($route);
 
 		$controllerName = $id."Controller";
 		var_dump($controllerName);
-		$controllerFile = self::getDirectory('@app') . DIRECTORY_SEPARATOR . ( self::getDirectory('@controllers')!==null ? self::getDirectory('@controllers') : 'controllers' ) .
+		$controllerFile = ( self::getPath('@controllers')!==null ? self::getPath('@controllers') : self::getPath('@app') . DIRECTORY_SEPARATOR . 'controllers' ) .
 								DIRECTORY_SEPARATOR . $controllerName . '.php';
 		var_dump($controllerFile);
 		$className = ltrim(self::$controllerNamespace . '\\' . $controllerName, '\\');
@@ -325,69 +329,147 @@ var_dump(error_get_last()); //exit();
 	 */
 	public static function autoload($class, $return_cName = false){
 
+
 		$class = ltrim($class, '\\');
-		$pathinfo = pathinfo($class);
-		//var_dump($class);
-//var_dump(self::$aliases);
+
+		//if (isset(self::$classMap[$className])) {
+			//$classFile = static::getAlias(self::$classMap[$className]);
+			//if (!is_file($classFile)) {
+				//throw new InvalidConfigException("Class file does not exist: $classFile");
+			//}
+		//} else {
+
 		if(isset(self::$aliases[$class])){
 			//echo "infff";
 			return class_alias(self::$aliases[$class],$class);
-		}
-
-		// PSR-0 denotes that classes can be loaded with both \ and _ being translated to / (DIRECTORY_SEPARATOR)
-		$file_name=self::getDirectory('@app').str_replace(array('\\', '_'), DIRECTORY_SEPARATOR, '\\'.$class).'.php';
-		if(file_exists($file_name)){
-			return include $file_name;
-		}
-//		var_dump($file_name);
-//		exit();
-		foreach(self::$namespaces as $n=>$p){
-			if(!strncmp($class, $n, strlen($n))){
-				$file_name=str_replace(array('\\', '_'), DIRECTORY_SEPARATOR, self::getDirectory('@app').'\\'.str_replace($n,$p.'\\', $class)).'.php';
-				if(file_exists($file_name)){
-					return include $file_name;
-				}
-			}
-		}
-		return false;
-	}
-
-	public static function import($path){
-
-		$path = ltrim($path, '\\');
-
-		if(strpos('\\', $path)!==false){
-			// Import via PSR-0 notation
-			$file_name=str_replace(array('\\', '_'), DIRECTORY_SEPARATOR, self::getDirectory('@app').'\\'.$class).'.php';
-			if(file_exists($file_name)){
-				self::$_imported[$class] = $file_name;
-				return include file_name;
-			}
 		}else{
 
-			if(strpos('@',$path)===1){
+			// follow PSR-0 to determine the class file
+			if (($pos = strrpos($class, '\\')) !== false) {
+				// namespaced class, e.g. yii\base\Component
+				$path = str_replace('\\', '/', substr($class, 0, $pos + 1))
+				. str_replace('_', '/', substr($class, $pos + 1)) . '.php';
+			} else {
+				$path = str_replace('_', '/', $class) . '.php';
+			}
+var_dump($path);
+			// try via path alias first
+			if (($spos=strpos($path, '/')) !== false) {
 
-				// Then this is aliasing a directory
-				$dir=substr($path,0,strpos('/',$path));
-				$realPath = self::getDirectory('@root') . DIRECTORY_SEPARATOR . self::getDirectory($dir) . DIRECTORY_SEPARATOR .
-					str_replace('/',DIRECTORY_SEPARATOR,substr($path,strpos('/',$path)));
-				if(file_exists($realPath)){
-					self::$_imported[$path] = $realPath;
-					return include $realPath;
+				var_dump(substr('@' . $path,0,$spos+1));
+
+				$rootAlias = self::getPath(substr('@' . $path,0,$spos+1));
+
+				// If an alias could not be gotten just see if this is a path from the @app root else we dunno what it is
+				$fullPath=$rootAlias===null?self::getPath('@app').'/'.$path:$rootAlias.substr($path,$spos);
+				if ($fullPath !== false && is_file($fullPath)) {
+					$classFile = $fullPath;
 				}
-			}else{
-
 			}
 
+			// search include_path
+			if (!isset($classFile) && self::$enableIncludePath && ($fullPath = stream_resolve_include_path($path)) !== false) {
+				$classFile = $fullPath;
+			}
+
+			if (!isset($classFile)) {
+				// return false to let other autoloaders to try loading the class
+				return false;
+			}
+		}
+var_dump($classFile);
+		include $classFile;
+
+//		$class = ltrim($class, '\\');
+//		$pathinfo = pathinfo($class);
+//		//var_dump($class);
+////var_dump(self::$aliases);
+//
+//
+//		// PSR-0 denotes that classes can be loaded with both \ and _ being translated to / (DIRECTORY_SEPARATOR)
+//		$file_name=self::getDirectory('@app').str_replace(array('\\', '_'), DIRECTORY_SEPARATOR, '\\'.$class).'.php';
+//		if(file_exists($file_name)){
+//			return include $file_name;
+//		}
+////		var_dump($file_name);
+////		exit();
+//		foreach(self::$namespaces as $n=>$p){
+//			if(!strncmp($class, $n, strlen($n))){
+//				$file_name=str_replace(array('\\', '_'), DIRECTORY_SEPARATOR, self::getDirectory('@app').'\\'.str_replace($n,$p.'\\', $class)).'.php';
+//				if(file_exists($file_name)){
+//					return include $file_name;
+//				}
+//			}
+//		}
+//		return false;
+	}
+
+	/**
+	 * This function imports a file/class into the application.
+	 *
+	 * By default it will not actually include it in the same breath but instead will just map
+	 * the basename() to a place that can then be autoloaded, however, you can set it to $include and
+	 * can even specify the $op (include,require,include_once,require_once) to be used when including it.
+	 *
+	 * This means you don't have to use the PHP functions and this one to do your work.
+	 * @param string $path
+	 * @param boolean $include
+	 * @param string $op The include opeation to perform (include,include_once,require,require_once)
+	 */
+	public static function import($path, $include=false, $op='include'){
+
+		if (strncmp($alias, '@', 1)) {
+			return $alias;
+		} else {
+			$alias = static::getAlias($alias);
+			if (!isset(self::$_imported[$alias])) {
+				$className = basename($alias);
+				self::$_imported[$alias] = $className;
+				self::$classMap[$className] = $alias . '.php';
+			}
+			return self::$_imported[$alias];
 		}
 
+//		$path = ltrim($path, '\\');
+//
+//		if(strpos('\\', $path)!==false){
+//			// Import via PSR-0 notation
+//			$file_name=str_replace(array('\\', '_'), DIRECTORY_SEPARATOR, self::getDirectory('@app').'\\'.$class).'.php';
+//			if(file_exists($file_name)){
+//				self::$_imported[$class] = $file_name;
+//				return include file_name;
+//			}
+//		}else{
+//
+//			if(strpos('@',$path)===1){
+//
+//				// Then this is aliasing a directory
+//				$dir=substr($path,0,strpos('/',$path));
+//				$realPath = self::getDirectory('@root') . DIRECTORY_SEPARATOR . self::getDirectory($dir) . DIRECTORY_SEPARATOR .
+//					str_replace('/',DIRECTORY_SEPARATOR,substr($path,strpos('/',$path)));
+//				if(file_exists($realPath)){
+//					self::$_imported[$path] = $realPath;
+//					return include $realPath;
+//				}
+//			}else{
+//
+//			}
+//
+//		}
+
 	}
 
-	public static function registerAutoloader($callback = null){
-		spl_autoload_unregister(array('glue','autoload'));
-		if($callback) spl_autoload_register($callback);
-		spl_autoload_register(array('glue','autoload'));
-	}
+	/**
+	 * Registers you own autoloader. This isn't really needed since the glue
+	 * autoloader will actually permit
+	 * Enter description here ...
+	 * @param unknown_type $callback
+	 */
+//	public static function registerAutoloader($callback = null){
+//		spl_autoload_unregister(array('glue','autoload'));
+//		if($callback) spl_autoload_register($callback);
+//		spl_autoload_register(array('glue','autoload'));
+//	}
 
 	public static function mergeConfiguration(){
 		if (func_num_args() < 2) {
@@ -494,7 +576,7 @@ var_dump(error_get_last()); //exit();
 	 * @param array $events
 	 * @param \glue\Model $model
 	 */
-	public static function registerEvents($events,$model=null){
+	public static function setEvents($events,$model=null){
 		foreach($events as $k =>$v){
 			if($model)
 				self::on($k,array($model,$v));
