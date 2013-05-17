@@ -380,8 +380,11 @@ return array(
 		}
 	),
 
+	/**
+	 * This will include files directly into the global scope
+	 */
 	'include' => array(
-		'glue/Globals'
+		'@glue/helpers.php'
 	),
 
 	/**

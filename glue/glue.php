@@ -3,6 +3,12 @@ setlocale(LC_ALL, 'en_GB.UTF8');
 
 use \glue\Exception as Exception;
 
+/**
+ * Main glue framework class
+ *
+ * This is the entry point to the framework itself, everything will be autoloaded from
+ * here and the configuration defined in @app/config/cofnig will apply to this classes variables
+ */
 class glue{
 
 	public static $DEBUG=false;
@@ -14,10 +20,11 @@ class glue{
 	public static $params = array();
 
 	public static $www;
+
 	public static $defaultController='index';
 	public static $controllerNamespace;
-
 	public static $actionPrefix='action_';
+	public static $controller;
 
 	private static $startUp = array();
 
@@ -25,19 +32,12 @@ class glue{
 	private static $events = array();
 
 	private static $include=array();
-
-	//private static $namespaces = array();
-	//private static $directories = array();
 	private static $paths = array();
 	private static $aliases = array();
-
 	private static $enableIncludePath=false;
-
-	public static $controller;
 
 	private static $_components = array();
 	private static $_imported = array();
-
 	private static $classMap=array();
 
 	/**
@@ -72,22 +72,7 @@ class glue{
 			)
 		));
 
-//		if(isset($config['events'])&&is_array($config['events'])){
-//			foreach($config['events'] as $k => $v){
-//				self::on($k,$v);
-//			}
-//		}
-
-//		if(isset($config['errors'])&&is_array($config['errors'])){
-//			$errorHandler=$config['errors'];
-//		}
-
-//		if(isset($config['components'])&&is_array($config['components'])){
-//			self::setComponents($config['components']);
-//		}
-
-		//unset($config['errors']);
-		//unset($config['events'],$config['errors'], $config['components']);
+		// Setup the configuration
 		if(is_array($config)){
 			foreach($config as $k => $v){
 				if(method_exists('glue','set'.$k)){
@@ -98,15 +83,24 @@ class glue{
 				}
 			}
 		}
+
+		// Check the root path of the application
 		if(self::getPath('@app')===null)
 			throw new Exception('The "@app" directory within the "directories" configuration variable must be set.');
+
+		// Register glues autoloader, don't need to make a helper for this since
+		// The autoloader accepts other autloaders onto
 		spl_autoload_register(array('glue','autoload'));
-		//self::registerAutoloader();
 		self::registerErrorHandlers();
 
 		// Add the alias for the the framework root
 		self::setDirectories(array( '@glue' => __DIR__ ));
-//var_dump(self::getPath('@controllers')); exit();
+
+		// Import the includes
+		foreach(self::$include as $path)
+			self::import($path,true);
+
+		// Let's start processing the request
 		if(php_sapi_name() == 'cli'){
 			$args = self::http()->parseArgs($_SERVER['argv']);
 			self::$www='/cli';
@@ -142,10 +136,9 @@ class glue{
 	 * @param string $route
 	 * @param array $params
 	 */
-	static function runAction($route,$params = array()){
+	public static function runAction($route,$params = array()){
 
 		$controller = self::createController($route);
-		//var_dump($controller);
 		if(is_array($controller)){
 			list($controller,$action)=$controller;
 
@@ -154,7 +147,6 @@ class glue{
 
 			if(self::trigger('beforeAction',array($controller,$action))){
 				self::$controller = $controller;
-				echo "running action now";
 				call_user_func_array(array($controller,$action),$params);
 			}
 			self::trigger('afterAction',array($controller,$action));
@@ -166,7 +158,7 @@ class glue{
 	 * Runs a CLI script, may be redone in the future to make CLI run like controllers
 	 * @throws Exception
 	 */
-	static function runCliAction(){
+	public static function runCliAction(){
 		if ($route === '') {
 			throw new Exception('You must provide a cli file to run');
 		}
@@ -188,8 +180,8 @@ class glue{
 	 * Create a new controller
 	 * @param string $route
 	 */
-	static function createController($route){
-var_dump($route);
+	public static function createController($route){
+		var_dump($route);
 		if ($route === ''||$route === null) {
 			$route = self::$defaultController;
 		}
@@ -202,7 +194,6 @@ var_dump($route);
 		}
 
 		$controllerName = $id."Controller";
-		var_dump($controllerName);
 		$controllerFile = ( self::getPath('@controllers')!==null ? self::getPath('@controllers') : self::getPath('@app') . DIRECTORY_SEPARATOR . 'controllers' ) .
 								DIRECTORY_SEPARATOR . $controllerName . '.php';
 		var_dump($controllerFile);
@@ -229,13 +220,20 @@ var_dump($route);
 		return isset($controller) ? array($controller,$route) : false;
 	}
 
-	static function registerErrorHandlers(){
+	/**
+	 * Registers our error handlers, which atm, cannot be unregistered :\
+	 */
+	private static function registerErrorHandlers(){
 		set_error_handler(array('glue','handleError'));
 		set_exception_handler(array('glue','handleException')); // Exceptions are costly beware!
 		register_shutdown_function(array('glue','end'));
 	}
 
-	static function handleException($exception){
+	/**
+	 * The bootstrap function to call the error handler for handling our exceptions
+	 * @param Exception $exception
+	 */
+	private static function handleException($exception){
 
 		// disable error capturing to avoid recursive errors while handling exceptions
 		restore_error_handler();
@@ -246,10 +244,17 @@ var_dump($route);
 		exit(1);
 	}
 
-	static function handleError($code, $message, $file, $line, $fatal=false){
-		echo "hretjfdgljnfd";
+	/**
+	 * The bootstrap function to call the error handler to handle both normal errors and
+	 * fatal errors.
+	 * @param int $code
+	 * @param string $message
+	 * @param string $file
+	 * @param int $line
+	 * @param boolean $fatal
+	 */
+	private static function handleError($code, $message, $file, $line, $fatal=false){
 		$e=self::getComponent('errorHandler');
-//		var_dump($fatal);
 		if($fatal===true) // $fatal can sometimes be the symbol table, it depends on what mood PHP is in
 			$e->handleFatal($code,$message,$file,$line);
 		else
@@ -257,9 +262,18 @@ var_dump($route);
 		exit(1);
 	}
 
-	static function end($status=0,$exit=true){
+	/**
+	 * The end function.
+	 *
+	 * All functions in the framework will call this function when they force a closing of the thread via any function
+	 * include exit();. This function will check tio see if the program exited due to an error and if not run the after request event
+	 * and then exit for real.
+	 * @param int $status
+	 * @param boolean $exit
+	 */
+	public static function end($status=0,$exit=true){
 		echo "in end";
-var_dump(error_get_last()); //exit();
+//var_dump(error_get_last()); //exit();
 		if ($error = error_get_last()){
 			self::handleError($error['type'], $error['message'], $error['file'], $error['line'], true);
 		}else if ($status<1){ // If there was no error
@@ -277,7 +291,6 @@ var_dump(error_get_last()); //exit();
 	 */
 	public static function createComponent($config){
 
-//var_dump($config);
 		if (is_string($config)) {
 			$class = $config;
 			$config = array();
@@ -288,9 +301,9 @@ var_dump(error_get_last()); //exit();
 			throw new Exception('Component configuration must be an array containing a "class" element.');
 		}
 
-		//if (!class_exists($class, false)) {
-			//$class = self::import($class);
-		//}
+		if (!class_exists($class, false)&&strpos($class,'\\')===false /* If it is not a namespace */) {
+			$class = self::import($class);
+		}
 
 		$class = ltrim($class, '\\');
 		if (isset(self::$components[$class]) && self::$components[$class]!==null) {
@@ -306,7 +319,6 @@ var_dump(error_get_last()); //exit();
 	 * @throws Exception
 	 */
 	public static function getComponent($name, $config=array()){
-		//echo "fkdefjkdsf;fds";
 		$config = Collection::mergeArray(isset(self::$components[$name])&&is_array(self::$components[$name])?self::$components[$name]:array(), $config);
 //var_dump($config);
 		if(!empty($config) && $config){ // If is still unset then go to error clause
@@ -321,8 +333,7 @@ var_dump(error_get_last()); //exit();
 	}
 
 	/**
-	 * Imports a single file or directory into the app
-	 *
+	 * Autoloads a file into the glue framework
 	 * @param string $cName
 	 * @param string $cPath
 	 */
@@ -331,18 +342,10 @@ var_dump(error_get_last()); //exit();
 
 		$class = ltrim($class, '\\');
 
-		//if (isset(self::$classMap[$className])) {
-			//$classFile = static::getAlias(self::$classMap[$className]);
-			//if (!is_file($classFile)) {
-				//throw new InvalidConfigException("Class file does not exist: $classFile");
-			//}
-		//} else {
-
 		if(isset(self::$aliases[$class])){
-			//echo "infff";
 			return class_alias(self::$aliases[$class],$class);
 		}elseif (isset(self::$classMap[$class])) {
-			$fullPath = self::$classMap[$className]['file'];
+			$fullPath = self::$classMap[$class]['file'];
 			if (is_file($fullPath)) {
 				$classFile=$fullPath;
 			}
@@ -356,11 +359,9 @@ var_dump(error_get_last()); //exit();
 			} else {
 				$path = str_replace('_', '/', $class) . '.php';
 			}
-var_dump($path);
+
 			// try via path alias first
 			if (($spos=strpos($path, '/')) !== false) {
-
-				var_dump(substr('@' . $path,0,$spos+1));
 
 				$rootAlias = self::getPath(substr('@' . $path,0,$spos+1));
 
@@ -381,31 +382,7 @@ var_dump($path);
 			// return false to let other autoloaders to try loading the class
 			return false;
 		}
-var_dump($classFile);
 		include $classFile;
-
-//		$class = ltrim($class, '\\');
-//		$pathinfo = pathinfo($class);
-//		//var_dump($class);
-////var_dump(self::$aliases);
-//
-//
-//		// PSR-0 denotes that classes can be loaded with both \ and _ being translated to / (DIRECTORY_SEPARATOR)
-//		$file_name=self::getDirectory('@app').str_replace(array('\\', '_'), DIRECTORY_SEPARATOR, '\\'.$class).'.php';
-//		if(file_exists($file_name)){
-//			return include $file_name;
-//		}
-////		var_dump($file_name);
-////		exit();
-//		foreach(self::$namespaces as $n=>$p){
-//			if(!strncmp($class, $n, strlen($n))){
-//				$file_name=str_replace(array('\\', '_'), DIRECTORY_SEPARATOR, self::getDirectory('@app').'\\'.str_replace($n,$p.'\\', $class)).'.php';
-//				if(file_exists($file_name)){
-//					return include $file_name;
-//				}
-//			}
-//		}
-//		return false;
 	}
 
 	/**
@@ -426,8 +403,8 @@ var_dump($classFile);
 			$path='@'.$path;
 
 		$pos = strpos($path,'/');
-		$filePath=$pos!==false?self::getPath(substr($path,0,$pos+1)) . substr($path,$pos):$path;
-		$className = basename($alias);
+		$filePath=$pos!==false?self::getPath(substr($path,0,$pos)) . substr($path,$pos):$path;
+		$className = basename($path,'.php');
 
 		if (!isset(self::$classMap[$className])) {
 			self::$classMap[$className] = array(
@@ -442,63 +419,27 @@ var_dump($classFile);
 		if (!isset(self::$_imported[$className])&&$include&&isset($filePath)) {
 			switch($op){
 				case "include_once":
-					include_once $filePath;
+					return include_once $filePath;
 					break;
 				case "require":
-					require $filePath;
+					return require $filePath;
 					break;
 				case "require_once":
-					require_once $filePath;
+					return require_once $filePath;
 					break;
 				default:
-					include $filePath;
+					return include $filePath;
 					break;
 			}
 			self::$_imported[$className]=true;
 		}
-
-
-//		$path = ltrim($path, '\\');
-//
-//		if(strpos('\\', $path)!==false){
-//			// Import via PSR-0 notation
-//			$file_name=str_replace(array('\\', '_'), DIRECTORY_SEPARATOR, self::getDirectory('@app').'\\'.$class).'.php';
-//			if(file_exists($file_name)){
-//				self::$_imported[$class] = $file_name;
-//				return include file_name;
-//			}
-//		}else{
-//
-//			if(strpos('@',$path)===1){
-//
-//				// Then this is aliasing a directory
-//				$dir=substr($path,0,strpos('/',$path));
-//				$realPath = self::getDirectory('@root') . DIRECTORY_SEPARATOR . self::getDirectory($dir) . DIRECTORY_SEPARATOR .
-//					str_replace('/',DIRECTORY_SEPARATOR,substr($path,strpos('/',$path)));
-//				if(file_exists($realPath)){
-//					self::$_imported[$path] = $realPath;
-//					return include $realPath;
-//				}
-//			}else{
-//
-//			}
-//
-//		}
-
+		return $className;
 	}
 
 	/**
-	 * Registers you own autoloader. This isn't really needed since the glue
-	 * autoloader will actually permit
-	 * Enter description here ...
-	 * @param unknown_type $callback
+	 * Merges two maps recursively and returns only one
+	 * @throws Exception
 	 */
-//	public static function registerAutoloader($callback = null){
-//		spl_autoload_unregister(array('glue','autoload'));
-//		if($callback) spl_autoload_register($callback);
-//		spl_autoload_register(array('glue','autoload'));
-//	}
-
 	public static function mergeConfiguration(){
 		if (func_num_args() < 2) {
 			throw new Exception(__FUNCTION__ .' needs two or more array arguments');
@@ -644,10 +585,9 @@ var_dump($classFile);
 
 		$dir=self::$paths[$alias];
 
-		if(strncmp($dir, '@', 1)===0){ // Maybe this SHOULD be a /?
+		if(strncmp($dir, '@', 1)===0){
 			$pos = strpos($dir, '/');
 			$root = $pos === false ? $dir : substr($dir, 0, $pos); // Lets get the root alias of this path
-			//var_dump($root); var_dump(self::$directories['@glue']); exit();
 			$rootAlias = self::getPath($root);
 
 			return $pos === false || $rootAlias===null ? $dir : $rootAlias . substr($dir, $pos);
