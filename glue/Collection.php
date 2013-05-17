@@ -2,7 +2,8 @@
 
 namespace glue;
 
-//use \glue\Exception;
+use glue,
+	\glue\Exception;
 
 class Collection implements \Iterator,\ArrayAccess,\Countable{
 
@@ -15,7 +16,7 @@ class Collection implements \Iterator,\ArrayAccess,\Countable{
 			$this->_class = $class;
 
 		$return_array = array();
-		$list = is_string($list) ? include ROOT.'/application/lists/'.$list_file.'.php' : $list;
+		$list = is_string($list) ? glue::import('@app/lists/'.$list_file.'.php',true) : $list;
 
 		if(count($fields) <= 0)
 			$this->_container = $list;
