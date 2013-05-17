@@ -34,7 +34,7 @@ class glue{
 	private static $include=array();
 	private static $paths = array();
 	private static $aliases = array();
-	private static $enableIncludePath=false;
+	public static $enableIncludePath=false;
 
 	private static $_components = array();
 	private static $_imported = array();
