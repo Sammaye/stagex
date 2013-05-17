@@ -11,14 +11,14 @@ foreach($stream_cursor as $k => $v){
 
 $stream_cursor = iterator_to_array($stream_cursor);
 
-//print sizeof($stream_cursor); // DEBUG
+//print count($stream_cursor); // DEBUG
 
 // Set them to processing so future crons don't try and share twice
 // The idea for this is that the cronjob runs once every 3 mins but it will take long than 3 mins for the cronjob to finish
 // so I reserve the docs are are being processed by one thread so another thread won't try and take them and create duplicates or an infinite loop.
 $c = glue::db()->auto_publish_stream->update(array('_id' => array('$in' => $_ids)), array('$set' => array('processing' => 1)), array('multiple' => true));
 
-//print sizeof($stream_cursor); // DEBUG
+//print count($stream_cursor); // DEBUG
 
 // Now lets iterate through the documents finding out what kind of action needs auto publishing to networks
 // The list of possible values can be found in AutoPublishStream model
@@ -96,7 +96,7 @@ foreach($stream_cursor as $k => $v){
 					$playlist->title,
 					'Liked a playlist on StageX',
 					glue::url()->create('/playlist/view', array('id' => $playlist->_id)),
-					'There are '.sizeof($playlist->videos).' videos in this playlist',
+					'There are '.count($playlist->videos).' videos in this playlist',
 					str_replace('http://', '', $playlist->getRandomVideoPic())
 				);
 				$twitter->update_status('Liked '.glue::url()->create('/playlist/view', array('id' =>  $playlist->_id)).' on #StageX');
@@ -108,7 +108,7 @@ foreach($stream_cursor as $k => $v){
 					$playlist->title,
 					'Added '.$video->title.' to '.$playlist->title,
 					glue::url()->create('/playlist/view', array('id' => $playlist->_id)),
-					'There are '.sizeof($playlist->videos).' videos in this playlist',
+					'There are '.count($playlist->videos).' videos in this playlist',
 					str_replace('http://', '', $video->getImage(124,69))
 				);
 				$twitter->update_status('Added a video to '.glue::url()->create('/playlist/view', array('id' =>  $playlist->_id)).' on #StageX');

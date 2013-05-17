@@ -103,9 +103,9 @@ glue::clientScript()->addJsScript('user.subscribe', "
 
 								<div style='margin-bottom:15px;'>
 									<?php $urls = array_chunk(is_array($user->external_links) ? $user->external_links : array(), 3); ?>
-									<?php for($i = 0, $size= sizeof($urls); $i < $size; $i++){ ?>
+									<?php for($i = 0, $size= count($urls); $i < $size; $i++){ ?>
 										<ul class='user_profile_url_list'>
-											<?php for($j = 0, $url_s = sizeof($urls[$i]); $j < $url_s; $j++){ $row = $urls[$i][$j]; ?>
+											<?php for($j = 0, $url_s = count($urls[$i]); $j < $url_s; $j++){ $row = $urls[$i][$j]; ?>
 												<li><?php echo html::a(array('href' => $row['url'], 'text' => $row['title'] ? $row['title'] : $row['url'], 'rel' => 'nofollow')) ?></li>
 											<?php } ?>
 										</ul>

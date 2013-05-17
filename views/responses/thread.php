@@ -211,9 +211,9 @@ glue::clientScript()->addJsScript('watch.response_list', "
 				</div>
 			</div>
 		</div>
-		<?php if(sizeof($thread) > 0){ ?>
+		<?php if(count($thread) > 0){ ?>
 			<div class='thread_reply_list'>
-				<div class='thread_reply_amnt'><?php echo sizeof($thread) ?> replies to <?php echo $thread_parent->author->getUsername() ?></div>
+				<div class='thread_reply_amnt'><?php echo count($thread) ?> replies to <?php echo $thread_parent->author->getUsername() ?></div>
 				<div class='comment_list'>
 					<div class='list'>
 						<?php foreach($thread as $k => $v){

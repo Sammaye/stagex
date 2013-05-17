@@ -703,7 +703,7 @@ class GdThumb extends ThumbBase
 		}
 
 		// we've yet to init the default options, so create them here
-		if (sizeof($this->options) == 0)
+		if (count($this->options) == 0)
 		{
 			$defaultOptions = array
 			(

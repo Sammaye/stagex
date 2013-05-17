@@ -183,7 +183,7 @@ class videoresponseController extends GController{
 
 		$video = Video::model()->findOne(array('_id' => new MongoId($video_id)));
 
-		if(sizeof($_ids) <= 0 || !is_array($_ids) || !$video){
+		if(count($_ids) <= 0 || !is_array($_ids) || !$video){
 			GJSON::kill(GJSON::UNKNOWN);
 		}
 
@@ -195,7 +195,7 @@ class videoresponseController extends GController{
 		}
 
 		$comment_rows = VideoResponse::model()->find(array('_id' => array('$in' => $_ids), 'vid' => $video->_id));
-		if(sizeof($_ids) != $comment_rows->count())
+		if(count($_ids) != $comment_rows->count())
 			GJSON::kill('Some of the comments you specified could not be found');
 
 		foreach($comment_rows as $k => $v){
@@ -269,7 +269,7 @@ class videoresponseController extends GController{
 
 		$video = Video::model()->findOne(array('_id' => new MongoId($video_id)));
 
-		if(sizeof($_ids) <= 0 || !is_array($_ids) || !$video){
+		if(count($_ids) <= 0 || !is_array($_ids) || !$video){
 			GJSON::kill(GJSON::UNKNOWN);
 		}
 
@@ -283,7 +283,7 @@ class videoresponseController extends GController{
 		$comment_rows = glue::db()->videoresponse->find(array('_id' => array('$in' => $_ids), 'vid' => $video->_id));
 		$row_count = $comment_rows->count();
 
-		if(sizeof($_ids) != $row_count)
+		if(count($_ids) != $row_count)
 			GJSON::kill('Some of the comments you specified could not be found');
 
 		glue::db()->videoresponse->remove(array('_id' => array('$in' => $_ids), 'vid' => $video->_id), array('safe' => true));

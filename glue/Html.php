@@ -454,7 +454,7 @@ class html{
 
 		// Has model been validated?
 		if($model_validated){
-			if(!$succeeded && sizeof($messages) > 0){ // If the model/s did not validate
+			if(!$succeeded && count($messages) > 0){ // If the model/s did not validate
 				$html .= self::openTag('div', array('class' => 'block_summary error_summary'));
 				$html .= self::openTag('div', array('class' => 'close')).self::a(array('href' => '#', 'text' => utf8_decode('&#215;'))).self::closeTag('div');
 
@@ -624,7 +624,7 @@ class html{
 			{
 				if($pos!==0){  // e.g. name[a][b]
 					$exploded_path = explode('.', trim(strtr($attribute,array(']['=>'.','['=>'.')),']'));
-					if(sizeof($exploded_path) > 0){
+					if(count($exploded_path) > 0){
 						$previous = $model;
 						foreach($exploded_path as $part){
 							if(is_object($previous)){

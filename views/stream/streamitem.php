@@ -75,8 +75,8 @@
 								?><div class='text_response_item'>[Comment Deleted]</div><?php
 							} break; ?>
 						<?php } ?>
-						<?php if(sizeof($item->items) > 1){ ?>
-							<div class='view_more_responses'><a href='<?php echo glue::url()->create('/videoresponse/view_all', array('id' => strval($item->parent_video->_id))) ?>'>+<?php echo sizeof($item->items)-1 ?> more responses</a></div>
+						<?php if(count($item->items) > 1){ ?>
+							<div class='view_more_responses'><a href='<?php echo glue::url()->create('/videoresponse/view_all', array('id' => strval($item->parent_video->_id))) ?>'>+<?php echo count($item->items)-1 ?> more responses</a></div>
 						<?php } ?>
 					</div>
 		<?php elseif($item->type == Stream::VIDEO_RATE):

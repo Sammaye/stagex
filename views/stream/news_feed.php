@@ -26,11 +26,11 @@ glue::clientScript()->addJsScript('page_js', "
 <div class='grid_5 alpha omega user_news_feed_body float_left'>
 	<div class='head_outer'>
 		<div class='head'>News Stream</div>
-		<div class='subs'><a href='<?php echo glue::url()->create('/user/subscriptions') ?>'><?php echo sizeof($subscriptions).' subscriptions' ?></a></div>
+		<div class='subs'><a href='<?php echo glue::url()->create('/user/subscriptions') ?>'><?php echo count($subscriptions).' subscriptions' ?></a></div>
 	</div>
 	<div class='list'>
 		<?php
-		if(sizeof($model) > 0){
+		if(count($model) > 0){
 			foreach($model as $k => $item){
 				$this->partialRender('stream/streamitem', array('item' => $item, 'hideDelete' => true));
 			}

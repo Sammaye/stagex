@@ -38,7 +38,7 @@ class GMySQL extends GApplicationComponent{
 		$in_fields = array();
 		foreach($params as $field => $value){
 			if(is_array($value)){
-				for($i=0,$size=sizeof($value);$i<$size;$i++)
+				for($i=0,$size=count($value);$i<$size;$i++)
 					$in_array[] = $field.$i;
 
 				$query = str_replace($field, "(".implode(',', $in_array).")", $query); // Lets replace the position in the quiery string with the full version
@@ -57,7 +57,7 @@ class GMySQL extends GApplicationComponent{
 
 		// Now lets bind the IN params
 		foreach($in_fields as $field => $value){
-			for($i=0,$size=sizeof($value);$i<$size;$i++){
+			for($i=0,$size=count($value);$i<$size;$i++){
 				$query_obj->bindValue($field.$i, $value[$i]); // Both the named param index and this index are based off the array index which has not changed...hopefully
 			}
 		}

@@ -611,11 +611,11 @@ class Video extends MongoDocument{
 			$ages_highCharts_array[] = array($u_age_capt, ($sum/$total_ages)*100);
 		}
 
-		if(sizeof($ages_highCharts_array) <= 0){
+		if(count($ages_highCharts_array) <= 0){
 			$ages_highCharts_array = array(array('None', 100));
 		}
 
-		if(sizeof($browsers_highCharts_array) <= 0){
+		if(count($browsers_highCharts_array) <= 0){
 			$browsers_highCharts_array = array(array('None', 100));
 		}
 

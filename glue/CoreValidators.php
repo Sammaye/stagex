@@ -425,7 +425,7 @@ class CoreValidators{
 		$ex_val = preg_split($params['del'], $value);
 
 		if(isset($params['max'])){
-			if(sizeof($ex_val) > $params['max']){
+			if(count($ex_val) > $params['max']){
 				self::$codes[$field][] = 'TOK_MAX';
 				return false;
 			}
@@ -491,7 +491,7 @@ class CoreValidators{
 
 		switch($params['format']){
 			case 'd/m/yyyy':
-				if(sizeof($date_parts) != 3){
+				if(count($date_parts) != 3){
 					return false;
 				}
 

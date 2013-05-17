@@ -599,7 +599,7 @@ glue::clientScript()->addJsScript('watch.edit_video', "
 <?php if(glue::roles()->checkRoles(array('canView' => $playlist))){ ?>
 <div class="playlist_bar_outer" data-id='<?php echo $playlist->_id ?>'>
 	<div class='playlist_bar_head'>
-		<div class='float_left head_left'>Playlist: <a href='<?php echo glue::url()->create('/playlist/view', array('id' => $playlist->_id)) ?>'><?php echo html::encode($playlist->title) ?></a> (<?php echo sizeof($playlist->videos) ?> Videos)
+		<div class='float_left head_left'>Playlist: <a href='<?php echo glue::url()->create('/playlist/view', array('id' => $playlist->_id)) ?>'><?php echo html::encode($playlist->title) ?></a> (<?php echo count($playlist->videos) ?> Videos)
 		- By <b><a href='<?php echo glue::url()->create('/user/view', array('id' => $playlist->user_id)) ?>'><?php echo $playlist->author->getUsername(); ?></a></b></div>
 		<button class='float_right view_all_videos'>View All Videos</button>
 	</div>

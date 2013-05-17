@@ -61,7 +61,7 @@ class historyController extends GController{
 		$_ids = isset($_POST['items']) ? $_POST['items'] : array();
 		$type = isset($_POST['type']) ? $_POST['type'] : null;
 
-		if(!is_array($_ids) || sizeof($_ids) <= 0 && ($type != 'video' && $type != 'playlist')){
+		if(!is_array($_ids) || count($_ids) <= 0 && ($type != 'video' && $type != 'playlist')){
 			GJSON::kill(GJSON::UNKNOWN);
 		}
 
@@ -106,7 +106,7 @@ class historyController extends GController{
 
 		$_ids = isset($_POST['items']) ? $_POST['items'] : array();
 
-		if(!is_array($_ids) || sizeof($_ids) <= 0){
+		if(!is_array($_ids) || count($_ids) <= 0){
 			//echo "hwere";
 			GJSON::kill(GJSON::UNKNOWN);
 		}
@@ -117,7 +117,7 @@ class historyController extends GController{
 		}
 
 		$rows = glue::db()->watched_history->find(array('_id' => array('$in' => $mongo_ids), 'user_id' => glue::session()->user->_id));
-		if($rows->count() != sizeof($_ids)){
+		if($rows->count() != count($_ids)){
 			GJSON::kill(GJSON::UNKNOWN);
 		}
 		glue::db()->watched_history->remove(array('_id' => array('$in' => $mongo_ids), 'user_id' => glue::session()->user->_id));

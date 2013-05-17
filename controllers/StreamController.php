@@ -122,7 +122,7 @@ class StreamController extends GController{
 		if(!glue::http()->isAjax())
 			glue::route(glue::config('404', 'errorPages'));
 
-		if(sizeof($_POST['items']) > 0){
+		if(count($_POST['items']) > 0){
 			$items = array();
 
 			foreach($_POST['items'] as $k=>$v){
@@ -131,7 +131,7 @@ class StreamController extends GController{
 			$stream = new Stream;
 			$stream->removeAll_byid($items);
 
-			if(sizeof($_POST['items']) > 1){
+			if(count($_POST['items']) > 1){
 				GJSON::kill('Stream items were deleted', true);
 			}else{
 				GJSON::kill('Stream item was deleted', true);
@@ -155,7 +155,7 @@ class StreamController extends GController{
 		ob_start();
 			$items = Stream::model()->find(array('user_id' => glue::session()->user->_id))->sort(array('ts' => -1))->limit(20);
 
-			if(sizeof($items) > 0){
+			if(count($items) > 0){
 				foreach($model as $k => $item){
 					$this->partialRender('stream/streamitem', array('item' => $item));
 				}

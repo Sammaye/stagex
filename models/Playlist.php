@@ -44,7 +44,7 @@ class Playlist extends MongoDocument{
 
 	function getRandomVideoPic(){
 
-		if(sizeof($this->videos) <= 0){
+		if(count($this->videos) <= 0){
 			if(isset(glue::$params['thumbnailBase'])){
 				return 'images.stagex.co.uk/videos/_w_138_h_77.png';
 			}else{
@@ -59,8 +59,8 @@ class Playlist extends MongoDocument{
 	function get4Pics(){
 		$pics = array(); $i = 0;
 
-		if(sizeof($this->videos) > 0){
-			for($i, $size = sizeof($this->videos) >= 4 ? 4 : sizeof($this->videos); $i < $size; $i++){
+		if(count($this->videos) > 0){
+			for($i, $size = count($this->videos) >= 4 ? 4 : count($this->videos); $i < $size; $i++){
 				$video = Video::model()->findOne(array('_id' => $this->videos[$i]['_id']));
 
 				if(!$video)
@@ -89,7 +89,7 @@ class Playlist extends MongoDocument{
 			if($v['_id'] == $_id)
 				return; // Bail if the video exists
 		}
-		$this->videos[] = array('_id' => $_id, 'pos' => sizeof($this->videos));
+		$this->videos[] = array('_id' => $_id, 'pos' => count($this->videos));
 	}
 
 	function add_video_at_pos($_id, $pos = 0){
@@ -183,7 +183,7 @@ class Playlist extends MongoDocument{
 					":title" => $this->title,
 					":description" => $this->description,
 					":type" => "playlist",
-					":videos" => sizeof($this->videos),
+					":videos" => count($this->videos),
 					":author_name" => glue::session()->user->username,
 				));
 
@@ -199,7 +199,7 @@ class Playlist extends MongoDocument{
 					":title" => $this->title,
 					":description" => $this->description,
 					":author_name" => glue::session()->user->username,
-					":videos" => sizeof($this->videos)
+					":videos" => count($this->videos)
 				));
 			}
 		}

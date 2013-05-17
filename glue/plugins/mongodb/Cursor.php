@@ -78,7 +78,7 @@ class Cursor implements \Iterator, \Countable{
     	if($this->cursor() instanceof \MongoCursor)
     		return $this->cursor()->count();
     	elseif($this->cursor())
-    		return sizeof($this->cursor);
+    		return count($this->cursor);
     }
 
     /**

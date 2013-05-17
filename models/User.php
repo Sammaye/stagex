@@ -194,7 +194,7 @@ class User extends MongoDocument{
 	}
 
 	function validate_birthday($field, $params = array()){
-		$filled_size = sizeof(array_filter(array(
+		$filled_size = count(array_filter(array(
 			GValidators::isEmpty($this->birth_day) ? null : $this->birth_day,
 			GValidators::isEmpty($this->birth_month) ? null : $this->birth_month,
 			GValidators::isEmpty($this->birth_year) ? null : $this->birth_year,
@@ -323,11 +323,11 @@ class User extends MongoDocument{
 		//if(!$valid)
 			//$this->addError('One or more of the external links you entered were incorrect. Please enter the full URL you wish to link to and optionally a title no longer than 20 characters.');
 
-		if(sizeof($this->external_links) > 6){
+		if(count($this->external_links) > 6){
 			$this->addError('You can only add 6 external links for the time being. Please make sure you have entered no more and try again.');
 		}
 
-		if(sizeof($this->getErrors()) > 0){
+		if(count($this->getErrors()) > 0){
 			return false;
 		}
 		return true;

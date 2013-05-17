@@ -11,9 +11,9 @@
 		<div class='title'><a href='<?php echo glue::url()->create('/playlist/view', array('id' => strval($item->_id))) ?>'><?php echo $item->title ?></a></div>
 		<div class='video_preview'>
 			<div class='video_count'>
-				<?php echo sizeof($item->videos) ?>
+				<?php echo count($item->videos) ?>
 				<div>videos</div>
-			</div><div class='image_row'><?php for($i = 1; $i < sizeof($pics); $i++){ ?>
+			</div><div class='image_row'><?php for($i = 1; $i < count($pics); $i++){ ?>
 			<img alt='thumbnail' src='<?php echo $pics[$i] ?>' class='smaller <?php if($i==3) echo 'last' ?>'/>
 		<?php } ?></div>
 		</div>

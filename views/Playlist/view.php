@@ -92,7 +92,7 @@ glue::clientScript()->addJsScript('user.subscribe', "
 	});
 ");
 
-$video_count = sizeof($playlist->videos);
+$video_count = count($playlist->videos);
 ?>
 <div class='container_16'>
 <div class='grid_16 alpha omega view_playlist_body'>

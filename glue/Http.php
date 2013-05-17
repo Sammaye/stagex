@@ -237,7 +237,7 @@ class Http{
 			unset($params['url']);
 
 			$path = $this->path();
-			return $host.'/'.$path.(sizeof($params) > 0 ? '?'.$this->getParams($params) : '').($fragment ? '#'.$fragment : '');
+			return $host.'/'.$path.(count($params) > 0 ? '?'.$this->getParams($params) : '').($fragment ? '#'.$fragment : '');
 		}
 
 		if(is_array($path)){
@@ -251,7 +251,7 @@ class Http{
 			$params = array_merge($getParams, $path);
 			$path = '/'.$this->path();
 		}
-		return $host.$path.(sizeof($params) > 0 ? '?'.$this->getParams($params) : '').($fragment ? '#'.$fragment : '');
+		return $host.$path.(count($params) > 0 ? '?'.$this->getParams($params) : '').($fragment ? '#'.$fragment : '');
 	}
 
 	public function getUrl($returnObj = false){

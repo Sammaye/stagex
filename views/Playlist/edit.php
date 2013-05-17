@@ -131,7 +131,7 @@ glue::clientScript()->addJsScript('playlist_ops', "
 	<div class='videos_list'>
 		<?php
 		$videos = $playlist->get_sorted_videos();
-		if(sizeof($videos) > 0){ ?>
+		if(count($videos) > 0){ ?>
 			<ul class='sortable_list playlist_video_list'>
 			<?php foreach($videos as $k => $video){ ?>
 				<li class='sortable_item video_item' data-id='<?php echo $video->_id ?>'>

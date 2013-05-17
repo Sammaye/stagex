@@ -3,7 +3,7 @@
 	<div class='content'>
 		<?php $children = $model->getDescendants()->sort(array('type' => 1, 'seq' => 1)) ?>
 
-		<?php if(sizeof($children) > 0){ ?>
+		<?php if(count($children) > 0){ ?>
 			<ul class='topic_content_list'>
 			<?php foreach($children as $child){
 				if($child->type == 'article'){ ?>

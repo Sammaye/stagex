@@ -738,7 +738,7 @@ class RequestCore
 		}
 
 		// Merge in the CURLOPTs
-		if (isset($this->curlopts) && sizeof($this->curlopts) > 0)
+		if (isset($this->curlopts) && count($this->curlopts) > 0)
 		{
 			foreach ($this->curlopts as $k => $v)
 			{

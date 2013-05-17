@@ -53,7 +53,7 @@ class Google{
 			'access_type='.$access_type
 		);
 
-		if(sizeof($scopes) > 0){
+		if(count($scopes) > 0){
 			$url_scopes = 'scope=';
 			foreach($scopes as $scope){
 				$url_scopes .= $this->getScopeURI($scope).'+';
@@ -114,7 +114,7 @@ class Google{
 		$ch = curl_init();
 
 		$get_string = 'access_token='.$this->getAccessToken();
-		if(sizeof($params) > 0){
+		if(count($params) > 0){
 			foreach($params as $key => $value){
 				$get_string .= $key.'='.$value.'&';
 			}

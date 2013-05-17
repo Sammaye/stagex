@@ -146,7 +146,7 @@ class Controller {
 	 */
 	public static function beginWidget($path, $args = null){
 		$pieces = explode("/", $path);
-		$cName = substr($pieces[sizeof($pieces)-1], 0, strrpos($pieces[sizeof($pieces)-1], "."));
+		$cName = substr($pieces[count($pieces)-1], 0, strrpos($pieces[count($pieces)-1], "."));
 		Glue::import($path);
 		$widget = new $cName();
 		$widget->attributes($args);

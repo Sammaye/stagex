@@ -36,7 +36,7 @@ class loginForm extends GModel{
 			}
 		}
 
-		if(sizeof($this->getErrors()) <= 0){
+		if(count($this->getErrors()) <= 0){
 			if(glue::session()->login($this->email, $this->password)){
 				return true;
 			}else{

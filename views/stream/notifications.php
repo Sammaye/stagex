@@ -4,7 +4,7 @@
 
 		<?php
 		$stream = Notification::model()->find(array('user_id' => glue::session()->user->_id))->sort(array('ts' => -1))->limit(20);
-		if(sizeof($stream) <= 0){
+		if(count($stream) <= 0){
 			?><div class='no_notifications'>You have no new notifications</div><?php
 		}
 
@@ -17,8 +17,8 @@
 				<div class='notification_item'>
 					<div class='notification_header'>
 						<?php
-						echo sprintf('%1$s'.(sizeof($stream_item->from_users) > 1 ? ' have ' : ' has ').
-							($stream_item->response_count > sizeof($stream_item->from_users) ? 'made a total of %2$s responses to' : 'responded to').
+						echo sprintf('%1$s'.(count($stream_item->from_users) > 1 ? ' have ' : ' has ').
+							($stream_item->response_count > count($stream_item->from_users) ? 'made a total of %2$s responses to' : 'responded to').
 							' %3$s '.($stream_item->approved == false ? 'which require moderation' : ''),
 
 							$stream_item->get_usernames_caption(), $stream_item->response_count,
@@ -47,7 +47,7 @@
 			<?php }elseif($stream_item->type == Notification::VIDEO_COMMENT_REPLY){ ?>
 				<div class='notification_item'>
 					<div class='notification_header'>
-						<?php echo sprintf('%1$s '.($stream_item->response_count > sizeof($stream_item->from_users) ? 'made %2$s responses to a comment you made on' :
+						<?php echo sprintf('%1$s '.($stream_item->response_count > count($stream_item->from_users) ? 'made %2$s responses to a comment you made on' :
 								'responded to a comment you made on').' %3$s',
 
 							$stream_item->get_usernames_caption(), $stream_item->response_count,
@@ -113,7 +113,7 @@
 			<?php }elseif($stream_item->type == Notification::WALL_POST){ ?>
 				<div class='notification_item'>
 					<div class='notification_header'>
-						<?php echo sprintf('%1$s has posted '.($stream_item->response_count > sizeof($stream_item->from_users) ? '%2$s comments' :
+						<?php echo sprintf('%1$s has posted '.($stream_item->response_count > count($stream_item->from_users) ? '%2$s comments' :
 								'a comment').' on your stream',
 							$stream_item->get_usernames_caption(), $stream_item->response_count);
 						?><span class='sent_date'> - <?php echo $stream_item->getDateTime() ?></span>

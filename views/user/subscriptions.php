@@ -82,7 +82,7 @@
 		<div class='user_subscription_list'>
 		<?php
 
-		if(sizeof($subscriptions) > 0){
+		if(count($subscriptions) > 0){
 			ob_start();
 			?> <div class='list' style='padding:7px 10px;'>{items}<div style='margin-top:7px;'>{pager}<div class="clearer"></div></div></div> <?php
 			$template = ob_get_contents();

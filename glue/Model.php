@@ -283,7 +283,7 @@ class Model{
 			$rule_params = $rule;
 			unset($rule_params[0], $rule_params[1], $rule_params['message'], $rule_params['on'], $rule_params['label']);
 
-			if(sizeof($rule_scenarios) > 0){
+			if(count($rule_scenarios) > 0){
 				if(!array_key_exists($this->getScenario(), $rule_scenarios)) continue; // If a scenario is set and this rule does not apply to the scenario then move onto the next
 			}
 
@@ -295,11 +295,11 @@ class Model{
 
 				$field_parts = explode('.', $field);
 
-				if(sizeof($field_parts) > 1){
+				if(count($field_parts) > 1){
 
 					// This is a subdocument
 					$previous = $data;
-					for($i=0, $size=sizeof($field_parts); $i < $size; $i++){
+					for($i=0, $size=count($field_parts); $i < $size; $i++){
 						if($field_parts[$i] == '$'){
 							foreach($previous as $row){
 								$key = isset($field_parts[$i+1]) ? $field_parts[$i+1] : null;

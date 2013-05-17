@@ -305,8 +305,8 @@ class Document{
 				}
 			}
 			$this->db->getServer()->setObjectCache(get_class($this),
-				sizeof($virtualFields) > 0 ? $virtualFields : null,
-				sizeof($documentFields) > 0 ? $documentFields : null
+				count($virtualFields) > 0 ? $virtualFields : null,
+				count($documentFields) > 0 ? $documentFields : null
 			);
 		}
 
@@ -736,7 +736,7 @@ class Document{
 							}elseif($validator == 'embedMany'){
 
 								// If no field is to be set here cos the incoming value is empty then lets set it null
-								$newFieldValue = sizeof($a[$field]) > 0 ? array() : null;
+								$newFieldValue = count($a[$field]) > 0 ? array() : null;
 								$aField = isset($a[$field]) ? $a[$field] : array();
 
 								foreach($aField as $k => $v){
@@ -875,7 +875,7 @@ class Document{
 
 		$this->errors = $errors;
 
-		if(sizeof($this->getErrors()) > 0){
+		if(count($this->getErrors()) > 0){
 			$valid = false; // NOT VALID
 		}else{
 			$valid = true; // VALID
@@ -922,11 +922,11 @@ class Document{
 					if($validator == 'embedOne'){
 						if($schema){
 							$fieldErrors = $this->validateSubdocument($document[$field], $schema);
-							if(sizeof($fieldErrors) > 0)
+							if(count($fieldErrors) > 0)
 								$errors[$field] = $fieldErrors;
 						}elseif($document[$field] instanceof \mongoglue\Document){
 							$document[$field]->validate();
-							if(sizeof($document[$field]->getErrors()) > 0)
+							if(count($document[$field]->getErrors()) > 0)
 								$errors[$field] = $document[$field]->getErrors();
 
 							// This gives us only the values back for the field. I am unsure whether this is a good approach tbh
@@ -941,11 +941,11 @@ class Document{
 
 							if($schema){
 								$e = $this->validateSubdocument($document[$field][$k], $schema);
-								if(sizeof($e) > 0)
+								if(count($e) > 0)
 									$fieldErrors[$k] = $e;
 							}elseif($document[$field][$k] instanceof \mongoglue\Document){
 								$document[$field][$k]->validate();
-								if(sizeof($document[$field][$k]->getErrors()) > 0)
+								if(count($document[$field][$k]->getErrors()) > 0)
 									$fieldErrors[$k] = $document[$field][$k]->getErrors();
 
 								$f[$k] = $document[$field][$k]->getRawDocument();
@@ -956,7 +956,7 @@ class Document{
 						if(!empty($f))
 							$this->$field = $f;
 
-						if(sizeof($fieldErrors) > 0)
+						if(count($fieldErrors) > 0)
 							$errors[$field] = $fieldErrors;
 					}
 
@@ -987,7 +987,7 @@ class Document{
 		$this->valid = $valid;
 
 		// If there is only one field to this rule then we can actually apply it to that field
-		if(!$valid && sizeof($scope) <= 1 && $message)
+		if(!$valid && count($scope) <= 1 && $message)
 			$errors[$field][] = $message;
 		elseif(!$valid && $message)
 			$errors['global'][] = $message;

@@ -78,7 +78,7 @@
 
 	<div class='video_list'>
 		<?php
-		if(sizeof($model->videos) > 0){
+		if(count($model->videos) > 0){
 			$_id_array = array(); $videos = array();
 			foreach($model->videos as $k => $item){
 				$_id_array[] = $item['_id'];

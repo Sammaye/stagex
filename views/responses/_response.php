@@ -3,7 +3,7 @@ if(!isset($view)) $view = '';
 if(!isset($mode)) $mode = null;
 
 if($item->type == "text"){ ?>
-	<div class='video_response_item video_text_response_item <?php if($view == 'thread' && (sizeof(preg_split('/,/', $item->path)) > 1)): echo " thread_comment"; endif; ?>'
+	<div class='video_response_item video_text_response_item <?php if($view == 'thread' && (count(preg_split('/,/', $item->path)) > 1)): echo " thread_comment"; endif; ?>'
 		data-id='<?php echo $item->_id ?>'>
 
 			<?php if(glue::roles()->checkRoles(array('^' => $item->video)) && $mode == 'admin'){ ?>

@@ -73,7 +73,7 @@ class CacheMC extends CacheCore implements ICacheCore
 		}
 
 		// Process Memcached servers.
-		if (isset($location) && sizeof($location) > 0)
+		if (isset($location) && count($location) > 0)
 		{
 			foreach ($location as $loc)
 			{

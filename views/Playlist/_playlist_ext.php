@@ -18,9 +18,9 @@
 			<div class='title'><a href='<?php echo glue::url()->create('/playlist/view') ?>'>[Playlist Deleted]</a></div>
 			<div class='video_preview'>
 				<div class='video_count'>
-					<?php echo sizeof($model->videos) ?>
+					<?php echo count($model->videos) ?>
 					<div>videos</div>
-				</div><div class='image_row'><?php for($i = 1; $i < sizeof($pics); $i++){ ?>
+				</div><div class='image_row'><?php for($i = 1; $i < count($pics); $i++){ ?>
 				<img alt='thumbnail' src='<?php echo $pics[$i] ?>' class='smaller <?php if($i==3) echo 'last' ?>'/>
 			<?php } ?></div>
 			</div>
@@ -43,9 +43,9 @@
 			<div class='title'><a href='<?php echo glue::url()->create('/playlist/view', array('id' => strval($model->_id))) ?>'><?php echo strlen($model->title) > 0 ? $model->title : '[Playlist Deleted]' ?></a></div>
 			<div class='video_preview'>
 				<div class='video_count'>
-					<?php echo sizeof($model->videos) ?>
+					<?php echo count($model->videos) ?>
 					<div>videos</div>
-				</div><div class='image_row'><?php for($i = 1; $i < sizeof($pics); $i++){ ?>
+				</div><div class='image_row'><?php for($i = 1; $i < count($pics); $i++){ ?>
 				<img alt='thumbnail' src='<?php echo $pics[$i] ?>' class='smaller <?php if($i==3) echo 'last' ?>'/>
 			<?php } ?></div>
 			</div>

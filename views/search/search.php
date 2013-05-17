@@ -180,7 +180,7 @@ glue::clientScript()->addJsScript('sortChange', "
 <div class="container_16 search_body" style='width:970px;'>
 	<div class="grid_12 alpha alpha result_list" style='width:650px;'>
 		<?php
-		if(sizeof($sphinx->matches) > 0){
+		if(count($sphinx->matches) > 0){
 			foreach($sphinx->matches as $k => $model){
 
 				if(!$model)
@@ -226,14 +226,14 @@ glue::clientScript()->addJsScript('sortChange', "
 								$large_pic = $pics[0];
 							?>
 							<img alt='thumbnail' src='<?php echo $large_pic ?>' class='large_pic'/>
-							<?php for($i = 1; $i < sizeof($pics); $i++){ ?>
+							<?php for($i = 1; $i < count($pics); $i++){ ?>
 								<img alt='thumbnail' src='<?php echo $pics[$i] ?>' class='smaller <?php if($i==3) echo 'last' ?>'/>
 							<?php } ?>
 						</div>
 						<div class='details'>
 							<div class='title'><a href='<?php echo glue::url()->create('/playlist/view', array('id' => strval($model->_id))) ?>'><?php echo $model->title ?></a></div>
 							<div class='info'>
-								<div class='videos'><?php echo sizeof($model->videos) ?><div>videos</div></div>
+								<div class='videos'><?php echo count($model->videos) ?><div>videos</div></div>
 								<?php if($model->author): ?>
 									<div class='compiled_user'><span class='divider'>|</span>Compiled by <a href="<?php echo glue::url()->create('/user/view', array('id' => strval($model->author->_id))) ?>"><?php echo $model->author->getUsername() ?></a></div>
 								<?php endif; ?>

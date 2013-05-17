@@ -92,7 +92,7 @@ class PlaylistController extends GController{
 				$video_assign_error = false;
 
 				if(isset($_POST['videos'])){
-					if(sizeof($_POST['videos']) > 0){
+					if(count($_POST['videos']) > 0){
 						foreach($_POST['videos'] as $k => $v){
 							$video = Video::model()->findOne(array('_id' => new MongoId($v['video_id'])));
 							if($video){
@@ -105,7 +105,7 @@ class PlaylistController extends GController{
 					}
 				}
 
-				if(sizeof($playlist->videos) > 200){
+				if(count($playlist->videos) > 200){
 					$playlist->addErrorMessage('You cannot have more than 200 videos to a single playlist. Please remove some and continue.');
 					echo json_encode(array('success' => false, 'html' => html::form_summary($playlist, array(
 						'errorHead' => '<h2>Could not save playlist</h2><p>This playlist could not be saved because:</p>'
@@ -177,7 +177,7 @@ class PlaylistController extends GController{
 
 		$playlist_rows = Playlist::model()->find(array('_id' => array('$in' => $playlist_ids), 'user_id' => glue::session()->user->_id, 'title' => array('$ne' => 'Watch Later')));
 
-		if(sizeof($playlist_ids) != $playlist_rows->count()){
+		if(count($playlist_ids) != $playlist_rows->count()){
 			GJSON::kill(GJSON::UNKNOWN);
 		}
 
@@ -193,7 +193,7 @@ class PlaylistController extends GController{
 
 		glue::db()->playlist_likes->remove(array('item' => array('$in' => $playlist_ids)));
 
-		glue::session()->user->total_playlists = glue::session()->user->total_playlists > sizeof($playlist_ids) ? glue::session()->user->total_playlists-sizeof($playlist_ids) : 0;
+		glue::session()->user->total_playlists = glue::session()->user->total_playlists > count($playlist_ids) ? glue::session()->user->total_playlists-count($playlist_ids) : 0;
 		glue::session()->user->save();
 
 		GJSON::kill('The playlists you selected were deleted', true);
@@ -252,7 +252,7 @@ class PlaylistController extends GController{
 		if($video){
 			$playlist = Playlist::model()->findOne(array('_id' => new MongoId($_POST['p_id']), 'user_id' => glue::session()->user->_id, 'deleted' => array('$ne' => 1)));
 			if($playlist){
-				if((sizeof($playlist->videos)+1) > 200){
+				if((count($playlist->videos)+1) > 200){
 					echo json_encode(array('success' => false, 'html' =>
 						$this->get_menu_summary('This video would exceed the 200 slots you have on this playlist')));
 					exit();
@@ -301,10 +301,10 @@ class PlaylistController extends GController{
 			$videos = Video::model()->find(array('_id' => array('$in' => $vars_array)));
 			$playlist = Playlist::model()->findOne(array('_id' => new MongoId($_POST['p_id']), 'user_id' => glue::session()->user->_id, 'deleted' => array('$ne' => 1)));
 
-			if($videos->count() == sizeof($_POST['id']) && $playlist){
-				if((sizeof($playlist->videos)+$videos->count()) > 200){
+			if($videos->count() == count($_POST['id']) && $playlist){
+				if((count($playlist->videos)+$videos->count()) > 200){
 					echo json_encode(array('success' => false, 'html' =>
-						$this->get_menu_summary('You selected '.sizeof($_POST['id']).' videos but only have '.(200-sizeof($playlist->videos)).' free slots on this playlist')));
+						$this->get_menu_summary('You selected '.count($_POST['id']).' videos but only have '.(200-count($playlist->videos)).' free slots on this playlist')));
 					exit();
 				}
 
@@ -341,7 +341,7 @@ class PlaylistController extends GController{
 		$_ids = isset($_POST['items']) ? $_POST['items'] : array();
 		$playlist = Playlist::model()->findOne(array('_id' => new MongoId($_POST['id']), 'user_id' => glue::session()->user->_id));
 
-		if(sizeof($_ids) <= 0)
+		if(count($_ids) <= 0)
 			GJSON::kill('You selected no videos to delete');
 
 		if(!$playlist || (bool)$playlist->deleted){
@@ -353,14 +353,14 @@ class PlaylistController extends GController{
 			$vars_array[] = new MongoId($v);
 		}
 
-		for($i=0,$size = sizeof($playlist->videos); $i < $size; $i++){ // Unset the videos
+		for($i=0,$size = count($playlist->videos); $i < $size; $i++){ // Unset the videos
 			if($playlist->videos[$i]['_id'] == $vars_array[$i]){
 				unset($playlist->videos[$i]);
 			}
 		}
 
 		//reindex the array
-		for($i=0,$size = sizeof($playlist->videos); $i < $size; $i++){
+		for($i=0,$size = count($playlist->videos); $i < $size; $i++){
 			$playlist->videos[$i]['pos'] = $i;
 		}
 		$playlist->save();
@@ -440,7 +440,7 @@ class PlaylistController extends GController{
 				<div class='item' data-playlist='<?php echo $watch_later ? $watch_later->_id : '' ?>'>Watch Later</div>
 				<div class='divider'></div>
 				<?php
-				if(sizeof($playlists) > 0){
+				if(count($playlists) > 0){
 					foreach($playlists as $k => $v){ ?>
 						<div class='item' data-playlist='<?php echo $v->_id ?>'><?php echo $v->title ?></div>
 					<?php }
@@ -498,7 +498,7 @@ class PlaylistController extends GController{
 		}
 
 		// Now lets form the html
-		if(sizeof($videos_a) > 0){
+		if(count($videos_a) > 0){
 			ob_start(); ?>
 				<ol>
 					<?php foreach($videos_a as $k => $v){

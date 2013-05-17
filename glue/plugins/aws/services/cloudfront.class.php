@@ -687,7 +687,7 @@ class AmazonCloudFront extends CFRuntime
 			{
 				foreach ($cname as $cn)
 				{
-					for ($i = 0, $length = sizeof($xml->CNAME); $i < $length; $i++)
+					for ($i = 0, $length = count($xml->CNAME); $i < $length; $i++)
 					{
 						if ((string) $xml->CNAME[$i] == $cn)
 						{
@@ -701,7 +701,7 @@ class AmazonCloudFront extends CFRuntime
 			// If we only have one CNAME value...
 			else
 			{
-				for ($i = 0, $length = sizeof($xml->CNAME); $i < $length; $i++)
+				for ($i = 0, $length = count($xml->CNAME); $i < $length; $i++)
 				{
 					if ((string) $xml->CNAME[$i] == $cname)
 					{

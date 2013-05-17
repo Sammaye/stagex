@@ -501,7 +501,7 @@ class videoController extends GController{
 		}
 
 		$video_rows = Video::model()->find(array('_id' => array('$in' => $video_ids), 'user_id' => glue::session()->user->_id));
-		if(sizeof($video_ids) != $video_rows->count()){
+		if(count($video_ids) != $video_rows->count()){
 			GJSON::kill(GJSON::UNKNOWN);
 		}
 
@@ -553,7 +553,7 @@ class videoController extends GController{
 		}
 
 		$video_rows = Video::model()->find(array('_id' => array('$in' => $video_ids), 'user_id' => glue::session()->user->_id));
-		if(sizeof($video_ids) != $video_rows->count()){
+		if(count($video_ids) != $video_rows->count()){
 			GJSON::kill(GJSON::UNKNOWN);
 		}
 
