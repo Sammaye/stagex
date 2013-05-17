@@ -1,16 +1,14 @@
 <?php
 
 /**
- * This is basically a classw which houses a bunch of functions that do not really fit in any other class but are so useful
- * I need then in global scope acting as part of PHP itself and breaking namespaces.
+ * Convert bytes to a human readable figure
  * @param unknown_type $size
  */
-
-function convert_size_human($size){
+function convert_size_human($size,$round=true){
 	$unit=array('','KB','MB','GB','TB','PB');
 	$byte_size = $size/pow(1024,($i=floor(log($size,1024))));
 
-	if(preg_match('/^[0-9]+$/', $byte_size)){
+	if(preg_match('/^[0-9]+$/', $byte_size)||$round){
 		return $byte_size.' '.$unit[$i];
 	}else{
 		preg_match('/^[0-9]+\.[0-9]{2}/', $byte_size, $matches);
@@ -20,45 +18,61 @@ function convert_size_human($size){
 
 /**
  * Strips all from string including symbols and punctuation
- *
  * @param $blurb
  */
 function strip_all($blurb){
 
 	$blurb = stripslashes(strip_tags($blurb));
-
 	$blurb = preg_replace('/<[^>]*>/', '', $blurb);
-
 	$blurb = trim(preg_replace('/(?:\s\s+|\n|\t)/', ' ', $blurb));
-
 	$blurb = preg_replace("/[^a-zA-Z0-9\s]/", "", $blurb);
 
 	return $blurb;
 }
 
-function make_alpha_numeric($blurb){
+/**
+ * Makes a string alpha-numeric by stripping any and all symbols (non-alphanumeric characters)
+ * from the string
+ * @param string $blurb
+ */
+function strip_symbols($blurb){
 	$blurb = preg_replace("/[^a-zA-Z0-9\s]/", "", $blurb);
 	return $blurb;
 }
 
-function stripTags_whitespace($blurb){
+/**
+ * Nukes HTML tags and spaces at the same time
+ * @param string $blurb
+ */
+function strip_tags_whitespace($blurb){
 	$blurb = stripslashes(strip_tags($blurb));
-
 	$blurb = preg_replace('/<[^>]*>/', '', $blurb);
-
 	$blurb = trim(preg_replace('/(?:\s\s+|\n|\t)/', ' ', $blurb));
 
 	return $blurb;
 }
 
+/**
+ * Strips white space from around a string
+ * @param string $str
+ */
 function strip_whitespace($str){
 	return trim(preg_replace('/(?:\s\s+|\n|\t)/', '', $str));
 }
 
+/**
+ * Strips all double spaces to single spaces
+ * @param string $str
+ */
 function strip_to_single($str){
 	return trim(preg_replace('/(?:\s\s+|\n|\t)/', ' ', $str));
 }
 
+/**
+ * Truncates a string by a set number of characters
+ * @param string $title_string
+ * @param int $truncate_after_nr_chars
+ */
 function truncate_string($title_string, $truncate_after_nr_chars = 50){
 
 	$nr_of_chars = strlen($title_string);
@@ -68,12 +82,23 @@ function truncate_string($title_string, $truncate_after_nr_chars = 50){
 	return $title_string;
 }
 
-////////////////////////////////////////////////////////
-// Function:         do_dump
-// Inspired from:     PHP.net Contributions
-// Description: Better GI than print_r or var_dump
-
-function do_dump(&$var, $var_name = NULL, $indent = NULL, $reference = NULL)
+/**
+ * var_dump replacement which houses it own self contained HTML and can act on more complex variables
+ *
+ * It has been renamed from its original from do_dump to dd
+ *
+ * @param $var
+ * @param $var_name
+ * @param $indent
+ * @param $reference
+ *
+ * ////////////////////////////////////////////////////////
+ * // Function:         do_dump
+ * // Inspired from:     PHP.net Contributions
+ * // Description: Better GI than print_r or var_dump
+ *
+ */
+function dd(&$var, $var_name = NULL, $indent = NULL, $reference = NULL)
 {
 	$do_dump_indent = "<span style='color:#eeeeee;'>|</span> &nbsp;&nbsp; ";
 	$reference = $reference.$var_name;
