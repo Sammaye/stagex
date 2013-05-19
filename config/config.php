@@ -48,13 +48,9 @@ return array(
 
 		// MongoDB configuration settings
 		"db"=>array(
-			"connection"=>"mongodb://localhost:27017",
-			"db" => "the_stage",
-			"class"=>"GMongo",
-			"path"=>"glue/plugins/storage/mongo/GMongo.php",
-			'indexPath' => 'application/core/mongoIndexes.php',
-			"persistent"=>true,
-			"autoConnect"=>true,
+			"class"=>"mongoglue\MongoClient",
+			"server"=>"mongodb://localhost:27017",
+			"db" => "stagex",
 
 			/**
 			 * These are indexes that are used in MongoDB indexed by collection name.
@@ -394,7 +390,7 @@ return array(
 	 * making your life bareable
 	 */
 	'namespaces' => array(
-		'mongoglue' => '@app/glue/plugins/mongodb'
+		'mongoglue' => '@app/glue/components/mongodb'
 	),
 
 	/**
