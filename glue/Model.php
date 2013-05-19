@@ -257,80 +257,12 @@ class Model{
 		if($runEvents && !$this->onBeforeValidate()){
 			$this->setHasBeenValidated(true); return false; // NOT VALID
 		}
-
-		$valid = true;
-		$validator_object = null;
-		$rules = !empty($rules) ? $rules : $this->rules;
-
-		foreach($rules as $rule){
-
-			if(!isset($rule[0])){
-				trigger_error('Empty rule provided: '.print_r($rule));
-			}
-
-			$validator_object = null; // Reset the validator object each iteration so we don't accidently reuse it for other rules.
-			$rule_valid = true; // Per rule validation
-
-			$rule_scope = $rule[0];
-			$rule_function = $rule[1];
-
-			if(strlen($rule_function) < 0 && !is_callable($rule_function))
-				trigger_error('Empty validation rule: '.print_r($rule));
-
-			$rule_message = isset($rule['message']) ? $rule['message'] : null;
-			$rule_scenarios = isset($rule['on']) ? array_flip(preg_split('/[\s]*[,][\s]*/', $rule['on'])) : null;
-
-			$rule_params = $rule;
-			unset($rule_params[0], $rule_params[1], $rule_params['message'], $rule_params['on'], $rule_params['label']);
-
-			if(count($rule_scenarios) > 0){
-				if(!array_key_exists($this->getScenario(), $rule_scenarios)) continue; // If a scenario is set and this rule does not apply to the scenario then move onto the next
-			}
-
-			$field_data = $data;
-			$rule_fields = preg_split('/[\s]*[,][\s]*/', $rule_scope);
-
-			// Now for each rule get the fields needing to be validated
-			foreach($rule_fields as $field){
-
-				$field_parts = explode('.', $field);
-
-				if(count($field_parts) > 1){
-
-					// This is a subdocument
-					$previous = $data;
-					for($i=0, $size=count($field_parts); $i < $size; $i++){
-						if($field_parts[$i] == '$'){
-							foreach($previous as $row){
-								$key = isset($field_parts[$i+1]) ? $field_parts[$i+1] : null;
-								$value = $key !== null && isset($row[$key]) ? $row[$key] : null;
-								$rule_valid = $this->runValidationRule($rule_function, $field, $value, $rule_params) && $rule_valid;
-							}
-							break;
-						}else{
-							if($previous===null && $i==0) // This is the first iteration so lets get the field value
-								$previous = isset($field_data[$field]) ? $field_data[$field] : null;
-							if(is_object($previous)){
-								$previous = property_exists($previous, $field_parts[$i]) ? $previous->$field_parts[$i] : null;
-							}else{
-								$previous = isset($previous[$field_parts[$i]]) ? $previous[$field_parts[$i]] : null;
-							}
-
-							if($i==$size-1){
-								$rule_valid = $this->runValidationRule($rule_function, $field, $previous, $rule_params) && $rule_valid;
-								break;
-							}
-						}
-					}
-				}else{
-					$value = isset($field_data[$field]) ? $field_data[$field] : null;
-					$rule_valid = $this->runValidationRule($rule_function, $field, $value, $rule_params) && $rule_valid;
-				}
-			}
-
-			if(!$rule_valid && $rule_message) $this->addError($rule_message);
-			$valid = $rule_valid && $valid;
-		}
+		$this->validator=new \glue\Validation(array(
+			'model' => $this,
+			'scenario' => $this->getScenario(),
+			'rules' => !empty($rules) ? $rules : $this->rules
+		));
+		$valid=$this->validator->run();
 
 		$this->setHasBeenValidated(true);
 		$this->valid = $valid;
@@ -339,35 +271,6 @@ class Model{
 			$this->onAfterValidate();
 
 		return $valid;
-	}
-
-	private function runValidationRule($rule_function, $field, $value, $rule_params){
-		if(is_callable(array('GValidators', $rule_function))){
-
-			// If it is a validator inside this class
-			return GValidators::$rule_function($field, $value, $rule_params);
-		}elseif($this->method_exists($rule_function)){
-
-			// Else if is callable in general
-			return $this->$rule_function($field, $rule_params);
-		}else{
-
-			// Lets see if it is a file otherwise lets die() like emos
-			if(file_exists(ROOT.'/'.$rule_function)){
-
-				// If it is a file based validator lets form it up and run it
-				if(!$validator_object){
-					$cName = pathinfo(ROOT.'/'.$rule_function, PATHINFO_FILENAME);
-					glue::import($rule_function);
-					$validator_object = new $cName();
-					$validator_object->attributes($rule_params);
-				}
-				return $validator_object->validateAttribute($this, $field, $value);
-
-			}else{
-				trigger_error('No such validator exists: '.$rule_function);
-			}
-		}
 	}
 
 	function validateRules($rules, $data = null, $runEvents = false){

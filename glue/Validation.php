@@ -6,13 +6,12 @@ use glue,
 	\glue\Exception,
 	\glue\Collection;
 
-class Validator extends \glue\Component{
+class Validation extends \glue\Component{
 	
-	public $document;
+	public $model;
 	public $scenario;
 	public $rules;
 	
-	public $model;
 	public $valid;
 	
 	public $error_codes = array();
@@ -23,8 +22,8 @@ class Validator extends \glue\Component{
 		$valid = true;
 		$errors = array();
 		
-		if(!$this->document)
-			throw new Exception("No document was provided to validate against");
+		if(!$this->model)
+			throw new Exception("No model or map was provided to validate against");
 		if(!is_array($this->rules))
 			throw new Exception("A valid set of rules must be applied");
 	
@@ -55,16 +54,18 @@ class Validator extends \glue\Component{
 		$validator_caption=basename($validator);
 	
 		if(isset($scenario[$this->scenario]) || !$scenario){ // If the scenario key exists in the flipped $rule['on']
+			
+			$field_value = is_object($this->model) ? $this->model->$field : $this->model[$field];
+			
 			foreach($scope as $k => $field){ // Foreach of the field lets check it out
 				if(method_exists($this, $validator)){
-					$valid=self::$validator($field, $document[$field], $params)&&$valid;
+					$valid=self::$validator($field, $field_value, $params)&&$valid;
 				}elseif($this->model && $this->model->method_exists($validator)){
-					$valid = $this->model->$validator($field, $document[$field], $params) && $valid;	
+					$valid = $this->model->$validator($field, $field_value, $params) && $valid;	
 				}else{//if(glue::canImport($validator)){
-					$o = new $validator;
-					$o->attributes($params);
+					$o = new $validator($params);
 					$o->owner = $this;
-					$valid = $o->validate($field, $document[$field]) && $valid;					
+					$valid = $o->validate($field, $field_value) && $valid;					
 				//}else{
 					//trigger_error("The validator $validator could not be found in the ".get_class($this)." model");
 				}
