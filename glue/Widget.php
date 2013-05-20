@@ -12,7 +12,7 @@ namespace glue;
  * @author Sam Millman
  *
  */
-abstract class Widget{
+abstract class Widget extends \glue\Component{
 
 	public $id;
 

@@ -8,6 +8,10 @@ class Controller {
 
 	const HEAD = 1;
 	const BODY_END = 2;
+	
+	const DENIED = 1;
+	const LOGIN = 2;
+	const UNKNOWN = 3;	
 
 	public $defaultAction = 'index';
 
@@ -15,8 +19,17 @@ class Controller {
 	public $pageTitle;
 	public $pageDescription;
 	public $pageKeywords;
+	
+	
+	private $coreCSS = array();
+	
+	private $cssTags = array();
+	private $jsTags = array();
+	private $tags = array();
 
 	public function filters(){ return array(); }
+	
+	function authRules(){ return array(); }
 
 	function addCssFile($map, $path, $media = null, $POS = 'HEAD', $core=false){
 		$this->cssTags[$map] = array('map' => $map, 'path' => $path, 'type' => 'file', 'media' => $media, 'pos' => $POS);
@@ -42,7 +55,7 @@ class Controller {
 		$this->tags[] = array( 'html' => $html, 'pos' => $POS );
 	}
 
-	function authRules(){ return array(); }
+	
 
 	function render($page, $args = null){
 
@@ -99,6 +112,104 @@ class Controller {
 
 		if($returnString): return $view; else: echo $view; endif;
 	}
+	
+	/**
+	 * Inserts the scripts in the head section.
+	 * @param string $output the output to be inserted with scripts.
+	 */
+	public function renderHead(&$output){
+		$html='';
+		foreach($this->tags as $k=>$val){
+			if($val['pos'] == self::HEAD){
+				$html.=$val['html'];
+			}
+		}
+	
+		foreach($this->cssTags as $k => $val){
+			if($val['type'] == 'file' && $val['pos'] == self::HEAD && $val['core'] == true){
+				$html.=html::cssFile($val['path'], $val['media'])."\n";
+				unset($this->cssTags[$k]);
+			}
+		}
+		foreach($this->cssTags as $k => $val){
+			if($val['type'] == 'file' && $val['pos'] == self::HEAD){
+				$html.=html::cssFile($val['path'], $val['media'])."\n";
+			}
+		}
+		foreach($this->jsTags as $k => $val){
+			if($val['type'] == 'file' && $val['pos'] == self::HEAD){
+				$html.=html::jsFile($val['path'])."\n";
+			}
+		}
+		foreach($this->cssTags as $k => $val){
+			if($val['type'] == 'script' && $val['poos'] == self::HEAD){
+				$html.=html::css($val['media'], $val['script'])."\n";
+			}
+		}
+	
+		$code = '';
+		foreach($this->jsTags as $k => $val){
+			if($val['type'] == 'script' && $val['pos'] == self::HEAD){
+				if(Glue::config("Minify_JS")){
+					$code.= JSMin::minify($val['script']);
+				}else{
+					$code.= $val['script'];
+				}
+			}
+		}
+	
+		if(!empty($code)){
+			$html.=html::js($code)."\n";
+		}
+	
+		if($html!=='')
+		{
+			$count=0;
+			$output=preg_replace('/(<title\b[^>]*>|<\\/head\s*>)/is','<###head###>$1',$output,1,$count);
+			if($count)
+				$output=str_replace('<###head###>',$html,$output);
+			else
+				$output=$html.$output;
+		}
+		return $output;
+	}
+	
+	/**
+	 * Inserts the scripts at the end of the body section.
+	 * @param string $output the output to be inserted with scripts.
+	 */
+	public function renderBodyEnd(&$output){
+	
+		$fullPage=0;
+		$output=preg_replace('/(<\\/body\s*>)/is','<###end###>$1',$output,1,$fullPage);
+		$html='';
+		foreach($this->cssTags as $k => $val){
+			if($val['type'] == 'file' && $val['pos'] == self::BODY_END){
+				$html.=html::cssFile($val['path'], $val['media'])."\n";
+			}
+		}
+	
+		$code = '';
+		foreach($this->jsTags as $k => $val){
+			if($val['type'] == 'script' && $val['pos'] == self::BODY_END){
+				if(Glue::config("Minify_JS")){
+					$code .= JSMin::minify($val['script']);
+				}else{
+					$code .= $val['script'];
+				}
+			}
+		}
+	
+		if(!empty($code))
+			$html.=html::js($code);
+	
+		if($fullPage)
+			$output=str_replace('<###end###>',$html,$output);
+		else
+			$output=$output.$html;
+	
+		return $output;
+	}	
 
 	function getView($path){
 
@@ -144,12 +255,8 @@ class Controller {
 	 * @param string $path
 	 * @param array $args
 	 */
-	public static function beginWidget($path, $args = null){
-		$pieces = explode("/", $path);
-		$cName = substr($pieces[count($pieces)-1], 0, strrpos($pieces[count($pieces)-1], "."));
-		Glue::import($path);
-		$widget = new $cName();
-		$widget->attributes($args);
+	public static function beginWidget($class, $args = null){
+		$widget = new $class($args);
 		$widget->init();
 		return $widget;
 	}
@@ -165,153 +272,48 @@ class Controller {
 		return $widget->render();
 	}
 
-	const DENIED = 1;
-	const LOGIN = 2;
-	const UNKNOWN = 3;
-
-	static function kill($params, $success = false){
-		if(!$success)
-			echo self::error($params);
-		else
-			echo self::success($params);
-		exit();
-	}
-
-	static function success($params){
+	function json_success($params,$exit=true){
+		
+		$json='';
 		if(is_string($params)){
-			return json_encode(array('success' => true, 'messages' => array($params)));
+			$json= json_encode(array('success' => true, 'messages' => array($params)));
 		}else{
-			return json_encode(array_merge(array('success' => true), $params));
+			$json= json_encode(array_merge(array('success' => true), $params));
 		}
+		
+		if($exit){
+			echo $json;
+			exit(0);
+		}
+		return $json;		
 	}
 
-	static function error($params){
+	function json_error($params,$exit=true){
+		$json='';
 		switch(true){
 			case $params == self::DENIED:
-				return json_encode(array('success' => false, 'messages' => array('Action not Permitted')));
+				$json= json_encode(array('success' => false, 'messages' => array('Action not Permitted')));
 				break;
 			case $params == self::LOGIN:
-				return json_encode(array('success' => false, 'messages' => array('You must login to continue')));
+				$json= json_encode(array('success' => false, 'messages' => array('You must login to continue')));
 				break;
 			case $params == self::UNKNOWN:
-				return json_encode(array('success' => false, 'messages' => array('An unknown error was encountered')));
+				$json= json_encode(array('success' => false, 'messages' => array('An unknown error was encountered')));
 				break;
 			default:
 				if(is_string($params)){
-					return json_encode(array('success' => false, 'messages' => array($params)));
+					$json= json_encode(array('success' => false, 'messages' => array($params)));
 				}else{
-					return json_encode(array_merge(array('success' => false), $params));
+					$json= json_encode(array_merge(array('success' => false), $params));
 				}
 				break;
 		}
-	}
-
-
-
-	private $coreCSS = array();
-
-	private $cssTags = array();
-	private $jsTags = array();
-	private $tags = array();
-
-
-
-	/**
-	 * Inserts the scripts in the head section.
-	 * @param string $output the output to be inserted with scripts.
-	 */
-	public function renderHead(&$output){
-		$html='';
-		foreach($this->tags as $k=>$val){
-			if($val['pos'] == self::HEAD){
-				$html.=$val['html'];
-			}
+		
+		if($exit){
+			echo $json;
+			exit(0);
 		}
-
-		foreach($this->cssTags as $k => $val){
-			if($val['type'] == 'file' && $val['pos'] == self::HEAD && $val['core'] == true){
-				$html.=html::cssFile($val['path'], $val['media'])."\n";
-				unset($this->cssTags[$k]);
-			}
-		}
-		foreach($this->cssTags as $k => $val){
-			if($val['type'] == 'file' && $val['pos'] == self::HEAD){
-				$html.=html::cssFile($val['path'], $val['media'])."\n";
-			}
-		}
-		foreach($this->jsTags as $k => $val){
-			if($val['type'] == 'file' && $val['pos'] == self::HEAD){
-				$html.=html::jsFile($val['path'])."\n";
-			}
-		}
-		foreach($this->cssTags as $k => $val){
-			if($val['type'] == 'script' && $val['poos'] == self::HEAD){
-				$html.=html::css($val['media'], $val['script'])."\n";
-			}
-		}
-
-		$code = '';
-		foreach($this->jsTags as $k => $val){
-			if($val['type'] == 'script' && $val['pos'] == self::HEAD){
-				if(Glue::config("Minify_JS")){
-					$code.= JSMin::minify($val['script']);
-				}else{
-					$code.= $val['script'];
-				}
-			}
-		}
-
-		if(!empty($code)){
-			$html.=html::js($code)."\n";
-		}
-
-		if($html!=='')
-		{
-			$count=0;
-			$output=preg_replace('/(<title\b[^>]*>|<\\/head\s*>)/is','<###head###>$1',$output,1,$count);
-			if($count)
-				$output=str_replace('<###head###>',$html,$output);
-			else
-				$output=$html.$output;
-		}
-		return $output;
-	}
-
-	/**
-	 * Inserts the scripts at the end of the body section.
-	 * @param string $output the output to be inserted with scripts.
-	 */
-	public function renderBodyEnd(&$output){
-
-		$fullPage=0;
-		$output=preg_replace('/(<\\/body\s*>)/is','<###end###>$1',$output,1,$fullPage);
-		$html='';
-		foreach($this->cssTags as $k => $val){
-			if($val['type'] == 'file' && $val['pos'] == self::BODY_END){
-				$html.=html::cssFile($val['path'], $val['media'])."\n";
-			}
-		}
-
-		$code = '';
-		foreach($this->jsTags as $k => $val){
-			if($val['type'] == 'script' && $val['pos'] == self::BODY_END){
-				if(Glue::config("Minify_JS")){
-					$code .= JSMin::minify($val['script']);
-				}else{
-					$code .= $val['script'];
-				}
-			}
-		}
-
-		if(!empty($code))
-			$html.=html::js($code);
-
-		if($fullPage)
-			$output=str_replace('<###end###>',$html,$output);
-		else
-			$output=$output.$html;
-
-		return $output;
+		return $json;
 	}
 
 	/**
