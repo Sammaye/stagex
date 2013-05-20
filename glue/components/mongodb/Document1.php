@@ -304,3 +304,29 @@ class MongoDocument extends GModel{
 		return json_encode($this->getDocument());
 	}
 }
+
+
+	/*
+	public function setSuccess($bool){
+		$this->success = $bool;
+	}
+
+	public function getSuccess(){
+		return $this->success;
+	}
+
+	public function setSuccessMessage($message){
+		$this->success = true;
+		$this->success_message = $message;
+	}
+
+	public function getSuccessMessage(){
+		return $this->success_message;
+	}
+	*/
+
+	/**
+	 * Not sure if I need these
+	private $success = false;
+	private $success_message;
+	 */

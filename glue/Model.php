@@ -2,44 +2,56 @@
 
 namespace glue;
 
-class Model{
+use glue,
+	\glue\Exception;
 
-	private $doc = array();
+class Model extends \glue\Component{
 
 	private $scenario;
 
 	private $behaviours = array();
 	private $rules = array();
 
+	private $validator;
 	private $valid = false;
-	private $success = false;
 	private $validated = false;
-	private $success_message;
 
 	private $error_codes = array();
 	private $error_messages = array();
 
-	function __get($k){
-		return $this->$k;
-	}
+	private static $_meta;
 
-	function __set($k, $v){
-		$this->$k = $v;
-	}
+	public function behaviours(){ return array(); }
 
-	function __construct($scenario = 'insert'){
+	public function rules(){ return array(); }
+
+	function init($scenario = 'insert'){
 		foreach($this->behaviours() as $name => $attr){
 			$this->attachBehaviour($name, $attr);
 		}
 
-		$reflect = new ReflectionClass(get_class($this));
-		$class_vars = $reflect->getProperties(ReflectionProperty::IS_PROTECTED);
+		static $reflections=array();
+		if(!isset($reflections[get_class($this)])&&get_class($this)!='\\glue\\Model'){
 
-		foreach ($class_vars as $prop) {
-			$this->doc[$prop->getName()] = $this->{$prop->getName()};
+			$_meta = array();
+
+			$reflect = new \ReflectionClass(get_class($o));
+			$class_vars = $reflect->getProperties(ReflectionProperty::IS_PUBLIC); // Pre-defined doc attributes
+
+			foreach ($class_vars as $prop) {
+
+				if($prop->isStatic())
+					continue;
+
+				$docBlock = $prop->getDocComment();
+				$field_meta = array(
+					'name' => $prop->getName(),
+					'virtual' => $prop->isProtected() || preg_match('/@virtual/i', $docBlock) <= 0 ? false : true 
+					// If the field is virtual its value will not saved  
+				);
+				$_meta[$prop->getName()] = $field_meta;
+			}
 		}
-
-		$this->rules = $this->rules();
 		$this->onAfterConstruct();
 	}
 
@@ -69,9 +81,6 @@ class Model{
 		return false;
 	}
 
-	function behaviours(){ return array(); }
-
-	public function rules(){ return array(); }
 
 	public function getScenario(){
 		return $this->scenario;
@@ -79,6 +88,94 @@ class Model{
 
 	public function setScenario($scenario){
 		$this->scenario = $scenario;
+	}
+
+	public function getValidated(){
+		return $this->validated;
+	}
+
+	public function setValidated($validated){
+		$this->validated = $validated;
+	}
+
+	function getValid(){
+		return $this->valid;
+	}
+
+	function setValid($valid){
+		$this->valid=$valid;
+	}
+
+	public function setRule(){
+		$this->rules[] = $rule;
+	}
+
+	public function getRules(){
+		return array_merge($this->rules(), $this->rules);
+	}
+
+	public function attributeNames($safeOnly=true){
+		$names=array();
+		$i=0;
+		foreach($this->getRules() as $rule){
+			if($safeOnly && isset($rule['safe']) && $rule['safe']===false)
+				continue;
+
+			$fields=preg_split('/[\s]*[,][\s]*/', $rule[0]);
+			foreach($fields as $field)
+				$names[$field]=$i;
+			$i++;
+		}
+		return array_values(array_flip($names));
+	}
+
+	/**
+	 * If you want to set the full object from scratch use this
+	 * @param $a
+	 */
+	function setAttributes($a,$safeOnly=true){
+		$scenario = $this->getScenario();
+
+		$attributes = array_flip($safeOnly ? $this->attributeNames() : $this->attributeNames(false));
+		foreach($a as $name=>$value){
+			if($safeOnly&&isset($attributes[$name])){
+				$this->$name=!is_array($value) && preg_match('/^([0-9]|[1-9]{1}\d+)$/' /* Will only match real integers, unsigned */, $value) > 0 ? (int)$value : $value;
+			}else{
+				$this->$name=!is_array($value) && preg_match('/^([0-9]|[1-9]{1}\d+)$/' /* Will only match real integers, unsigned */, $value) > 0 ? (int)$value : $value;
+			}
+		}
+	}
+
+	public function getAttributes($db_only = false) {
+
+		// Redo using the reflection cache above
+
+		$attributes = array();
+		$reflect = new ReflectionClass(get_class($this));
+		$class_vars = $reflect->getProperties($db_only ? ReflectionProperty::IS_PROTECTED : ReflectionProperty::IS_PROTECTED | ReflectionProperty::IS_PUBLIC);
+
+		foreach ($class_vars as $prop) {
+			$attributes[$prop->getName()] = $this->{$prop->getName()};
+		}
+		return $attributes;
+	}
+
+	/**
+	 * Override this function is you want more complex handling of getting back
+	 * attributes from the model for things like Html helpers and what not
+	 * @param string $k
+	 */
+	function getAttribute($k){
+		return $this->$k;
+	}
+
+	/**
+	 * This function decides if the form has a summary waiting to be used
+	 */
+	function hasSummary(){
+		if($this->getSuccess() || $this->hasErrors())
+			return true;
+		return false;
 	}
 
 	function getErrors($field = null, $getFirst = false){
@@ -103,187 +200,33 @@ class Model{
 		}
 	}
 
-	public function setSuccess($bool){
-		$this->success = $bool;
-	}
-
-	public function getSuccess(){
-		return $this->success;
-	}
-
-	public function setSuccessMessage($message){
-		$this->success = true;
-		$this->success_message = $message;
-	}
-
-	public function getSuccessMessage(){
-		return $this->success_message;
-	}
-
-	public function getHasBeenValidated(){
-		return $this->validated;
-	}
-
-	public function setHasBeenValidated($validated){
-		$this->validated = $validated;
-	}
-
-	public function isValid(){
-		return $this->valid;
-	}
-
-	/**
-	 * If you want to set the full object from scratch use this
-	 * @param $a
-	 */
-	function setAttributes($a){
-		if($a){
-			foreach($a as $k=>$v){
-				if(!array_key_exists($k, $this->relations())){
-					if(!is_array($v) && preg_match('/^[0-9]+$/', $v) > 0): $this->$k = (int)$v; else: $this->$k = $v; endif;
-				}
-			}
-		}
-	}
-
-	/**
-	 * If you want to assign $_POST or $_GET to the model use this
-	 * @param $a
-	 */
-	function _attributes($a){
-		$scenario = $this->getScenario();
-
-		// Set main model fields
-		foreach($this->rules as $rule){
-
-			$scenarios = preg_split("/[\s]*[,][\s]*/", isset($rule['on']) ? $rule['on'] : '');
-			if(array_key_exists($scenario, array_flip($scenarios)) || !isset($rule['on'])){
-				$fields = preg_split('/[\s]*[,][\s]*/', $rule[0]);
-				foreach($fields as $field){
-					if(isset($a[$field])){
-						if(!is_array($a[$field]) && preg_match('/^[0-9]+$/', $a[$field]) > 0): $this->$field = (int)$a[$field]; else: $this->$field = $a[$field]; endif;
-					}
-				}
-			}
-		}
-	}
-
-	public function getAttributes($db_only = false) {
-		$attributes = array();
-		$reflect = new ReflectionClass(get_class($this));
-		$class_vars = $reflect->getProperties($db_only ? ReflectionProperty::IS_PROTECTED : ReflectionProperty::IS_PROTECTED | ReflectionProperty::IS_PUBLIC);
-
-		foreach ($class_vars as $prop) {
-			$attributes[$prop->getName()] = $this->{$prop->getName()};
-		}
-		return $attributes;
-	}
-
-	function getAttribute($k){
-		return $this->$k;
-	}
-
-	function files($a){
-		$scenario = $this->getScenario();
-
-		// Set main model fields
-		foreach($this->rules() as $rule){
-
-			$scenarios = preg_split('/[\s]*[,][\s]*/', isset($rule['on']) ? $rule['on'] : '');
-
-			if(array_key_exists($scenario, array_flip($scenarios)) || !isset($rule['on'])){
-				if($rule[1] == 'file' || $rule[1] == 'multifile'){
-					$fields = preg_split('/[\s]*[,][\s]*/', $rule[0]);
-
-					foreach($fields as $field){
-						if($rule[1] == "file"){
-							$this->$field = array(
-								"name" => $a['name'][$field],
-								"type" => $a['type'][$field],
-								"tmp_name" => $a['tmp_name'][$field],
-								"error" => $a['error'][$field],
-								"size" => $a['size'][$field]
-							);
-						}elseif($rule[1] == "multifile"){
-							$c = count($a['name'][$field]);
-							$files = array();
-
-							for($i=0; $i < $c; $i++){
-								foreach($_FILES as $fileAttribute => $details){
-									$files[$i][$fileAttribute] = $details[$field][$i];
-								}
-							}
-							$this->$field = $files;
-						}
-					}
-				}
-			}
-		}
-	}
-
-	public function getFiles($byScenario = false){
-		$files = array();
-		$valid = true;
-
-		$scenario = $this->getScenario();
-
-		foreach($this->rules() as $rule){
-			if($rule[1] == 'file' || $rule[1] == 'multifile'){
-				if($byScenario){
-					$scenarios = preg_split('/[\s]*[,][\s]*/', $rule['on']);
-
-					if(array_key_exists($scenario, array_flip($scenarios)) || !isset($rule['on'])){
-						$valid = true;
-					}else{
-						$valid = false;
-					}
-				}
-
-				if($valid){
-					$fields = preg_split('/[\s]*[,][\s]*/', $rule[0]);
-					foreach($fields as $field){
-						$files[] = $this->$field;
-					}
-				}
-			}
-		}
-		return $files;
-	}
-
 	public function validate($data = null, $rules = array(), $runEvents = true){
 
 		if(!$data) $data = $this->getAttributes();
 
 		if($runEvents && !$this->onBeforeValidate()){
-			$this->setHasBeenValidated(true); return false; // NOT VALID
+			$this->setValidated(true); return false; // NOT VALID
 		}
-		$this->validator=new \glue\Validation(array(
-			'model' => $this,
-			'scenario' => $this->getScenario(),
-			'rules' => !empty($rules) ? $rules : $this->rules
-		));
-		$valid=$this->validator->run();
+		if(($validator=$this->getValidator())!==null)
+			$valid=$validator->run();
 
-		$this->setHasBeenValidated(true);
-		$this->valid = $valid;
+		$this->setValidated(true);
+		$this->setValid($valid);
 
 		if($runEvents)
 			$this->onAfterValidate();
-
 		return $valid;
 	}
 
-	function validateRules($rules, $data = null, $runEvents = false){
-		return $this->validate($data, $rules, $runEvents);
-	}
-
-	/**
-	 * This function decides if the form has a summary waiting to be used
-	 */
-	function hasSummary(){
-		if($this->getSuccess() || $this->hasErrors())
-			return true;
-		return false;
+	function getValidator(){
+		if($this->validator===null){
+			return $this->validator=new \glue\Validation(array(
+				'model' => $this,
+				'scenario' => $this->getScenario(),
+				'rules' => !empty($rules) ? $rules : array_merge($this->rules(),$this->rules)
+			));
+		}
+		return $this->validator;
 	}
 
 	/**
@@ -368,22 +311,13 @@ class Model{
 	 * This enables us to be able to build models dynamically and even use the std::Model class to give us anon models to play with
 	 */
 
-	public function attachValidationRule($rule){
-		$this->rules[] = $rule;
-	}
-
-	public function clearRules(){
-		$this->rules = null;
-	}
-
 	function attachBehaviour($name, $options = array()){
 
 		if(!isset($options['class']))
-		trigger_error("There is no class set for {$name} behaviour");
+			throw new Exception("There is no class set for {$name} behaviour");
 
 		if(!isset($this->behaviours[$name])){
-			glue::import($options['class']);
-			$behaviour = new $name();
+			$behaviour = new $name;
 			$behaviour->attributes($options);
 
 			$this->behaviours[$name] = array(
@@ -392,7 +326,6 @@ class Model{
 			$behaviour->attach($this);
 		}
 	}
-
 
 	function detachBehaviour($name){
 		$behaviour = $this->behaviours[$name];
@@ -412,7 +345,10 @@ class Model{
 	}
 }
 
-class ModelBehaviour{
+/**
+ * The behaviour class. All models behaviour extend from this one.
+ */
+class Behaviour extends \glue\Component{
 
 	public $owner;
 
@@ -432,7 +368,8 @@ class ModelBehaviour{
 	public function attach($owner){
 		$this->owner = $owner;
 		foreach($this->events() as $event => $handler){
-			$this->owner->attachEventHandler($event, array($this,$handler));
+			if(method_exists($this,$handler))
+				$this->owner->attachEventHandler($event, array($this,$handler));
 		}
 	}
 
@@ -442,28 +379,4 @@ class ModelBehaviour{
 		}
 		$this->owner = null;
 	}
-
-	public function attributes($a){
-		if(is_array($a)){
-			foreach($a as $k => $v){
-				$this->$k = $v;
-			}
-		}
-	}
-
-	public function beforeValidate(){}
-
-	public function afterValidate(){}
-
-	public function beforeSave(){}
-
-	public function afterSave(){}
-
-	public function beforeDelete(){}
-
-	public function afterDelete(){}
-
-	public function beforeFind(){}
-
-	public function afterFind(){}
 }

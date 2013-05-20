@@ -1,13 +1,13 @@
 <?php
 
-namespace glue\extended\behaviours;
+namespace glue\behaviours;
 
 /**
  * An Example of how a behaviour works
  * @author Sam
  */
 
-class Timestamp extends GModelBehaviour{
+class Timestamp extends \glue\Behaviour{
 	function afterValidate(){
 		$this->owner->ts = new MongoDate();
 	}

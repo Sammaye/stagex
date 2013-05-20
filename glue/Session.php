@@ -7,7 +7,8 @@
 
 namespace glue;
 
-use	\glue\Exception;
+use	glue,
+	\glue\Exception;
 
 class Session extends \glue\Component{
 
