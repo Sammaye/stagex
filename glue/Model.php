@@ -2,10 +2,9 @@
 
 namespace glue;
 
-use glue,
-	\glue\Exception;
+use \glue\Exception;
 
-class Model extends \glue\Component{
+class Model{
 
 	private $scenario;
 
@@ -18,43 +17,53 @@ class Model extends \glue\Component{
 
 	private $error_codes = array();
 	private $error_messages = array();
-
-	private static $_meta;
+	
+	private static $_meta=array();
 
 	public function behaviours(){ return array(); }
 
 	public function rules(){ return array(); }
+	
+	/**
+	 * Will either look for a getter function or will just get
+	 * @param string $name
+	 */
+	public function __get($name){
+		if(method_exists('get'.$name)){
+			return $this->{'get'.$name}();
+		}
+		return $this->$name;
+	}
+	
+	/**
+	 * Will either look for a setter function or will just set init
+	 * @param string $name
+	 * @param mixed $value
+	 */
+	public function __set($name, $value){
+		if(method_exists('set'.$name)){
+			return $this->{'set'.$name}($value);
+		}
+		return $this->$name=$value;
+	}
 
-	function init($scenario = 'insert'){
+	/**
+	 * The constructor, all it does is attach behaviours and fires onAfterConstruct
+	 * @param string $scenario
+	 */
+	function __construct($scenario = 'insert'){
 		foreach($this->behaviours() as $name => $attr){
 			$this->attachBehaviour($name, $attr);
-		}
-
-		static $reflections=array();
-		if(!isset($reflections[get_class($this)])&&get_class($this)!='\\glue\\Model'){
-
-			$_meta = array();
-
-			$reflect = new \ReflectionClass(get_class($o));
-			$class_vars = $reflect->getProperties(ReflectionProperty::IS_PUBLIC); // Pre-defined doc attributes
-
-			foreach ($class_vars as $prop) {
-
-				if($prop->isStatic())
-					continue;
-
-				$docBlock = $prop->getDocComment();
-				$field_meta = array(
-					'name' => $prop->getName(),
-					'virtual' => $prop->isProtected() || preg_match('/@virtual/i', $docBlock) <= 0 ? false : true 
-					// If the field is virtual its value will not saved  
-				);
-				$_meta[$prop->getName()] = $field_meta;
-			}
 		}
 		$this->onAfterConstruct();
 	}
 
+	/**
+	 * Magically you can call any function within a behaviour as though they are part of the 
+	 * parent model
+	 * @param string $name
+	 * @param array $parameters
+	 */
 	function __call($name, $parameters){
 		foreach($this->behaviours as $k => $attr){
 			if(isset($attr['obj'])){
@@ -66,6 +75,11 @@ class Model extends \glue\Component{
 		return false;
 	}
 
+	/**
+	 * Checks to see if a method exists. This will search all behaviours as well to see if a method exists
+	 * @param string $f
+	 * @return boolean
+	 */
 	function method_exists($f){
 		if(method_exists($this, $f)){
 			return true;
@@ -81,19 +95,32 @@ class Model extends \glue\Component{
 		return false;
 	}
 
-
+	/**
+	 * Gets the models scenario
+	 */
 	public function getScenario(){
 		return $this->scenario;
 	}
 
+	/**
+	 * Sets the models Scenario
+	 * @param string $scenario
+	 */
 	public function setScenario($scenario){
 		$this->scenario = $scenario;
 	}
 
+	/**
+	 * Gets a boolean value representing whether or not this modle has been validated once
+	 */
 	public function getValidated(){
 		return $this->validated;
 	}
 
+	/**
+	 * Sets whether or not this model has been validated
+	 * @param boolean $validated
+	 */
 	public function setValidated($validated){
 		$this->validated = $validated;
 	}
@@ -110,23 +137,66 @@ class Model extends \glue\Component{
 		$this->rules[] = $rule;
 	}
 
-	public function getRules(){
-		return array_merge($this->rules(), $this->rules);
+	/**
+	 * Gets the rules of the model. if not scenario is implied within the parameter it will just get all 
+	 * the rules of the model, however, if a scenario is implied within the parameter then it will return only 
+	 * rules that shuld run on that scenario
+	 */
+	public function getRules($scenario=null){
+		$rules = array_merge($this->rules(), $this->rules);
+		if($scenario===null)
+			return $rules;
+		else{
+			$srules=array();
+			foreach($rules as $rule){
+				if(isset($rule['on'])){
+					$scenarios=preg_split('/[\s]*[,][\s]*/', $rule['on']);
+					if(array_key_exists($scenario, array_flip($scenarios))){
+						$srules[] = $rule;
+					}
+				}else{
+					$srules[] = $rule;
+				}
+			}
+			return $srules;
+		}
 	}
 
-	public function attributeNames($safeOnly=true){
+	/**
+	 * Gets a list of attribute names of the model.
+	 * Attributes are considered to be any class variable which is public and not static.
+	 * 
+	 * It will cache reflections into the meta of the model class.
+	 * @return array
+	 */
+	public function attributeNames(){
+		if(isset(self::$_meta[get_class($this)])){
+			return self::$_meta[get_class($this)];
+		}
+		
+		$class = new \ReflectionClass($this);
+		$names = array();
+		foreach ($class->getProperties(\ReflectionProperty::IS_PUBLIC) as $property) {
+			$name = $property->getName();
+			if (!$property->isStatic()) {
+				$names[] = $name;
+			}
+		}
+		return self::$_meta[get_class($this)]=$names;		
+	}
+	
+	/**
+	 * Gets a list of the attribute names currently stored within the rules of the model.
+	 * This method can be overriden to just return an array of names as the values of each element
+	 */
+	public function scenarioAttributeNames(){
 		$names=array();
-		$i=0;
-		foreach($this->getRules() as $rule){
-			if($safeOnly && isset($rule['safe']) && $rule['safe']===false)
-				continue;
-
+		foreach($this->getRules($this->getScenario()) as $rule){
 			$fields=preg_split('/[\s]*[,][\s]*/', $rule[0]);
 			foreach($fields as $field)
-				$names[$field]=$i;
-			$i++;
+				$names[$field]=true;
 		}
-		return array_values(array_flip($names));
+		return array_keys($names);
 	}
 
 	/**
@@ -136,7 +206,7 @@ class Model extends \glue\Component{
 	function setAttributes($a,$safeOnly=true){
 		$scenario = $this->getScenario();
 
-		$attributes = array_flip($safeOnly ? $this->attributeNames() : $this->attributeNames(false));
+		$attributes = array_flip($safeOnly ? $this->scenarioAttributeNames() : $this->attributeNames());
 		foreach($a as $name=>$value){
 			if($safeOnly&&isset($attributes[$name])){
 				$this->$name=!is_array($value) && preg_match('/^([0-9]|[1-9]{1}\d+)$/' /* Will only match real integers, unsigned */, $value) > 0 ? (int)$value : $value;
@@ -146,38 +216,32 @@ class Model extends \glue\Component{
 		}
 	}
 
-	public function getAttributes($db_only = false) {
+	/**
+	 * Gets the models attributes
+	 */
+	public function getAttributes($names=null) {
 
-		// Redo using the reflection cache above
-
-		$attributes = array();
-		$reflect = new ReflectionClass(get_class($this));
-		$class_vars = $reflect->getProperties($db_only ? ReflectionProperty::IS_PROTECTED : ReflectionProperty::IS_PROTECTED | ReflectionProperty::IS_PUBLIC);
-
-		foreach ($class_vars as $prop) {
-			$attributes[$prop->getName()] = $this->{$prop->getName()};
+		$values = array();
+		if ($names === null) {
+			$names = $this->attributeNames();
 		}
-		return $attributes;
+		foreach ($names as $name) {
+			$values[$name] = $this->$name;
+		}
+		foreach ($except as $name) {
+			unset($values[$name]);
+		}
+		
+		return $values;		
 	}
 
 	/**
-	 * Override this function is you want more complex handling of getting back
-	 * attributes from the model for things like Html helpers and what not
-	 * @param string $k
+	 * Gets the errors for the model. If a field parameter is provided it will get the errors only for that field 
+	 * and if the getFirst parameter is set to true it will only get the first error of that field.
+	 * @param string $field
+	 * @param boolean $getFirst
+	 * @return array
 	 */
-	function getAttribute($k){
-		return $this->$k;
-	}
-
-	/**
-	 * This function decides if the form has a summary waiting to be used
-	 */
-	function hasSummary(){
-		if($this->getSuccess() || $this->hasErrors())
-			return true;
-		return false;
-	}
-
 	function getErrors($field = null, $getFirst = false){
 		if($field){
 			if(isset($this->error_messages[$field]))
@@ -188,27 +252,54 @@ class Model extends \glue\Component{
 		return array();
 	}
 
-	function getErrorMessages(){
-		return $this->getErrors();
-	}
-
-	function addError($field, $message = null){
+	/**
+	 * Sets an error on the model
+	 * @param string $field
+	 * @param string $message
+	 */
+	function setError($field, $message = null){
 		if(!$message){
 			$this->error_messages[] = $field;
 		}else{
 			$this->error_messages[$field][] = $message;
 		}
 	}
+	
+	/**
+	 * Clears all the models errors. If a field name is provided in the parameters 
+	 * then it will clear the errors for only one field.
+	 * @param string $field
+	 */
+	function clearErrors($field=null){
+		if($field===null){
+			$this->error_messages=array();
+			$this->error_codes=array();
+		}elseif(isset($this->error_messages[$field])){
+			unset($this->error_messages[$field]);
+		}elseif(isset($this->error_codes[$field]))
+			unset($this->error_codes[$field]);
+	}
 
-	public function validate($data = null, $rules = array(), $runEvents = true){
+	/**
+	 * Validates the model while running the beforeValidate and afterValidate events of the model.
+	 * @param boolean $runEvents Whether or not to run the events of the model
+	 */
+	public function validate($runEvents = true){
 
 		if(!$data) $data = $this->getAttributes();
+		
+		$this->clearErrors();
+		$this->setValidated(false);
 
 		if($runEvents && !$this->onBeforeValidate()){
 			$this->setValidated(true); return false; // NOT VALID
 		}
-		if(($validator=$this->getValidator())!==null)
+		if(($validator=$this->getValidator())!==null){
+			$validator->model=$this;
+			$validator->scenario=$this->getScenario();
+			$validator->rules=$this->getRules($validator->scenario);
 			$valid=$validator->run();
+		}
 
 		$this->setValidated(true);
 		$this->setValid($valid);
@@ -218,13 +309,14 @@ class Model extends \glue\Component{
 		return $valid;
 	}
 
+	/**
+	 * Either creates or returns the models validator
+	 * @param array $rules
+	 * @return \glue\Validation
+	 */
 	function getValidator(){
 		if($this->validator===null){
-			return $this->validator=new \glue\Validation(array(
-				'model' => $this,
-				'scenario' => $this->getScenario(),
-				'rules' => !empty($rules) ? $rules : array_merge($this->rules(),$this->rules)
-			));
+			return $this->validator=new \glue\Validation();
 		}
 		return $this->validator;
 	}
