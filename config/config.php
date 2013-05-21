@@ -48,7 +48,7 @@ return array(
 
 		// MongoDB configuration settings
 		"db"=>array(
-			"class"=>"mongoglue\MongoClient",
+			"class"=>"glue\db\Client",
 			"server"=>"mongodb://localhost:27017",
 			"db" => "stagex",
 

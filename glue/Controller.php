@@ -14,18 +14,23 @@ class Controller {
 	const UNKNOWN = 3;	
 
 	public $defaultAction = 'index';
-
 	public $layout = "blank_page";
-	public $pageTitle;
-	public $pageDescription;
-	public $pageKeywords;
 	
+	public $action;
 	
-	private $coreCSS = array();
+	public $title;
 	
-	private $cssTags = array();
-	private $jsTags = array();
-	private $tags = array();
+	public $metaTags;
+	public $linkTags;
+	
+	public $jsFiles;
+	public $js;
+	
+	public $cssFiles;
+	public $css;
+	
+	public $description;
+	public $keywords;
 
 	public function filters(){ return array(); }
 	
@@ -112,6 +117,39 @@ class Controller {
 
 		if($returnString): return $view; else: echo $view; endif;
 	}
+	
+	/**
+	 * Marks the beginning of an HTML page.
+	 */
+	public function beginPage(){
+		ob_start();
+		ob_implicit_flush(false);
+	
+		$this->trigger(self::EVENT_BEGIN_PAGE);
+	}
+
+	/**
+	 * Marks the ending of an HTML page.
+	 */
+	public function endPage(){
+		$this->trigger(self::EVENT_END_PAGE);
+	
+		$content = ob_get_clean();
+		echo strtr($content, array(
+				self::PL_HEAD => $this->renderHeadHtml(),
+				self::PL_BODY_BEGIN => $this->renderBodyBeginHtml(),
+				self::PL_BODY_END => $this->renderBodyEndHtml(),
+		));
+	
+		unset(
+				$this->metaTags,
+				$this->linkTags,
+				$this->css,
+				$this->cssFiles,
+				$this->js,
+				$this->jsFiles
+		);
+	}	
 	
 	/**
 	 * Inserts the scripts in the head section.

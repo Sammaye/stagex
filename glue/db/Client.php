@@ -1,9 +1,8 @@
 <?php
 
-namespace \mongoglue;
+namespace \glue\db;
 
-use glue,
-	\glue\Exception;
+use \glue\Exception;
 
 /**
  * MongoClient
@@ -15,7 +14,7 @@ use glue,
  * Normally this would represent the MongoClient or Mongo and it is even named after them and implements
  * some of their functions but it is not due to the way Yii works.
  */
-class EMongoClient extends \glue\Component{
+class Client extends \glue\Component{
 
 	/**
 	 * The server string (connection string pre-1.3)
