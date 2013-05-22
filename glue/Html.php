@@ -16,7 +16,7 @@ namespace glue;
  * @author Sam Millman
  *
  */
-class html{
+class Html{
 
 	/////////////////
 	// BASIC ELEMENTS
@@ -73,7 +73,7 @@ class html{
 	 * @param array $options
 	 */
 	public static function metaTag($content, $options){
-		if($options['httpEquiv']){
+		if(isset($options['httpEquiv'])){
 			return "<meta http-equiv='{$options['httpEquiv']}' content='{$content}' />";
 		}else{
 			return "<meta name='{$options['name']}' content='{$content}' />";

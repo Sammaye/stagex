@@ -14,16 +14,15 @@ $this->beginPage() ?>
 		<title><?php echo Html::encode($this->title) ?></title>
 
 		<?php
-			Html::jsFile('/js/jquery-ui.js');
-			Html::jsFile('/js/jquery-ui.js');
-			Html::jsFile('/js/jquery.js');
+			echo Html::jsFile('/js/jquery-ui.js')."\n";
+			echo Html::jsFile('/js/jquery.js')."\n";
 
-			Html::jsFile("/js/facebox.js");
-			Html::jsFile('/js/common.js');
+			echo Html::jsFile("/js/facebox.js")."\n";
+			echo Html::jsFile('/js/common.js')."\n";
 
-			Html::jsFile("/css/reset.css");
-			Html::jsFile("/css/960.css");
-			Html::jsFile("/css/main.css");
+			echo Html::cssFile("/css/reset.css")."\n";
+			echo Html::cssFile("/css/960.css")."\n";
+			echo Html::cssFile("/css/main.css")."\n";
 
 			$this->js('ga_script', "var _gaq = _gaq || [];
 			  _gaq.push(['_setAccount', 'UA-31049834-1']);
@@ -46,7 +45,7 @@ $this->beginPage() ?>
 	</head>
 	<body>
 		<?php $this->beginBody() ?>
-			<?php app\widgets\Menu::widget() ?>
+			<?php //app\widgets\Menu::widget() ?>
 			<?php echo $content ?>
 			<div id="mainSearch_results"></div>
 		<?php $this->endBody() ?>

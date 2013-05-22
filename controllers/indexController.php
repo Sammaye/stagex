@@ -15,7 +15,7 @@ class indexController extends \glue\Controller{
 //		if($_SESSION['logged']){
 //			glue::route('/stream/news');
 //		}else{
-//			$this->render('/index');
+			$this->render('/index');
 //		}
 	}
 }

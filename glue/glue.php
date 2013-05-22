@@ -234,7 +234,7 @@ class glue{
 	 * The bootstrap function to call the error handler for handling our exceptions
 	 * @param Exception $exception
 	 */
-	private static function handleException($exception){
+	public static function handleException($exception){
 
 		// disable error capturing to avoid recursive errors while handling exceptions
 		restore_error_handler();
@@ -254,7 +254,7 @@ class glue{
 	 * @param int $line
 	 * @param boolean $fatal
 	 */
-	private static function handleError($code, $message, $file, $line, $fatal=false){
+	public static function handleError($code, $message, $file, $line, $fatal=false){
 		$e=self::getComponent('errorHandler');
 		if($fatal===true) // $fatal can sometimes be the symbol table, it depends on what mood PHP is in
 			$e->handleFatal($code,$message,$file,$line);

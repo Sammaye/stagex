@@ -46,7 +46,7 @@
 	</div>
 
 	<div class='grid_16 alpha omega caption_text bottom_caption'>Also as ever you have ownership over your content.
-	So, looking for a piece of the action? Just <a href='<?php echo glue::url()->create('/user/login') ?>'>sign in</a> or
-	<a href='<?php echo glue::url()->create('/user/create') ?>'>register</a> to enjoy StageX!</div>
+	So, looking for a piece of the action? Just <a href='<?php //echo glue::url()->create('/user/login') ?>'>sign in</a> or
+	<a href='<?php //echo glue::url()->create('/user/create') ?>'>register</a> to enjoy StageX!</div>
 </div>
 

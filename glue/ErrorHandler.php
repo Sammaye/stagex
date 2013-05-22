@@ -164,7 +164,6 @@ class ErrorHandler extends \glue\Component{
 		}
 
 		$backtracel = '';
-		var_dump(debug_backtrace());
 		foreach(debug_backtrace() as $k=>$v){
 			if($v['function'] == "include" || $v['function'] == "include_once" || $v['function'] == "require_once" || $v['function'] == "require"){
 				$backtracel .= "#".$k." ".$v['function']."(".$v['args'][0].") called at [".$v['file'].":".$v['line']."]<br />";

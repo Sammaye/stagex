@@ -16,8 +16,8 @@ class Controller {
 	const UNKNOWN = 3;
 
 	public $tpl_head = '<![CDATA[GLUE-BLOCK-HEAD]]>';
-	public $tpl_body_begin = '<![CDATA[GLUE-BLOCK-HEAD]]>';
-	public $tpl_body_end = '<![CDATA[GLUE-BLOCK-HEAD]]>';
+	public $tpl_body_begin = '<![CDATA[GLUE-BLOCK-BODY]]>';
+	public $tpl_body_end = '<![CDATA[GLUE-BLOCK-BODY_END]]>';
 
 	public $defaultAction = 'index';
 	public $layout = "blank_page";
@@ -35,12 +35,10 @@ class Controller {
 	public $cssFiles;
 	public $css;
 
-	public function filters(){ return array(); }
-
 	function authRules(){ return array(); }
 
 	public function __construct(){
-		$this->title = $this->title ?: glue::$title;
+		$this->title = $this->title ?: glue::$name;
 		if(glue::$description!==null)
 			$this->metaTag('description', glue::$description);
 		if(glue::$keywords!==null)
@@ -60,7 +58,7 @@ class Controller {
 	}
 
 	function js($map, $script, $POS = self::BODY_END){
-		$this->jsTags[$POS][$map] = Html::js($script);
+		$this->js[$POS][$map] = $script;
 	}
 
 	function metaTag($name, $html){
@@ -76,18 +74,18 @@ class Controller {
 
 	public function render($view, $params = array()){
 		$viewFile = $this->getViewPath($view);
-		$output = $this->renderFile($viewFile, $params, $this);
+		$content = $this->renderFile($viewFile, $params);
 		$layoutFile = $this->getLayoutPath($this->layout);
 		if ($layoutFile !== false) {
-			return $this->renderFile($layoutFile, array('content' => $output), $this);
+			echo require $layoutFile;
 		} else {
-			return $output;
+			echo $output;
 		}
 	}
 
 	public function renderPartial($view, $params = array()){
 		$viewFile = $this->getViewPath($view);
-		return $this->renderFile($viewFile, $params, $this);
+		echo $this->renderFile($viewFile, $params, $this);
 	}
 
 	public function renderFile($_file_, $_params_ = array()){
@@ -127,9 +125,9 @@ class Controller {
 
 		$content = ob_get_clean();
 		echo strtr($content, array(
-				$this->tpl_head => $this->renderHeadHtml(),
-				$this->tpl_body_begin => $this->renderBodyBeginHtml(),
-				$this->tpl_body_end => $this->renderBodyEndHtml(),
+			$this->tpl_head => $this->renderHeadHtml(),
+			$this->tpl_body_begin => $this->renderBodyBeginHtml(),
+			$this->tpl_body_end => $this->renderBodyEndHtml(),
 		));
 
 		unset(
