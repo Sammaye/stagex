@@ -31,25 +31,15 @@ abstract class Widget extends \glue\Component{
 	private static $counter = 0;
 
 	/**
-	 * Populates the class attributes
-	 * @param array $a
-	 */
-	function attributes($a){
-		if($a){
-			foreach($a as $k=>$v){
-				$this->{$k} = $v;
-			}
-		}
-	}
-
-	/**
 	 * Much like beginWidget this function produces a widget however it will call both init() and render() all in one call
 	 *
 	 * @param string $path
 	 * @param array $args
 	 */
-	function widget($path, $args = array()){
-		return glue::widget($path, $args);
+	static function widget(){
+		$o=new $this;
+		$o->render();
+		return $o;
 	}
 
 	/**
@@ -58,8 +48,9 @@ abstract class Widget extends \glue\Component{
 	 * @param string $path
 	 * @param array $args
 	 */
-	function beginWidget($path, $args = array()){
-		return glue::beginWidget($path, $args);
+	function beginWidget(){
+		$o=new $this;
+		return $o;
 	}
 
 	/**
@@ -104,11 +95,6 @@ abstract class Widget extends \glue\Component{
 		else
 			return $this->id='gw_'.self::$counter++;
 	}
-
-	/**
-	 * Allows for pre-processing and is not required
-	 */
-	function init(){ return true; } // Init function allows for pre-processing, it is not required
 
 	/**
 	 * Allows for a widget to be rendered and is required
