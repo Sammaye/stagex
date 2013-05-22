@@ -115,7 +115,7 @@ class glue{
 				foreach(self::$startUp as $c)
 					self::getComponent($c);
 			}
-			//self::getComponent('user'); // force the user to be inited
+			self::getComponent('user'); // force the user to be inited
 			self::route($url);
 		}
 	}

@@ -1,6 +1,6 @@
 <?php
 
-namespace \glue\db;
+namespace glue\db;
 
 use \glue\Exception;
 
@@ -353,11 +353,11 @@ class Document extends \glue\Model{
 
 	function attributeNames($db_only=false){
 
-		if(!isset(self::$_meta[get_class($this)])&&end(explode('\\', get_class($this)))!='Model'){
+		if(!isset(self::$_meta[get_class($this)])&&get_class($this)!='glue\Model'){
 
 			$_meta = array();
 
-			$reflect = new \ReflectionClass(get_class($o));
+			$reflect = new \ReflectionClass(get_class($this));
 			$class_vars = $reflect->getProperties(\ReflectionProperty::IS_PUBLIC); // Pre-defined doc attributes
 
 			foreach ($class_vars as $prop) {

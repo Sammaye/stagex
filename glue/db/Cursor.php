@@ -1,6 +1,6 @@
 <?php
 
-namespace \glue\db;
+namespace glue\db;
 
 use \glue\Exception;
 

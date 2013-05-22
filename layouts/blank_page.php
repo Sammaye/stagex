@@ -14,8 +14,8 @@ $this->beginPage() ?>
 		<title><?php echo Html::encode($this->title) ?></title>
 
 		<?php
-			echo Html::jsFile('/js/jquery-ui.js')."\n";
 			echo Html::jsFile('/js/jquery.js')."\n";
+			echo Html::jsFile('/js/jquery-ui.js')."\n";
 
 			echo Html::jsFile("/js/facebox.js")."\n";
 			echo Html::jsFile('/js/common.js')."\n";
@@ -45,7 +45,7 @@ $this->beginPage() ?>
 	</head>
 	<body>
 		<?php $this->beginBody() ?>
-			<?php \app\widgets\Menu::widget() ?>
+			<?php new app\widgets\Menu ?>
 			<?php echo $content ?>
 			<div id="mainSearch_results"></div>
 		<?php $this->endBody() ?>

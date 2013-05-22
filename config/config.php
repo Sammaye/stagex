@@ -12,7 +12,7 @@ return array(
 	// App name // Can be used as title at times
 	"name"=>'StageX',
 
-	'www' => 'stagex-local.co.uk',
+	//'www' => 'stagex-local.co.uk',
 
 	// This switches the debug mode
 	"DEBUG" => true,

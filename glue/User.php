@@ -2,9 +2,10 @@
 
 namespace glue;
 
-use \glue\util\Crypt;
+use glue,
+	\glue\util\Crypt;
 
-class User extends \glue\Model{
+class User extends \glue\db\Document{
 
 	/**
 	 * This decides when the user should no longer be "trusted" as being logged in

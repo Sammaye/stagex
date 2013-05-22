@@ -61,7 +61,7 @@ abstract class Widget extends \glue\Component{
 		$model = $this->model;
 		$attribute = $this->attribute;
 
-		if($model instanceof GModel){ // If the model is a valid model
+		if($model instanceof \glue\Model){ // If the model is a valid model
 			if(($pos=strpos($attribute,'['))!==false)
 			{
 				if($pos!==0){  // e.g. name[a][b]

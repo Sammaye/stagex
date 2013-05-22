@@ -1,6 +1,6 @@
 <?php
 
-namespace \glue\db;
+namespace glue\db;
 
 use \glue\Exception;
 
@@ -132,13 +132,13 @@ class Client extends \glue\Component{
 		// glue will easily and effortlessly display the errors from the PHP driver, we should only catch its exceptions if
 		// we wanna add our own custom messages on top which we don't, the errors are quite self explanatory
 		if(version_compare(phpversion('mongo'), '1.3.0', '<')){
-			$this->_mongo = new Mongo($this->server, $this->options);
+			$this->_mongo = new \Mongo($this->server, $this->options);
 			$this->_mongo->connect();
 
 			if($this->setSlaveOkay)
 				$this->_mongo->setSlaveOkay($this->setSlaveOkay);
 		}else{
-			$this->_mongo = new MongoClient($this->server, $this->options);
+			$this->_mongo = new \MongoClient($this->server, $this->options);
 
 			if(is_array($this->RP)){
 				$const = $this->RP[0];
