@@ -1,25 +1,24 @@
-<?php 
+<?php
 
 namespace \glue\db;
 
 use \glue\Exception;
 
 class Document extends \glue\Model{
-	
+
 	private $_related=array();
 	private $_partial=false;
-	
+
 	private $_attributes=array();
-	
+
 	private $_new=false;
 	private $_criteria;
 	private $_projected_fields=array();
-	
-	private $_db;
-	
+
+	private static $_db;
 	private static $_models=array();
 	private static $_meta=array();
-	
+
 	/**
 	 * The scope attached to this model
 	 *
@@ -41,7 +40,7 @@ class Document extends \glue\Model{
 	 * @return An array of scopes
 	 */
 	public function scopes(){ return array(); }
-	
+
 	/**
 	 * Sets the default scope
 	 *
@@ -56,16 +55,16 @@ class Document extends \glue\Model{
 	 *
 	 * @return an array which represents a single scope within the scope() function
 	 */
-	public function defaultScope(){ return array(); }	
-	
+	public function defaultScope(){ return array(); }
+
 	public function attributeLabels(){ return array(); }
-	
+
 	/**
 	 * (non-PHPdoc)
 	 * @see yii/framework/CComponent::__get()
 	 */
 	public function __get($name){
-	
+
 		if(isset($this->_attributes[$name]))
 			return $this->_attributes[$name];
 		elseif(isset($this->_related[$name]))
@@ -76,20 +75,20 @@ class Document extends \glue\Model{
 			return parent::__get($name);
 		}
 	}
-	
+
 	/**
 	 * (non-PHPdoc)
 	 * @see CComponent::__set()
 	 */
 	public function __set($name,$value){
-	
+
 		if(isset($this->_related[$name]) || array_key_exists($name, $this->relations()))
 			return $this->_related[$name]=$value;
 		else{
 			return $this->setAttribute($name,$value);
 		}
 	}
-	
+
 	/**
 	 * (non-PHPdoc)
 	 * @see CComponent::__isset()
@@ -104,7 +103,7 @@ class Document extends \glue\Model{
 		elseif(property_exists($this,$name))
 			return true;
 	}
-	
+
 	/**
 	 * (non-PHPdoc)
 	 * @see CComponent::__unset()
@@ -117,7 +116,7 @@ class Document extends \glue\Model{
 		elseif(property_exists($this,$name))
 			unset($this->$name);
 	}
-	
+
 	/**
 	 * Sets up our model and set the field cache just like in EMongoModel
 	 *
@@ -127,35 +126,35 @@ class Document extends \glue\Model{
 	 * @param string $scenario
 	 */
 	public function __construct($scenario='insert'){
-	
+
 		// will set the cache of our fields if needed
 		$this->attributeNames();
-		
+
 		if($scenario===null) // internally used by populateRecord() and model()
 			return;
-	
+
 		$this->setScenario($scenario);
 		$this->setIsNewRecord(true);
-	
+
 		$this->init();
-	
+
 		$this->attachBehaviors($this->behaviors());
 		$this->afterConstruct();
 	}
-	
+
 	/**
 	 * This, in addition to EMongoModels edition, will also call scopes on the model
 	 * @see protected/extensions/MongoYii/EMongoModel::__call()
 	 */
 	public function __call($name,$parameters){
-	
+
 		if(array_key_exists($name, $this->relations())){
 			if(empty($parameters))
 				return $this->getRelated($name,false);
 			else
 				return $this->getRelated($name,false,$parameters[0]);
 		}
-	
+
 		$scopes=$this->scopes();
 		if(isset($scopes[$name])){
 			$this->setDbCriteria($this->mergeCriteria($this->_criteria, $scopes[$name]));
@@ -163,7 +162,7 @@ class Document extends \glue\Model{
 		}
 		return parent::__call($name,$parameters);
 	}
-	
+
 	/**
 	 * Resets the scopes applied to the model clearing the _criteria variable
 	 * @return $this
@@ -175,7 +174,7 @@ class Document extends \glue\Model{
 			$this->_criteria = null;
 		return $this;
 	}
-	
+
 	/**
 	 * Returns the collection name as a string
 	 *
@@ -184,7 +183,7 @@ class Document extends \glue\Model{
 	 * return 'users';
 	 */
 	function collectionName(){}
-	
+
 	/**
 	 * Returns the value of the primary key
 	 */
@@ -193,7 +192,7 @@ class Document extends \glue\Model{
 			$value=$this->{$this->primaryKey()};
 		return $value instanceof \MongoId ? $value : new MongoId($value);
 	}
-	
+
 	/**
 	 * Returns if the current record is new.
 	 * @return boolean whether the record is new and should be inserted when calling {@link save}.
@@ -204,7 +203,7 @@ class Document extends \glue\Model{
 	public function getIsNewRecord(){
 		return $this->_new;
 	}
-	
+
 	/**
 	 * Sets if the record is new.
 	 * @param boolean $value whether the record is new and should be inserted when calling {@link save}.
@@ -213,14 +212,14 @@ class Document extends \glue\Model{
 	public function setIsNewRecord($value){
 		$this->_new=$value;
 	}
-	
+
 	/**
 	 * Gets a list of the projected fields for the model
 	 */
 	public function getProjectedFields(){
 		return $this->_projected_fields;
 	}
-	
+
 	/**
 	 * Sets the projected fields of the model
 	 * @param array $a
@@ -228,7 +227,7 @@ class Document extends \glue\Model{
 	public function setProjectedFields($a){
 		$this->_projected_fields=$a;
 	}
-	
+
 	/**
 	 * Sets the attribute of the model
 	 * @param string $name
@@ -242,7 +241,7 @@ class Document extends \glue\Model{
 		//else return false;
 		return true;
 	}
-	
+
 	/**
 	 * Returns the static model of the specified AR class.
 	 * The model returned is a static instance of the AR class.
@@ -268,7 +267,7 @@ class Document extends \glue\Model{
 			return $model;
 		}
 	}
-	
+
 	/**
 	 * Instantiates a model from an array
 	 * @param array $document
@@ -278,7 +277,7 @@ class Document extends \glue\Model{
 		$model=new $class(null);
 		return $model;
 	}
-	
+
 	/**
 	 * Returns the text label for the specified attribute.
 	 * This method overrides the parent implementation by supporting
@@ -312,7 +311,7 @@ class Document extends \glue\Model{
 		else
 			return $this->generateAttributeLabel($attribute);
 	}
-	
+
 	/**
 	 * Creates an active record with the given attributes.
 	 * This method is internally used by the find methods.
@@ -329,14 +328,14 @@ class Document extends \glue\Model{
 			$record->setScenario('update');
 			$record->setIsNewRecord(false);
 			$record->init();
-	
+
 			$labels=array();
 			foreach($attributes as $name=>$value)
 			{
 				$labels[$name]=1;
 				$record->$name=$value;
 			}
-	
+
 			if($partial){
 				$record->setIsPartial(true);
 				$record->setProjectedFields($labels);
@@ -349,23 +348,23 @@ class Document extends \glue\Model{
 		}
 		else
 			return null;
-	}	
-	
-	
-	function attributeNames(){
-		
+	}
+
+
+	function attributeNames($db_only=false){
+
 		if(!isset(self::$_meta[get_class($this)])&&end(explode('\\', get_class($this)))!='Model'){
-		
+
 			$_meta = array();
-		
+
 			$reflect = new \ReflectionClass(get_class($o));
 			$class_vars = $reflect->getProperties(\ReflectionProperty::IS_PUBLIC); // Pre-defined doc attributes
-		
+
 			foreach ($class_vars as $prop) {
-		
+
 				if($prop->isStatic())
 					continue;
-		
+
 				$docBlock = $prop->getDocComment();
 				$field_meta = array(
 						'name' => $prop->getName(),
@@ -375,10 +374,19 @@ class Document extends \glue\Model{
 				$_meta[$prop->getName()] = $field_meta;
 			}
 			self::$_meta[get_class($this)]=$_meta;
-		}		
-		return self::$_meta[get_class($this)];
+		}
+
+		if($db_only){
+			$fields=array();
+			foreach(self::$_meta[get_class($this)] as $field){
+				if(!$field['virtual'])
+					$fields[$field['name']] = true;
+			}
+			return array_keys($fields);
+		}else
+			return array_keys(self::$_meta[get_class($this)]);
 	}
-	
+
 	/**
 	 * Saves this record
 	 *
@@ -393,7 +401,7 @@ class Document extends \glue\Model{
 		else
 			return false;
 	}
-	
+
 	/**
 	 * Saves only a specific subset of attributes as defined by the param
 	 * @param array $attributes
@@ -417,14 +425,14 @@ class Document extends \glue\Model{
 					$values[$name]=$this->$name=$value;
 			}
 			if(!isset($this->{$this->primaryKey()}) || $this->{$this->primaryKey()}===null)
-				throw new CDbException(Yii::t('yii','The active record cannot be updated because its _id is not set!'));
-	
+				throw new Exception('The active record cannot be updated because its _id is not set!');
+
 			return $this->updateByPk($this->{$this->primaryKey()},$values);
 		}
 		else
-			throw new CDbException(Yii::t('yii','The active record cannot be updated because it is new.'));
+			throw new Exception('The active record cannot be updated because it is new.');
 	}
-	
+
 	/**
 	 * Inserts this record
 	 * @param array $attributes
@@ -432,13 +440,13 @@ class Document extends \glue\Model{
 	 */
 	public function insert($attributes=null){
 		if(!$this->getIsNewRecord())
-			throw new CDbException(Yii::t('yii','The active record cannot be inserted to database because it is not new.'));
+			throw new Exception('The active record cannot be inserted to database because it is not new.');
 		if($this->beforeSave())
 		{
 			$this->trace(__FUNCTION__);
-	
+
 			if(!isset($this->{$this->primaryKey()})) $this->{$this->primaryKey()} = new MongoId;
-			if($this->getCollection()->insert($this->getRawDocument(), $this->getDbConnection()->getDefaultWriteConcern())){
+			if($this->getCollection()->insert($this->getRawDocument(), $this->getDb()->getDefaultWriteConcern())){
 				$this->afterSave();
 				$this->setIsNewRecord(false);
 				$this->setScenario('update');
@@ -447,7 +455,7 @@ class Document extends \glue\Model{
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Updates this record
 	 * @param array $attributes
@@ -455,13 +463,13 @@ class Document extends \glue\Model{
 	 */
 	public function update($attributes=null){
 		if($this->getIsNewRecord())
-			throw new CDbException(Yii::t('yii','The active record cannot be updated because it is new.'));
+			throw new Exception('The active record cannot be updated because it is new.');
 		if($this->beforeSave())
 		{
 			$this->trace(__FUNCTION__);
 			if($this->{$this->primaryKey()}===null) // An _id is required
-				throw new CDbException(Yii::t('yii','The active record cannot be updated because it has no _id.'));
-	
+				throw new Exception('The active record cannot be updated because it has no _id.');
+
 			if($attributes!==null)
 				$attributes=$this->filterRawDocument($attributes);
 			elseif($this->getIsPartial()){
@@ -471,7 +479,7 @@ class Document extends \glue\Model{
 			}else
 				$attributes=$this->getRawDocument();
 			unset($attributes['_id']); // Unset the _id before update
-	
+
 			$this->updateByPk($this->{$this->primaryKey()}, array('$set' => $attributes));
 			$this->afterSave();
 			return true;
@@ -479,7 +487,7 @@ class Document extends \glue\Model{
 		else
 			return false;
 	}
-	
+
 	/**
 	 * Deletes this record
 	 * @throws CDbException
@@ -496,21 +504,18 @@ class Document extends \glue\Model{
 				return false;
 		}
 		else
-			throw new CDbException(Yii::t('yii','The active record cannot be deleted because it is new.'));
+			throw new Exception('The active record cannot be deleted because it is new.');
 	}
-	
+
 	/**
 	 * Checks if a record exists in the database
 	 * @param array $criteria
 	 */
 	public function exists($criteria=array()){
 		$this->trace(__FUNCTION__);
-	
-		if($criteria instanceof EMongoCriteria)
-			$criteria = $criteria->getCondition();
 		return $this->getCollection()->findOne($criteria)!==null;
 	}
-	
+
 	/**
 	 * Compares current active record with another one.
 	 * The comparison is made by comparing table name and the primary key values of the two active records.
@@ -521,17 +526,13 @@ class Document extends \glue\Model{
 	{
 		return $this->collectionName()===$record->collectionName() && (string)$this->getPrimaryKey()===(string)$record->getPrimaryKey();
 	}
-	
+
 	/**
 	 * Find one record
 	 * @param array $criteria
 	 */
 	public function findOne($criteria=array(),$fields=array()){
 		$this->trace(__FUNCTION__);
-	
-		if($criteria instanceof EMongoCriteria)
-			$criteria = $criteria->getCondition();
-		$c=$this->getDbCriteria();
 		if((
 				$record=$this->getCollection()->findOne($this->mergeCriteria(isset($c['condition']) ? $c['condition'] : array(), $criteria),
 						$this->mergeCriteria(isset($c['project']) ? $c['project'] : array(), $fields))
@@ -541,35 +542,31 @@ class Document extends \glue\Model{
 		}else
 			return null;
 	}
-	
+
 	/**
 	 * Find some records
 	 * @param array $criteria
 	 */
 	public function find($criteria=array(),$fields=array()){
 		$this->trace(__FUNCTION__);
-	
-		if($criteria instanceof EMongoCriteria){
-			$c = $criteria->mergeWith($this->getDbCriteria())->toArray();
-			$criteria=array();
-		}else{
-			$c=$this->getDbCriteria();
-		}
-	
+
+		$c=$this->getDbCriteria();
+
 		if($c!==array()){
-			$cursor = new EMongoCursor($this, $this->mergeCriteria(isset($c['condition']) ? $c['condition'] : array(), $criteria),
-					$this->mergeCriteria(isset($c['project']) ? $c['project'] : array(), $fields));
+			$cursor = new \glue\db\Cursor($this,
+					$this->getCollection()->find($this->mergeCriteria(isset($c['condition']) ? $c['condition'] : array(), $criteria),
+					$this->mergeCriteria(isset($c['project']) ? $c['project'] : array(), $fields)));
 			if(isset($c['sort'])) $cursor->sort($c['sort']);
 			if(isset($c['skip'])) $cursor->skip($c['skip']);
 			if(isset($c['limit'])) $cursor->limit($c['limit']);
-	
+
 			$this->resetScope();
 			return $cursor;
 		}else{
-			return new EMongoCursor($this, $criteria, $fields);
+			return new EMongoCursor($this, $this->getCollection()->find($criteria, $fields));
 		}
 	}
-	
+
 	/**
 	 * Finds one by _id
 	 * @param $_id
@@ -579,7 +576,7 @@ class Document extends \glue\Model{
 		$_id = $this->getPrimaryKey($_id);
 		return $this->findOne(array($this->primaryKey() => $_id),$fields);
 	}
-	
+
 	/**
 	 * An alias for findBy_id() that relates to Yiis own findByPk
 	 * @param $pk
@@ -588,7 +585,7 @@ class Document extends \glue\Model{
 		$this->trace(__FUNCTION__);
 		return $this->findBy_id($pk,$fields);
 	}
-	
+
 	/**
 	 * Delete record by pk
 	 * @param $pk
@@ -597,14 +594,11 @@ class Document extends \glue\Model{
 	 */
 	public function deleteByPk($pk,$criteria=array(),$options=array()){
 		$this->trace(__FUNCTION__);
-	
-		if($criteria instanceof EMongoCriteria)
-			$criteria = $criteria->getCondition();
 		$pk = $this->getPrimaryKey($pk);
 		return $this->getCollection()->remove(array_merge(array($this->primaryKey() => $pk), $criteria),
-				array_merge($this->getDbConnection()->getDefaultWriteConcern(), $options));
+				array_merge($this->getDb()->getDefaultWriteConcern(), $options));
 	}
-	
+
 	/**
 	 * Update record by PK
 	 *
@@ -614,14 +608,12 @@ class Document extends \glue\Model{
 	 */
 	public function updateByPk($pk, $updateDoc = array(), $criteria = array(), $options = array()){
 		$this->trace(__FUNCTION__);
-	
-		if($criteria instanceof EMongoCriteria)
-			$criteria = $criteria->getCondition();
+
 		$pk = $this->getPrimaryKey($pk);
 		return $this->getCollection()->update($this->mergeCriteria($criteria, array($this->primaryKey() => $pk)),$updateDoc,
-				array_merge($this->getDbConnection()->getDefaultWriteConcern(), $options));
+				array_merge($this->getDb()->getDefaultWriteConcern(), $options));
 	}
-	
+
 	/**
 	 * Update all records matching a criteria
 	 * @param array $criteria
@@ -630,12 +622,9 @@ class Document extends \glue\Model{
 	 */
 	public function updateAll($criteria=array(),$updateDoc=array(),$options=array('multiple'=>true)){
 		$this->trace(__FUNCTION__);
-	
-		if($criteria instanceof EMongoCriteria)
-			$criteria = $criteria->getCondition();
-		return $this->getCollection()->update($criteria, $updateDoc, array_merge($this->getDbConnection()->getDefaultWriteConcern(), $options));
+		return $this->getCollection()->update($criteria, $updateDoc, array_merge($this->getDb()->getDefaultWriteConcern(), $options));
 	}
-	
+
 	/**
 	 * Delete all records matching a criteria
 	 * @param array $criteria
@@ -643,29 +632,26 @@ class Document extends \glue\Model{
 	 */
 	public function deleteAll($criteria=array(),$options=array()){
 		$this->trace(__FUNCTION__);
-	
-		if($criteria instanceof EMongoCriteria)
-			$criteria = $criteria->getCondition();
-		return $this->getCollection()->remove($criteria, array_merge($this->getDbConnection()->getDefaultWriteConcern(), $options));
+		return $this->getCollection()->remove($criteria, array_merge($this->getDb()->getDefaultWriteConcern(), $options));
 	}
-	
+
 	/**
 	 * (non-PHPdoc)
 	 * @see http://www.yiiframework.com/doc/api/1.1/CActiveRecord#saveCounters-detail
 	 */
 	public function saveCounters(array $counters) {
 		$this->trace(__FUNCTION__);
-	
+
 		if ($this->getIsNewRecord())
-			throw new EMongoException(Yii::t('yii', 'The active record cannot be updated because it is new.'));
-	
+			throw new Exception('The active record cannot be updated because it is new.');
+
 		if(sizeof($counters)>0){
 			foreach($counters as $k => $v) $this->$k=$this->$k+$v;
 			return $this->updateByPk($this->{$this->primaryKey()}, array('$inc' => $counters));
 		}
 		return true; // Assume true since the action did run it just had nothing to update...
 	}
-	
+
 	/**
 	 * Count() allows you to count all the documents returned by a certain condition, it is analogous
 	 * to $db->collection->find()->count() and basically does exactly that...
@@ -673,15 +659,18 @@ class Document extends \glue\Model{
 	 */
 	public function count($criteria = array()){
 		$this->trace(__FUNCTION__);
-	
+
 		// If we provide a manual criteria via EMongoCriteria or an array we do not use the models own DbCriteria
-		$criteria = !empty($criteria) && !$criteria instanceof EMongoCriteira ? $criteria : $this->getDbCriteria();
-	
-		if($criteria instanceof EMongoCriteria)
-			$crtieria = $criteria->getCondition();
 		return $this->getCollection()->find(isset($criteria) ? $criteria : array())->count();
-	}	
-	
+	}
+
+	/**
+	 * Alias for getRelated
+	 */
+	public function with($name,$refresh=false,$params=array()){
+		return $this->getRelated($name,$refresh=false,$params=array());
+	}
+
 	/**
 	 * Returns the related record(s).
 	 * This method will return the related record(s) of the current record.
@@ -699,31 +688,24 @@ class Document extends \glue\Model{
 	{
 		if(!$refresh && $params===array() && (isset($this->_related[$name]) || array_key_exists($name,$this->_related)))
 			return $this->_related[$name];
-	
+
 		$relations = $this->relations();
-	
+
 		if(!isset($relations[$name]))
-			throw new EMongoException(Yii::t('yii','{class} does not have relation "{name}".',
-					array('{class}'=>get_class($this), '{name}'=>$name)));
-	
-		Yii::trace('lazy loading '.get_class($this).'.'.$name,'extensions.MongoYii.EMongoModel');
-	
-		// I am unsure as to the purpose of this bit
-		//if($this->getIsNewRecord() && !$refresh && ($relation instanceof CHasOneRelation || $relation instanceof CHasManyRelation))
-		//return $relation instanceof CHasOneRelation ? null : array();
-	
+			throw new Exception(get_class($this)." does not have relation".$name);
+
 		$cursor = array();
 		$relation = $relations[$name];
-	
+
 		// Let's get the parts of the relation to understand it entirety of its context
 		$cname = $relation[1];
 		$fkey = $relation[2];
 		$pk = isset($relation['on']) ? $this->{$relation['on']} : $this->{$this->primaryKey()};
-	
+
 		// Form the where clause
 		$where = array();
 		if(isset($relation['where'])) $where = array_merge($relation['where'], $params);
-	
+
 		// Find out what the pk is and what kind of condition I should apply to it
 		if (is_array($pk)) {
 			//It is an array of references
@@ -738,24 +720,24 @@ class Document extends \glue\Model{
 			// It is an array of _ids
 			$clause = array_merge($where, array($fkey=>array('$in' => $pk)));
 		}elseif($pk instanceof MongoDBRef){
-	
+
 			// I should probably just return it here
 			// otherwise I will continue on
 			return $this->populateReference($pk, $cname);
-	
+
 		}else{
-	
+
 			// It is just one _id
 			$clause = array_merge($where, array($fkey=>$pk));
 		}
-	
+
 		$o = $cname::model();
 		if($relation[0]==='one'){
-	
+
 			// Lets find it and return it
 			$cursor = $o->findOne($clause);
 		}elseif($relation[0]==='many'){
-	
+
 			// Lets find them and return them
 			$cursor = $o->find($clause);
 		}
@@ -796,28 +778,28 @@ class Document extends \glue\Model{
 			return self::$db;
 		else
 		{
-			self::$db=Yii::app()->mongodb;
-			if(self::$db instanceof EMongoClient)
+			self::$db=Yii::app()->db;
+			if(self::$db instanceof \glue\db\Client)
 				return self::$db;
 			else
-				throw new EMongoException(Yii::t('yii','MongoDB Active Record requires a "mongodb" EMongoClient application component.'));
+				throw new Exception('MongoDB Active Record requires a "mongodb" EMongoClient application component.');
 		}
 	}
-	
+
 	/**
 	 * Cleans or rather resets the document
 	 */
 	public function clean(){
 		$this->_attributes=array();
 		$this->_related=array();
-	
+
 		// blank class properties
-		$cache = $this->getDbConnection()->getDocumentCache(get_class($this));
+		$cache = $this->attributeNames();
 		foreach($cache as $k => $v)
 			$this->$k = null;
 		return true;
 	}
-	
+
 	/**
 	 * This is an aggregate helper on the model
 	 * Note: This does not return the model but instead the result array directly from MongoDB.
@@ -825,9 +807,9 @@ class Document extends \glue\Model{
 	 */
 	public function aggregate($pipeline){
 		$this->trace(__FUNCTION__);
-		return Yii::app()->mongodb->aggregate($this->collectionName(),$pipeline);
+		return $this->getDb()->aggregate($this->collectionName(),$pipeline);
 	}
-	
+
 	/**
 	 * A distinct helper on the model, this is not the same as the aggregation framework
 	 * distinct
@@ -839,24 +821,24 @@ class Document extends \glue\Model{
 		$this->trace(__FUNCTION__);
 		$c=$this->getDbCriteria();
 		if(is_array($c) && isset($c['condition']) && !empty($c['condition']))
-			$query=CMap::mergeArray($query, $c['condition']);
-	
-		return Yii::app()->mongodb->command(array(
-				'distinct' => $this->collectionName(),
-				'key' => $key,
-				'query' => $query
+			$query=\glue\Collection::mergeArray($query, $c['condition']);
+
+		return $this->getDb()->command(array(
+			'distinct' => $this->collectionName(),
+			'key' => $key,
+			'query' => $query
 		));
 	}
-	
+
 	/**
 	 * Refreshes the data from the database
 	 */
 	public function refresh(){
-	
+
 		$this->trace(__FUNCTION__);
 		if(!$this->getIsNewRecord() && ($record=$this->getCollection()->findOne(array($this->primaryKey() => $this->getPrimaryKey())))!==null){
 			$this->clean();
-	
+
 			foreach($record as $name=>$column)
 				$this->$name=$record[$name];
 			return true;
@@ -864,7 +846,7 @@ class Document extends \glue\Model{
 		else
 			return false;
 	}
-	
+
 	/**
 	 * gets and if null sets the db criteria for this model
 	 * @param $createIfNull
@@ -880,7 +862,7 @@ class Document extends \glue\Model{
 		}
 		return $this->_criteria;
 	}
-	
+
 	/**
 	 * Sets the db criteria for this model
 	 * @param array $criteria
@@ -888,7 +870,7 @@ class Document extends \glue\Model{
 	public function setDbCriteria($criteria){
 		return $this->_criteria=$criteria;
 	}
-	
+
 	/**
 	 * Merges the currrent DB Criteria with the inputted one
 	 * @param array $newCriteria
@@ -896,14 +878,14 @@ class Document extends \glue\Model{
 	public function mergeDbCriteria($newCriteria){
 		return $this->_criteria=$this->mergeCriteria($this->getDbCriteria(), $newCriteria);
 	}
-	
+
 	/**
 	 * Gets the collection for this model
 	 */
 	public function getCollection(){
-		return $this->getDbConnection()->{$this->collectionName()};
+		return $this->getDb()->{$this->collectionName()};
 	}
-	
+
 	/**
 	 * Merges two criteria objects. Best used for scopes
 	 * @param $oldCriteria
@@ -911,29 +893,29 @@ class Document extends \glue\Model{
 	 */
 	public function mergeCriteria($oldCriteria, $newCriteria){
 		return \glue\Collection::mergeArray($oldCriteria, $newCriteria);
-	}	
-	
+	}
+
 	/**
 	 * Gets the formed document with MongoYii objects included
 	 */
 	public function getDocument(){
-	
-		$attributes = $this->getDbConnection()->getFieldCache(get_class($this));
+
+		$attributes = $this->attributeNames(true);
 		$doc = array();
-	
+
 		if(is_array($attributes)){
 			foreach($attributes as $field) $doc[$field] = $this->$field;
 		}
 		return array_merge($doc, $this->_attributes);
 	}
-	
+
 	/**
 	 * Gets the raw document with MongoYii objects taken out
 	 */
 	public function getRawDocument(){
 		return $this->filterRawDocument($this->getDocument());
 	}
-	
+
 	/**
 	 * Filters a provided document to take out MongoYii objects.
 	 * @param array $doc
@@ -950,19 +932,27 @@ class Document extends \glue\Model{
 		}
 		return $doc;
 	}
-	
+
 	/**
 	 * Gets the JSON encoded document
 	 */
 	public function getJSONDocument(){
 		return json_encode($this->getRawDocument());
 	}
-	
+
 	/**
 	 * Gets the BSON encoded document (never normally needed)
 	 */
 	public function getBSONDocument(){
 		return bson_encode($this->getRawDocument());
-	}	
-	
+	}
+
+    /**
+     * Produces a trace message for functions in this class
+     * @param string $func
+     */
+    public function trace($func){
+    	return true;
+    	//Yii::trace(get_class($this).'.'.$func.'()','extensions.MongoYii.EMongoDocument');
+    }
 }

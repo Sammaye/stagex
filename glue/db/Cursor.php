@@ -5,6 +5,10 @@ namespace \glue\db;
 use \glue\Exception;
 
 class Cursor implements \Iterator, \Countable{
+
+	private $modelClass;
+	private $model;
+
 	private $cursor = array();
 	private $current;
 
@@ -21,11 +25,19 @@ class Cursor implements \Iterator, \Countable{
 	 * @param array|MongoCursor $condition Either a condition array (without sort,limit and skip) or a MongoCursor Object
 	 * @param string $class the class name for the active record
 	 */
-	public function __construct($cursor,$partial=false) {
+	public function __construct($modelClass,$cursor,$partial=false) {
 
 		// If $fields has something in it
 		if($partial)
 			$this->partial=true;
+
+	    if(is_string($modelClass)){
+			$this->modelClass=$modelClass;
+			$this->model=EMongoDocument::model($this->modelClass);
+		}elseif($modelClass instanceof EMongoDocument){
+			$this->modelClass=get_class($modelClass);
+			$this->model=$modelClass;
+		}
 
 		$this->cursor=$cursor;
 		return $this; // Maintain chainability
