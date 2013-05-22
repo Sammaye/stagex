@@ -40,17 +40,11 @@ class Controller {
 	function authRules(){ return array(); }
 
 	public function __construct(){
-			if(!$this->pageTitle){
-			$this->pageTitle = glue::config('pageTitle');
-		}
-
-		if(!$this->pageDescription){
-			$this->pageDescription = glue::config('pageDescription');
-		}
-
-		if(!$this->pageKeywords){
-			$this->pageKeywords = glue::config('pageKeywords');
-		}
+		$this->title = $this->title ?: glue::$title;
+		if(glue::$description!==null)
+			$this->metaTag('description', glue::$description);
+		if(glue::$keywords!==null)
+			$this->metaTag('keywords', glue::$keywords);
 	}
 
 	function CssFile($map, $path, $media = null){
@@ -81,18 +75,18 @@ class Controller {
 	}
 
 	public function render($view, $params = array()){
-		$viewFile = $this->findViewFile($view);
-		$output = $this->getView()->renderFile($viewFile, $params, $this);
-		$layoutFile = $this->findLayoutFile();
+		$viewFile = $this->getViewPath($view);
+		$output = $this->renderFile($viewFile, $params, $this);
+		$layoutFile = $this->getLayoutPath($this->layout);
 		if ($layoutFile !== false) {
-			return $this->getView()->renderFile($layoutFile, array('content' => $output), $this);
+			return $this->renderFile($layoutFile, array('content' => $output), $this);
 		} else {
 			return $output;
 		}
 	}
 
 	public function renderPartial($view, $params = array()){
-		$viewFile = $this->findViewFile($view);
+		$viewFile = $this->getViewPath($view);
 		return $this->renderFile($viewFile, $params, $this);
 	}
 
@@ -218,58 +212,36 @@ class Controller {
 		if(strpos($path, '../') === 0){
 
 			// Then this should go from doc root
-			return str_replace('../', DIRECTORY_SEPARATOR, ROOT.$path);
+			return str_replace('../', DIRECTORY_SEPARATOR, glue::getPath('@app').$path);
 
 		}elseif(strpos($path, '/')!==false){
 
 			// Then this should go from views root (/application/views) because we have something like user/edit.php
-			return str_replace('/', DIRECTORY_SEPARATOR, ROOT.'/application/views/'.$path);
+			return str_replace('/', DIRECTORY_SEPARATOR, glue::getPath('@app').'/views/'.$path);
 
 		}else{
 
 			// Then lets attempt to get the cwd from the controller. If the controller is not set we use siteController as default. This can occur for cronjobs
-			return str_replace('/', DIRECTORY_SEPARATOR, ROOT.'/application/views/'.str_replace('controller', '',
-					strtolower(isset(glue::$action['controller']) ? glue::$action['controller'] : 'siteController')).'/'.$path);
+			return str_replace('/', DIRECTORY_SEPARATOR, glue::getPath('@app').'/views/'.str_replace('controller', '',
+					glue::$controller instanceof \glue\Controller ? get_class(glue::$controller) : 'siteController').'/'.$path);
 		}
 	}
 
 	function getLayoutPath($path){
 
+		$path = strlen(pathinfo($path, PATHINFO_EXTENSION)) <= 0 ? $path.'.php' : $path;
+
 		if(mb_substr($path, 0, 1) == '/'){
 
 			// Then this should go from doc root
-			return str_replace('/', DIRECTORY_SEPARATOR, ROOT.$path.'.php');
+			return str_replace('/', DIRECTORY_SEPARATOR, glue::getPath('@app').$path);
 
 		}else{
 
 			// Then this should go from layouts root (/application/layouts) because we have something like user/blank
-			return str_replace('/', DIRECTORY_SEPARATOR, ROOT.'/application/layouts/'.$path.'.php');
+			return str_replace('/', DIRECTORY_SEPARATOR, glue::getPath('@app').'/layouts/'.$path);
 
 		}
-	}
-
-
-	/**
-	 * Starts a widget but does not run the render() function
-	 *
-	 * @param string $path
-	 * @param array $args
-	 */
-	public static function beginWidget($class, $args = null){
-		$widget = new $class($args);
-		$widget->init();
-		return $widget;
-	}
-
-	/**
-	 * Starts a widget and runs the render() function of a widget
-	 *
-	 * @param string $path
-	 * @param array $params
-	 */
-	public static function widget($path, $params = null){
-		$widget = self::beginWidget($path, $params);
-		return $widget->render();
 	}
 
 	function json_success($params,$exit=true){
