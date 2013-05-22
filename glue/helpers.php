@@ -83,6 +83,77 @@ function truncate_string($title_string, $truncate_after_nr_chars = 50){
 }
 
 /**
+ * Encodes a PHP variable into javascript representation.
+ *
+ * Example:
+ * <pre>
+ * $options=array('key1'=>true,'key2'=>123,'key3'=>'value');
+ * echo CJavaScript::encode($options);
+ * // The following javascript code would be generated:
+ * // {'key1':true,'key2':123,'key3':'value'}
+ * </pre>
+ *
+ * For highly complex data structures use {@link jsonEncode} and {@link jsonDecode}
+ * to serialize and unserialize.
+ *
+ * @param mixed $value PHP variable to be encoded
+ * @return string the encoded string
+ */
+function js_encode($value)
+{
+	if(is_string($value))
+	{
+		if(strpos($value,'js:')===0)
+		return substr($value,3);
+		else
+		return "'".js_quote($value)."'";
+	}
+	else if($value===null)
+	return 'null';
+	else if(is_bool($value))
+	return $value?'true':'false';
+	else if(is_integer($value))
+	return "$value";
+	else if(is_float($value))
+	{
+		if($value===-INF)
+		return 'Number.NEGATIVE_INFINITY';
+		else if($value===INF)
+		return 'Number.POSITIVE_INFINITY';
+		else
+		return rtrim(sprintf('%.16F',$value),'0');  // locale-independent representation
+	}
+	else if(is_object($value))
+	return js_encode(get_object_vars($value));
+	else if(is_array($value))
+	{
+		$es=array();
+		if(($n=count($value))>0 && array_keys($value)!==range(0,$n-1))
+		{
+			foreach($value as $k=>$v)
+			$es[]="'".js_quote($k)."':".js_encode($v);
+			return '{'.implode(',',$es).'}';
+		}
+		else
+		{
+			foreach($value as $v)
+			$es[]=js_encode($v);
+			return '['.implode(',',$es).']';
+		}
+	}
+	else
+	return '';
+}
+
+function js_quote($js,$forUrl=false)
+{
+	if($forUrl)
+	return strtr($js,array('%'=>'%25',"\t"=>'\t',"\n"=>'\n',"\r"=>'\r','"'=>'\"','\''=>'\\\'','\\'=>'\\\\','</'=>'<\/'));
+	else
+	return strtr($js,array("\t"=>'\t',"\n"=>'\n',"\r"=>'\r','"'=>'\"','\''=>'\\\'','\\'=>'\\\\','</'=>'<\/'));
+}
+
+/**
  * var_dump replacement which houses it own self contained HTML and can act on more complex variables
  *
  * It has been renamed from its original from do_dump to dd

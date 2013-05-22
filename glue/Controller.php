@@ -2,79 +2,45 @@
 
 namespace glue;
 
-use glue;
+use glue,
+	\glue\Html;
 
 class Controller {
 
 	const HEAD = 1;
-	const BODY_END = 2;
-	
+	const BODY_BEGIN = 2;
+	const BODY_END = 3;
+
 	const DENIED = 1;
 	const LOGIN = 2;
-	const UNKNOWN = 3;	
+	const UNKNOWN = 3;
+
+	public $tpl_head = '<![CDATA[GLUE-BLOCK-HEAD]]>';
+	public $tpl_body_begin = '<![CDATA[GLUE-BLOCK-HEAD]]>';
+	public $tpl_body_end = '<![CDATA[GLUE-BLOCK-HEAD]]>';
 
 	public $defaultAction = 'index';
 	public $layout = "blank_page";
-	
+
 	public $action;
-	
+
 	public $title;
-	
+
 	public $metaTags;
 	public $linkTags;
-	
+
 	public $jsFiles;
 	public $js;
-	
+
 	public $cssFiles;
 	public $css;
-	
-	public $description;
-	public $keywords;
 
 	public function filters(){ return array(); }
-	
+
 	function authRules(){ return array(); }
 
-	function addCssFile($map, $path, $media = null, $POS = 'HEAD', $core=false){
-		$this->cssTags[$map] = array('map' => $map, 'path' => $path, 'type' => 'file', 'media' => $media, 'pos' => $POS);
-	}
-
-	function addCssScript($map, $script, $media = null, $POS = 'END'){
-		$this->cssTags[$map] = array( 'script' => $script, 'type' => 'script', 'media' => $media, 'pos' => $POS );
-	}
-
-	function addJsFile($map, $path, $POS = 'HEAD', $core=false){
-		if(is_array($this->jsTags)){
-			$this->jsTags = array_merge(array($map => array( 'path' => $path, 'type' => 'file', 'pos' => self::HEAD )), $this->jsTags);
-		}else{
-			$this->jsTags[$map] = array( 'path' => $path, 'type' => 'file', 'pos' => self::HEAD  );
-		}
-	}
-
-	function addJsScript($map, $script, $POS = 'END'){
-		$this->jsTags[$map] = array( 'script' => $script, 'type' => 'script', 'pos' => $POS );
-	}
-
-	function addHeadTag($html, $POS = self::HEAD){
-		$this->tags[] = array( 'html' => $html, 'pos' => $POS );
-	}
-
-	
-
-	function render($page, $args = null){
-
-		//core::view()->render();
-
-		if(isset($args['page']) || isset($args['args'])) throw new Exception("The \$page and \$args variables are reserved variables within the render function.");
-
-		if($args){
-			foreach($args as $k=>$v){
-				$$k = $v;
-			}
-		}
-
-		if(!$this->pageTitle){
+	public function __construct(){
+			if(!$this->pageTitle){
 			$this->pageTitle = glue::config('pageTitle');
 		}
 
@@ -85,62 +51,93 @@ class Controller {
 		if(!$this->pageKeywords){
 			$this->pageKeywords = glue::config('pageKeywords');
 		}
-
-		ob_start();
-			include $this->getView($page);
-			$page = ob_get_contents();
-		ob_clean();
-
-		ob_start();
-			include_once $this->getLayout($this->layout);
-			$layout = ob_get_contents();
-		ob_clean();
-
-		$layout = glue::clientScript()->renderHead($layout);
-		$layout = glue::clientScript()->renderBodyEnd($layout);
-		echo $layout;
 	}
 
-	function partialRender($page, $args = null, $returnString = false){
+	function CssFile($map, $path, $media = null){
+		$this->cssFiles[$map] = Html::cssFile($path, $media);
+	}
 
-		if($args){
-			foreach($args as $k=>$v){
-				$$k = $v;
-			}
+	function Css($map, $script, $media = null){
+		$this->css[$map] = Html::css($media, $script);
+	}
+
+	function JsFile($map, $path, $POS = self::HEAD){
+		$this->jsFiles[$POS][$map] = Html::jsFile($path);
+	}
+
+	function Js($map, $script, $POS = self::BODY_END){
+		$this->jsTags[$POS][$map] = Html::js($script);
+	}
+
+	function metaTag($name, $html){
+		$this->metaTags[$name] = Html::metaTag($html,array('name'=>$name));
+	}
+
+	function linkTag($options,$key=null){
+		if($key===null)
+			$this->linkTags[] = Html::linkTag($content);
+		else
+			$this->linkTags[$name] = Html::linkTag($content);
+	}
+
+	public function render($view, $params = array()){
+		$viewFile = $this->findViewFile($view);
+		$output = $this->getView()->renderFile($viewFile, $params, $this);
+		$layoutFile = $this->findLayoutFile();
+		if ($layoutFile !== false) {
+			return $this->getView()->renderFile($layoutFile, array('content' => $output), $this);
+		} else {
+			return $output;
 		}
-
-		ob_start();
-			ob_implicit_flush(false);
-			include $this->getView($page);
-			$view = ob_get_contents();
-		ob_end_clean();
-
-		if($returnString): return $view; else: echo $view; endif;
 	}
-	
+
+	public function renderPartial($view, $params = array()){
+		$viewFile = $this->findViewFile($view);
+		return $this->renderFile($viewFile, $params, $this);
+	}
+
+	public function renderFile($_file_, $_params_ = array()){
+		ob_start();
+		ob_implicit_flush(false);
+		extract($_params_, EXTR_OVERWRITE);
+		require($_file_);
+		return ob_get_clean();
+	}
+
 	/**
 	 * Marks the beginning of an HTML page.
 	 */
 	public function beginPage(){
 		ob_start();
 		ob_implicit_flush(false);
-	
-		$this->trigger(self::EVENT_BEGIN_PAGE);
+		glue::trigger('beginPage');
+	}
+
+	public function head(){
+		echo $this->head;
+	}
+
+	public function beginBody(){
+		echo $this->body_begin;
+	}
+
+	public function endBody(){
+		echo $this->body_end;
 	}
 
 	/**
 	 * Marks the ending of an HTML page.
 	 */
 	public function endPage(){
-		$this->trigger(self::EVENT_END_PAGE);
-	
+		glue::trigger('endPage');
+
 		$content = ob_get_clean();
 		echo strtr($content, array(
-				self::PL_HEAD => $this->renderHeadHtml(),
-				self::PL_BODY_BEGIN => $this->renderBodyBeginHtml(),
-				self::PL_BODY_END => $this->renderBodyEndHtml(),
+				$this->head => $this->renderHeadHtml(),
+				$this->body_begin => $this->renderBodyBeginHtml(),
+				$this->body_end => $this->renderBodyEndHtml(),
 		));
-	
+
 		unset(
 				$this->metaTags,
 				$this->linkTags,
@@ -149,107 +146,72 @@ class Controller {
 				$this->js,
 				$this->jsFiles
 		);
-	}	
-	
-	/**
-	 * Inserts the scripts in the head section.
-	 * @param string $output the output to be inserted with scripts.
-	 */
-	public function renderHead(&$output){
-		$html='';
-		foreach($this->tags as $k=>$val){
-			if($val['pos'] == self::HEAD){
-				$html.=$val['html'];
-			}
-		}
-	
-		foreach($this->cssTags as $k => $val){
-			if($val['type'] == 'file' && $val['pos'] == self::HEAD && $val['core'] == true){
-				$html.=html::cssFile($val['path'], $val['media'])."\n";
-				unset($this->cssTags[$k]);
-			}
-		}
-		foreach($this->cssTags as $k => $val){
-			if($val['type'] == 'file' && $val['pos'] == self::HEAD){
-				$html.=html::cssFile($val['path'], $val['media'])."\n";
-			}
-		}
-		foreach($this->jsTags as $k => $val){
-			if($val['type'] == 'file' && $val['pos'] == self::HEAD){
-				$html.=html::jsFile($val['path'])."\n";
-			}
-		}
-		foreach($this->cssTags as $k => $val){
-			if($val['type'] == 'script' && $val['poos'] == self::HEAD){
-				$html.=html::css($val['media'], $val['script'])."\n";
-			}
-		}
-	
-		$code = '';
-		foreach($this->jsTags as $k => $val){
-			if($val['type'] == 'script' && $val['pos'] == self::HEAD){
-				if(Glue::config("Minify_JS")){
-					$code.= JSMin::minify($val['script']);
-				}else{
-					$code.= $val['script'];
-				}
-			}
-		}
-	
-		if(!empty($code)){
-			$html.=html::js($code)."\n";
-		}
-	
-		if($html!=='')
-		{
-			$count=0;
-			$output=preg_replace('/(<title\b[^>]*>|<\\/head\s*>)/is','<###head###>$1',$output,1,$count);
-			if($count)
-				$output=str_replace('<###head###>',$html,$output);
-			else
-				$output=$html.$output;
-		}
-		return $output;
 	}
-	
-	/**
-	 * Inserts the scripts at the end of the body section.
-	 * @param string $output the output to be inserted with scripts.
-	 */
-	public function renderBodyEnd(&$output){
-	
-		$fullPage=0;
-		$output=preg_replace('/(<\\/body\s*>)/is','<###end###>$1',$output,1,$fullPage);
-		$html='';
-		foreach($this->cssTags as $k => $val){
-			if($val['type'] == 'file' && $val['pos'] == self::BODY_END){
-				$html.=html::cssFile($val['path'], $val['media'])."\n";
-			}
-		}
-	
-		$code = '';
-		foreach($this->jsTags as $k => $val){
-			if($val['type'] == 'script' && $val['pos'] == self::BODY_END){
-				if(Glue::config("Minify_JS")){
-					$code .= JSMin::minify($val['script']);
-				}else{
-					$code .= $val['script'];
-				}
-			}
-		}
-	
-		if(!empty($code))
-			$html.=html::js($code);
-	
-		if($fullPage)
-			$output=str_replace('<###end###>',$html,$output);
-		else
-			$output=$output.$html;
-	
-		return $output;
-	}	
 
-	function getView($path){
+	/**
+	 * Renders the content to be inserted in the head section.
+	 * The content is rendered using the registered meta tags, link tags, CSS/JS code blocks and files.
+	 * @return string the rendered content
+	 */
+	protected function renderHeadHtml()
+	{
+		$lines = array();
+		if (!empty($this->metaTags)) {
+			$lines[] = implode("\n", $this->metaTags);
+		}
+		if (!empty($this->linkTags)) {
+			$lines[] = implode("\n", $this->linkTags);
+		}
+		if (!empty($this->cssFiles)) {
+			$lines[] = implode("\n", $this->cssFiles);
+		}
+		if (!empty($this->css)) {
+			$lines[] = implode("\n", $this->css);
+		}
+		if (!empty($this->jsFiles[self::HEAD])) {
+			$lines[] = implode("\n", $this->jsFiles[self::HEAD]);
+		}
+		if (!empty($this->js[self::HEAD])) {
+			$lines[] = Html::js(implode("\n", $this->js[self::HEAD]));
+		}
+		return empty($lines) ? '' : implode("\n", $lines) . "\n";
+	}
+
+	/**
+	 * Renders the content to be inserted at the beginning of the body section.
+	 * The content is rendered using the registered JS code blocks and files.
+	 * @return string the rendered content
+	 */
+	protected function renderBodyBeginHtml()
+	{
+		$lines = array();
+		if (!empty($this->jsFiles[self::BODY_BEGIN])) {
+			$lines[] = implode("\n", $this->jsFiles[self::BODY_BEGIN]);
+		}
+		if (!empty($this->js[self::BODY_BEGIN])) {
+			$lines[] = Html::js(implode("\n", $this->js[self::BODY_BEGIN]));
+		}
+		return empty($lines) ? '' : implode("\n", $lines) . "\n";
+	}
+
+	/**
+	 * Renders the content to be inserted at the end of the body section.
+	 * The content is rendered using the registered JS code blocks and files.
+	 * @return string the rendered content
+	 */
+	protected function renderBodyEndHtml()
+	{
+		$lines = array();
+		if (!empty($this->jsFiles[self::BODY_END])) {
+			$lines[] = implode("\n", $this->jsFiles[self::BODY_END]);
+		}
+		if (!empty($this->js[self::BODY_END])) {
+			$lines[] = Html::js(implode("\n", $this->js[self::BODY_END]));
+		}
+		return empty($lines) ? '' : implode("\n", $lines) . "\n";
+	}
+
+	function getViewPath($path){
 
 		$path = strlen(pathinfo($path, PATHINFO_EXTENSION)) <= 0 ? $path.'.php' : $path;
 
@@ -271,7 +233,7 @@ class Controller {
 		}
 	}
 
-	function getLayout($path){
+	function getLayoutPath($path){
 
 		if(mb_substr($path, 0, 1) == '/'){
 
@@ -311,19 +273,19 @@ class Controller {
 	}
 
 	function json_success($params,$exit=true){
-		
+
 		$json='';
 		if(is_string($params)){
 			$json= json_encode(array('success' => true, 'messages' => array($params)));
 		}else{
 			$json= json_encode(array_merge(array('success' => true), $params));
 		}
-		
+
 		if($exit){
 			echo $json;
 			exit(0);
 		}
-		return $json;		
+		return $json;
 	}
 
 	function json_error($params,$exit=true){
@@ -346,83 +308,12 @@ class Controller {
 				}
 				break;
 		}
-		
+
 		if($exit){
 			echo $json;
 			exit(0);
 		}
 		return $json;
-	}
-
-	/**
-	 * Encodes a PHP variable into javascript representation.
-	 *
-	 * Example:
-	 * <pre>
-	 * $options=array('key1'=>true,'key2'=>123,'key3'=>'value');
-	 * echo CJavaScript::encode($options);
-	 * // The following javascript code would be generated:
-	 * // {'key1':true,'key2':123,'key3':'value'}
-	 * </pre>
-	 *
-	 * For highly complex data structures use {@link jsonEncode} and {@link jsonDecode}
-	 * to serialize and unserialize.
-	 *
-	 * @param mixed $value PHP variable to be encoded
-	 * @return string the encoded string
-	 */
-	public static function encode($value)
-	{
-		if(is_string($value))
-		{
-			if(strpos($value,'js:')===0)
-				return substr($value,3);
-			else
-				return "'".self::quote($value)."'";
-		}
-		else if($value===null)
-			return 'null';
-		else if(is_bool($value))
-			return $value?'true':'false';
-		else if(is_integer($value))
-			return "$value";
-		else if(is_float($value))
-		{
-			if($value===-INF)
-				return 'Number.NEGATIVE_INFINITY';
-			else if($value===INF)
-				return 'Number.POSITIVE_INFINITY';
-			else
-				return rtrim(sprintf('%.16F',$value),'0');  // locale-independent representation
-		}
-		else if(is_object($value))
-			return self::encode(get_object_vars($value));
-		else if(is_array($value))
-		{
-			$es=array();
-			if(($n=count($value))>0 && array_keys($value)!==range(0,$n-1))
-			{
-				foreach($value as $k=>$v)
-					$es[]="'".self::quote($k)."':".self::encode($v);
-				return '{'.implode(',',$es).'}';
-			}
-			else
-			{
-				foreach($value as $v)
-					$es[]=self::encode($v);
-				return '['.implode(',',$es).']';
-			}
-		}
-		else
-			return '';
-	}
-
-	public static function quote($js,$forUrl=false)
-	{
-		if($forUrl)
-			return strtr($js,array('%'=>'%25',"\t"=>'\t',"\n"=>'\n',"\r"=>'\r','"'=>'\"','\''=>'\\\'','\\'=>'\\\\','</'=>'<\/'));
-		else
-			return strtr($js,array("\t"=>'\t',"\n"=>'\n',"\r"=>'\r','"'=>'\"','\''=>'\\\'','\\'=>'\\\\','</'=>'<\/'));
 	}
 
 	function compressCSS($buffer) {
