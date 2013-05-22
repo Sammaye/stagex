@@ -1,7 +1,12 @@
 <?php
-class presenceBar extends GWidget{
 
-	function render(){ ?>
+namespace app\widgets;
+
+use \glue\Html;
+
+class Menu extends \glue\Widget{
+
+	function render(){  echo "this is where the menu would be"; return;?>
 			<div class='presence_bar'>
 				<div class='grid_970'>
 				<div class="presence_bar-topLeft">

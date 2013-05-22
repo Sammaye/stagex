@@ -77,9 +77,9 @@ class Controller {
 		$content = $this->renderFile($viewFile, $params);
 		$layoutFile = $this->getLayoutPath($this->layout);
 		if ($layoutFile !== false) {
-			echo require $layoutFile;
+			require $layoutFile;
 		} else {
-			echo $output;
+			echo $content;
 		}
 	}
 
@@ -102,7 +102,7 @@ class Controller {
 	public function beginPage(){
 		ob_start();
 		ob_implicit_flush(false);
-		glue::trigger('beginPage');
+		glue::trigger('beforeRender');
 	}
 
 	public function head(){
@@ -121,7 +121,7 @@ class Controller {
 	 * Marks the ending of an HTML page.
 	 */
 	public function endPage(){
-		glue::trigger('endPage');
+		glue::trigger('afterRender');
 
 		$content = ob_get_clean();
 		echo strtr($content, array(

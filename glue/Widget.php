@@ -37,7 +37,7 @@ abstract class Widget extends \glue\Component{
 	 * @param array $args
 	 */
 	static function widget(){
-		$o=new $this;
+		$o=new static;
 		$o->render();
 		return $o;
 	}
@@ -49,7 +49,7 @@ abstract class Widget extends \glue\Component{
 	 * @param array $args
 	 */
 	function beginWidget(){
-		$o=new $this;
+		$o=new static;
 		return $o;
 	}
 
