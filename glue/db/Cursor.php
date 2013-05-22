@@ -64,6 +64,14 @@ class Cursor implements \Iterator, \Countable{
 		return $this->cursor;
 	}
 
+    /**
+     * Get next doc in cursor
+     */
+    public function getNext(){
+		if($c=$this->cursor()->getNext())
+			return $this->current=$this->model->populateRecord($c,true,$this->partial);
+    }
+
 	/**
 	 * Gets the active record for the current row
 	 */
