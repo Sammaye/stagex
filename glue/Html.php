@@ -638,24 +638,24 @@ class html{
 						}
 						return $previous;
 					}else{
-						return $model->getAttribute(substr($attribute,0,$pos));
+						return $model->{substr($attribute,0,$pos)};
 					}
 				}
 				if(($pos=strrpos($attribute,']'))!==false && $pos!==strlen($attribute)-1)  // e.g. [a][b]name
 				{
 					$sub=substr($attribute,0,$pos+1);
 					$attribute=substr($attribute,$pos+1);
-					return $model->getAttribute($attribute);
+					return $model->$attribute;
 				}
 				if(preg_match('/\](\w+\[.*)$/',$attribute,$matches))
 				{
 					$name=get_class($model).'['.str_replace(']','][',trim(strtr($attribute,array(']['=>']','['=>']')),']')).']';
 					$attribute=$matches[1];
-					return $model->getAttribute($attribute);
+					return $model->$attribute;
 				}
 			}
 			else
-			return $model->getAttribute($attribute);
+			return $model->$attribute;
 		}
 		return "";
 	}
