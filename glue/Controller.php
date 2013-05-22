@@ -47,19 +47,19 @@ class Controller {
 			$this->metaTag('keywords', glue::$keywords);
 	}
 
-	function CssFile($map, $path, $media = null){
+	function cssFile($map, $path, $media = null){
 		$this->cssFiles[$map] = Html::cssFile($path, $media);
 	}
 
-	function Css($map, $script, $media = null){
+	function css($map, $script, $media = null){
 		$this->css[$map] = Html::css($media, $script);
 	}
 
-	function JsFile($map, $path, $POS = self::HEAD){
+	function jsFile($map, $path, $POS = self::HEAD){
 		$this->jsFiles[$POS][$map] = Html::jsFile($path);
 	}
 
-	function Js($map, $script, $POS = self::BODY_END){
+	function js($map, $script, $POS = self::BODY_END){
 		$this->jsTags[$POS][$map] = Html::js($script);
 	}
 
