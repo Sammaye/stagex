@@ -108,15 +108,15 @@ class Controller {
 	}
 
 	public function head(){
-		echo $this->head;
+		echo $this->tpl_head;
 	}
 
 	public function beginBody(){
-		echo $this->body_begin;
+		echo $this->tpl_body_begin;
 	}
 
 	public function endBody(){
-		echo $this->body_end;
+		echo $this->tpl_body_end;
 	}
 
 	/**
@@ -127,9 +127,9 @@ class Controller {
 
 		$content = ob_get_clean();
 		echo strtr($content, array(
-				$this->head => $this->renderHeadHtml(),
-				$this->body_begin => $this->renderBodyBeginHtml(),
-				$this->body_end => $this->renderBodyEndHtml(),
+				$this->tpl_head => $this->renderHeadHtml(),
+				$this->tpl_body_begin => $this->renderBodyBeginHtml(),
+				$this->tpl_body_end => $this->renderBodyEndHtml(),
 		));
 
 		unset(
