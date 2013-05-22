@@ -147,6 +147,7 @@ class glue{
 
 			if(self::trigger('beforeAction',array($controller,$action))){
 				self::$controller = $controller;
+				$controller->action=$action; // We set this so we know what action in that controller is being run
 				call_user_func_array(array($controller,$action),$params);
 			}
 			self::trigger('afterAction',array($controller,$action));
