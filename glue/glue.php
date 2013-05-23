@@ -107,7 +107,7 @@ class glue{
 
 			self::runCliAction();
 		}else{
-			self::$www = self::$www?:self::http()->baseUrl();
+			self::$www = self::$www?:null;
 
 			// since there is no controller as such for CLI atm lets not run the startUp stuff on cli actions
 			// So after that lets touch all startup items and get them to run their contructors and init functions

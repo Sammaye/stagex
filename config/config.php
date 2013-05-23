@@ -356,10 +356,10 @@ return array(
 		 */
 		'404' => function(){
 			echo "404";
-			glue::http()->redirect('error/notfound');
+			glue::http()->redirect('/error/notfound');
 		},
 		'403' => function(){
-			glue::http()->redirect('error/forbidden');
+			glue::http()->redirect('/error/forbidden');
 		},
 
 		/**
@@ -406,27 +406,11 @@ return array(
 	),
 
 	/**
-	 * These are class aliases to make life easier, there is no mapping of this stored in the framework, this is
-	 * the mapping ready for you to break.
-	 *
-	 * If you wish to override one of these files then you can just replace the default value here for your version
+	 * These are class aliases to make life easier. The framework itself will reference these statically as such killing these will 
+	 * not harm the framework workings
 	 */
 	'aliases' => array(
-		"Controller" 			=> "glue\\Controller",
-		"View" 					=> "glue\\View",
-		"ErrorHandler" 			=> "glue\\ErrorHandler",
-		"Collection"			=> "glue\\Collection",
-		"Model"					=> "glue\\Model",
-		"ModelBehaviour"		=> "glue\\Model",
-		"Validators"			=> "glue\\Validators",
-		"Validator"				=> "glue\\Validator",
-		"Http"					=> "glue\\Http",
-		"Widget" 				=> "glue\\Widget",
-		"ApplicationComponent" 	=> "glue\\ApplicationComponent",
 		"Html"					=> "glue\\Html",
-		"Auth"					=> "glue\\Auth",
-		"Exception"				=> "glue\\Exception",
-		"Config"				=> "glue\\Config",
 
 		/**
 		 * Core utils
@@ -436,7 +420,7 @@ return array(
 		"JSON"					=> "glue\\util\\JSON",
 		"JSMin" 				=> "glue\\util\\JSMin",
 
-		"CoreValidators"		=> "glue\\CoreValidators",
+		"Validation"			=> "glue\\Validation",
 
 		/**
 		 * Core Widgets

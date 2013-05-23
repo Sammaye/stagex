@@ -49,4 +49,3 @@
 	So, looking for a piece of the action? Just <a href='<?php echo glue::http()->createUrl('/user/login') ?>'>sign in</a> or
 	<a href='<?php echo glue::http()->createUrl('/user/create') ?>'>register</a> to enjoy StageX!</div>
 </div>
-

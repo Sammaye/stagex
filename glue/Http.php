@@ -50,13 +50,15 @@ class Http{
 
 	function host(){
 		if(php_sapi_name() == 'cli'){
-			return isset(glue::$www) ? glue::$www : null;
+			return isset(glue::$www) ? glue::$www : 'cli';
 		}
+		if(isset(glue::$www)&&glue::$www!==null)
+			return glue::$www;
 		return isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME'];
 	}
 
 	function hostInfo($scheme=''){
-		return $this->scheme().'://'.glue::$www;
+		return $this->scheme().'://'.$this->host();
 		//$this->host();
 	}
 
@@ -262,8 +264,8 @@ class Http{
 		}
 	}
 
-	function redirect($url, $attr = array()){
-		header("Location: ".$this->createUrl($url, $attr, true));
+	function redirect($url, $attr = array(), $host='/'){
+		header("Location: ".$this->createUrl($url, $attr, $host));
 		exit();
 	}
 
