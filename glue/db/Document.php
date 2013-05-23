@@ -58,6 +58,8 @@ class Document extends \glue\Model{
 	public function defaultScope(){ return array(); }
 
 	public function attributeLabels(){ return array(); }
+	
+	public function relations(){ return array(); }
 
 	/**
 	 * (non-PHPdoc)

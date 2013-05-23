@@ -107,10 +107,11 @@ class Client extends \glue\Component{
 		}
 	}
 
-	public function __construct(){
+	public function __construct($config){
 		// TODO: Wanna do something similar for my framework, would be kinda kool
 		// We copy this function to add the subdocument validator as a built in validator
 		//CValidator::$builtInValidators['subdocument'] = 'ESubdocumentValidator';
+		parent::__construct($config);
 	}
 
 	/**
@@ -177,7 +178,6 @@ class Client extends \glue\Component{
 	 * @return MongoDB
 	 */
 	public function getDB(){
-
 		if(empty($this->_db))
 			$this->setDB($this->db);
 

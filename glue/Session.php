@@ -30,10 +30,6 @@ class Session extends \glue\Component{
 	 */
 	private $_session = array();
 
-	function init(){
-		$this->open();
-	}
-
 	/**
 	 * Constructor
 	 */
