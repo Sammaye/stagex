@@ -17,19 +17,12 @@ class Validation extends \glue\Component{
 	public $error_codes = array();
 	public $error_messages=array();
 
-//	public function __construct($config){
-//		$d=new \glue\util\Crypt();
-//		var_dump($d); exit();
-//		trigger_error('f');
-//	}
-
 	public function run(){
 		$valid = true;
-		$errors = array();
 
 		if(!$this->model)
 			throw new Exception("No model or map was provided to validate against");
-		if(!is_array($this->rules))
+		if(!is_array($this->rules)||empty($this->rules))
 			throw new Exception("A valid set of rules must be applied");
 
 		foreach($this->rules as $k => $rule)
@@ -72,7 +65,7 @@ class Validation extends \glue\Component{
 				}elseif($this->model && $this->model->method_exists($validator)){
 					$valid = $this->model->$validator($field, $field_value, $params) && $valid;
 				}elseif($validator instanceof \Closure||(is_string($validator) && function_exists($validator))){
-					$valid = $validator($field,$field_value,$params,&$this->model) && $valid;
+					$valid = $validator($field,$field_value,$params,$this) && $valid;
 				}else{//if(glue::canImport($validator)){
 					$o = new $validator($params);
 					$o->owner = $this;

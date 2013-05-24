@@ -11,8 +11,9 @@ class indexController extends \glue\Controller{
 	public function action_index(){
 
 		$v=new \glue\Validation(array('rules'=>array(
-			array('d', 'required', 'message' => 'd is required')
-		), 'model' => array('e'=>1)));
+			array('d,e', 'required', 'message' => 'd and e are required'),
+			array('email', 'email', 'message'=>'needs an email')
+		), 'model' => array('e'=>1,'d'=>2, 'email' => 'sam.millman@googlemail.com')));
 		$v->run();
 		var_dump($v->getErrors());
 

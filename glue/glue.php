@@ -306,7 +306,6 @@ class glue{
 		if (!class_exists($class, false)&&strpos($class,'\\')===false /* If it is not a namespace */) {
 			$class = self::import($class);
 		}
-		var_dump(debug_print_backtrace());
 
 		$class = ltrim($class, '\\');
 		if (isset(self::$components[$class]) && self::$components[$class]!==null) {
