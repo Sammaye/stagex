@@ -8,7 +8,7 @@ use glue,
 class User extends \glue\db\Document{
 
 	public $username;
-	
+
 	/**
 	 * This decides when the user should no longer be "trusted" as being logged in
 	 * @var int|float of seconds

@@ -20,13 +20,13 @@ use glue;
  *
  */
 class ErrorHandler extends \glue\Component{
-	
+
 	public $emails = array();
 	public $action = 'index/error';
-	
+
 	public $log=false;
 	public $logger=null;
-	
+
 	function handle($errno, $errstr='', $errfile='', $errline=''){
 
 		$handlers = ob_list_handlers();
@@ -199,19 +199,19 @@ class ErrorHandler extends \glue\Component{
 			case E_NOTICE:
 			case E_USER_NOTICE:
 			default:
-				
+
 				if(!glue::$DEBUG){
-					
+
 					if(is_array($this->emails) && $this->emails!==array()){
 						foreach($this->emails as $email)
-							mail($v, 'Critical error of type '.$err, 
-									$errorText, 
+							mail($v, 'Critical error of type '.$err,
+									$errorText,
 									'MIME-Version: 1.0'."\r\n".'Content-type: text/html; charset=iso-8859-1'."\r\n"
 								);
 					}
-					
+
 					glue::route($this->action);
-					
+
 					if($this->log && ($this->logger instanceof \Closure || is_callable($this->logger)))
 						$this->logger();
 				}else{
@@ -241,7 +241,7 @@ class ErrorHandler extends \glue\Component{
 	    	".$this->printBacktrace();
 
 		if(!glue::$DEBUG){
-					
+
 			if(is_array($this->emails) && $this->emails!==array()){
 				foreach($this->emails as $email)
 					mail($v, 'Critical error of type '.$err,
@@ -249,14 +249,14 @@ class ErrorHandler extends \glue\Component{
 							'MIME-Version: 1.0'."\r\n".'Content-type: text/html; charset=iso-8859-1'."\r\n"
 					);
 			}
-			
+
 			// We try to produce as little action as possible in the event of a fatal error
 			?>
 			<div style='wisth:613px; margin:45px auto;'>
 				<h1 style='font-size:16px; color:#333333;'>You have just been the victim of a unforgivable crime</h1>
 				<p style='font-family: arial, sans-serif; font-size:12px; line-height:17px; color:#333333;'>An error we that we just could not fix rose up to steal the day!
 					This might have been temporary and we encourage you to try and refresh your window.</p>
-			</div><?php 				
+			</div><?php
 		}else{
 			echo $text;
 		}

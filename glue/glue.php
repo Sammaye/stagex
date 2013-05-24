@@ -116,7 +116,7 @@ class glue{
 				foreach(self::$startUp as $c)
 					self::getComponent($c);
 			}
-			self::getComponent('user'); // force the user to be inited
+			//self::getComponent('user'); // force the user to be inited
 			self::route($url);
 		}
 	}
@@ -238,8 +238,8 @@ class glue{
 	public static function handleException($exception){
 
 		// disable error capturing to avoid recursive errors while handling exceptions
-		restore_error_handler();
-		restore_exception_handler();
+//		restore_error_handler();
+//		restore_exception_handler();
 
 		$e=self::getComponent('errorHandler');
 		$e->handle($exception);
@@ -306,11 +306,12 @@ class glue{
 		if (!class_exists($class, false)&&strpos($class,'\\')===false /* If it is not a namespace */) {
 			$class = self::import($class);
 		}
+		var_dump(debug_print_backtrace());
 
 		$class = ltrim($class, '\\');
 		if (isset(self::$components[$class]) && self::$components[$class]!==null) {
 			$config = array_merge(self::$components[$class], $config);
-		}
+		} //var_dump($class);
 		return $config === array() ? new $class : new $class($config);
 	}
 
@@ -340,8 +341,9 @@ class glue{
 	 * @param string $cPath
 	 */
 	public static function autoload($class, $return_cName = false){
-
-
+		if($class=='glue\ErrorHandler'){
+			var_dump($class); //exit();
+		}
 		$class = ltrim($class, '\\');
 
 		if(isset(self::$aliases[$class])){
@@ -361,7 +363,7 @@ class glue{
 			} else {
 				$path = str_replace('_', '/', $class) . '.php';
 			}
-
+//var_dump($path);
 			// try via path alias first
 			if (($spos=strpos($path, '/')) !== false) {
 

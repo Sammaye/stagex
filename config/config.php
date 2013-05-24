@@ -406,7 +406,7 @@ return array(
 	),
 
 	/**
-	 * These are class aliases to make life easier. The framework itself will reference these statically as such killing these will 
+	 * These are class aliases to make life easier. The framework itself will reference these statically as such killing these will
 	 * not harm the framework workings
 	 */
 	'aliases' => array(

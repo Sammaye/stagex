@@ -7,31 +7,36 @@ use glue,
 	\glue\Collection;
 
 class Validation extends \glue\Component{
-	
+
 	public $model;
 	public $scenario;
 	public $rules;
-	
+
 	public $valid;
-	
+
 	public $error_codes = array();
 	public $error_messages=array();
-	
+
+//	public function __construct($config){
+//		$d=new \glue\util\Crypt();
+//		var_dump($d); exit();
+//		trigger_error('f');
+//	}
+
 	public function run(){
-	
 		$valid = true;
 		$errors = array();
-		
+
 		if(!$this->model)
 			throw new Exception("No model or map was provided to validate against");
 		if(!is_array($this->rules))
 			throw new Exception("A valid set of rules must be applied");
-	
-		foreach($schema as $k => $rule)
+
+		foreach($this->rules as $k => $rule)
 			$valid=$this->validateRule($rule)&&$valid;
 		return $this->valid=$valid; // Return whether valid or not
-	}	
-	
+	}
+
 	/**
 	 * Validates a single rule to an inputted document
 	 *
@@ -39,39 +44,45 @@ class Validation extends \glue\Component{
 	 * @param $document The document in array form
 	 */
 	private function validateRule($rule){
-	
+
 		// Now lets get the pieces of this rule
 		$scope = isset($rule[0]) ? preg_split('/[\s]*[,][\s]*/', $rule[0]) : null;
 		$validator = isset($rule[1]) ? $rule[1] : null;
-	
+
 		$scenario = isset($rule['on']) ? array_flip(preg_split('/[\s]*[,][\s]*/', $rule['on'])) : null;
 		$message = isset($rule['message']) ? $rule['message'] : null;
-	
+
 		$params = $rule;
 		unset($params[0], $params[1], $params['message'], $params['on'], $params['label']);
-	
+
 		$valid = true;
 		$validator_caption=basename($validator);
-	
+
 		if(isset($scenario[$this->scenario]) || !$scenario){ // If the scenario key exists in the flipped $rule['on']
-			
-			$field_value = is_object($this->model) ? $this->model->$field : $this->model[$field];
-			
 			foreach($scope as $k => $field){ // Foreach of the field lets check it out
+
+				if(is_object($this->model)){
+					$field_value = isset($this->model->$field) ? $this->model->$field : null;
+				}else{
+					$field_value = isset($this->model[$field]) ? $this->model[$field] : null;
+				}
+
 				if(method_exists($this, $validator)){
 					$valid=self::$validator($field, $field_value, $params)&&$valid;
 				}elseif($this->model && $this->model->method_exists($validator)){
-					$valid = $this->model->$validator($field, $field_value, $params) && $valid;	
+					$valid = $this->model->$validator($field, $field_value, $params) && $valid;
+				}elseif($validator instanceof \Closure||(is_string($validator) && function_exists($validator))){
+					$valid = $validator($field,$field_value,$params,&$this->model) && $valid;
 				}else{//if(glue::canImport($validator)){
 					$o = new $validator($params);
 					$o->owner = $this;
-					$valid = $o->validate($field, $field_value) && $valid;					
+					$valid = $o->validate($field, $field_value) && $valid;
 				//}else{
 					//trigger_error("The validator $validator could not be found in the ".get_class($this)." model");
 				}
 			}
 		}
-	
+
 		// If there is only one field to this rule then we can actually apply it to that field
 		if(!$valid && count($scope) <= 1){
 			if($message)
@@ -82,10 +93,10 @@ class Validation extends \glue\Component{
 				$this->error_messages['global'][] = $message;
 			foreach($scope as $k => $field) // if there are multiple fields apply the error code to every field
 				$this->error_codes[$field][]=$validator_caption;
-		} 
+		}
 		return $valid;
-	}	
-	
+	}
+
 	/**
 	 * Adds an error message to the model
 	 * @param $message
@@ -94,11 +105,11 @@ class Validation extends \glue\Component{
 	function addErrorMessage($message, $field = 'global' /* Global denotes where the error should apply to the form rather than a field */){
 		$this->error_messages[$field][] = $message;
 	}
-	
+
 	function addErrorCode($field,$validator){
 		$this->error_codes[$field][]=$validator;
 	}
-	
+
 	/**
 	 * Gets all errors for this model or if $field is set
 	 * gets only those fields errors
@@ -114,11 +125,11 @@ class Validation extends \glue\Component{
 			return $this->error_messages;
 		}
 	}
-	
+
 	function getErrorCodes(){
 		return $this->error_codes;
 	}
-	
+
 	/**
 	 * Gets the first global error if $field is not set or the first error for that field
 	 * if it is set
@@ -126,10 +137,10 @@ class Validation extends \glue\Component{
 	 */
 	function getFirstError($field = null){
 		$errors = $this->getErrors();
-	
+
 		if(!is_array($errors))
 			return null;
-	
+
 		// If $field is not set it will take first global error
 		if(!$field && isset($errors['global'])){
 			return $errors['global'][0];
@@ -137,18 +148,18 @@ class Validation extends \glue\Component{
 			return $errors[$field][0];
 		}
 		return null;
-	}	
-	
+	}
+
 	public function setFieldMessages($messages){
 		$this->error_messages[$field]=$messages;
 	}
-	
+
 	public function setFieldCodes($codes){
 		$this->error_codes[$field]=$codes;
 	}
 
 	// START OF VALIDATORS
-	
+
 	public static function isEmpty($value, $trim = false){
 		return $value===null || $value===array() || $value==='' || $trim && is_scalar($value) && trim($value)==='';
 	}
