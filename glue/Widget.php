@@ -8,9 +8,6 @@ namespace glue;
  *
  * This class provides basic functionality for widgets allowing for both normal none-active-record widgets but also allowing for fully fletched
  * active record controlled widgets producing and manipulating models.
- *
- * @author Sam Millman
- *
  */
 abstract class Widget extends \glue\Component{
 
@@ -48,7 +45,7 @@ abstract class Widget extends \glue\Component{
 	 * @param string $path
 	 * @param array $args
 	 */
-	function beginWidget(){
+	static function begin(){
 		$o=new static;
 		return $o;
 	}

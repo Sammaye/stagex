@@ -59,7 +59,6 @@ class Http{
 
 	function hostInfo($scheme=''){
 		return $this->scheme().'://'.$this->host();
-		//$this->host();
 	}
 
 	function baseUrl($absolute = false){

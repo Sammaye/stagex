@@ -1,7 +1,8 @@
 <?php
 setlocale(LC_ALL, 'en_GB.UTF8');
 
-use \glue\Exception as Exception;
+use \glue\Exception as Exception,
+	\glue\Collection;
 
 /**
  * Main glue framework class
