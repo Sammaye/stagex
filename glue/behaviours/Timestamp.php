@@ -2,19 +2,18 @@
 
 namespace glue\behaviours;
 
-/**
- * An Example of how a behaviour works
- * @author Sam
- */
-
 class Timestamp extends \glue\Behaviour{
-	function afterValidate(){
-		$this->owner->ts = new MongoDate();
+	function beforeSave(){
+		if($this->owner->getIsNewRecord()){
+			$this->owner->created = new MongoDate();
+		}else
+			$this->owner->updated = new MongoDate();
+		return true;
 	}
 
-	function getTs(){
-		if($this->owner->ts instanceof MongoDate)
-			return $this->owner->ts->sec;
+	function getTs($ts){
+		if($ts instanceof MongoDate)
+			return $ts->sec;
 		else
 			return null;
 	}

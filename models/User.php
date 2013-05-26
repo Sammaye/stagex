@@ -1,42 +1,25 @@
 <?php
-include_once ROOT.'/glue/plugins/phpthumb/ThumbLib.inc.php';
 
-class User extends MongoDocument{
+namespace app\models;
 
+use glue,
+	glue\util\Crypt,
+	glue\Collection,
+	glue\Validation;
+
+glue::import('@glue/components/phpthumb/ThumbLib.inc.php');
+//include_once ROOT.'/glue/plugins/phpthumb/ThumbLib.inc.php';
+
+class User extends \glue\User{
+
+	/** @virtual */
 	public $new_email;
+	/** @virtual */
 	public $profile_image;
+	/** @virtual */
 	public $hash;
 
-	protected $name;
-	protected $username;
-	protected $password;
-	protected $email;
-
-	protected $birth_day;
-	protected $birth_month;
-	protected $birth_year;
-
-	protected $about;
-	protected $gender;
-	protected $country;
-
-	protected $external_links;
-
-	protected $profile_privacy;
-
-	protected $ins;
-
-	protected $remember;
-	protected $rem_m;
-
-	protected $temp_access_token;
-
-	protected $single_sign;
-	protected $email_notify;
-
-	protected $group;
-
-	protected $safe_srch = "S";
+	public $safe_srch = "S";
 
 	/**
 	 * This is used for the search.
@@ -45,69 +28,50 @@ class User extends MongoDocument{
 	 * 1- is Searchable
 	 * 0- is Private
 	 */
-	protected $listing = 1;
+	public $listing = 1;
 
-	protected $max_upload;
-	protected $upload_left;
-
-	protected $next_bandwidth_up;
-
-	protected $image_src; // I do really wanna take this out
-
-	protected $max_video_file_size;
-
-	protected $default_video_settings = array('listing' => 1, 'voteable' => true, 'embeddable' => true, 'mod_comments' => 0,
+	public $default_video_settings = array('listing' => 1, 'voteable' => true, 'embeddable' => true, 'mod_comments' => 0,
 			'voteable_comments' => true, 'vid_coms_allowed' => true, 'txt_coms_allowed' => true, 'private_stats' => false, 'licence' => 1);
 
-	protected $email_vid_responses = 0;
-	protected $email_vid_response_replies = 0;
-	protected $email_wall_comments = 0;
-	protected $email_encoding_result = 0;
+	public $email_vid_responses = 0;
+	public $email_vid_response_replies = 0;
+	public $email_wall_comments = 0;
+	public $email_encoding_result = 0;
 
-	protected $auto_play_vids = 1;
-	protected $use_divx_player = 0;
+	public $auto_play_vids = 1;
+	public $use_divx_player = 0;
 
-	protected $autoshare_opts;
-	protected $fb_autoshare_token;
-	protected $twt_autoshare_token;
+	public $autoshare_opts;
+	public $fb_autoshare_token;
+	public $twt_autoshare_token;
 
-	protected $total_subscribers = 0;
-	protected $total_subscriptions = 0;
-	protected $total_playlists = 0;
-	protected $total_uploads = 0;
+	public $total_subscribers = 0;
+	public $total_subscriptions = 0;
+	public $total_playlists = 0;
+	public $total_uploads = 0;
 
-	protected $fb_uid;
-	protected $google_uid;
-	protected $clicky_uid;
-
-	protected $last_notification_pull;
-
-	protected $upload_enabled = 1;
-	protected $deleted = 0;
-	protected $banned;
-
-	protected $updated;
-	protected $ts;
+	public $upload_enabled = 1;
+	public $deleted = 0;
 
 	function groups(){
 		return array(
-		  	"a normal user"=>1,
-		  	"a VIP"=>4,
-		  	"Liked enough to be given this role but not enough to be given something of use"=>6,
-		  	"IRMOD"=>8,
-		  	"the King of StageX"=>9,
-			"the Queen of StageX"=>10
+			1=>'user',
+			2=>'VIP',
+			3=>'Liked enough to be given this role but not enough to be given something of use',
+			4=>'IRMOD',
+			5=>'King of StageX',
+			6=>'Queen of StageX'
 		);
 	}
 
-	function getCollectionName(){
+	function collectionName(){
 		return "users";
 	}
 
 	function behaviours(){
 		return array(
 			'timestampBehaviour' => array(
-				'class' => 'glue/extended/behaviours/timestampBehaviour.php'
+				'class' => 'glue\\behaviours\\Timestamp'
 			)
 		);
 	}
@@ -118,17 +82,17 @@ class User extends MongoDocument{
 
 	function relations(){
 		return array(
-			"subscriptions" => array(self::HAS_MANY, 'Subscription', "from_id"),
-			"subscribers" => array(self::HAS_MANY, 'Subscription', "to_id"),
-			"videos" => array(self::HAS_MANY, 'Video', "user_id"),
-			"playlists" => array(self::HAS_MANY, 'Playlist', "user_id"),
-			'notifications' => array(self::HAS_MANY, 'Notification', 'user_id'),
+			"subscriptions" => array('many', 'Subscription', "from_id"),
+			"subscribers" => array('many', 'Subscription', "to_id"),
+			"videos" => array('many', 'Video', "user_id"),
+			"playlists" => array('many', 'Playlist', "user_id"),
+			'notifications' => array('many', 'Notification', 'user_id'),
 		);
 	}
 
 	function beforeValidate(){
 		if($this->getScenario() == "updatePassword"){
-			if(GCrypt::verify($this->o_password, $this->password)){
+			if(Crypt::verify($this->o_password, $this->password)){
 				return true;
 			}else{
 				$this->addError('The old password did not match the one we have on record for you');
@@ -170,7 +134,7 @@ class User extends MongoDocument{
 		array('birth_month', 'number', 'min'=>1, 'max'=>12, 'message' => 'Birth month was a invalid value'),
 		array('birth_year', 'number', 'min'=>date('Y') - 100, 'max'=>date('Y'), 'message' => 'Birth year was a invalid value'),
 
-		array('country', 'in', 'range' => new GListProvider('countries', 'code'), 'on' => 'updateProfile', 'message' => 'You supplied an invalid country.'), // We only wanna do laggy functions on scenarios
+		array('country', 'in', 'range' => new Collection('countries', 'code'), 'on' => 'updateProfile', 'message' => 'You supplied an invalid country.'), // We only wanna do laggy functions on scenarios
 
 		array('new_email', 'required', 'on' => 'updateEmail', 'message' => 'You did not enter a valid Email Address for this account'),
 		array('new_email', 'email', 'on' => 'updateEmail', 'message' => 'You must enter a valid Email Address'),
@@ -195,9 +159,9 @@ class User extends MongoDocument{
 
 	function validate_birthday($field, $params = array()){
 		$filled_size = count(array_filter(array(
-			GValidators::isEmpty($this->birth_day) ? null : $this->birth_day,
-			GValidators::isEmpty($this->birth_month) ? null : $this->birth_month,
-			GValidators::isEmpty($this->birth_year) ? null : $this->birth_year,
+			\glue\Validation::isEmpty($this->birth_day) ? null : $this->birth_day,
+			\glue\Validation::isEmpty($this->birth_month) ? null : $this->birth_month,
+			\glue\Validation::isEmpty($this->birth_year) ? null : $this->birth_year,
 		)));
 
 		if($filled_size != 3 && $filled_size > 0){
@@ -223,7 +187,7 @@ class User extends MongoDocument{
 			if($this->getScenario() == "updatePassword")
 			$this->password = $this->new_password;
 
-			$this->password = GCrypt::blowfish_hash($this->password);
+			$this->password = Crypt::blowfish_hash($this->password);
 		}
 
 		if($this->getScenario() == "updateEmail"){
@@ -235,7 +199,7 @@ class User extends MongoDocument{
 				"hash" => $hash,
 				"email" => $this->new_email,
 				"y" => "E_CHANGE",
-				"url" => glue::url()->create("/user/confirminbox", array('e' => $this->new_email, 'h' => $hash, 'uid' => strval($this->_id)))
+				"url" => glue::http()->createUrl("/user/confirminbox", array('e' => $this->new_email, 'h' => $hash, 'uid' => strval($this->_id)))
 			);
 		}
 
@@ -267,7 +231,7 @@ class User extends MongoDocument{
 				":type" => "user",
 			));
 
-			glue::sitemap()->addUrl(glue::url()->create('/user/view', array('id' => $this->_id)), 'hourly', '1.0');
+			glue::sitemap()->addUrl(glue::http()->createUrl('/user/view', array('id' => $this->_id)), 'hourly', '1.0');
 		}else{
 			glue::mysql()->query("UPDATE documents SET _id=:_id, deleted=:deleted, listing=:listing, title=:title, type=:type WHERE _id=:_id", array(
 				":_id" => strval($this->_id),
@@ -331,14 +295,6 @@ class User extends MongoDocument{
 			return false;
 		}
 		return true;
-	}
-
-	function setAutoshareOptions($ar){
-		$rules = array(array('upload, create_pl, video_2_pl, lk_dl, c_video, facebook, twitter, linkedin', 'boolean', 'allowNull' => true,
-				'message' => 'An unknown error occurred. We are working as fast as possible to fix these errors so please try again later.'));
-
-		$this->autoshare_opts = filter_array_fields($ar, array('upload', 'create_pl', 'video_2_pl', 'lk_dl', 'c_video', 'facebook', 'twitter', 'linkedin'));
-		return $this->validateRules($rules, $ar);
 	}
 
 	function setProfilePrivacy($ar){

@@ -36,6 +36,10 @@ return array(
 	// This part houses all of the configuration settings for framework components
 	'components' => array(
 
+		'user' => array(
+			'class'=>'app\\models\\User'		
+		),
+			
 		/**
 		 * Configures the session handler
 		 */

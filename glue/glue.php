@@ -323,8 +323,9 @@ class glue{
 	public static function getComponent($name, $config=array()){
 		$config = Collection::mergeArray(isset(self::$components[$name])&&is_array(self::$components[$name])?self::$components[$name]:array(), $config);
 //var_dump($config);
+
 		if(!empty($config) && $config){ // If is still unset then go to error clause
-			if(isset(self::$_components[$name])&&self::$_components[$name]===null){
+			if(isset(self::$_components[$name])&&self::$_components[$name]!==null){
 				return self::$_components[$name];
 			}else{
 				return self::$_components[$name] = self::createComponent($config);
