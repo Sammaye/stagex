@@ -13,16 +13,19 @@ class indexController extends \glue\Controller{
 		$v=new \glue\Validation(array('rules'=>array(
 			array('d,e', 'required', 'message' => 'd and e are required'),
 			array('email', 'email', 'message'=>'needs an email')
-		), 'model' => array('e'=>1,'d'=>2, 'email' => 'sam.millman@googlemail.com')));
+		), 'model' => array('email' => 'sam.millman@googlemail.com')));
 		$v->run();
 		var_dump($v->getErrors());
+		var_dump($v->getErrorCodes(array(
+			'd_required||e_required' => 'Poop those fields are required'		
+		)));
 
-
-//		$this->pageTitle = "Welcome to the StageX Beta";
-//		if($_SESSION['logged']){
-//			glue::route('/stream/news');
-//		}else{
-			//$this->render('/index');
-//		}
+		//'e'=>1,'d'=>2,
+		$this->title = "Welcome to the StageX Beta";
+		if($_SESSION['logged']){
+			glue::route('/stream/news');
+		}else{
+			echo $this->render('/index');
+		}
 	}
 }

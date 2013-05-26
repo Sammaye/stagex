@@ -77,15 +77,15 @@ class Controller {
 		$content = $this->renderFile($viewFile, $params);
 		$layoutFile = $this->getLayoutPath($this->layout);
 		if ($layoutFile !== false) {
-			require $layoutFile;
+			return $this->renderFile($layoutFile, array('content'=>$content));
 		} else {
-			echo $content;
+			return $content;
 		}
 	}
 
 	public function renderPartial($view, $params = array()){
 		$viewFile = $this->getViewPath($view);
-		echo $this->renderFile($viewFile, $params, $this);
+		return $this->renderFile($viewFile, $params, $this);
 	}
 
 	public function renderFile($_file_, $_params_ = array()){

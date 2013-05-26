@@ -13,6 +13,8 @@ class Validation extends \glue\Component{
 	public $rules;
 
 	public $valid;
+	
+	public $error_map=array();
 
 	public $error_codes = array();
 	public $error_messages=array();
@@ -36,7 +38,7 @@ class Validation extends \glue\Component{
 	 * @param $rule The rule in array form
 	 * @param $document The document in array form
 	 */
-	private function validateRule($rule){
+	function validateRule($rule){
 
 		// Now lets get the pieces of this rule
 		$scope = isset($rule[0]) ? preg_split('/[\s]*[,][\s]*/', $rule[0]) : null;
@@ -62,7 +64,7 @@ class Validation extends \glue\Component{
 
 				if(method_exists($this, $validator)){
 					$valid=self::$validator($field, $field_value, $params)&&$valid;
-				}elseif($this->model && $this->model->method_exists($validator)){
+				}elseif($this->model instanceof \glue\Model && $this->model->method_exists($validator)){
 					$valid = $this->model->$validator($field, $field_value, $params) && $valid;
 				}elseif($validator instanceof \Closure||(is_string($validator) && function_exists($validator))){
 					$valid = $validator($field,$field_value,$params,$this) && $valid;
@@ -119,7 +121,46 @@ class Validation extends \glue\Component{
 		}
 	}
 
-	function getErrorCodes(){
+	function getErrorCodes($map){
+		if($map!==array()){
+
+			$mapped_errors=array();
+			
+			foreach($map as $k => $v){
+				if(($pos=strpos($k,'||'))!==false){
+					
+					// $or condition
+					$match=false;
+					foreach(preg_split('/\|\|/',$k) as $f){
+						list($fd, $vr)=preg_split('/_/',$f);
+						if(isset($this->error_codes[$fd])&&array_key_exists($vr,array_flip($this->error_codes[$fd])))
+							$match=true;
+					}
+					
+					if($match)
+						$mapped_errors['global']=$v;
+				}elseif(($pos=strpos($k,'&&'))!==false){
+					
+					// $and condition
+					$match=true;
+					foreach(preg_split('/&&/',$k) as $f){
+						list($fd, $vr)=preg_split('/_/',$f);
+						if(isset($this->error_codes[$fd])&&array_key_exists($vr,array_flip($this->error_codes[$fd])))
+							$match=false&&$match;
+					}
+						
+					if($match)
+						$mapped_errors['global']=$v;					
+				}else{
+					list($field, $validator)=preg_split('/_/',$k);
+					if(isset($this->error_codes[$field])&&array_key_exists($validator,array_flip($this->error_codes[$field])))
+						$mapped_errors[$field]=$v;
+				}
+				
+			}
+			
+			return $mapped_errors;
+		}
 		return $this->error_codes;
 	}
 
@@ -149,6 +190,29 @@ class Validation extends \glue\Component{
 
 	public function setFieldCodes($codes){
 		$this->error_codes[$field]=$codes;
+	}
+	
+	function getValidatedAttributes(){
+		
+		$attributes=array();
+		foreach($this->rules as $rule){
+			$scope = isset($rule[0]) ? preg_split('/[\s]*[,][\s]*/', $rule[0]) : null;
+			$scenario = isset($rule['on']) ? array_flip(preg_split('/[\s]*[,][\s]*/', $rule['on'])) : null;
+			
+			if($scope!==null&&$scenario!==null){
+				foreach($scope as $field){
+					if(isset($scenario[$this->scenario]) || !$scenario){ // If the scenario key exists in the flipped $rule['on']
+						if(is_object($this->model)){
+							$attributes[$field]=isset($this->model->$field)?$this->model->$field:null;
+						}else{
+							$attributes[$field]=isset($this->model[$field])?$this->model[$field]:null;
+						}
+					}
+				}
+				
+			}
+		}
+		return $attributes;
 	}
 
 	// START OF VALIDATORS
