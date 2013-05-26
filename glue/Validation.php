@@ -199,9 +199,9 @@ class Validation extends \glue\Component{
 			$scope = isset($rule[0]) ? preg_split('/[\s]*[,][\s]*/', $rule[0]) : null;
 			$scenario = isset($rule['on']) ? array_flip(preg_split('/[\s]*[,][\s]*/', $rule['on'])) : null;
 			
-			if($scope!==null&&$scenario!==null){
+			if($scope!==null){
 				foreach($scope as $field){
-					if(isset($scenario[$this->scenario]) || !$scenario){ // If the scenario key exists in the flipped $rule['on']
+					if(!$scenario || isset($scenario[$this->scenario])){ // If the scenario key exists in the flipped $rule['on']
 						if(is_object($this->model)){
 							$attributes[$field]=isset($this->model->$field)?$this->model->$field:null;
 						}else{
