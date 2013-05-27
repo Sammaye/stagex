@@ -1,11 +1,11 @@
-<?php $this->addJsScript('account_settings', "
+<?php $this->js('account_settings', "
 	$(document).ready(function(){
 		$('.login_submit').click(function(event){
 			event.preventDefault();
 			$(this).parents('form').submit();
 		});
 	});
-") ?>
+"); ?>
 
 <div class="user_login_body">
 	<?php $form = html::activeForm(); ?>
@@ -36,12 +36,10 @@
 					<h2>Captcha</h2>
 					<p class='smallArial'><b>Please note:</b> Since you have unsuccessfully logged in 3 times now you must also fill in the captcha to prove you are human.</p>
 					<?php
-
-					echo $this->widget('application/widgets/reCaptcha/recaptcha.php', array(
+					echo app\widgets\reCaptcha\recaptcha::widget(array(
 						"public_key"=>"6LfCNb0SAAAAAF4EZ2hV_4JCxbY3lfq0ren11EfM",
 						"errors"=>$model->getErrors('captcha', true))
-					);
-
+					) 
 					?>
 				</div>
 			<?php } ?>
@@ -54,7 +52,7 @@
 			<div class="clearer"></div>
 		</div>
 		<div class='form_footer'>
-			<p>Cannot get into your account? <a href='<?php echo Glue::url()->create("/user/recover") ?>'>Recover your account details here</a></p>
+			<p>Cannot get into your account? <a href='<?php echo Glue::http()->createUrl("/user/recover") ?>'>Recover your account details here</a></p>
 		</div>
 	<?php $form->end() ?>
 

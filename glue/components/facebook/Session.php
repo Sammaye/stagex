@@ -1,7 +1,12 @@
 <?php
-Glue::import('glue/plugins/facebook/facebook.php');
 
-class facebook_session extends GApplicationComponent{
+namespace glue\components\facebook;
+
+use glue;
+
+glue::import('@glue/components/facebook/facebook.php');
+
+class Session extends \glue\Component{
 
 	public $appId;
 	public $secret;
@@ -9,7 +14,7 @@ class facebook_session extends GApplicationComponent{
 	public $facebook;
 
 	public function init(){
-		$this->facebook = new Facebook(array(
+		$this->facebook = new \Facebook(array(
 		  'appId' => $this->appId,
 		  'secret' => $this->secret
 		));
@@ -24,7 +29,7 @@ class facebook_session extends GApplicationComponent{
 
 			try {
 				return $this->facebook->api('/me');
-			} catch (FacebookApiException $e) {
+			} catch (\FacebookApiException $e) {
 				return false;
 			}
 

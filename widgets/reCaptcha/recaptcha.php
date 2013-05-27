@@ -1,8 +1,12 @@
 <?php
 
-Glue::import('application/widgets/reCaptcha/recaptchalib.php');
+namespace app\widgets;
 
-class recaptcha extends GWidget{
+use glue;
+
+Glue::import('@app/widgets/reCaptcha/recaptchalib.php');
+
+class recaptcha extends \glue\Widget{
 
 	public $private_key;
 	public $public_key;

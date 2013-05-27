@@ -167,23 +167,20 @@ return array(
 		),
 
 		'facebook' => array(
-			'class' => 'facebook_session',
-			'path' => 'glue/plugins/facebook/facebook_session.php',
+			'class' => 'glue\\components\\facebook\\Session',
 		  	'appId' => '455165987850786',
 		  	'secret' => '6c6336958eec554bfb2326e6824ea427',
 		),
 
 		'twitter' => array(
-			'class' => 'TwitterSession',
-			'path' => 'glue/plugins/twitter/TwitterSession.php',
+			'class' => 'glue\\components\\twitter\\Session',
 			'consumer_key' => "E1uIs3dzvlrodsj4R3I8w",
 			'secret_key' => "HxbMV2giKXekGI41TXp2A2rJh9P5OroGCSxlEYPogwc",
 			'callback' => "http://stagex.co.uk/autoshare/auth?network=twt"
 		),
 
 		'google' => array(
-			'class' => 'google_session',
-			'path' => 'glue/plugins/googleapi/google_session.php',
+			'class' => 'glue\\components\\google\\Session',
 			'client_id' => '170938211589.apps.googleusercontent.com',
 			'client_secret' => 'lTJpybuvyAD-zWTBI-mnyT1Q',
 			'callback_uri' => 'http://stagex-local.co.uk/user/google_login'
@@ -414,7 +411,7 @@ return array(
 	 * not harm the framework workings
 	 */
 	'aliases' => array(
-		"Html"					=> "glue\\Html",
+		"html"					=> "glue\\Html",
 
 		/**
 		 * Core utils

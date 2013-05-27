@@ -348,8 +348,8 @@ class glue{
 
 		if(isset(self::$aliases[$class])){
 			return class_alias(self::$aliases[$class],$class);
-		}elseif (isset(self::$classMap[$class])) {
-			$fullPath = self::$classMap[$class]['file'];
+		}elseif (isset(self::$classMap[strtolower($class)])) {
+			$fullPath = self::$classMap[strtolower($class)]['file'];
 			if (is_file($fullPath)) {
 				$classFile=$fullPath;
 			}
@@ -408,7 +408,7 @@ class glue{
 
 		$pos = strpos($path,'/');
 		$filePath=$pos!==false?self::getPath(substr($path,0,$pos)) . substr($path,$pos):$path;
-		$className = basename($path,'.php');
+		$className = strtolower(basename($path,'.php'));
 
 		if (!isset(self::$classMap[$className])) {
 			self::$classMap[$className] = array(

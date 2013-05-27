@@ -1,7 +1,12 @@
 <?php
-Glue::import('glue/plugins/googleapi/Google.php');
 
-class google_session extends GApplicationComponent{
+namespace glue\components\google;
+
+use glue;
+
+Glue::import('@glue/components/google/Google.php');
+
+class Session extends \glue\Component{
 
 	public $client_id;
 	public $client_secret;
@@ -11,7 +16,7 @@ class google_session extends GApplicationComponent{
 	public $Google;
 
 	public function init(){
-		$this->Google = new Google($this->client_id, $this->client_secret);
+		$this->Google = new \Google($this->client_id, $this->client_secret);
 	}
 
 	public function getLoginURI($scopes = array(), $response_type = 'code', $approval_prompt = 'auto', $access_type = 'offline'){

@@ -1,6 +1,7 @@
 <?php
 
 use glue\Html,
+	app\models\loginForm,
 	app\models\User;
 
 class userController extends \glue\Controller{
@@ -39,7 +40,7 @@ class userController extends \glue\Controller{
 		$model = new User;
 
 		if(isset($_POST['User'])){
-			$model->_attributes($_POST['User']);
+			$model->attributes=$_POST['User'];
 			if($model->validate()){
 
 				$login = new loginForm();
@@ -57,12 +58,12 @@ class userController extends \glue\Controller{
 			}
 		}
 
-		$this->render("register", array("model" => $model));
+		echo $this->render("register", array("model" => $model));
 	}
 
 	function action_login(){
 
-		$this->pageTitle = "Login to your StageX Account";
+		$this->title = "Login to your StageX Account";
 
 		$model = new loginForm();
 		$model->_attributes(isset($_POST['_login']) ? $_POST['_login'] : null);
@@ -84,7 +85,7 @@ class userController extends \glue\Controller{
 			}
 		}
 
-		$this->render('user/login', array('model' => $model, 'attempts' => $loginAttempts['c']));
+		echo $this->render('user/login', array('model' => $model, 'attempts' => $loginAttempts['c']));
 	}
 
 	function action_fb_login(){

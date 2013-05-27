@@ -1,13 +1,18 @@
 <?php
+
+namespace app\models;
+
+use glue;
+
 /** Incase this is being used somewhere where it hasn't been included in the controller */
-Glue::import('application/widgets/reCaptcha/recaptchalib.php');
+glue::import('@app/widgets/reCaptcha/recaptchalib.php');
 
-class loginForm extends GModel{
+class loginForm extends \glue\Model{
 
-	protected $email;
-	protected $password;
-	protected $hash;
-	protected $remember;
+	public $email;
+	public $password;
+	public $hash;
+	public $remember;
 
 	public function rules(){
 		return array(

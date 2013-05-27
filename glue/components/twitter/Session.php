@@ -1,7 +1,11 @@
 <?php
-Glue::import('glue/plugins/twitter/twitteroauth.php');
+namespace glue\components\twitter;
 
-class TwitterSession extends GApplicationComponent{
+use glue;
+
+Glue::import('@glue/components/twitter/twitteroauth.php');
+
+class Session extends \glue\Component{
 
 	public $consumer_key;
 	public $secret_key;
@@ -13,7 +17,7 @@ class TwitterSession extends GApplicationComponent{
 	protected $model;
 
 	function connect($props){
-		$this->model = new TwitterOAuth($this->consumer_key, $this->secret_key);
+		$this->model = new \TwitterOAuth($this->consumer_key, $this->secret_key);
 
 		if(isset($props['access_token']) && !empty($props['access_token'])){
 			//echo "inhere";
@@ -53,7 +57,7 @@ class TwitterSession extends GApplicationComponent{
 		}
 
 		/* Create TwitteroAuth object with app key/secret and token key/secret from default phase */
-		$connection = new TwitterOAuth($this->consumer_key, $this->secret_key, $cookie_token['oauth_token'], $cookie_token['oauth_token_secret']);
+		$connection = new \TwitterOAuth($this->consumer_key, $this->secret_key, $cookie_token['oauth_token'], $cookie_token['oauth_token_secret']);
 
 		/* Request access tokens from twitter */
 		$token = $connection->getAccessToken($_REQUEST['oauth_verifier']);
