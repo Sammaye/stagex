@@ -220,7 +220,7 @@ class Controller {
 		}else{
 
 			// Then lets attempt to get the cwd from the controller. If the controller is not set we use siteController as default. This can occur for cronjobs
-			return str_replace('/', DIRECTORY_SEPARATOR, glue::getPath('@app').'/views/'.str_replace('controller', '',
+			return str_replace('/', DIRECTORY_SEPARATOR, glue::getPath('@app').'/views/'.str_replace('Controller', '',
 					glue::$controller instanceof \glue\Controller ? get_class(glue::$controller) : 'siteController').'/'.$path);
 		}
 	}

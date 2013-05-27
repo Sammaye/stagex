@@ -131,7 +131,7 @@ class Crypt{
 		return $output;
 	}
 
-	function generate_new_pass(){
+	static function generate_new_pass(){
 
 		$length=9; // Length of the returned password
 		$strength=8; // A strength denominator

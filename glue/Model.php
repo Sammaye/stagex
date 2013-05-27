@@ -29,10 +29,12 @@ class Model{
 	 * @param string $name
 	 */
 	public function __get($name){
-		if(method_exists('get'.$name)){
+		if(method_exists($this,'get'.$name)){
 			return $this->{'get'.$name}();
-		}
-		return $this->$name;
+		}elseif(property_exists($this,$name))
+			return $this->$name;
+		else
+			return null;
 	}
 	
 	/**
@@ -41,7 +43,7 @@ class Model{
 	 * @param mixed $value
 	 */
 	public function __set($name, $value){
-		if(method_exists('set'.$name)){
+		if(method_exists($this,'set'.$name)){
 			return $this->{'set'.$name}($value);
 		}
 		return $this->$name=$value;

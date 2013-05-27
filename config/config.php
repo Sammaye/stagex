@@ -290,8 +290,8 @@ return array(
 						GJSON::kill(GJSON::LOGIN);
 						exit();
 					}else{
-						html::setErrorFlashMessage('You must be logged in to access this page');
-						header('Location: /user/login?nxt='.Glue::url()->create('SELF', array(), ''));
+						\glue\Html::setErrorFlashMessage('You must be logged in to access this page');
+						header('Location: /user/login?nxt='.Glue::http()->createUrl('SELF', array(), ''));
 						exit();
 					}
 					return false;

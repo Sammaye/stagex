@@ -22,7 +22,7 @@ class Auth extends \glue\Component{
 	function beforeAction($controller,$action){
 		if(is_callable(array($controller, $action))){
 			$this->controller=$controller;
-			if($this->parseControllerRights($controller->authRules(), $action)){
+			if($this->parseControllerRights($controller->authRules(), preg_replace('/'.glue::$actionPrefix.'/', '', $action))){
 				return true;
 			}else{
 				glue::trigger('403');
@@ -55,16 +55,17 @@ class Auth extends \glue\Component{
 	public function parseControllerRights($controllerPermissions, $action){
 
 		foreach($controllerPermissions as $permission){
-
+			
 			$actions = isset($permission['actions']) && is_array($permission['actions']) ? $permission['actions'] : array();
+			//var_dump($actions); var_dump($action);
 			if((array_key_exists($action, array_flip($actions)) || count($actions) <= 0)){
-
 				$users = isset($permission['users']) ? $permission['users'] : array('*');
 				foreach($users as $role){
-
+					//var_dump($role);
 					if(($func=$this->getFilter($role))===null)
 						throw new Exception("The auth shortcut: $role you specified within ".get_class($this->controller)." does not exist.");
-//var_dump($func); //exit();
+					
+//var_dump($func); exit();
 					if(is_callable($func)){
 						if($func()){
 							if($permission[0] == "allow"){

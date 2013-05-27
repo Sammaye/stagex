@@ -2,6 +2,8 @@
 
 namespace glue;
 
+use glue;
+
 /**
  * HTML constructor class
  *
@@ -686,7 +688,7 @@ class form_base{
 	public function init(){
 
 		//$this->name = $name;
-		if(!$this->action) $this->action = Glue::url()->create('SELF');
+		if(!$this->action) $this->action = Glue::http()->createUrl('SELF');
 		if(!$this->method) $this->method = "post";
 
 		$options = array();

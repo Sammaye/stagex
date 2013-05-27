@@ -65,6 +65,7 @@ class Http{
 		if($this->baseUrl === null){
 			$this->baseUrl = rtrim(dirname($this->scriptUrl()),'\\/');
 		}
+		//var_dump($this->hostInfo()); exit();
 		return $absolute ? $this->hostInfo().$this->baseUrl : $this->baseUrl;
 	}
 
@@ -262,6 +263,19 @@ class Http{
 			return $this->createUrl('SELF');
 		}
 	}
+	
+	public function getParams($params = null){
+		$ar = array();
+		if(empty($params)){
+			$params = $_GET;
+			unset($_GET['url']);
+		}
+	
+		foreach($params as $field => $value){
+			$ar[] = $field.'='.$value;
+		}
+		return implode('&amp;', $ar);
+	}	
 
 	function redirect($url, $attr = array(), $host='/'){
 		header("Location: ".$this->createUrl($url, $attr, $host));
@@ -387,7 +401,7 @@ class Http{
 	}
 
 	function setCsrfToken(){
-		$_SESSION[$this->csrf_token_name] = md5(generate_new_pass());
+		$_SESSION[$this->csrf_token_name] = md5(glue\util\Crypt::generate_new_pass());
 	}
 
 	function getCsrfToken(){

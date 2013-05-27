@@ -1,19 +1,18 @@
 <?php
-class userController extends GController{
+
+use glue\Html,
+	app\models\User;
+
+class userController extends \glue\Controller{
 
 	public $tab = "settings";
 	public $profile_tab = "settings";
 
-	public $pageTitle = 'Your Stuff - StageX';
+	public $title = 'Your Stuff - StageX';
 
 	public $page;
 
-	// A set of filters to be run before and after the controller action
-	public function filters(){
-		return array('rbam');
-	}
-
-	public function accessRules(){
+	public function authRules(){
 		return array(
 			array('allow',
 				'actions' => array('create', 'login', 'view', 'recover', 'view_videos', 'view_playlists', 'fb_login', 'twt_login', 'google_login'),
@@ -35,7 +34,7 @@ class userController extends GController{
 
 	function action_create(){
 
-		$this->pageTitle = 'Create a new StageX Account';
+		$this->title = 'Create a new StageX Account';
 
 		$model = new User;
 

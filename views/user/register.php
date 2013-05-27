@@ -1,4 +1,8 @@
-<?php $this->addJsScript('account_settings', "
+<?php 
+
+use glue\Html;
+
+$this->js('account_settings', "
 	$(document).ready(function(){
 		$('.register_submit').click(function(event){
 			event.preventDefault();
