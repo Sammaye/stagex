@@ -1,5 +1,10 @@
 <?php
-class Jqautocomplete extends GWidget{
+
+namespace app\widgets;
+
+use glue;
+
+class Jqautocomplete extends \glue\Widget{
 
 	public $options = array();
 	public $renderItem;
@@ -20,7 +25,7 @@ class Jqautocomplete extends GWidget{
 
 				$js .= "
 						$('.".$this->attribute."').autocomplete(
-							" . GClientScript::encode($this->options) . "
+							" . js_encode($this->options) . "
 						)
 				";
 
@@ -36,8 +41,8 @@ class Jqautocomplete extends GWidget{
 
 			$js .= "});";
 
-			glue::clientScript()->addJsScript('jqauto_complete_'.$this->attribute, $js);
-			echo html::textfield($this->attribute, $this->value ? $this->value : null, array('class' => $this->attribute));
+			glue::$controller->js('jqauto_complete_'.$this->attribute, $js);
+			echo \html::textfield($this->attribute, $this->value ? $this->value : null, array('class' => $this->attribute));
 		}
 	}
 }

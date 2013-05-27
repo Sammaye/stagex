@@ -2,16 +2,17 @@
 
 namespace app\widgets;
 
-use \glue\Html;
+use glue,
+	\glue\Html;
 
 class Menu extends \glue\Widget{
 
-	function render(){  echo "this is where the menu would be"; return;?>
+	function render(){ ?>
 			<div class='presence_bar'>
 				<div class='grid_970'>
 				<div class="presence_bar-topLeft">
 					<ul>
-						<li class='logo'><a href='<?php echo glue::url()->create('/') ?>'><img src='/images/main_logo.png' alt='StageX'/></a></li>
+						<li class='logo'><a href='<?php echo glue::http()->createUrl('/') ?>'><img src='/images/main_logo.png' alt='StageX'/></a></li>
 						<li class="presenceBar_mainSearch_li">
 							<form action="/search" method="get"><div class="search_bar">
 									<label><?php
@@ -20,7 +21,7 @@ class Menu extends \glue\Widget{
 										$val = glue::http()->param('mainSearch', '');
 									}
 
-									glue::clientScript()->addJsScript('mainSearch_click', "
+									glue::$controller->js('mainSearch_click', "
 										$(function(){
 											$('#mainSearch_submit').click(function(event){
 												event.preventDefault();
@@ -29,7 +30,7 @@ class Menu extends \glue\Widget{
 										});
 									");
 
-									$this->widget('application/widgets/Jqautocomplete.php', array(
+									\app\widgets\Jqautocomplete::widget(array(
 										'attribute' => 'mainSearch',
 										'value' => $val,
 										'options' => array(
@@ -47,7 +48,7 @@ class Menu extends \glue\Widget{
 							</form>
 						</li>
 
-						<li class='link_item'><a href="<?php echo Glue::url()->create("/video") ?>">Videos</a></li>
+						<li class='link_item'><a href="<?php echo Glue::http()->createUrl("/video") ?>">Videos</a></li>
 					</ul>
 				</div>
 				<?php if(isset($_SESSION)){ ?>
@@ -56,7 +57,7 @@ class Menu extends \glue\Widget{
 						<?php if($_SESSION['logged']){ ?>
 							<li>
 
-								<?php $newNotifications = Notification::getNewCount_Notifications(); ?>
+								<?php $newNotifications =0; //Notification::getNewCount_Notifications(); ?>
 								<a class='notification_area <?php if($newNotifications > 0): echo "new_nots"; endif; ?>' href='/stream/notifications'>
 								<?php
 								if($newNotifications > 100){ ?>
@@ -66,14 +67,14 @@ class Menu extends \glue\Widget{
 								} ?>
 								</a>
 							</li>
-							<li><img alt='thumbnail' class='user_image' src='<?php echo glue::session()->user->getPic(30,30) ?>'/></li>
-							<li><a href="<?php echo Glue::url()->create("/user/videos", array('id' => glue::session()->user->_id)) ?>"><?php echo glue::session()->user->getUsername() ?></a></li>
-							<li><a href="<?php echo Glue::url()->create("/help") ?>">Help</a></li>
+							<li><img alt='thumbnail' class='user_image' src='<?php echo glue::user()->getPic(30,30) ?>'/></li>
+							<li><a href="<?php echo Glue::http()->createUrl("/user/videos", array('id' => glue::user()->_id)) ?>"><?php echo glue::user()->getUsername() ?></a></li>
+							<li><a href="<?php echo Glue::http()->createUrl("/help") ?>">Help</a></li>
 							<li><a target='_blank' href="https://getsatisfaction.com/stagex">Report Bug</a></li>
 						<?php }else{ ?>
-							<li><a href="<?php echo Glue::url()->create("/user/create") ?>">Create Account</a></li>
-							<li><a href="<?php echo Glue::url()->create("/user/login") ?>">Sign In</a></li>
-							<li><a href="<?php echo Glue::url()->create("/help") ?>">Help</a></li>
+							<li><a href="<?php echo Glue::http()->createUrl("/user/create") ?>">Create Account</a></li>
+							<li><a href="<?php echo Glue::http()->createUrl("/user/login") ?>">Sign In</a></li>
+							<li><a href="<?php echo Glue::http()->createUrl("/help") ?>">Help</a></li>
 							<li><a target='_blank' href="https://getsatisfaction.com/stagex">Report Bug</a></li>
 						<?php } ?>
 					</ul>

@@ -303,6 +303,9 @@ class Model{
 			$valid=$validator->run();
 		}
 
+		$this->error_codes=\glue\Collection::mergeArray($this->error_codes,$validator->error_codes);
+		$this->error_messages=\glue\Collection::mergeArray($this->error_messages,$validator->error_messages);
+		
 		$this->setValidated(true);
 		$this->setValid($valid);
 

@@ -136,66 +136,6 @@ return array(
 			)
 		),
 
-		// Yes some MySQL
-		"mysql"=>array(
-			"host" => "localhost",
-			"user" => "root",
-			"password" => "samill2man",
-			"db" => 'sphinx_index',
-			"path"=>"glue/plugins/storage/mysql/GMySQL.php",
-			"class"=>"GMySQL"
-		),
-
-		// Woo Sphinx!
-		"sphinx"=>array(
-			'class' => 'sphinx_searcher',
-			'path' => 'glue/plugins/sphinx/sphinx_searcher.php',
-			"host"=>"localhost",
-			"port"=>9312,
-			'indexes' => array(
-				'main' => array(
-					'type' => 'delta',
-					'delta' => 'main_delta',
-					'cursor' => 'MainSearch_SphinxCursor',
-					'query_fields' => array( 'title', 'description', 'tags', 'author_name' ),
-				),
-				'help' => array(
-					'cursor' => 'HelpSearch_SphinxCursor',
-					'query_fields' => array( 'title', 'content', 'tags', 'path' ),
-				)
-			)
-		),
-
-		'facebook' => array(
-			'class' => 'glue\\components\\facebook\\Session',
-		  	'appId' => '455165987850786',
-		  	'secret' => '6c6336958eec554bfb2326e6824ea427',
-		),
-
-		'twitter' => array(
-			'class' => 'glue\\components\\twitter\\Session',
-			'consumer_key' => "E1uIs3dzvlrodsj4R3I8w",
-			'secret_key' => "HxbMV2giKXekGI41TXp2A2rJh9P5OroGCSxlEYPogwc",
-			'callback' => "http://stagex.co.uk/autoshare/auth?network=twt"
-		),
-
-		'google' => array(
-			'class' => 'glue\\components\\google\\Session',
-			'client_id' => '170938211589.apps.googleusercontent.com',
-			'client_secret' => 'lTJpybuvyAD-zWTBI-mnyT1Q',
-			'callback_uri' => 'http://stagex-local.co.uk/user/google_login'
-		),
-
-		'aws' => array(
-			'class' => 'aws_bootstrap',
-			'path' => 'glue/plugins/aws/aws_bootstrap.php',
-			'key' => 'AKIAICYRUYXAXE3MTUXA',
-			'secret' => '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',
-			'bucket' => 'videos.stagex.co.uk',
-			'input_queue' => 'https://us-west-2.queue.amazonaws.com/663341881510/stagex-uploadsQueue',
-			'output_queue' => 'https://us-west-2.queue.amazonaws.com/663341881510/stagex-outputsQueue'
-		),
-
 		/**
 		 * This holds the auth configuration. Of course this particular auth module uses programmed auth roles, better to make
 		 * an extension to store this shit in a database...
@@ -288,7 +228,7 @@ return array(
 						exit();
 					}else{
 						\glue\Html::setErrorFlashMessage('You must be logged in to access this page');
-						header('Location: /user/login?nxt='.Glue::http()->createUrl('SELF', array(), ''));
+						header('Location: /user/login?nxt='.Glue::http()->createUrl('SELF', array(), null));
 						exit();
 					}
 					return false;
@@ -345,6 +285,78 @@ return array(
 				return true;
 			}
 		),
+		
+		
+		// Yes some MySQL
+		"mysql"=>array(
+				"host" => "localhost",
+				"user" => "root",
+				"password" => "samill2man",
+				"db" => 'sphinx_index',
+				"class"=>"glue\\components\\mysql\\Record"
+		),
+		
+		// Woo Sphinx!
+		"sphinx"=>array(
+				'class' => 'sphinx_searcher',
+				'path' => 'glue/plugins/sphinx/sphinx_searcher.php',
+				"host"=>"localhost",
+				"port"=>9312,
+				'indexes' => array(
+						'main' => array(
+								'type' => 'delta',
+								'delta' => 'main_delta',
+								'cursor' => 'MainSearch_SphinxCursor',
+								'query_fields' => array( 'title', 'description', 'tags', 'author_name' ),
+						),
+						'help' => array(
+								'cursor' => 'HelpSearch_SphinxCursor',
+								'query_fields' => array( 'title', 'content', 'tags', 'path' ),
+						)
+				)
+		),
+		
+		'facebook' => array(
+				'class' => 'glue\\components\\facebook\\Session',
+				'appId' => '455165987850786',
+				'secret' => '6c6336958eec554bfb2326e6824ea427',
+		),
+		
+		'twitter' => array(
+				'class' => 'glue\\components\\twitter\\Session',
+				'consumer_key' => "E1uIs3dzvlrodsj4R3I8w",
+				'secret_key' => "HxbMV2giKXekGI41TXp2A2rJh9P5OroGCSxlEYPogwc",
+				'callback' => "http://stagex.co.uk/autoshare/auth?network=twt"
+		),
+		
+		'google' => array(
+				'class' => 'glue\\components\\google\\Session',
+				'client_id' => '170938211589.apps.googleusercontent.com',
+				'client_secret' => 'lTJpybuvyAD-zWTBI-mnyT1Q',
+				'callback_uri' => 'http://stagex-local.co.uk/user/google_login'
+		),
+		
+		'aws' => array(
+				'class' => 'aws_bootstrap',
+				'path' => 'glue/plugins/aws/aws_bootstrap.php',
+				'key' => 'AKIAICYRUYXAXE3MTUXA',
+				'secret' => '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',
+				'bucket' => 'videos.stagex.co.uk',
+				'input_queue' => 'https://us-west-2.queue.amazonaws.com/663341881510/stagex-uploadsQueue',
+				'output_queue' => 'https://us-west-2.queue.amazonaws.com/663341881510/stagex-outputsQueue'
+		),
+			
+		'purifier' => array(
+				'path' => 'glue/plugins/purifier/purify.php'
+		),
+		
+		'mailer' => array(
+				'path' => 'glue\\components\\phpmailer\\mailer'
+		),
+		
+		'sitemap' => array(
+				'path' => 'glue\\plugins\\sitemap\\sitemap'
+		),		
 	),
 
 	/**

@@ -58,7 +58,7 @@ class userController extends \glue\Controller{
 			}
 		}
 
-		echo $this->render("register", array("model" => $model));
+		echo $this->render("create", array("model" => $model));
 	}
 
 	function action_login(){

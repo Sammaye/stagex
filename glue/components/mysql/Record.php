@@ -1,5 +1,9 @@
 <?php
-class GMySQL extends GApplicationComponent{
+namespace glue\components\mysql;
+
+use glue\Exception;
+
+class Record extends \glue\Component{
 
 	public $host;
 	public $user;
@@ -8,8 +12,6 @@ class GMySQL extends GApplicationComponent{
 
 	private $link;
 	private $pdo_link;
-
-	function __construct(){}
 
 	function init(){
 		$this->pdo_link = new PDO('mysql:host='.$this->host.';dbname='.$this->db, $this->user, $this->password, array(PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES \'UTF8\''));
@@ -32,7 +34,7 @@ class GMySQL extends GApplicationComponent{
 	 */
 	function query($query, $params = array()){
 		if(!$query)
-			trigger_error('Could not query nothing');
+			throw new Exception('Could not query nothing');
 
 		// Lets get our IN fields first
 		$in_fields = array();

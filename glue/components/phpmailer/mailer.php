@@ -1,16 +1,16 @@
 <?php
 
+namespace glue\components\phpmailer;
+
 require_once str_replace('/', DIRECTORY_SEPARATOR, dirname(__FILE__).'/class.phpmailer.php');
 
-class mailer extends GApplicationComponent{
+class mailer extends \glue\Component{
 
 	private $_mailer;
 
 	public $viewPath = 'application/views/mail';
 
-	function __construct(){
-		$this->_mailer = new PHPMailer();
-	}
+	function init(){ $this->_mailer = new PHPMailer(); }
 
 	function __get($k){
 		if($this->_mailer instanceof PHPMailer) return $this->_mailer->$k;

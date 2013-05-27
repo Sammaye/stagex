@@ -535,7 +535,7 @@ class Html{
 		$html = html::openTag('div', array('class' => 'MOTD '.$class));
 		$html .= html::openTag('div', array('class' => 'MOTD_message')).$message.html::closeTag('div');
 
-		$html .= html::openTag('div', array('class' => 'MOTD_action')).html::a(array('href' => glue::url()->create('SELF'), 'text' => utf8_decode('&#215;'))).self::closeTag('div');
+		$html .= html::openTag('div', array('class' => 'MOTD_action')).html::a(array('href' => glue::http()->createUrl('SELF'), 'text' => utf8_decode('&#215;'))).self::closeTag('div');
 		$html .= html::open_closeTag(array('class' => 'clearer'));
 
 		$html .= html::closeTag('div');

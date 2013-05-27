@@ -1,40 +1,42 @@
 <?php
 
-class Playlist extends MongoDocument{
+namespace app\models;
 
-	protected $user_id;
+class Playlist extends \glue\db\Document{
 
-	protected $title;
-	protected $description;
+	public $user_id;
 
-	protected $listing = 1; // protected, unlisted or private
-	protected $allow_embedding = true;
-	protected $allow_like = true;
+	public $title;
+	public $description;
 
-	protected $videos = array(); // For each video there is a _id, position and description
+	public $listing = 1; // public, unlisted or private
+	public $allow_embedding = true;
+	public $allow_like = true;
 
-	protected $likes = 0;
-	protected $total_videos = 0;
+	public $videos = array(); // For each video there is a _id, position and description
 
-	protected $deleted = 0;
+	public $likes = 0;
+	public $total_videos = 0;
 
-	protected $ts;
+	public $deleted = 0;
 
-	public function getCollectionName(){
+	//public $ts;
+
+	public function collectionName(){
 		return 'playlists';
 	}
 
 	function behaviours(){
 		return array(
 			'timestampBehaviour' => array(
-				'class' => 'glue/extended/behaviours/timestampBehaviour.php'
+				'class' => 'glue\\behaviours\\Timestamp'
 			)
 		);
 	}
 
 	function relations(){
 		return array(
-			"author" => array(self::HAS_ONE, 'User', "_id", 'on' => 'user_id'),
+			"author" => array('one', 'app\\models\\User', "_id", 'on' => 'user_id'),
 		);
 	}
 
@@ -162,8 +164,7 @@ class Playlist extends MongoDocument{
 
 	function beforeSave(){
 		if($this->getIsNewRecord() && !$this->user_id){
-			$this->user_id = glue::session()->user->_id;
-			//$this->ts = new MongoDate();
+			$this->user_id = glue::user()->_id;
 		}
 		return true;
 	}

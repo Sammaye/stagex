@@ -3,6 +3,7 @@
 namespace app\models;
 
 use glue,
+	app\models\Playlist,
 	glue\util\Crypt,
 	glue\Collection,
 	glue\Validation;
@@ -119,12 +120,12 @@ class User extends \glue\User{
 		array('about', 'string', 'max' => 1500, 'message' => 'You can only write 1500 characters for your bio.'),
 
 		array('hash', 'hash', 'on'=>'insert'),
-		array('username', 'objExist', 'class'=>'User', 'field'=>'username', 'notExist' => true, 'on'=>'insert, updateUsername',
+		array('username', 'objExist', 'class'=>'app\\models\\User', 'field'=>'username', 'notExist' => true, 'on'=>'insert, updateUsername',
 				'message' => 'That username already exists please try another.'),
 
 		array('email', 'email', 'message' => 'You must enter a valid Email Address'),
 
-		array('email', 'objExist', 'class'=>'User', 'field'=>'email', 'notExist' => true, 'on'=>'insert', 'message' =>
+		array('email', 'objExist', 'class'=>'app\\models\\User', 'field'=>'email', 'notExist' => true, 'on'=>'insert', 'message' =>
 				'That email address already exists please try and login with it, or if you have forgotten your password try to recover your account.'),
 
 		array('gender', 'in', 'range'=>array("m", "f"), 'message' => 'You must enter a valid gender'),
@@ -175,24 +176,22 @@ class User extends \glue\User{
 
 		if($this->getIsNewRecord()){
 			$this->last_notification_pull = new MongoDate();
-			$this->ts = new MongoDate();
+			//$this->ts = new MongoDate();
 			$this->next_bandwidth_up = strtotime('+1 week', mktime(0, 0, 0, date('m'), date('d'), date('Y')));
 			$this->upload_left = glue::$params['maxUpload'];
 		}else{
-			$this->updated = new MongoDate();
+			//$this->updated = new MongoDate();
 		}
 
 		if($this->getScenario() == "updatePassword" || $this->getScenario() == "recoverPassword" || $this->getIsNewRecord()){
-
 			if($this->getScenario() == "updatePassword")
-			$this->password = $this->new_password;
-
+				$this->password = $this->new_password;
 			$this->password = Crypt::blowfish_hash($this->password);
 		}
 
 		if($this->getScenario() == "updateEmail"){
 
-			$hash = hash("sha256", generate_new_pass().(substr(md5(uniqid(rand(), true)), 0, 32)));
+			$hash = hash("sha256", Crypt::generate_new_pass().(substr(md5(uniqid(rand(), true)), 0, 32)));
 
 			$this->temp_access_token = array(
 				"to" => time()+60*60*24, // 24 Hours

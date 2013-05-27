@@ -1,6 +1,9 @@
 <?php
+namespace glue\components\sitemap;
 
-class sitemap extends GApplicationComponent{
+use glue;
+
+class sitemap extends \glue\Component{
 
 	public $path = '/';
 	public $sitemap_name = 'site_map.xml';
@@ -10,8 +13,8 @@ class sitemap extends GApplicationComponent{
 	private $index_path;
 
 	public function __construct(){
-		$this->sitemap_path = ROOT.$this->path.$this->sitemap_name;
-		$this->index_path = ROOT.$this->path.$this->index_name;
+		$this->sitemap_path = glue::getpath('@app').$this->path.$this->sitemap_name;
+		$this->index_path = glue::getpath('@app').$this->path.$this->index_name;
 	}
 
 	public function getSitemap(){
