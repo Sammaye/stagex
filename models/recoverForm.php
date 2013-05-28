@@ -1,10 +1,14 @@
 <?php
-Glue::import('application/widgets/reCaptcha/recaptchalib.php');
+namespace app\models;
 
-class recoverForm extends GModel{
+use glue;
 
-	protected $email;
-	protected $hash;
+glue::import('@app/widgets/reCaptcha/recaptchalib.php');
+
+class recoverForm extends \glue\Model{
+
+	public $email;
+	public $hash;
 
 	public function rules(){
 		return array(

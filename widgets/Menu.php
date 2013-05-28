@@ -57,7 +57,7 @@ class Menu extends \glue\Widget{
 						<?php if($_SESSION['logged']){ ?>
 							<li>
 
-								<?php $newNotifications =0; //Notification::getNewCount_Notifications(); ?>
+								<?php $newNotifications = \app\models\Notification::getNewCount_Notifications(); ?>
 								<a class='notification_area <?php if($newNotifications > 0): echo "new_nots"; endif; ?>' href='/stream/notifications'>
 								<?php
 								if($newNotifications > 100){ ?>

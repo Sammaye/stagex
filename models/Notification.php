@@ -1,4 +1,7 @@
 <?php
+namespace app\models;
+
+use glue;
 
 /**
  * Notifications class
@@ -7,27 +10,25 @@
  * Notifications are basically actions that concern other users involved.
  * Notifications were created for the same reason as facebook has them! To stop so much crap
  * from entering the users inbox and leave it clean for important stuff.
- *
- * @author Sam Millman
  */
-class Notification extends MongoDocument{
+class Notification extends \glue\db\Document{
 
 	const VIDEO_COMMENT = 1;
 	const VIDEO_COMMENT_REPLY = 2;
 	const VIDEO_RESPONSE_APPROVE = 3;
 	const WALL_POST = 4;
 
-	protected $user_id;
-	protected $from_users = array();
-	protected $items = array();
-	protected $type;
-	protected $ts;
+	public $user_id;
+	public $from_users = array();
+	public $items = array();
+	public $type;
+	public $ts;
 
-	protected $response_count;
-	protected $approved;
-	protected $comment_id;
+	public $response_count;
+	public $approved;
+	public $comment_id;
 
-	function getCollectionName(){
+	function collectionName(){
 		return "notification";
 	}
 
@@ -37,18 +38,18 @@ class Notification extends MongoDocument{
 
 	function relations(){
 		return array(
-			"parent_video" => array(self::HAS_ONE, 'Video', "_id", 'on' => 'video_id'),
-			"original_comment" => array(self::HAS_ONE, 'VideoResponse', "_id", 'on' => 'comment_id'),
-			'parent_playlist' => array(self::HAS_ONE, 'Playlist', '_id', 'on' => 'playlist_id'),
-			"status_sender" => array(self::HAS_ONE, 'User', '_id', 'on' => 'user_id'),
-			"subscribed_user" => array(self::HAS_ONE, 'User', '_id', 'on' => 'subscribed_user_id'),
-			"commenting_user" => array(self::HAS_ONE, 'User', '_id', 'on' => 'posted_by_id'),
+			"parent_video" => array('one', 'app\\models\\Video', "_id", 'on' => 'video_id'),
+			"original_comment" => array('one', 'app\\models\\VideoResponse', "_id", 'on' => 'comment_id'),
+			'parent_playlist' => array('one', 'app\\models\\Playlist', '_id', 'on' => 'playlist_id'),
+			"status_sender" => array('one', 'app\\models\\User', '_id', 'on' => 'user_id'),
+			"subscribed_user" => array('one', 'app\\models\\User', '_id', 'on' => 'subscribed_user_id'),
+			"commenting_user" => array('one', 'app\\models\\User', '_id', 'on' => 'posted_by_id'),
 		);
 	}
 
 	static function getNewCount_Notifications(){
-		return Notification::model()->find(array('user_id' => glue::session()->user->_id,
-				'ts' => array('$gt' => glue::session()->user->last_notification_pull)))->count();
+		return Notification::model()->find(array('user_id' => glue::user()->_id,
+				'ts' => array('$gt' => glue::user()->last_notification_pull)))->count();
 	}
 
 	function beforeSave(){
@@ -132,7 +133,7 @@ class Notification extends MongoDocument{
 		$status = Notification::model()->findOne(array( 'type' => Notification::VIDEO_COMMENT, 'user_id' => $to_user, 'video_id' => $video_id ));
 
 		if($status){
-			$status->addUser(glue::session()->user->_id);
+			$status->addUser(glue::user()->_id);
 			$status->approved = $approved;
 			$status->response_count = $status->response_count+1;
 			$status->save();
@@ -141,7 +142,7 @@ class Notification extends MongoDocument{
 			$status = new Notification();
 			$status->user_id = $to_user;
 			$status->video_id = $video_id;
-			$status->addUser(glue::session()->user->_id);
+			$status->addUser(glue::user()->_id);
 			$status->approved = $approved;
 			$status->response_count = $status->response_count+1;
 			$status->type = Notification::VIDEO_COMMENT;
@@ -153,7 +154,7 @@ class Notification extends MongoDocument{
 		$status = Notification::model()->findOne(array( 'type' => Notification::VIDEO_COMMENT_REPLY, 'user_id' => $to_user, 'comment_id' => $comment_id));
 
 		if($status){
-			$status->addUser($from_user ? $from_user : glue::session()->user->_id);
+			$status->addUser($from_user ? $from_user : glue::user()->_id);
 			$status->addItemBy_id($reply_id);
 			$status->response_count = $status->response_count+1;
 			$status->save();
@@ -163,7 +164,7 @@ class Notification extends MongoDocument{
 			$status->user_id = $to_user;
 			$status->video_id = $video_id;
 			$status->comment_id = $comment_id;
-			$status->addUser($from_user ? $from_user : glue::session()->user->_id);
+			$status->addUser($from_user ? $from_user : glue::user()->_id);
 			$status->addItemBy_id($reply_id);
 			$status->response_count = $status->response_count+1;
 			$status->type = Notification::VIDEO_COMMENT_REPLY;
@@ -175,7 +176,7 @@ class Notification extends MongoDocument{
 		$status = Notification::model()->findOne(array( 'type' => Notification::VIDEO_RESPONSE_APPROVE, 'user_id' => $to_user, 'video_id' => $video_id));
 
 		if($status){
-			$status->addUser($from_user ? $from_user : glue::session()->user->_id);
+			$status->addUser($from_user ? $from_user : glue::user()->_id);
 			$status->response_count = $status->response_count+1;
 			$status->save();
 		}else{
@@ -183,7 +184,7 @@ class Notification extends MongoDocument{
 			$status = new Notification();
 			$status->user_id = $to_user;
 			$status->video_id = $video_id;
-			$status->addUser($from_user ? $from_user : glue::session()->user->_id);
+			$status->addUser($from_user ? $from_user : glue::user()->_id);
 			$status->response_count = $status->response_count+1;
 			$status->type = Notification::VIDEO_RESPONSE_APPROVE;
 			$status->save();
@@ -199,11 +200,11 @@ class Notification extends MongoDocument{
 
 			$user = User::model()->findOne(array('_id' => $this->from_users[$i]));
 			if($users_count > 1 && $i == $users_count-1){
-				$caption .=  " and <a href='".glue::url()->create('/user/view', array('id' => strval($user->_id)))."'>@{$user->getUsername()}</a>";
+				$caption .=  " and <a href='".glue::http()->createUrl('/user/view', array('id' => strval($user->_id)))."'>@{$user->getUsername()}</a>";
 			}elseif($users_count > 1 && $i != 0){
-				$caption .=  ", <a href='".glue::url()->create('/user/view', array('id' => strval($user->_id)))."'>@{$user->getUsername()}</a>";
+				$caption .=  ", <a href='".glue::http()->createUrl('/user/view', array('id' => strval($user->_id)))."'>@{$user->getUsername()}</a>";
 			}else{
-				$caption .=  "<a href='".glue::url()->create('/user/view', array('id' => strval($user->_id)))."'>@{$user->getUsername()}</a>";
+				$caption .=  "<a href='".glue::http()->createUrl('/user/view', array('id' => strval($user->_id)))."'>@{$user->getUsername()}</a>";
 			}
 
 			if($i == 2 || $getOnlyFirst)

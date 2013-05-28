@@ -1,6 +1,9 @@
 <?php
+namespace app\models;
 
-class Stream extends MongoDocument{
+use glue;
+
+class Stream extends \glue\db\Document{
 
 	const VIDEO_UPLOAD = 1;
 	const VIDEO_RATE = 2;
@@ -12,22 +15,30 @@ class Stream extends MongoDocument{
 	const SUBSCRIBED_TO = 8;
 	const WALL_POST = 10;
 
-	protected $user_id;
-	protected $from_users = array();
-	protected $items = array();
-	protected $type;
-	protected $ts;
+	public $user_id;
+	public $from_users = array();
+	public $items = array();
+	public $type;
+	public $ts;
 
-	protected $posted_by_id;
-	protected $message;
-	protected $subscribed_user_id;
-	protected $video_id;
-	protected $item_id;
-	protected $item_type;
-	protected $like;
+	public $posted_by_id;
+	public $message;
+	public $subscribed_user_id;
+	public $video_id;
+	public $item_id;
+	public $item_type;
+	public $like;
 
-	function getCollectionName(){
+	function collectionName(){
 		return "stream";
+	}
+
+	function behaviours(){
+		return array(
+			'timestampBehaviour' => array(
+				'class' => 'glue\\behaviours\\Timestamp'
+			)
+		);
 	}
 
 	public static function model($className = __CLASS__){
@@ -36,26 +47,26 @@ class Stream extends MongoDocument{
 
 	function relations(){
 		return array(
-			"parent_video" => array(self::HAS_ONE, 'Video', "_id", 'on' => 'video_id'),
-			"original_comment" => array(self::HAS_ONE, 'VideoResponse', "_id", 'on' => 'comment_id'),
-			'parent_playlist' => array(self::HAS_ONE, 'Playlist', '_id', 'on' => 'playlist_id'),
-			"status_sender" => array(self::HAS_ONE, 'User', '_id', 'on' => 'user_id'),
-			"subscribed_user" => array(self::HAS_ONE, 'User', '_id', 'on' => 'subscribed_user_id'),
-			"commenting_user" => array(self::HAS_ONE, 'User', '_id', 'on' => 'posted_by_id'),
+			"parent_video" => array('one', 'app\\models\\Video', "_id", 'on' => 'video_id'),
+			"original_comment" => array('one', 'app\\models\\VideoResponse', "_id", 'on' => 'comment_id'),
+			'parent_playlist' => array('one', 'app\\models\\Playlist', '_id', 'on' => 'playlist_id'),
+			"status_sender" => array('one', 'app\\models\\User', '_id', 'on' => 'user_id'),
+			"subscribed_user" => array('one', 'app\\models\\User', '_id', 'on' => 'subscribed_user_id'),
+			"commenting_user" => array('one', 'app\\models\\User', '_id', 'on' => 'posted_by_id'),
 		);
 	}
 
 	function beforeSave(){
-		$this->ts = new MongoDate();
+		//$this->ts = new MongoDate();
 		return true;
 	}
 
 	function getDateTime(){
 		$today_start = mktime(0, 0, 0, date("n"), date("j")-1, date("Y"));
-		if($today_start < $this->ts->sec){ // Older than a day
-			return date('g:i a', $this->ts->sec);
+		if($today_start < $this->created->sec){ // Older than a day
+			return date('g:i a', $this->created->sec);
 		}else{
-			return date('j M Y', $this->ts->sec);
+			return date('j M Y', $this->created->sec);
 		}
 	}
 
