@@ -8,6 +8,7 @@ use glue,
 class User extends \glue\db\Document{
 
 	public $username;
+	public $password;
 
 	/**
 	 * This decides when the user should no longer be "trusted" as being logged in
@@ -69,27 +70,27 @@ class User extends \glue\db\Document{
 			if(session_id()===''){
 				if($this->domain)
 					ini_set("session.cookie_domain", $this->domain);
-	
+
 				glue::session()->open();
-	
+
 				// Process the user login
 				if(!isset($_SESSION['logged']))
 					$this->session_defaults();
-	
+
 				// Are they logged in?
 				if($_SESSION['logged'] && isset($_COOKIE[$this->tempCookie])) {
-	
+
 					/** Check session as normal */
 					$this->_checkSession();
-	
+
 				}elseif(isset($_COOKIE[$this->permCookie])){
-	
+
 					$this->session_defaults();
 					$this->_checkCookie($this->permCookie);
 					$_SESSION['AUTH_TIER2'] = false;
-	
+
 				}else{
-	
+
 					/** Else in any other case default session variables */
 					$this->session_defaults();
 				}

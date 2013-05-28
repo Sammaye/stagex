@@ -9,50 +9,99 @@ use glue,
 	glue\Validation;
 
 glue::import('@glue/components/phpthumb/ThumbLib.inc.php');
-//include_once ROOT.'/glue/plugins/phpthumb/ThumbLib.inc.php';
 
 class User extends \glue\User{
 
 	/** @virtual */
-	public $new_email;
+	public $newEmail;
 	/** @virtual */
-	public $profile_image;
+	public $profileImage;
 	/** @virtual */
 	public $hash;
 
-	public $safe_srch = "S";
+	public $username;
+	public $password;
+
+	public $name;
+	public $email;
+
+	public $birthDay;
+	public $birthMonth;
+	public $birthYear;
+
+	public $about;
+	public $gender;
+	public $country;
+
+	public $externalLinks;
+
+	public $birthdayPrivacy=0;
+	public $genderPrivacy=0;
+	public $countryPrivacy=0;
+
+	public $group=1;
+
+	/**
+	 * 0 - Off
+	 * 1 - Children
+	 * 2 - Mature
+	 */
+	public $safeSearch = 1;
 
 	/**
 	 * This is used for the search.
 	 * It decides wether or not the users profile is searchable
 	 *
-	 * 1- is Searchable
-	 * 0- is Private
+	 * 0 - Public
+	 * 1 - Unlisted
+	 * 2 - Private
 	 */
-	public $listing = 1;
+	public $listing = 0;
 
-	public $default_video_settings = array('listing' => 1, 'voteable' => true, 'embeddable' => true, 'mod_comments' => 0,
+	public $defaultVideoSettings = array('listing' => 1, 'voteable' => true, 'embeddable' => true, 'mod_comments' => 0,
 			'voteable_comments' => true, 'vid_coms_allowed' => true, 'txt_coms_allowed' => true, 'private_stats' => false, 'licence' => 1);
 
-	public $email_vid_responses = 0;
-	public $email_vid_response_replies = 0;
-	public $email_wall_comments = 0;
-	public $email_encoding_result = 0;
+	public $emailVideoResponses = 0;
+	public $emailVideoResponseReplies = 0;
+	public $emailWallComments = 0;
+	public $emailEncodingResult = 0;
 
-	public $auto_play_vids = 1;
-	public $use_divx_player = 0;
+	public $autoplayVideos = 1;
+	public $useDivx = 0;
 
-	public $autoshare_opts;
-	public $fb_autoshare_token;
-	public $twt_autoshare_token;
+	public $autoshareUploads=0;
+	public $autoshareResponses=0;
+	public $autoshareLikes=0;
+	public $autoshareAddToPlaylist=0;
+	public $autoshareFb;
+	public $autoshareTwitter;
 
-	public $total_subscribers = 0;
-	public $total_subscriptions = 0;
-	public $total_playlists = 0;
-	public $total_uploads = 0;
+	public $maxFileSize;
+	public $bandwidthLeft;
 
-	public $upload_enabled = 1;
+	public $fbUid;
+	public $googleUid;
+	public $clickyUid;
+
+	public $totalSubscribers = 0;
+	public $totalSubscriptions = 0;
+	public $totalPlaylists = 0;
+	public $totalUploads = 0;
+
+	public $lastNotificationPull;
+
+	public $canUpload = 1;
 	public $deleted = 0;
+	public $banned = 0;
+
+	public $sessions;
+	public $remember;
+	public $remM;
+
+	public $singleSignOn=0;
+	public $emailLogins=0;
+
+	public $accessToken;
 
 	function groups(){
 		return array(
@@ -66,7 +115,7 @@ class User extends \glue\User{
 	}
 
 	function collectionName(){
-		return "users";
+		return "user";
 	}
 
 	function behaviours(){
@@ -294,14 +343,6 @@ class User extends \glue\User{
 			return false;
 		}
 		return true;
-	}
-
-	function setProfilePrivacy($ar){
-		$rules = array(
-			array('gender, birthday, country', 'in', 'range' => array(0, 1), 'message' => 'Some of the values you provided for your privacy settings were invalid.')
-		);
-		$this->profile_privacy = filter_array_fields($ar, array('gender', 'birthday', 'country'));
-		return $this->validateRules($rules, $ar);
 	}
 
 	function setDefaultVideoSettings($ar){
