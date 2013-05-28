@@ -1,26 +1,67 @@
 <?php
-class VideoResponse extends MongoDocument{
+namespace app\models;
 
-	protected $user_id;
-	protected $vid;
-	protected $type;
-	protected $content;
-	protected $xtn_vid;
+use glue;
 
-	protected $parent_comment;
-	protected $path;
+class VideoResponse extends \glue\db\Document{
 
-	protected $approved;
-	protected $likes = 0;
-	protected $dislikes = 0;
+	public $userId;
+	public $videoId;
+	public $type;
+	public $content;
+	public $replyVideoId;
 
-	protected $reply_tousername; // This is used for when the parent comment or user account is deleted to avoid awkward convos
+	public $threadParentId;
+	public $path;
 
-	protected $deleted = 0;
-	protected $ts;
+	public $threadParentUsername; // This is used for when the parent comment or user account is deleted to avoid awkward convos
 
-	function getCollectionName(){
+	public $approved;
+	public $likes = 0;
+	public $dislikes = 0;
+
+	public $deleted = 0;
+
+	function collectionName(){
 		return "videoresponse";
+	}
+
+	function behaviours(){
+		return array(
+			'timestampBehaviour' => array(
+				'class' => 'glue\\behaviours\\Timestamp'
+			)
+		);
+	}
+
+	function defaultScope(){
+		return array(
+			'condition' => array('deleted' => 0),
+			'sort' => array('created'=>-1)
+		);
+	}
+
+	function scopes(){
+		return array(
+			'public' => array(
+				'condition' => array('$or' => array(
+					array('approved' => true),
+					array('user_id' => glue::user()->_id)
+				))
+			),
+			'moderated' => array(
+				'condition' => array('approved'=>true)
+			),
+		);
+	}
+
+	function relations(){
+		return array(
+			"author" => array('one', 'app\\models\\User', "_id", 'on' => 'userId'),
+			"video" => array('one', 'app\\models\\Video', "_id", 'on' => 'videoId'),
+			"reply_video" => array('one', 'app\\models\\Video', "_id", 'on' => 'replyVideoId'),
+			'thread_parent' => array('one', 'app\\models\\VideoResponse', '_id', 'on' => 'threadParentId')
+		);
 	}
 
 	public static function model($className = __CLASS__){
@@ -28,28 +69,15 @@ class VideoResponse extends MongoDocument{
 	}
 
 	public static function findAllComments($video, $ts_query = array()){
-		return self::model()->find(array('vid' => $video->_id, 'deleted' => 0, 'ts' => $ts_query))->sort(array('ts' => -1));
+		return self::model()->find(array('vid' => $video->_id, 'ts' => $ts_query));
 	}
 
 	public static function findPublicComments($video,  $ts_query = array(), $showOnlyModerated = false){
 		if($showOnlyModerated){
-			return self::model()->find(array('vid' => $video->_id, 'approved' => true, 'deleted' => 0, 'ts' => $ts_query))->sort(array('ts' => -1));
+			return self::model()->moderated()->find(array('vid' => $video->_id));
 		}else{
-			return self::model()->find(array('$or' => array(
-				array('vid' => $video->_id, 'approved' => true),
-				array('user_id' => glue::session()->user->_id, 'vid' => $video->_id)
-			), 'deleted' => 0, 'ts' => $ts_query))->sort(array('ts' => -1));
+			return self::model()->public()->find(array('vid' => $video->id, 'ts' => $ts_query));
 		}
-	}
-
-	function relations(){
-		return array(
-			"author" => array(self::HAS_ONE, 'User', "_id", 'on' => 'user_id'),
-			"in_reply" => array(self::HAS_ONE, 'Video', "_id", 'on' => 'vid'),
-			"video" => array(self::HAS_ONE, 'Video', "_id", 'on' => 'vid'),
-			"reply_video" => array(self::HAS_ONE, 'Video', "_id", 'on' => 'xtn_vid'),
-			'thread_parent' => array(self::HAS_ONE, 'VideoResponse', '_id', 'on' => 'parent_comment')
-		);
 	}
 
 	function beforeValidate(){
@@ -73,8 +101,8 @@ class VideoResponse extends MongoDocument{
 
 	function rules(){
 		return array(
-			array('vid', 'required', 'message' => 'An unknown error occured. Try refreshing the page to fix this.'),
-			array('vid', 'objExist',
+			array('videoId', 'required', 'message' => 'An unknown error occured. Try refreshing the page to fix this.'),
+			array('videoId', 'objExist',
 				'class'=>'Video',
 				'field'=>'_id',
 				'allowNull' => true, 'message' => 'The video you are replying to might no longer exist. Either way we cannot seem to find it now'
@@ -82,18 +110,18 @@ class VideoResponse extends MongoDocument{
 			array('content', 'required', 'on' => 'text_comment', 'message' => 'You must enter at least something into the comment field to post a text response.'),
 			array('content', 'string', 'max' => '1500', 'message' => 'You can only write 1500 characters for a comment.'),
 
-			array('xtn_vid', 'required', 'on' => 'video_comment', 'message' => 'You must specify a video to repond with'),
-			array('xtn_vid', 'objExist',
+			array('replyVideoId', 'required', 'on' => 'video_comment', 'message' => 'You must specify a video to repond with'),
+			array('replyVideoId', 'objExist',
 				'class'=>'Video',
 				'field'=>'_id',
 				'allowNull' => true,
 				'on' => 'video_comment', 'message' => 'The video you selected cannot be validated. Please choose a different video.'
 			),
-			array('xtn_vid', 'check_already_reply', 'message' => 'This video has already been used as a reply on this one.'),
-			array('xtn_vid', 'check_same_video', 'message' => 'The same video being watched cannot be added as a reply.'),
+			array('replyVideoId', 'check_already_reply', 'message' => 'This video has already been used as a reply on this one.'),
+			array('replyVideoId', 'check_same_video', 'message' => 'The same video being watched cannot be added as a reply.'),
 
-			array('parent_comment', 'safe', 'on' => 'text_comment'),
-			array('parent_comment', 'objExist',
+			array('threadParentUsername', 'safe', 'on' => 'text_comment'),
+			array('threadParentUsername', 'objExist',
 				'class'=>'VideoResponse',
 				'field'=>'_id',
 				'allowNull' => true,
@@ -103,11 +131,11 @@ class VideoResponse extends MongoDocument{
 	}
 
 	function check_already_reply($field, $value, $params = array()){
-		return !self::model()->findOne(array('xtn_vid' => $value, 'vid' => $this->vid));
+		return !self::model()->findOne(array('replyVideoId' => $value, 'videoId' => $this->videoId));
 	}
 
 	function check_same_video($field, $value, $params = array()){
-		return $this->xtn_vid != $this->vid;
+		return $this->replyVideoId != $this->videoId;
 	}
 
 	function getThread(){
@@ -117,11 +145,10 @@ class VideoResponse extends MongoDocument{
 
 	function beforeSave(){
 		if($this->getIsNewRecord()){
-			$this->user_id = glue::session()->user->_id;
-			$this->ts = new MongoDate();
+			$this->user_id = glue::user()->_id;
 
 			if($this->video->mod_comments == 1)
-				$this->approved = !glue::roles()->checkRoles(array('^' => $this->video)) ? false : true;
+				$this->approved = !glue::auth()->checkRoles(array('^' => $this->video)) ? false : true;
 			else
 				$this->approved = true;
 
@@ -136,15 +163,11 @@ class VideoResponse extends MongoDocument{
 			// Build a path. There are some bugs in my active record stopping this from working in a better way
 			$this->_id = new MongoId(); // Set the id here since we don't actually have it yet, we'll send it down with the rest of the record
 
-			if($this->video->listing != 'u' && $this->video->listing != 'n'){
-				Stream::commentedOn($this->user_id, $this->vid, $this->_id);
+			if($this->video->listing != 2 && $this->video->listing != 3){
+				\app\models\Stream::commentedOn($this->user_id, $this->vid, $this->_id);
 			}
 
-			if(!$this->thread_parent){
-				$this->path = strval($this->_id);
-			}else{
-				$this->path = $this->thread_parent->path.','.strval($this->_id);
-			}
+			$this->path = rtrim($this->thread_parent->path.','.strval($this->_id),',');
 		}
 		return true;
 	}
@@ -193,29 +216,29 @@ class VideoResponse extends MongoDocument{
 			$this->approved = true;
 			$this->save();
 
-			if($this->parent_comment){
+			if($this->threadParentId){
 
-				if(!glue::roles()->checkRoles(array('^' => $this->video)) && $this->thread_parent->author->email_vid_response_replies){
+				if(!glue::auth()->checkRoles(array('^' => $this->video)) && $this->thread_parent->author->email_vid_response_replies){
 					glue::mailer()->mail($this->thread_parent->author->email, array('no-reply@stagex.co.uk', 'StageX'), 'Someone replied to one of you comments on StageX',
 						"videos/new_comment_reply.php", array( 'username' => $this->thread_parent->author->username,
 						'comment' => $this, 'from' => $this->author, 'video' => $this->video ));
 				}
-				Notification::newVideoResponseReply($this->thread_parent->_id, $this->thread_parent->user_id, $this->_id, $this->video->_id, $this->user_id);
+				\app\models\Notification::newVideoResponseReply($this->thread_parent->_id, $this->thread_parent->userId, $this->_id, $this->video->_id, $this->userId);
 			}
-			Notification::commentApproved($this->video->user_id, $this->video->_id, $this->user_id);
+			\app\models\Notification::commentApproved($this->video->userId, $this->video->_id, $this->userId);
 			return true;
 		}
 		return false;
 	}
 
 	function currentUserLikes(){
-		return $this->Db('videoresponse_likes')->findOne(array('user_id' => glue::session()->user->_id, 'response_id' => $this->_id));
+		return $this->Db('videoresponse_likes')->findOne(array('userId' => glue::session()->user->_id, 'responseId' => $this->_id));
 	}
 
 	function like(){
-		$this->Db("videoresponse_likes")->update(
-			array("user_id"=>glue::session()->user->_id, "response_id"=>$this->_id),
-			array("user_id"=>glue::session()->user->_id, "response_id"=>$this->_id, "weight"=>"+1", 'video_id' => $this->vid, "ts" => new MongoDate()),
+		glue::db()->videoresponse_likes->update(
+			array("userId"=>glue::user()->_id, "responseId"=>$this->_id),
+			array("userId"=>glue::user()->_id, "responseId"=>$this->_id, "weight"=>"+1", 'videoId' => $this->videoId, "ts" => new MongoDate()),
 			array("upsert"=>true)
 		);
 
@@ -225,9 +248,7 @@ class VideoResponse extends MongoDocument{
 	}
 
 	function unlike(){
-
-		$this->Db("videoresponse_likes")->remove(array("user_id"=>glue::session()->user->_id, "response_id"=>$this->_id));
-
+		glue::db()->videoresponse_likes->remove(array("userId"=>glue::user()->_id, "responseId"=>$this->_id));
 		$this->likes = $this->likes-1;
 		$this->save();
 		return true;
@@ -238,8 +259,7 @@ class VideoResponse extends MongoDocument{
 		$video->total_responses = $video->total_responses-1;
 		$video->save();
 
-		$this->Db("videoresponse_likes")->remove(array("response_id"=>$this->_id));
-
+		glue::db()->videoresponse_likes->remove(array("responseId"=>$this->_id));
 		parent::delete();
 	}
 }
