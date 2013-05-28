@@ -1,6 +1,7 @@
 <?php
-
 namespace app\models;
+
+use glue;
 
 class Playlist extends \glue\db\Document{
 
@@ -19,8 +20,6 @@ class Playlist extends \glue\db\Document{
 	public $total_videos = 0;
 
 	public $deleted = 0;
-
-	//public $ts;
 
 	public function collectionName(){
 		return 'playlists';
@@ -170,11 +169,11 @@ class Playlist extends \glue\db\Document{
 	}
 
 	function afterSave(){
-		if($this->title != 'Watch Later'){
+		if($this->listing==1){
 			if($this->getIsNewRecord()){
 
-				$this->author->total_playlists = $this->author->total_playlists+1;
-				$this->author->save();
+				//$this->author->total_playlists = $this->author->total_playlists+1;
+				//$this->author->save();
 
 				glue::mysql()->query("INSERT INTO documents (_id, uid, listing, title, description, tags, author_name, type, videos, date_uploaded)
 					VALUES (:_id, :uid, :listing, :title, :description, null, :author_name, :type, :videos, now())", array(
@@ -185,7 +184,7 @@ class Playlist extends \glue\db\Document{
 					":description" => $this->description,
 					":type" => "playlist",
 					":videos" => count($this->videos),
-					":author_name" => glue::session()->user->username,
+					":author_name" => glue::user()->username,
 				));
 
 				glue::sitemap()->addUrl(glue::url()->create('/playlist/view', array('id' => $this->_id)), 'hourly', '1.0');
@@ -199,7 +198,7 @@ class Playlist extends \glue\db\Document{
 					":listing" => $this->listing,
 					":title" => $this->title,
 					":description" => $this->description,
-					":author_name" => glue::session()->user->username,
+					":author_name" => glue::user()->username,
 					":videos" => count($this->videos)
 				));
 			}
@@ -209,9 +208,9 @@ class Playlist extends \glue\db\Document{
 
 	function delete(){
 		glue::mysql()->findOne("UPDATE documents SET deleted = 1 WHERE _id = :_id");
-		self::model()->remove(array('_id' => $this->_id));
+		$this->remove(array('_id' => $this->_id));
 
-		$this->author->total_playlists = $this->author->total_playlists-1;
+		//$this->author->total_playlists = $this->author->total_playlists-1;
 		return true;
 	}
 }
