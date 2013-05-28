@@ -31,9 +31,9 @@ XML;
 			touch($this->sitemap_path); // Add the sitemap if it does not exist
 			file_put_contents($this->sitemap_name, $xml);
 
-			return new SimpleXMLElement($xml);
+			return new \SimpleXMLElement($xml);
 		}else
-			return new SimpleXMLElement($this->sitemap_path, 0, true);
+			return new \SimpleXMLElement($this->sitemap_path, 0, true);
 	}
 
 	public function getIndex(){
@@ -50,9 +50,9 @@ XMLINDEX;
 			touch($this->index_path); // Add the sitemap if it does not exist
 			file_put_contents($this->index_path, $xml);
 
-			return new SimpleXMLElement($xml);
+			return new \SimpleXMLElement($xml);
 		}else
-			return new SimpleXMLElement($this->index_path, 0, true);
+			return new \SimpleXMLElement($this->index_path, 0, true);
 
 	}
 

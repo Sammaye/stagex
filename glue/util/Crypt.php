@@ -32,7 +32,7 @@ class Crypt{
 	}
 
 	static function blowfish_hash($input, $rounds = 15){
-		$o = new \glue\Crypt();
+		$o = new \glue\util\Crypt();
 		$o->mode = 'blowfish';
 		$o->rounds = $rounds;
 		return $o->hash($input);

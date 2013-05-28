@@ -78,6 +78,7 @@ class User extends \glue\User{
 
 	public $maxFileSize;
 	public $bandwidthLeft;
+	public $nextBandwidthTopup;
 
 	public $fbUid;
 	public $googleUid;
@@ -224,10 +225,10 @@ class User extends \glue\User{
 	function beforeSave(){
 
 		if($this->getIsNewRecord()){
-			$this->last_notification_pull = new MongoDate();
+			$this->lastNotificationPull = new \MongoDate();
 			//$this->ts = new MongoDate();
-			$this->next_bandwidth_up = strtotime('+1 week', mktime(0, 0, 0, date('m'), date('d'), date('Y')));
-			$this->upload_left = glue::$params['maxUpload'];
+			$this->nextBandwidthTopup = strtotime('+1 week', mktime(0, 0, 0, date('m'), date('d'), date('Y')));
+			$this->bandwidthLeft = glue::$params['maxUpload'];
 		}else{
 			//$this->updated = new MongoDate();
 		}
@@ -242,7 +243,7 @@ class User extends \glue\User{
 
 			$hash = hash("sha256", Crypt::generate_new_pass().(substr(md5(uniqid(rand(), true)), 0, 32)));
 
-			$this->temp_access_token = array(
+			$this->accessToken = array(
 				"to" => time()+60*60*24, // 24 Hours
 				"hash" => $hash,
 				"email" => $this->new_email,
@@ -262,8 +263,8 @@ class User extends \glue\User{
 			$watch_later = new Playlist();
 			$watch_later->title = "Watch Later";
 			$watch_later->description = "All videos you mark for watching later are saved here";
-			$watch_later->listing = 3;
-			$watch_later->user_id = $this->_id;
+			$watch_later->listing = 2;
+			$watch_later->userId = $this->_id;
 			$watch_later->save();
 
 			if($this->getScenario() != 'social_signup'){

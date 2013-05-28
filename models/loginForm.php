@@ -42,10 +42,10 @@ class loginForm extends \glue\Model{
 		}
 
 		if(count($this->getErrors()) <= 0){
-			if(glue::session()->login($this->email, $this->password)){
+			if(glue::user()->login($this->email, $this->password)){
 				return true;
 			}else{
-				switch(glue::session()->response()){
+				switch(glue::user()->response()){
 					case "BANNED":
 						$this->addError('You have been banned from this site.');
 						break;
@@ -53,7 +53,7 @@ class loginForm extends \glue\Model{
 						$this->addError("Your account has been deleted. This process cannot be undone and may take upto 24 hours.");
 						break;
 					case "WRONG_CREDS":
-						glue::session()->log($this->email, false);
+						glue::user()->log($this->email, false);
 						$this->addError("The username and/or password could not be be found. Please try again. If you encounter further errors please try to recover your password.");
 						break;
 					case "NOT_FOUND":

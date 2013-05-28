@@ -5,14 +5,14 @@ namespace glue\behaviours;
 class Timestamp extends \glue\Behaviour{
 	function beforeSave(){
 		if($this->owner->getIsNewRecord()){
-			$this->owner->created = new MongoDate();
+			$this->owner->created = new \MongoDate();
 		}else
-			$this->owner->updated = new MongoDate();
+			$this->owner->updated = new \MongoDate();
 		return true;
 	}
 
 	function getTs($ts){
-		if($ts instanceof MongoDate)
+		if($ts instanceof \MongoDate)
 			return $ts->sec;
 		else
 			return null;

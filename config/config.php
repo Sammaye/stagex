@@ -347,15 +347,15 @@ return array(
 		),
 			
 		'purifier' => array(
-				'path' => 'glue/plugins/purifier/purify.php'
+				'class' => 'glue/plugins/purifier/purify.php'
 		),
 		
 		'mailer' => array(
-				'path' => 'glue\\components\\phpmailer\\mailer'
+				'class' => 'glue\\components\\phpmailer\\mailer'
 		),
 		
 		'sitemap' => array(
-				'path' => 'glue\\plugins\\sitemap\\sitemap'
+				'class' => 'glue\\components\\sitemap\\sitemap'
 		),		
 	),
 

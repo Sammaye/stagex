@@ -448,15 +448,15 @@ class Html{
 						$model_validated = $v->getHasBeenValidated() ? true : false;
 				}
 			}else{
-				$succeeded = $models->getSuccess();
+				//$succeeded = $models->getSuccess();
 				$messages = $models->getErrors();
-				$model_validated = $models->getHasBeenValidated() ? true : false;
+				$model_validated = $models->getValidated() ? true : false;
 			}
 		}
 
 		// Has model been validated?
 		if($model_validated){
-			if(!$succeeded && count($messages) > 0){ // If the model/s did not validate
+			if(count($messages) > 0){ // If the model/s did not validate
 				$html .= self::openTag('div', array('class' => 'block_summary error_summary'));
 				$html .= self::openTag('div', array('class' => 'close')).self::a(array('href' => '#', 'text' => utf8_decode('&#215;'))).self::closeTag('div');
 
@@ -473,6 +473,9 @@ class Html{
 					foreach($messages as $message){
 						if(!is_array($message)){ //If it's an array it is something custom
 							$html .= self::openTag("li").$message.self::closeTag("li");
+						}else{
+							foreach($message as $field_m)
+								$html .= self::openTag("li").$field_m.self::closeTag("li");
 						}
 					}
 					$html .= self::closeTag("ul");
@@ -574,48 +577,48 @@ class Html{
 		if(($pos=strpos($attribute,'['))!==false)
 		{
 			if($pos!==0){  // e.g. name[a][b]
-				$id = str_replace(']', '_', strtr(get_class($model).'['.substr($attribute,0,$pos).']'.substr($attribute,$pos),array(']['=>']','['=>']')));
+				$id = str_replace(']', '_', strtr(self::getModelShortName($model).'['.substr($attribute,0,$pos).']'.substr($attribute,$pos),array(']['=>']','['=>']')));
 				return $id;
 			}
 			if(($pos=strrpos($attribute,']'))!==false && $pos!==strlen($attribute)-1)  // e.g. [a][b]name
 			{
 				$sub=substr($attribute,0,$pos+1);
 				$attribute=substr($attribute,$pos+1);
-				$id = str_replace(']', '_', trim(strtr(get_class($model).$sub.'['.$attribute.']',array(']['=>']','['=>']'))));
+				$id = str_replace(']', '_', trim(strtr(self::getModelShortName($model).$sub.'['.$attribute.']',array(']['=>']','['=>']'))));
 				return $id;
 			}
 			if(preg_match('/\](\w+\[.*)$/',$attribute,$matches))
 			{
-				$id = str_replace('[', '_', get_class($model).'['.str_replace(']','_',trim(strtr($attribute,array(']['=>']','['=>']')),']')));
-				$name=get_class($model).'['.str_replace(']','][',trim(strtr($attribute,array(']['=>']','['=>']')),']')).']';
+				$id = str_replace('[', '_', self::getModelShortName($model).'['.str_replace(']','_',trim(strtr($attribute,array(']['=>']','['=>']')),']')));
+				$name=self::getModelShortName($model).'['.str_replace(']','][',trim(strtr($attribute,array(']['=>']','['=>']')),']')).']';
 				$attribute=$matches[1];
 				return $id;
 			}
 		}
 		else
-			return str_replace('[', '_', trim(get_class($model).'['.$attribute.']', ']'));
+			return str_replace('[', '_', trim(self::getModelShortName($model).'['.$attribute.']', ']'));
 	}
 
 	public static function getModelFormVariableName($attribute, $model){
 		if(($pos=strpos($attribute,'['))!==false)
 		{
 			if($pos!==0)  // e.g. name[a][b]
-			return get_class($model).'['.substr($attribute,0,$pos).']'.substr($attribute,$pos);
+			return self::getModelShortName($model).'['.substr($attribute,0,$pos).']'.substr($attribute,$pos);
 			if(($pos=strrpos($attribute,']'))!==false && $pos!==strlen($attribute)-1)  // e.g. [a][b]name
 			{
 				$sub=substr($attribute,0,$pos+1);
 				$attribute=substr($attribute,$pos+1);
-				return get_class($model).$sub.'['.$attribute.']';
+				return self::getModelShortName($model).$sub.'['.$attribute.']';
 			}
 			if(preg_match('/\](\w+\[.*)$/',$attribute,$matches))
 			{
-				$name=get_class($model).'['.str_replace(']','][',trim(strtr($attribute,array(']['=>']','['=>']')),']')).']';
+				$name=self::getModelShortName($model).'['.str_replace(']','][',trim(strtr($attribute,array(']['=>']','['=>']')),']')).']';
 				$attribute=$matches[1];
 				return $name;
 			}
 		}
 		else
-			return get_class($model).'['.$attribute.']';
+			return self::getModelShortName($model).'['.$attribute.']';
 	}
 
 	public static function getModelFormVariableValue($attribute, $model, $options = array()){
@@ -651,7 +654,7 @@ class Html{
 				}
 				if(preg_match('/\](\w+\[.*)$/',$attribute,$matches))
 				{
-					$name=get_class($model).'['.str_replace(']','][',trim(strtr($attribute,array(']['=>']','['=>']')),']')).']';
+					$name=self::getModelShortName($model).'['.str_replace(']','][',trim(strtr($attribute,array(']['=>']','['=>']')),']')).']';
 					$attribute=$matches[1];
 					return $model->$attribute;
 				}
@@ -660,6 +663,11 @@ class Html{
 			return $model->$attribute;
 		}
 		return "";
+	}
+	
+	static function getModelShortName($model){
+		$d=explode('\\',get_class($model));
+		return end($d);
 	}
 }
 

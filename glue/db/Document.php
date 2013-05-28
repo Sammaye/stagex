@@ -2,7 +2,8 @@
 
 namespace glue\db;
 
-use \glue\Exception;
+use glue,
+	\glue\Exception;
 
 class Document extends \glue\Model{
 
@@ -86,6 +87,8 @@ class Document extends \glue\Model{
 
 		if(isset($this->_related[$name]) || array_key_exists($name, $this->relations()))
 			return $this->_related[$name]=$value;
+		elseif(method_exists($this,'set'.$name))
+			return $this->{'set'.$name}($value);		
 		else{
 			return $this->setAttribute($name,$value);
 		}
@@ -140,7 +143,7 @@ class Document extends \glue\Model{
 
 		$this->init();
 
-		$this->attachBehaviors($this->behaviors());
+		$this->attachBehaviours($this->behaviours());
 		$this->afterConstruct();
 	}
 
@@ -186,13 +189,17 @@ class Document extends \glue\Model{
 	 */
 	function collectionName(){}
 
+	function primaryKey(){
+		return '_id';
+	}
+	
 	/**
 	 * Returns the value of the primary key
 	 */
 	public function getPrimaryKey($value=null){
 		if($value===null)
 			$value=$this->{$this->primaryKey()};
-		return $value instanceof \MongoId ? $value : new MongoId($value);
+		return $value instanceof \MongoId ? $value : new \MongoId($value);
 	}
 
 	/**
@@ -265,7 +272,7 @@ class Document extends \glue\Model{
 			return self::$_models[$className];
 		else{
 			$model=self::$_models[$className]=new $className(null);
-			$model->attachBehaviors($model->behaviors());
+			$model->attachBehaviours($model->behaviours());
 			return $model;
 		}
 	}
@@ -343,7 +350,7 @@ class Document extends \glue\Model{
 				$record->setProjectedFields($labels);
 			}
 			//$record->_pk=$record->primaryKey();
-			$record->attachBehaviors($record->behaviors());
+			$record->attachBehaviours($record->behaviours());
 			if($callAfterFind)
 				$record->afterFind();
 			return $record;
@@ -443,13 +450,13 @@ class Document extends \glue\Model{
 	public function insert($attributes=null){
 		if(!$this->getIsNewRecord())
 			throw new Exception('The active record cannot be inserted to database because it is not new.');
-		if($this->beforeSave())
+		if($this->onBeforeSave())
 		{
 			$this->trace(__FUNCTION__);
 
-			if(!isset($this->{$this->primaryKey()})) $this->{$this->primaryKey()} = new MongoId;
+			if(!isset($this->{$this->primaryKey()})) $this->{$this->primaryKey()} = new \MongoId;
 			if($this->getCollection()->insert($this->getRawDocument(), $this->getDb()->getDefaultWriteConcern())){
-				$this->afterSave();
+				$this->onAfterSave();
 				$this->setIsNewRecord(false);
 				$this->setScenario('update');
 				return true;
@@ -466,7 +473,7 @@ class Document extends \glue\Model{
 	public function update($attributes=null){
 		if($this->getIsNewRecord())
 			throw new Exception('The active record cannot be updated because it is new.');
-		if($this->beforeSave())
+		if($this->onBeforeSave())
 		{
 			$this->trace(__FUNCTION__);
 			if($this->{$this->primaryKey()}===null) // An _id is required
@@ -483,7 +490,7 @@ class Document extends \glue\Model{
 			unset($attributes['_id']); // Unset the _id before update
 
 			$this->updateByPk($this->{$this->primaryKey()}, array('$set' => $attributes));
-			$this->afterSave();
+			$this->onAfterSave();
 			return true;
 		}
 		else
@@ -497,7 +504,7 @@ class Document extends \glue\Model{
 	public function delete(){
 		if(!$this->getIsNewRecord()){
 			$this->trace(__FUNCTION__);
-			if($this->beforeDelete()){
+			if($this->onBeforeDelete()){
 				$result=$this->deleteByPk($this->{$this->primaryKey()});
 				$this->afterDelete();
 				return $result;
@@ -776,15 +783,15 @@ class Document extends \glue\Model{
 	 */
 	public function getDb()
 	{
-		if(self::$db!==null)
-			return self::$db;
+		if(self::$_db!==null)
+			return self::$_db;
 		else
 		{
-			self::$db=Yii::app()->db;
-			if(self::$db instanceof \glue\db\Client)
-				return self::$db;
+			self::$_db=glue::db();
+			if(self::$_db instanceof \glue\db\Client)
+				return self::$_db;
 			else
-				throw new Exception('MongoDB Active Record requires a "mongodb" EMongoClient application component.');
+				throw new Exception('MongoDB Active Record requires a "mongodb" glue\db\Client application component.');
 		}
 	}
 

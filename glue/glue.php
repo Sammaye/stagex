@@ -300,6 +300,7 @@ class glue{
 			$class = $config['class'];
 			unset($config['class']);
 		} else {
+			//var_dump($config); exit();
 			throw new Exception('Component configuration must be an array containing a "class" element.');
 		}
 

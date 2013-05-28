@@ -16,7 +16,7 @@ class Collection implements \Iterator,\ArrayAccess,\Countable{
 			$this->_class = $class;
 
 		$return_array = array();
-		$list = is_string($list) ? glue::import('@app/lists/'.$list_file.'.php',true) : $list;
+		$list = is_string($list) ? glue::import('@app/lists/'.$list.'.php',true) : $list;
 
 		if(count($fields) <= 0)
 			$this->_container = $list;

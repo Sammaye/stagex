@@ -21,12 +21,14 @@ class Validation extends \glue\Component{
 
 	public function run(){
 		$valid = true;
-
+		
 		if(!$this->model)
 			throw new Exception("No model or map was provided to validate against");
 		if(!is_array($this->rules)||empty($this->rules))
 			throw new Exception("A valid set of rules must be applied");
 
+		$this->clearErrors();
+		
 		foreach($this->rules as $k => $rule)
 			$valid=$this->validateRule($rule)&&$valid;
 		return $this->valid=$valid; // Return whether valid or not
@@ -190,6 +192,16 @@ class Validation extends \glue\Component{
 
 	public function setFieldCodes($codes){
 		$this->error_codes[$field]=$codes;
+	}
+	
+	function clearErrors($field=null){
+		if($field===null){
+			$this->error_messages=array();
+			$this->error_codes=array();
+		}elseif(isset($this->error_messages[$field])){
+			unset($this->error_messages[$field]);
+		}elseif(isset($this->error_codes[$field]))
+		unset($this->error_codes[$field]);		
 	}
 	
 	function getValidatedAttributes(){

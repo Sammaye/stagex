@@ -14,7 +14,7 @@ class Record extends \glue\Component{
 	private $pdo_link;
 
 	function init(){
-		$this->pdo_link = new PDO('mysql:host='.$this->host.';dbname='.$this->db, $this->user, $this->password, array(PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES \'UTF8\''));
+		$this->pdo_link = new \PDO('mysql:host='.$this->host.';dbname='.$this->db, $this->user, $this->password, array(\PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES \'UTF8\''));
 		return $this;
 	}
 
@@ -50,7 +50,7 @@ class Record extends \glue\Component{
 		}
 
 		$query_obj = $this->pdo_link->prepare($query);
-		$query_obj->setFetchMode(PDO::FETCH_ASSOC);
+		$query_obj->setFetchMode(\PDO::FETCH_ASSOC);
 
 		// Now lets bind normal params.
 		foreach($params as $field => $value){

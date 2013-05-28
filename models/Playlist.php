@@ -5,19 +5,24 @@ use glue;
 
 class Playlist extends \glue\db\Document{
 
-	public $user_id;
+	public $userId;
 
 	public $title;
 	public $description;
 
-	public $listing = 1; // public, unlisted or private
-	public $allow_embedding = true;
-	public $allow_like = true;
+	/**
+	 * 0 - Public
+	 * 1 - Unlisted
+	 * 2 - Private
+	 */	
+	public $listing = 0; // public, unlisted or private
+	public $allowEmbedding = true;
+	public $allowLike = true;
 
 	public $videos = array(); // For each video there is a _id, position and description
 
 	public $likes = 0;
-	public $total_videos = 0;
+	public $totalVideos = 0;
 
 	public $deleted = 0;
 
@@ -157,19 +162,19 @@ class Playlist extends \glue\db\Document{
 
 			//array('listing, allow_embedding, allow_like', 'safe', 'on' => 'update'),
 			array('listing', 'in', 'range' => array(1, 2, 3), 'on' => 'update', 'message' => 'You must enter a valid listing'),
-			array('allow_embedding, allow_like', 'boolean', 'allowNull' => true, 'on' => 'update'),
+			array('allowEmbedding, allowLike', 'boolean', 'allowNull' => true, 'on' => 'update'),
 		);
 	}
 
 	function beforeSave(){
-		if($this->getIsNewRecord() && !$this->user_id){
-			$this->user_id = glue::user()->_id;
+		if($this->getIsNewRecord() && !$this->userId){
+			$this->userId = glue::user()->_id;
 		}
 		return true;
 	}
 
 	function afterSave(){
-		if($this->listing==1){
+		if($this->listing==0){
 			if($this->getIsNewRecord()){
 
 				//$this->author->total_playlists = $this->author->total_playlists+1;

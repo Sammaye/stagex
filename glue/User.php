@@ -116,11 +116,11 @@ class User extends \glue\db\Document{
 			$doc = glue::db()->session_log->findOne(array('email' => $email));
 			if($doc){
 				if($doc['ts']->sec > time()-(60*5)){ // Last error was less than 5 mins ago update
-					glue::db()->session_log->update(array('email' => $email), array('$inc' => array('c' => 1), '$set' => array('ts' => new MongoDate())));
+					glue::db()->session_log->update(array('email' => $email), array('$inc' => array('c' => 1), '$set' => array('ts' => new \MongoDate())));
 					return;
 				}
 			}
-			glue::db()->session_log->update(array('email' => $email), array('$set' => array('c' => 1, 'ts' => new MongoDate())), array('upsert' => true));
+			glue::db()->session_log->update(array('email' => $email), array('$set' => array('c' => 1, 'ts' => new \MongoDate())), array('upsert' => true));
 		}
 	}
 
@@ -141,7 +141,7 @@ class User extends \glue\db\Document{
 	private function _checkSession() {
 
 		/** Query for the object */
-		$r=$this->getCollection()->findOne(array('_id' => new MongoId($_SESSION['uid']), 'email' => $_SESSION['email'], 'deleted' => 0));
+		$r=$this->getCollection()->findOne(array('_id' => new \MongoId($_SESSION['uid']), 'email' => $_SESSION['email'], 'deleted' => 0));
 
 		// Set the model attributes
 		foreach($r as $k=>$v)
@@ -185,7 +185,7 @@ class User extends \glue\db\Document{
 			"ip"=>$_SERVER['REMOTE_ADDR'],
 			"agent"=>$_SERVER['HTTP_USER_AGENT'],
 			"last_request"=>$_SERVER['REQUEST_URI'],
-			"last_active"=>new MongoDate(),
+			"last_active"=>new \MongoDate(),
 		);
 
 		// Lets delete old sessions (anything older than 2 weeks)
@@ -201,7 +201,7 @@ class User extends \glue\db\Document{
 
 		if($init){
 			$this->remember = $remember;
-			$this->ins[session_id()]['created'] = new MongoDate();
+			$this->ins[session_id()]['created'] = new \MongoDate();
 		}
 		//var_dump($this->user->ins[session_id()]);
 
@@ -246,7 +246,7 @@ class User extends \glue\db\Document{
 		if($social_login){
 			$valid = true;
 		}else{
-			$valid = Crypt::verify($password, $user->password);
+			$valid = Crypt::verify($password, $this->password);
 			//$valid = glue::crypt()->verify($password, $this->user->password);
 		}
 
@@ -380,7 +380,7 @@ class User extends \glue\db\Document{
 			$s_id = Crypt::AES_decrypt256($id);
 
 			/** Form the criteria for the search */
-			$criteria['_id'] = new MongoId($user_id);
+			$criteria['_id'] = new \MongoId($user_id);
 			$criteria['ins.'.$s_id] = array("\$exists"=>true);
 			$criteria['deleted'] = 0;
 
@@ -407,7 +407,7 @@ class User extends \glue\db\Document{
 			$s_id = Crypt::AES_decrypt256($id);
 
 			$r = $this->getCollection()->findOne(array(
-					"_id"=>new MongoId($user_id),
+					"_id"=>new \MongoId($user_id),
 					"rem_m"=>$s_id,
 					"deleted" => 0
 			));

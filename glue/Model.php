@@ -207,7 +207,6 @@ class Model{
 	 */
 	function setAttributes($a,$safeOnly=true){
 		$scenario = $this->getScenario();
-
 		$attributes = array_flip($safeOnly ? $this->scenarioAttributeNames() : $this->attributeNames());
 		foreach($a as $name=>$value){
 			if($safeOnly&&isset($attributes[$name])){
@@ -230,9 +229,9 @@ class Model{
 		foreach ($names as $name) {
 			$values[$name] = $this->$name;
 		}
-		foreach ($except as $name) {
-			unset($values[$name]);
-		}
+		//foreach ($except as $name) {
+			//unset($values[$name]);
+		//}
 		
 		return $values;		
 	}
@@ -288,8 +287,7 @@ class Model{
 	 */
 	public function validate($runEvents = true){
 
-		if(!$data) $data = $this->getAttributes();
-		
+		$data = $this->getAttributes();
 		$this->clearErrors();
 		$this->setValidated(false);
 
@@ -407,6 +405,13 @@ class Model{
 	 * These various functions concern themselves with attaching and detaching certain aspects of the model.
 	 * This enables us to be able to build models dynamically and even use the std::Model class to give us anon models to play with
 	 */
+	
+	function attachBehaviours($behaviours){
+		if(is_array($behaviours)){
+			foreach($behaviours as $name => $behaviour)
+				$this->attachBehaviour($name, $behaviour);
+		}
+	}
 
 	function attachBehaviour($name, $options = array()){
 
@@ -414,8 +419,9 @@ class Model{
 			throw new Exception("There is no class set for {$name} behaviour");
 
 		if(!isset($this->behaviours[$name])){
-			$behaviour = new $name;
-			$behaviour->attributes($options);
+			$cname=$options['class'];
+			$behaviour = new $cname;
+			$behaviour->setAttributes($options);
 
 			$this->behaviours[$name] = array(
 				'obj' => $behaviour
