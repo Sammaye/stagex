@@ -96,8 +96,6 @@ class User extends \glue\User{
 	public $banned = 0;
 
 	public $sessions;
-	public $remember;
-	public $remM;
 
 	public $singleSignOn=0;
 	public $emailLogins=0;
@@ -402,12 +400,6 @@ class User extends \glue\User{
 		}else{
 			return Glue::url()->create("/image/user", array('file' => strval($this->_id), "w"=>$width, "h"=>$height));
 		}
-	}
-
-	function loginNotification_email(){
-		glue::mailer()->mail($this->email, array('no-reply@stagex.co.uk', 'StageX'), 'Someone has logged onto your StageX account',	"user/emailLogin.php",
-			array_merge($this->ins[session_id()], array("username"=>$this->username)));
-    	return true;
 	}
 
 	function getGroup(){

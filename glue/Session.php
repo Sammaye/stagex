@@ -30,6 +30,27 @@ class Session extends \glue\Component{
 	 */
 	private $_session = array();
 
+	public function __get($name){
+		return $this->get($name);
+	}
+
+	public function __set($name,$value){
+		return $this->set($name,$value);
+	}
+
+	public function get($name){
+		return $_SESSION[$name];
+	}
+
+	public function set($name,$value=null){
+		if(is_array($name)){
+			foreach($name as $k=>$v)
+				$_SESSION[$k]=$v;
+		}else{
+			$_SESSION[$name]=$value;
+		}
+	}
+
 	/**
 	 * Constructor
 	 */

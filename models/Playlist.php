@@ -14,10 +14,10 @@ class Playlist extends \glue\db\Document{
 	 * 0 - Public
 	 * 1 - Unlisted
 	 * 2 - Private
-	 */	
+	 */
 	public $listing = 0; // public, unlisted or private
-	public $allowEmbedding = true;
-	public $allowLike = true;
+	public $allowEmbedding = 1;
+	public $allowLike = 1;
 
 	public $videos = array(); // For each video there is a _id, position and description
 

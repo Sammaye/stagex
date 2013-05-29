@@ -5,7 +5,7 @@ use glue;
 
 class sitemap extends \glue\Component{
 
-	public $path = '/';
+	public $path = '/www/';
 	public $sitemap_name = 'site_map.xml';
 	public $index_name = 'sitemaps.xml';
 

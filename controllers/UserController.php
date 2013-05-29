@@ -42,15 +42,8 @@ class userController extends \glue\Controller{
 		if(isset($_POST['User'])){
 			$model->attributes=$_POST['User'];
 			if($model->validate()){
-
-				$login = new loginForm();
-				$login->email = $model->email;
-				$login->password = $model->password;
-				$login->hash = $model->hash;
-
 				$model->save();
-
-				if($login->validate()){
+				if($model->login($model->username,$model->password)){
 					glue::http()->redirect("/user");
 				}else{
 					$model->addError("Login failed, however, it seems you are saved to our system so please try to login manually.");

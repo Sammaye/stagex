@@ -87,7 +87,7 @@ class User extends \glue\db\Document{
 
 					$this->session_defaults();
 					$this->_checkCookie($this->permCookie);
-					$_SESSION['AUTH_TIER2'] = false;
+					glue::session()->tier2_logged = false;
 
 				}else{
 
@@ -128,11 +128,11 @@ class User extends \glue\db\Document{
 	 * Set the default session values
 	 */
 	function session_defaults() {
-		$_SESSION['logged'] = false;
-		$_SESSION['uid'] = 0;
-		$_SESSION['AUTH_TIER2'] = false;
-		$_SESSION['email'] = '';
-		$_SESSION['server_key'] = '';
+		glue::session()->set(array(
+			'logged' => false,
+			'tier2_logged' => false,
+			'uid' => 0,
+		));
 	}
 
 	/**
@@ -144,12 +144,13 @@ class User extends \glue\db\Document{
 		$r=$this->getCollection()->findOne(array('_id' => new \MongoId($_SESSION['uid']), 'email' => $_SESSION['email'], 'deleted' => 0));
 
 		// Set the model attributes
+		$this->clean();
 		foreach($r as $k=>$v)
 			$this->$k=$v;
 
 		//echo "here"; echo session_id();
-		if(isset($this->ins[session_id()])){
-			if(($this->ins[session_id()]['ts']->sec + $this->timeout) < time()){
+		if(isset($this->sessions[session_id()])){
+			if(($this->sessions[session_id()]['ts']->sec + $this->timeout) < time()){
 				$this->_checkCookie();
 			}else{
 				/** VALID */
@@ -170,38 +171,37 @@ class User extends \glue\db\Document{
 	private function _setSession($remember = false, $init = false) {
 
 		/** Single sign on active? */
-		if((bool)$this->single_sign){
+		if((bool)$this->singleSignOn){
 			/** Delete all other sessions */
-			$this->ins = array();
+			$this->sessions = array();
 		}
 
 		/** Set session */
-		$_SESSION['uid'] = $this->_id;
-		$_SESSION['email'] = htmlspecialchars($this->email);
-		$_SESSION['logged'] = true;
+		glue::session()->uid=$this->_id;
+		glue::session()->logged=true;
+
 		//var_dump($this->user->ins);
-		$this->ins[session_id()] = array(
-			"key"=>$_SESSION['server_key'],
+		$this->sessions[session_id()] = array(
+			'id' => session_id(),
 			"ip"=>$_SERVER['REMOTE_ADDR'],
 			"agent"=>$_SERVER['HTTP_USER_AGENT'],
 			"last_request"=>$_SERVER['REQUEST_URI'],
-			"last_active"=>new \MongoDate(),
+			"last_active"=>new \MongoDate()
 		);
 
 		// Lets delete old sessions (anything older than 2 weeks)
-		$ins = $this->ins;
+		$ins = $this->sessions;
 		$new_ins = array();
 		foreach($ins as $k => $v){
 			if($v['last_active']->sec > strtotime('-2 weeks')){
 				$new_ins[$k] = $v;
 			}
 		}
-		$this->ins = $new_ins;
-
+		$this->sessions = $new_ins;
 
 		if($init){
-			$this->remember = $remember;
-			$this->ins[session_id()]['created'] = new \MongoDate();
+			$this->sessions[session_id()]['remember'] = (int)$remember;
+			$this->sessions[session_id()]['created'] = new \MongoDate();
 		}
 		//var_dump($this->user->ins[session_id()]);
 
@@ -210,7 +210,7 @@ class User extends \glue\db\Document{
 
 		/** Now if the user needs notifying via email lets do it */
 		if($init){
-			if((bool)$this->login_notify){
+			if((bool)$this->emailLogins){
 				$this->loginNotification_email();
 			}
 		}
@@ -232,57 +232,47 @@ class User extends \glue\db\Document{
 
 		/** Find the user */
 		$r = $this->getCollection()->findOne(array('email' => $username));
-		if(!empty($r)){
-			foreach($r as $k=>$v)
-				$this->$k=$v;
-		}
 
-		if(!$this->_id){
-			$this->logout(false);
-			$this->response = 'NOT_FOUND';
+		if(!$r){
+			//$this->logout(false);
+			$this->addError("The username and/or password could not be be found. Please try again. If you encounter further errors please try to recover your password.");
 			return false;
 		}
+
+		$this->clean();
+		foreach($r as $k=>$v)
+			$this->$k=$v;
 
 		if($social_login){
 			$valid = true;
 		}else{
 			$valid = Crypt::verify($password, $this->password);
-			//$valid = glue::crypt()->verify($password, $this->user->password);
 		}
 
 		/** If found */
 		if($valid){
 
-			/** Is deleted? */
-			if(!$this->deleted){
-
-				/** Is banned? */
-				if(!$this->banned){
-
-					/** Is their IP correct? */
-
-					/** Then log the login */
-					$this->log($this->email, true);
-
-					/** Set the session */
-					$this->_setSession($remember, true);
-					$_SESSION['AUTH_TIER2'] = true;
-
-					/** Success */
-					return true;
-				}else{
-					$this->logout(false);
-					$this->response = 'BANNED';
-					return false;
-				}
-			}else{
-				$this->logout(false);
-				$this->response = 'DELETED';
+			if($this->deleted){
+				$this->addError("Your account has been deleted. This process cannot be undone and may take upto 24 hours.");
 				return false;
 			}
+
+			if($this->banned){
+				$this->addError('You have been banned from this site.');
+				return false;
+			}
+			/** Then log the login */
+			$this->log($this->email, true);
+
+			/** Set the session */
+			$this->_setSession($remember, true);
+			glue::session()->tier2_logged=true;
+
+			/** Success */
+			return true;
 		}else{
-			$this->logout(false);
-			$this->response = 'WRONG_CREDS';
+			glue::user()->log($this->email, false);
+			$this->addError("The username and/or password could not be be found. Please try again. If you encounter further errors please try to recover your password.");
 			return false;
 		}
 	}
@@ -304,7 +294,7 @@ class User extends \glue\db\Document{
 
 		/** Remove session from table */
 		if($this->_id){
-			User::model()->update(array('_id' => $this->_id), array('$unset'=>"ins".session_id()), true);
+			User::model()->update(array('_id' => $this->_id), array('$unset'=>"sessions.".session_id()), true);
 		}
 
 		/** Unset session */
@@ -320,15 +310,15 @@ class User extends \glue\db\Document{
 		if(is_array($devices)){
 
 			$i = 0;
-			foreach($this->ins as $k=>$v){
+			foreach($this->sessions as $k=>$v){
 				if($devices[$i] == $k){
-					unset($this->ins[$k]);
+					unset($this->sessions[$k]);
 				}
 			}
 
 			$this->save();
 		}else{
-			unset($this->ins);
+			unset($this->sessions);
 			$this->save();
 		}
 		return true;
@@ -352,10 +342,8 @@ class User extends \glue\db\Document{
 		if($init){
 			if($remember){
 				setcookie($this->permCookie, serialize(array($cookie_string, $session_cookie)), time()+60*60*24*365*10, "/", $domain);
-				User::model()->update(array('_id' => $this->_id), array('$addToSet'=>array("rem_m"=>session_id())), true);
 			}else{
 				setcookie($this->permCookie, "", 1);
-				User::model()->update(array('_id' => $this->_id), array('$pull'=>array("rem_m"=>session_id())), true);
 			}
 		}
 
@@ -381,7 +369,7 @@ class User extends \glue\db\Document{
 
 			/** Form the criteria for the search */
 			$criteria['_id'] = new \MongoId($user_id);
-			$criteria['ins.'.$s_id] = array("\$exists"=>true);
+			$criteria['sessions.'.$s_id] = array('$exists'=>true);
 			$criteria['deleted'] = 0;
 
 			/** Get the matching user and session */
@@ -390,10 +378,10 @@ class User extends \glue\db\Document{
 				$this->$k=$v;
 
 			/** Check variable to ensure the session is valid */
-			if($this->ins[session_id()]['ip'] == $_SERVER['REMOTE_ADDR']){
+			if($this->sessions[session_id()]['ip'] == $_SERVER['REMOTE_ADDR']){
 
 				/** Auth user */
-				$_SESSION['AUTH_TIER2'] = true;
+				glue::session()->tier2_logged=true;
 				$this->_setSession();
 
 			}else{
@@ -408,7 +396,7 @@ class User extends \glue\db\Document{
 
 			$r = $this->getCollection()->findOne(array(
 					"_id"=>new \MongoId($user_id),
-					"rem_m"=>$s_id,
+					'sessions' => array('$elemMatch' => array('id' => $s_id, 'remember' => 1)),
 					"deleted" => 0
 			));
 			foreach($r as $k=>$v)
@@ -421,5 +409,11 @@ class User extends \glue\db\Document{
 			}
 		}
 		return false;
+	}
+
+	function loginNotification_email(){
+		glue::mailer()->mail($this->email, array('no-reply@stagex.co.uk', 'StageX'), 'Someone has logged onto your StageX account',	"user/emailLogin.php",
+			array_merge($this->ins[session_id()], array("username"=>$this->username)));
+    	return true;
 	}
 }
