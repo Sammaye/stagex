@@ -89,18 +89,18 @@ class userController extends \glue\Controller{
 		}
 
 		if(!$fb_user['verified']){
-			$this->render('user/unverified_login');
+			$this->render('unverified_login');
 			exit();
 		}
 
 		if(preg_match('/@googlemail.com/i', $fb_user['email']) > 0 || preg_match('/@gmail.com/i', $fb_user['email'])){
 			$email_username = explode('@', $fb_user['email']);
 			$user = User::model()->findOne(array('$or' => array(
-				array('fb_uid' => $fb_user['id']), array('email' => array('$in' => array($email_username[0].'@googlemail.com', $email_username[0].'@gmail.com')))
+				array('fbUid' => $fb_user['id']), array('email' => array('$in' => array($email_username[0].'@googlemail.com', $email_username[0].'@gmail.com')))
 			)));
 		}else{
 			$user = User::model()->findOne(array('$or' => array(
-				array('fb_uid' => $fb_user['id']), array('email' => $fb_user['email'])
+				array('fbUid' => $fb_user['id']), array('email' => $fb_user['email'])
 			)));
 		}
 
@@ -111,28 +111,31 @@ class userController extends \glue\Controller{
 			$user->email = $fb_user['email'];
 		}
 
-		$user->fb_uid = $fb_user['id'];
+		$user->fbUid = $fb_user['id'];
 		$user->save();
 
-		if(glue::session()->login($user->email, $user->password, false, true)){
+		if($user->banned){
+			$this->render('banned_login');
+			exit();
+		}
+
+		if($user->deleted){
+			$this->render('deleted_login');
+			exit();
+		}
+
+		if($user->login($user->email, $user->password, false, true)){
 			if(isset($_GET['nxt'])){
 				glue::http()->redirect(glue::http()->param('nxt'));
 			}else{
 				glue::http()->redirect("/");
 			}
 		}else{
-			switch(glue::session()->response()){
-				case "BANNED":
-					$this->render('user/banned_login');
-					exit();
-				case "DELETED":
-					$this->render('user/deleted_login');
-					exit();
-			}
+			glue::trigger('500');
 		}
 	}
 
-	function action_google_login(){
+	function action_googleLogin(){
 		$this->pageTitle = 'Logging into Stagex';
 
 		if(isset($_REQUEST['code'])){
@@ -156,8 +159,18 @@ class userController extends \glue\Controller{
 					$user->email = $g_user->email;
 				}
 
-				$user->google_uid = $g_user->id;
+				$user->googleUid = $g_user->id;
 				$user->save();
+
+				if($user->banned){
+					$this->render('banned_login');
+					exit();
+				}
+
+				if($user->deleted){
+					$this->render('deleted_login');
+					exit();
+				}
 
 				if(glue::session()->login($user->email, $user->password, false, true)){
 					if(isset($_GET['nxt'])){
@@ -166,14 +179,7 @@ class userController extends \glue\Controller{
 						glue::http()->redirect("/");
 					}
 				}else{
-					switch(glue::session()->response()){
-						case "BANNED":
-							$this->render('user/banned_login');
-							exit();
-						case "DELETED":
-							$this->render('user/deleted_login');
-							exit();
-					}
+					glue::trigger('500');
 				}
 			}else{
 				glue::http()->redirect('/user/login');
