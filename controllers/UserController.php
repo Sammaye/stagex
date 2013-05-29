@@ -6,12 +6,12 @@ use glue\Html,
 
 class userController extends \glue\Controller{
 
-	public $tab = "settings";
-	public $profile_tab = "settings";
-
+	public $defaultAction='videos';
 	public $title = 'Your Stuff - StageX';
 
-	public $page;
+	//public $tab = "settings";
+	//public $profile_tab = "settings";
+	//public $page;
 
 	public function authRules(){
 		return array(
@@ -29,10 +29,6 @@ class userController extends \glue\Controller{
 		);
 	}
 
-	function action_index(){
-		$this->action_videos();
-	}
-
 	function action_create(){
 
 		$this->title = 'Create a new StageX Account';
@@ -41,8 +37,7 @@ class userController extends \glue\Controller{
 
 		if(isset($_POST['User'])){
 			$model->attributes=$_POST['User'];
-			if($model->validate()){
-				$model->save();
+			if($model->validate()&&$model->save()){
 				if($model->login($model->username,$model->password)){
 					glue::http()->redirect("/user");
 				}else{
@@ -50,8 +45,6 @@ class userController extends \glue\Controller{
 				}
 			}
 		}
-		var_dump($model->validate());
-		var_dump($model->getErrors());
 
 		echo $this->render("create", array("model" => $model));
 	}
@@ -61,7 +54,7 @@ class userController extends \glue\Controller{
 		$this->title = "Login to your StageX Account";
 
 		$model = new loginForm();
-		$model->_attributes(isset($_POST['_login']) ? $_POST['_login'] : null);
+		$model->attributes=isset($_POST['loginForm']) ? $_POST['loginForm'] : array();
 
 		/** Count how many times the user has logged in over 5 mins */
 		$loginAttempts = Glue::db()->session_log->findOne(array("email"=>$model->email, "ts"=>array("\$gt"=>new MongoDate(time()-(60*5)))));
@@ -70,22 +63,25 @@ class userController extends \glue\Controller{
 		}
 
 		if(isset($_POST['loginForm'])){
-			$model->_attributes($_POST['loginForm']);
 			if($model->validate()){
-				if(isset($_GET['nxt'])){
-					glue::http()->redirect(glue::http()->param('nxt'));
+				if(glue::user()->login($model->username,$model->password,$model->remember)){
+					if(isset($_GET['nxt'])){
+						glue::http()->redirect(glue::http()->param('nxt'));
+					}else{
+						glue::http()->redirect("/");
+					}
 				}else{
-					glue::http()->redirect("/");
+					foreach(glue::user()->getErrors() as $f=>$v)
+						$model->setError($k,$v);
 				}
 			}
 		}
-
 		echo $this->render('user/login', array('model' => $model, 'attempts' => $loginAttempts['c']));
 	}
 
-	function action_fb_login(){
+	function action_fbLogin(){
 
-		$this->pageTitle = 'Logging into Stagex';
+		$this->title = 'Logging into Stagex';
 
 		$fb_user = glue::facebook()->getCurrentUser();
 		if(!$fb_user){
