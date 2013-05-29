@@ -69,14 +69,14 @@ class VideoResponse extends \glue\db\Document{
 	}
 
 	public static function findAllComments($video, $ts_query = array()){
-		return self::model()->find(array('vid' => $video->_id, 'ts' => $ts_query));
+		return self::model()->find(array('videoId' => $video->_id, 'created' => $ts_query));
 	}
 
 	public static function findPublicComments($video,  $ts_query = array(), $showOnlyModerated = false){
 		if($showOnlyModerated){
-			return self::model()->moderated()->find(array('vid' => $video->_id));
+			return self::model()->moderated()->find(array('videoId' => $video->_id));
 		}else{
-			return self::model()->public()->find(array('vid' => $video->id, 'ts' => $ts_query));
+			return self::model()->public()->find(array('videoId' => $video->id, 'created' => $ts_query));
 		}
 	}
 
@@ -145,7 +145,7 @@ class VideoResponse extends \glue\db\Document{
 
 	function beforeSave(){
 		if($this->getIsNewRecord()){
-			$this->user_id = glue::user()->_id;
+			$this->userId = $this->userId?:glue::user()->_id;
 
 			if($this->video->mod_comments == 1)
 				$this->approved = !glue::auth()->checkRoles(array('^' => $this->video)) ? false : true;
@@ -163,8 +163,8 @@ class VideoResponse extends \glue\db\Document{
 			// Build a path. There are some bugs in my active record stopping this from working in a better way
 			$this->_id = new MongoId(); // Set the id here since we don't actually have it yet, we'll send it down with the rest of the record
 
-			if($this->video->listing != 2 && $this->video->listing != 3){
-				\app\models\Stream::commentedOn($this->user_id, $this->vid, $this->_id);
+			if($this->video->listing != 1 && $this->video->listing != 2){
+				\app\models\Stream::commentedOn($this->userId, $this->videoId, $this->_id);
 			}
 
 			$this->path = rtrim($this->thread_parent->path.','.strval($this->_id),',');
@@ -195,7 +195,7 @@ class VideoResponse extends \glue\db\Document{
 						'comment' => $this, 'from' => $this->author, 'video' => $this->video ));
 				}
 
-				Notification::newVideoResponse($this->video->user_id, $this->video->_id, $this->approved);
+				\app\models\Notification::newVideoResponse($this->video->user_id, $this->video->_id, $this->approved);
 			}
 			if($this->parent_comment && $this->approved){
 
@@ -205,7 +205,7 @@ class VideoResponse extends \glue\db\Document{
 						'comment' => $this, 'from' => $this->author, 'video' => $this->video ));
 				}
 
-				Notification::newVideoResponseReply($this->thread_parent->_id, $this->thread_parent->user_id, $this->_id, $this->video->_id);
+				\app\models\Notification::newVideoResponseReply($this->thread_parent->_id, $this->thread_parent->userId, $this->_id, $this->video->_id);
 			}
 		}
 		return true;
@@ -232,7 +232,7 @@ class VideoResponse extends \glue\db\Document{
 	}
 
 	function currentUserLikes(){
-		return $this->Db('videoresponse_likes')->findOne(array('userId' => glue::session()->user->_id, 'responseId' => $this->_id));
+		return $this->Db('videoresponse_likes')->findOne(array('userId' => glue::user()->_id, 'responseId' => $this->_id));
 	}
 
 	function like(){

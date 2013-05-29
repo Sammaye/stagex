@@ -40,7 +40,7 @@ class Playlist extends \glue\db\Document{
 
 	function relations(){
 		return array(
-			"author" => array('one', 'app\\models\\User', "_id", 'on' => 'user_id'),
+			"author" => array('one', 'app\\models\\User', "_id", 'on' => 'userId'),
 		);
 	}
 
@@ -123,10 +123,10 @@ class Playlist extends \glue\db\Document{
 	}
 
 	function like(){
-		$like_row = glue::db()->playlist_likes->findOne(array('user_id' => glue::session()->user->_id, 'item' => $this->_id));
+		$like_row = glue::db()->playlist_likes->findOne(array('userId' => glue::user()->_id, 'item' => $this->_id));
 
 		if(!$like_row){
-			glue::db()->playlist_likes->insert(array('user_id' => glue::session()->user->_id, 'item' => $this->_id, 'like' => 1, 'ts' => new MongoDate()));
+			glue::db()->playlist_likes->insert(array('userId' => glue::user()->_id, 'item' => $this->_id, 'like' => 1, 'ts' => new MongoDate()));
 			$this->likes = $this->likes+1;
 			$this->save();
 		}
@@ -134,10 +134,10 @@ class Playlist extends \glue\db\Document{
 	}
 
 	function unlike(){
-		$like_row = glue::db()->playlist_likes->findOne(array('user_id' => glue::session()->user->_id, 'item' => $this->_id));
+		$like_row = glue::db()->playlist_likes->findOne(array('userId' => glue::user()->_id, 'item' => $this->_id));
 
 		if($like_row){
-			glue::db()->playlist_likes->remove(array('user_id' => glue::session()->user->_id, 'item' => $this->_id));
+			glue::db()->playlist_likes->remove(array('userId' => glue::user()->_id, 'item' => $this->_id));
 			$this->likes = $this->likes-1;
 			$this->save();
 		}
@@ -145,7 +145,7 @@ class Playlist extends \glue\db\Document{
 	}
 
 	function current_user_likes(){
-		$like_row = glue::db()->playlist_likes->findOne(array('user_id' => glue::session()->user->_id, 'item' => $this->_id));
+		$like_row = glue::db()->playlist_likes->findOne(array('userId' => glue::session()->user->_id, 'item' => $this->_id));
 		if($like_row)
 			return true;
 
@@ -198,7 +198,7 @@ class Playlist extends \glue\db\Document{
 				glue::mysql()->query("UPDATE documents SET uid = :uid, deleted = :deleted, listing = :listing, title = :title, description = :description,
 						author_name = :author_name, videos = :videos WHERE _id = :_id", array(
 					":_id" => strval($this->_id),
-					":uid" => strval($this->user_id),
+					":uid" => strval($this->userId),
 					":deleted" => $this->deleted,
 					":listing" => $this->listing,
 					":title" => $this->title,

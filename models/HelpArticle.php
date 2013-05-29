@@ -1,25 +1,38 @@
 <?php
+namespace app\models;
 
-class HelpArticle extends Help{
+use glue;
 
+class HelpArticle extends \app\models\Help{
+
+	/** @virtual */
 	public $tagString;
 
-	protected $title;
-	protected $content;
-	protected $author;
-	protected $tags;
+	public $userId;
 
-	protected $createtime;
-	protected $publishtime;
+	public $title;
+	public $content;
+	public $tags;
 
-	protected $type = "article";
+	public $published;
 
-	protected $t_keyword;
-	protected $t_normalised;
+	public $type = "article";
 
-	protected $path;
+	public $keywords;
+	public $normalisedTitle;
 
-	protected $seq = "z";
+	public $path;
+
+	public $parent;
+	public $seq = "z";
+
+	function behaviours(){
+		return array(
+			'timestampBehaviour' => array(
+				'class' => 'glue\\behaviours\\Timestamp'
+			)
+		);
+	}
 
 	public static function model($class = __CLASS__){
 		return parent::model($class);
@@ -29,21 +42,18 @@ class HelpArticle extends Help{
 		if(count($this->tags) > 0)
 			$this->tagString = implode(",", $this->tags);
 
-		$this->parent_topic = self::getParentTopic_selectedVal();
+		$this->parent = self::getParentTopic_selectedVal();
 	}
 
 	public function rules(){
 		return array(
 			array('tagString, title, content', 'required', 'message' => 'You must fill in at least a title, some content and some tags for this article.'),
 			//array('tagString', 'tokenized', 'target' => 'tags', 'divider' => ','),
-			array('parent_topic, seq', 'safe')
+			array('parent, seq', 'safe')
 		);
 	}
 
 	function beforeSave(){
-
-		if($this->getIsNewRecord())
-			$this->createtime = new MongoDate();
 
 		if(strlen(strip_whitespace($this->tagString)) > 0){
 			$this->tags = preg_split("/[\s]*[,][\s]*/", $this->tagString);
@@ -55,19 +65,19 @@ class HelpArticle extends Help{
 			unset($this->tags);
 		}
 
-		$this->t_normalised = strtolower(iconv('UTF-8', 'ASCII//TRANSLIT', trim(str_replace(' ', '-', strip_to_single(make_alpha_numeric($this->title))))));
-		$this->t_keyword = str_replace(" ", "-", $this->t_normalised);
+		$this->normalisedTitle = strtolower(iconv('UTF-8', 'ASCII//TRANSLIT', trim(str_replace(' ', '-', strip_to_single(make_alpha_numeric($this->title))))));
+		$this->keywords = str_replace(" ", "-", $this->normalisedTitle);
 
-		$this->publishtime = new MongoDate();
+		$this->published = new MongoDate();
 
 		$oldPath = $this->path;
-		if(strlen($this->parent_topic) <= 0 || !$this->parent_topic){
-			$this->path = $this->t_normalised;
+		if(strlen($this->parent) <= 0 || !$this->parent){
+			$this->path = $this->normalisedTitle;
 		}else{
-			$this->path = $this->parent_topic.','.$this->t_normalised;
+			$this->path = $this->parent.','.$this->normalisedTitle;
 		}
 
-		$this->author = glue::session()->user->_id;
+		$this->userId = glue::user()->_id;
 		//var_dump($this);
 		return true;
 	}
@@ -84,7 +94,7 @@ class HelpArticle extends Help{
 				":type" => 'article'
 			));
 
-			glue::sitemap()->addUrl(glue::url()->create('/help/view', array('title' => $this->t_normalised)), 'hourly', '0.5');
+			glue::sitemap()->addUrl(glue::http()->createUrl('/help/view', array('title' => $this->normalisedTitle)), 'hourly', '0.5');
 		}else{
 			glue::mysql()->query("UPDATE help_documents SET _id=:_id, title=:title, content=:content, tags=:tags, path=:path, type=:type WHERE _id=:_id", array(
 				":_id" => strval($this->_id),

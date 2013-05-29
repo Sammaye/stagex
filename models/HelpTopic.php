@@ -1,18 +1,26 @@
 <?php
 class HelpTopic extends Help{
 
-	protected $title;
-	protected $t_normalised;
-	protected $t_keyword;
-	protected $author;
-	protected $createtime;
-	protected $publishtime;
+	public $userId;
 
-	protected $parent;
-	protected $path;
-	protected $type = "topic";
+	public $title;
+	public $normalisedTitle;
+	public $keywords;
+	public $published;
 
-	protected $seq = "z";
+	public $parent;
+	public $path;
+	public $type = "topic";
+
+	public $seq = "z";
+
+	function behaviours(){
+		return array(
+			'timestampBehaviour' => array(
+				'class' => 'glue\\behaviours\\Timestamp'
+			)
+		);
+	}
 
 	public static function model($class = __CLASS__){
 		return parent::model($class);
@@ -32,28 +40,25 @@ class HelpTopic extends Help{
 			array('title', 'required', 'message' => 'You must enter at least a title'),
 			array('parent, seq', 'safe'),
 			array('parent', 'objExist',
-				'class'=>'HelpTopic', 'field'=>'path', 'allowNull' => true, 'message' => 'That parent topic could not be found'
+				'class'=>'app\\models\\HelpTopic', 'field'=>'path', 'allowNull' => true, 'message' => 'That parent topic could not be found'
 			),
 		);
 	}
 
 	function beforeSave(){
 
-		if($this->getIsNewRecord()){
-			$this->createtime = new MongoDate();
-			$this->author = glue::session()->user->_id;
-		}
+		$this->userId = glue::user()->_id;
 
-		$this->t_normalised = strtolower(iconv('UTF-8', 'ASCII//TRANSLIT', trim(str_replace(' ', '-', strip_to_single(make_alpha_numeric($this->title))))));
-		$this->t_keyword = str_replace(" ", "-", $this->t_normalised);
+		$this->normalisedTitle = strtolower(iconv('UTF-8', 'ASCII//TRANSLIT', trim(str_replace(' ', '-', strip_to_single(make_alpha_numeric($this->title))))));
+		$this->keywords = str_replace(" ", "-", $this->normalisedTitle);
 
-		$this->publishtime = new MongoDate();
+		$this->published = new MongoDate();
 
 		$oldPath = $this->path;
 		if(strlen($this->parent) <= 0 || !$this->parent){
-			$this->path = $this->t_normalised;
+			$this->path = $this->normalisedTitle;
 		}else{
-			$this->path = $this->parent.','.$this->t_normalised;
+			$this->path = $this->parent.','.$this->normalisedTitle;
 		}
 
 		if($this->getScenario() == 'update' && $oldPath != $this->path){
@@ -78,7 +83,7 @@ class HelpTopic extends Help{
 				":type" => 'topic',
 			));
 
-			glue::sitemap()->addUrl(glue::url()->create('/help/view', array('title' => $this->t_normalised)), 'hourly', '0.5');
+			glue::sitemap()->addUrl(glue::http()->createUrl('/help/view', array('title' => $this->normalisedTitle)), 'hourly', '0.5');
 		}else{
 			glue::mysql()->query("UPDATE help_documents SET _id=:_id, title=:title, path=:path, type=:type WHERE _id=:_id", array(
 				":_id" => strval($this->_id),
@@ -115,7 +120,7 @@ class HelpTopic extends Help{
 			$path_pieces = explode(",", $this->path); // the last part of the explosion should be the string we are looking for
 
 			foreach($helpItems as $_id => $item){
-				$infopath = str_replace($this->t_normalised.",", '', $item['path']); // Lets just remove this topic form its children
+				$infopath = str_replace($this->normalisedTitle.",", '', $item['path']); // Lets just remove this topic form its children
 				$this->Db()->update(array("_id"=>new MongoId($_id)), array("\$set"=>array("path"=>$infopath)));
 				glue::mysql()->query("UPDATE help_documents SET path=:path, deleted=1 WHERE _id=:_id", array(
 					":_id" => $_id,

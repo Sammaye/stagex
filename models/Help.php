@@ -1,7 +1,11 @@
 <?php
-class Help extends MongoDocument{
+namespace app\models;
 
-	function getCollectionName(){
+use glue;
+
+class Help extends \glue\db\Document{
+
+	function collectionName(){
 		return "help";
 	}
 
@@ -30,7 +34,7 @@ class Help extends MongoDocument{
 		foreach($breadcrumb as $i => $item){
 			if($item != $this->t_normalised){
 				$itemModel = self::model()->findOne(array('t_normalised' => $item));
-				$final_breadcrumb[$i] = html::a(array('href' => glue::url()->create('/help/view', array('title' => $item)), 'text' => $itemModel->title));
+				$final_breadcrumb[$i] = html::a(array('href' => glue::http()->createUrl('/help/view', array('title' => $item)), 'text' => $itemModel->title));
 			}
 		}
 		return implode(' '.utf8_decode('&rsaquo;').' ', $final_breadcrumb);
@@ -43,7 +47,7 @@ class Help extends MongoDocument{
 	}
 
 	function getPermaLink(){
-		return glue::url()->create('/help/view', array('title' => $this->t_normalised));
+		return glue::http()->createUrl('/help/view', array('title' => $this->t_normalised));
 	}
 
 	function getAbstract($amount = 100){
@@ -52,7 +56,7 @@ class Help extends MongoDocument{
 	}
 
 	function findOne($query){
-		$doc = glue::db()->{$this->getCollectionName()}->findOne($query);
+		$doc = glue::db()->{$this->collectionName()}->findOne($query);
 
 		if(!$doc){
 			return null;

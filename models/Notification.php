@@ -18,18 +18,27 @@ class Notification extends \glue\db\Document{
 	const VIDEO_RESPONSE_APPROVE = 3;
 	const WALL_POST = 4;
 
-	public $user_id;
-	public $from_users = array();
+	public $userId;
+	public $fromUsers = array();
 	public $items = array();
 	public $type;
 	public $ts;
 
-	public $response_count;
+	public $totalResponses;
 	public $approved;
-	public $comment_id;
+	public $videoId;
+	public $responseId;
 
 	function collectionName(){
 		return "notification";
+	}
+
+	function behaviours(){
+		return array(
+			'timestampBehaviour' => array(
+				'class' => 'glue\\behaviours\\Timestamp'
+			)
+		);
 	}
 
 	public static function model($className = __CLASS__){
@@ -38,52 +47,48 @@ class Notification extends \glue\db\Document{
 
 	function relations(){
 		return array(
-			"parent_video" => array('one', 'app\\models\\Video', "_id", 'on' => 'video_id'),
-			"original_comment" => array('one', 'app\\models\\VideoResponse', "_id", 'on' => 'comment_id'),
-			'parent_playlist' => array('one', 'app\\models\\Playlist', '_id', 'on' => 'playlist_id'),
-			"status_sender" => array('one', 'app\\models\\User', '_id', 'on' => 'user_id'),
-			"subscribed_user" => array('one', 'app\\models\\User', '_id', 'on' => 'subscribed_user_id'),
-			"commenting_user" => array('one', 'app\\models\\User', '_id', 'on' => 'posted_by_id'),
+			"video" => array('one', 'app\\models\\Video', "_id", 'on' => 'videoId'),
+			"response" => array('one', 'app\\models\\VideoResponse', "_id", 'on' => 'commentId'),
+			"sender" => array('one', 'app\\models\\User', '_id', 'on' => 'userId'),
 		);
 	}
 
 	static function getNewCount_Notifications(){
-		return Notification::model()->find(array('user_id' => glue::user()->_id,
-				'ts' => array('$gt' => glue::user()->last_notification_pull)))->count();
+		return Notification::model()->find(array('userId' => glue::user()->_id,
+				'created' => array('$gt' => glue::user()->lastNotificationPull)))->count();
 	}
 
 	function beforeSave(){
-		$this->ts = new MongoDate();
 		$this->read = false;
 		return true;
 	}
 
 	function getDateTime(){
 		$today_start = mktime(0, 0, 0, date("n"), date("j")-1, date("Y"));
-		if($today_start < $this->ts->sec){ // Older than a day
-			return date('g:i a', $this->ts->sec);
+		if($today_start < $this->created->sec){ // Older than a day
+			return date('g:i a', $this->created->sec);
 		}else{
-			return date('j M Y', $this->ts->sec);
+			return date('j M Y', $this->created->sec);
 		}
 	}
 
 	function addUser($id){
 
 		if($this->read){
-			$this->from_users = array();
+			$this->fromUsers = array();
 		}
 
-		if(is_array($this->from_users)){
-			foreach($this->from_users as $k => $user_id){
-				if(strval($user_id) == strval($id)){
-					unset($this->from_users[$k]);
+		if(is_array($this->fromUsers)){
+			foreach($this->fromUsers as $k => $userId){
+				if(strval($userId) == strval($id)){
+					unset($this->fromUsers[$k]);
 				}
 			}
-			$c = $this->from_users;
+			$c = $this->fromUsers;
 			array_unshift($c, $id);
-			$this->from_users = $c;
+			$this->fromUsers = $c;
 		}else{
-			$this->from_users = array($id);
+			$this->fromUsers = array($id);
 		}
 
 		return true;
@@ -111,94 +116,94 @@ class Notification extends \glue\db\Document{
 		return true;
 	}
 
-	static function newWallPost_on_OtherUserWall($user_id, $to_user){
-		$notification = Notification::model()->findOne(array('user_id' => $to_user, 'type' => Notification::WALL_POST));
+	static function newWallPost_on_OtherUserWall($userId, $to_user){
+		$notification = Notification::model()->findOne(array('userId' => $to_user, 'type' => Notification::WALL_POST));
 
 		if($notification){
-			$notification->addUser($user_id);
+			$notification->addUser($userId);
 			$notification->response_count = $notification->response_count+1;
 			$notification->save();
 		}else{
 			// make a new status
 			$notification = new Notification();
-			$notification->user_id = $to_user;
-			$notification->addUser($user_id);
-			$notification->response_count = 1;
+			$notification->userId = $to_user;
+			$notification->addUser($userId);
+			$notification->totalResponses = 1;
 			$notification->type = Notification::WALL_POST;
 			$notification->save();
 		}
 	}
 
 	public static function newVideoResponse($to_user, $video_id, $approved){
-		$status = Notification::model()->findOne(array( 'type' => Notification::VIDEO_COMMENT, 'user_id' => $to_user, 'video_id' => $video_id ));
+		$status = Notification::model()->findOne(array( 'type' => Notification::VIDEO_COMMENT, 'userId' => $to_user, 'videoId' => $video_id ));
 
 		if($status){
 			$status->addUser(glue::user()->_id);
 			$status->approved = $approved;
-			$status->response_count = $status->response_count+1;
+			$status->totalResponses = $status->totalResponses+1;
 			$status->save();
 		}else{
 			// make a new status
 			$status = new Notification();
-			$status->user_id = $to_user;
-			$status->video_id = $video_id;
+			$status->userId = $to_user;
+			$status->videoId = $video_id;
 			$status->addUser(glue::user()->_id);
 			$status->approved = $approved;
-			$status->response_count = $status->response_count+1;
+			$status->totalResponses = $status->totalResponses+1;
 			$status->type = Notification::VIDEO_COMMENT;
 			$status->save();
 		}
 	}
 
 	public static function newVideoResponseReply($comment_id, $to_user, $reply_id, $video_id, $from_user = null){
-		$status = Notification::model()->findOne(array( 'type' => Notification::VIDEO_COMMENT_REPLY, 'user_id' => $to_user, 'comment_id' => $comment_id));
+		$status = Notification::model()->findOne(array( 'type' => Notification::VIDEO_COMMENT_REPLY, 'userId' => $to_user, 'responseId' => $comment_id));
 
 		if($status){
 			$status->addUser($from_user ? $from_user : glue::user()->_id);
 			$status->addItemBy_id($reply_id);
-			$status->response_count = $status->response_count+1;
+			$status->totalResponses = $status->totalResponses+1;
 			$status->save();
 		}else{
 			// make a new status
 			$status = new Notification();
-			$status->user_id = $to_user;
-			$status->video_id = $video_id;
-			$status->comment_id = $comment_id;
+			$status->userId = $to_user;
+			$status->videoId = $video_id;
+			$status->responseId = $comment_id;
 			$status->addUser($from_user ? $from_user : glue::user()->_id);
 			$status->addItemBy_id($reply_id);
-			$status->response_count = $status->response_count+1;
+			$status->totalResponses = $status->totalResponses+1;
 			$status->type = Notification::VIDEO_COMMENT_REPLY;
 			$status->save();
 		}
 	}
 
 	public static function commentApproved($from_user, $video_id, $to_user){
-		$status = Notification::model()->findOne(array( 'type' => Notification::VIDEO_RESPONSE_APPROVE, 'user_id' => $to_user, 'video_id' => $video_id));
+		$status = Notification::model()->findOne(array( 'type' => Notification::VIDEO_RESPONSE_APPROVE, 'userId' => $to_user, 'videoId' => $video_id));
 
 		if($status){
 			$status->addUser($from_user ? $from_user : glue::user()->_id);
-			$status->response_count = $status->response_count+1;
+			$status->totalResponses = $status->totalResponses+1;
 			$status->save();
 		}else{
 			// make a new status
 			$status = new Notification();
-			$status->user_id = $to_user;
-			$status->video_id = $video_id;
+			$status->userId = $to_user;
+			$status->videoId = $video_id;
 			$status->addUser($from_user ? $from_user : glue::user()->_id);
-			$status->response_count = $status->response_count+1;
+			$status->totalResponses = $status->totalResponses+1;
 			$status->type = Notification::VIDEO_RESPONSE_APPROVE;
 			$status->save();
 		}
 	}
 
 	function get_usernames_caption($getOnlyFirst = false){
-		$users_count = count($this->from_users);
+		$users_count = count($this->fromUsers);
 		$caption = '';
 
 		$i = 0;
-		foreach($this->from_users as $user){
+		foreach($this->fromUsers as $user){
 
-			$user = User::model()->findOne(array('_id' => $this->from_users[$i]));
+			$user = User::model()->findOne(array('_id' => $this->fromUsers[$i]));
 			if($users_count > 1 && $i == $users_count-1){
 				$caption .=  " and <a href='".glue::http()->createUrl('/user/view', array('id' => strval($user->_id)))."'>@{$user->getUsername()}</a>";
 			}elseif($users_count > 1 && $i != 0){
