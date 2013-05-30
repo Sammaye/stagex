@@ -64,6 +64,14 @@ class User extends \glue\db\Document{
 			return null;
 		}
 	}
+	
+	function collectionName(){
+		return "user";
+	}	
+	
+	public static function model($className = __CLASS__){
+		return parent::model($className);
+	}	
 
 	function init(){
 		if(php_sapi_name() != 'cli'){
@@ -71,7 +79,7 @@ class User extends \glue\db\Document{
 				if($this->domain)
 					ini_set("session.cookie_domain", $this->domain);
 
-				glue::session()->open();
+				glue::session()->start();
 
 				// Process the user login
 				if(!isset($_SESSION['logged']))
@@ -229,12 +237,13 @@ class User extends \glue\db\Document{
 	public function login($username, $password, $remember = false, $social_login = false){
 
 		$this->logout(false);
-
+			
 		/** Find the user */
 		$r = $this->getCollection()->findOne(array('email' => $username));
 
 		if(!$r){
 			//$this->logout(false);
+			echo "not valid"; exit();
 			$this->addError("The username and/or password could not be be found. Please try again. If you encounter further errors please try to recover your password.");
 			return false;
 		}
@@ -263,7 +272,7 @@ class User extends \glue\db\Document{
 			}
 			/** Then log the login */
 			$this->log($this->email, true);
-
+			
 			/** Set the session */
 			$this->_setSession($remember, true);
 			glue::session()->tier2_logged=true;
@@ -294,7 +303,7 @@ class User extends \glue\db\Document{
 
 		/** Remove session from table */
 		if($this->_id){
-			User::model()->update(array('_id' => $this->_id), array('$unset'=>"sessions.".session_id()), true);
+			User::model()->updateAll(array('_id' => $this->_id), array('$unset'=>array("sessions.".session_id()=>'')));
 		}
 
 		/** Unset session */

@@ -29,8 +29,9 @@ class Validation extends \glue\Component{
 
 		$this->clearErrors();
 		
-		foreach($this->rules as $k => $rule)
+		foreach($this->rules as $k => $rule){
 			$valid=$this->validateRule($rule)&&$valid;
+		}
 		return $this->valid=$valid; // Return whether valid or not
 	}
 

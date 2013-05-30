@@ -167,7 +167,7 @@ class User extends \glue\User{
 		array('name', 'string', 'max' => 150, 'message' => 'You can only write 150 characters for your name.'),
 		array('about', 'string', 'max' => 1500, 'message' => 'You can only write 1500 characters for your bio.'),
 
-		array('hash', 'hash', 'on'=>'insert'),
+		array('hash', 'hash', 'on'=>'insert', 'message' => 'CSRF not valid'),
 		array('username', 'objExist', 'class'=>'app\\models\\User', 'field'=>'username', 'notExist' => true, 'on'=>'insert, updateUsername',
 				'message' => 'That username already exists please try another.'),
 

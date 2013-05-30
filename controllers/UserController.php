@@ -34,7 +34,8 @@ class userController extends \glue\Controller{
 		$this->title = 'Create a new StageX Account';
 
 		$model = new User;
-
+		//$_SESSION['GCSRF_TOKEN'] = md5('d');
+		//var_dump($_SESSION);
 		if(isset($_POST['User'])){
 			$model->attributes=$_POST['User'];
 			if($model->validate()&&$model->save()){

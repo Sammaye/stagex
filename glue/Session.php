@@ -7,8 +7,7 @@
 
 namespace glue;
 
-use	glue,
-	\glue\Exception;
+use	glue;
 
 class Session extends \glue\Component{
 
@@ -18,8 +17,9 @@ class Session extends \glue\Component{
 	 * @access private
 	 * @var int
 	 */
-	public $life_time='+2 weeks';
-
+	public $lifeTime='+2 weeks';
+	
+	public $sessionCollectionName='sessions';
 
 	/**
 	 * This stores the found session collection so that we don't
@@ -28,14 +28,18 @@ class Session extends \glue\Component{
 	 * @access private
 	 * @var sessions
 	 */
-	private $_session = array();
+	//private $_session;
 
 	public function __get($name){
-		return $this->get($name);
+		var_dump($name);
+		if(!property_exists($this,$name))
+			return $this->get($name);
 	}
 
 	public function __set($name,$value){
-		return $this->set($name,$value);
+		var_dump($name);
+		if(!property_exists($this,$name))
+			return $this->set($name,$value);
 	}
 
 	public function get($name){
@@ -54,20 +58,20 @@ class Session extends \glue\Component{
 	/**
 	 * Constructor
 	 */
-	function open() {
+	function start() {
 
 		// Ensure index on Session ID
 		// Why am I dong this here??
-		Glue::db()->sessions->ensureIndex(array('session_id' => 1), array("unique" => true));
+		glue::db()->sessions->ensureIndex(array('session_id' => 1), array("unique" => true));
 
 		// Register this object as the session handler
 		session_set_save_handler(
-			array( $this, "openSession" ),
-			array( $this, "closeSession" ),
-			array( $this, "readSession" ),
-			array( $this, "writeSession"),
-			array( $this, "destroySession"),
-			array( $this, "gcSession" )
+			array( $this, "open" ),
+			array( $this, "close" ),
+			array( $this, "read" ),
+			array( $this, "write"),
+			array( $this, "destroy"),
+			array( $this, "gc" )
 		);
 		session_start(); // Start the damn session
 	}
@@ -82,12 +86,10 @@ class Session extends \glue\Component{
 	 * @param string $save_path
 	 * @param string $session_name
 	 */
-	function openSession( $save_path, $session_name ) {
-
+	function open( $save_path, $session_name ) {
 		global $sess_save_path;
-
 		$sess_save_path = $save_path;
-
+		
 		// Don't need to do anything. Just return TRUE.
 		return true;
 
@@ -96,7 +98,7 @@ class Session extends \glue\Component{
 	/**
 	 * This function closes the session (end of session)
 	 */
-	function closeSession() {
+	function close() {
 
 		// Return true to indicate session closed
 		return true;
@@ -110,22 +112,15 @@ class Session extends \glue\Component{
 	 *
 	 * @param string $id
 	 */
-	function readSession( $id ) {
+	function read( $id ) {
 
 		// Set empty result
 		$data = '';
 
-		// Fetch session data from the selected database
-		$time = time();
-
-		$this->_sessions = Glue::db()->sessions->findOne(array("session_id"=>$id));
-
-		if (!empty($this->_sessions)) {
-			$data = $this->_sessions['session_data'];
-		}
-
+		if(($session=glue::db()->{$this->sessionCollectionName}->findOne(array("session_id"=>$id)))!==null)
+			$data=isset($session['data'])?$session['data']:'';
+		//$this->_session=$session;
 		return $data;
-
 	}
 
 	/**
@@ -139,23 +134,19 @@ class Session extends \glue\Component{
 	 *
 	 * @todo Need to make this function aware of other users since php sessions are not always unique maybe delete all old sessions.
 	 */
-	function writeSession( $id, $data ) {
+	function write( $id, $data ) {
 
 		//Write details to session table
-		$time = strtotime('+2 weeks');
+		$time = strtotime($this->lifeTime);
 
 		// If the user is logged in record their uid
-		$uid = $_SESSION['logged'] ? $_SESSION['uid'] : 0;
-
-		$fields = array(
+		glue::db()->{$this->sessionCollectionName}->update(array("session_id"=>$id), array('$set'=>array(
 			"session_id"=>$id,
-			"user_id"=>$uid,
-			"session_data"=>$data,
+			"user_id"=>$_SESSION['logged'] ? $_SESSION['uid'] : 0,
+			"data"=>$data,
 			"expires"=>$time,
 			"active"=>1
-		);
-
-		$fg = Glue::db()->sessions->update(array("session_id"=>$id), array('$set'=>$fields), array("fsync"=>1, "upsert"=>true));
+		)), array("upsert"=>true));
 
 		// DONE
 		return true;
@@ -167,11 +158,10 @@ class Session extends \glue\Component{
 	 *
 	 * @param string $id
 	 */
-	function destroySession( $id ) {
+	function destroy( $id ) {
 
 		// Remove from Db
-		Glue::db()->sessions->remove(array("session_id" => $id), true);
-
+		glue::db()->{$this->sessionCollectionName}->remove(array("session_id" => $id));
 		return true;
 	}
 
@@ -182,8 +172,8 @@ class Session extends \glue\Component{
 	 *
 	 * @todo Make a cronjob to delete all sessions after about a day old and are still inactive
 	 */
-	function gcSession() {
-		glue::db()->sessions->remove(array('expires' => array('$lt' => strtotime('+2 weeks'))));
+	function gc() {
+		glue::db()->{$this->sessionCollectionName}->remove(array('expires' => array('$lt' => strtotime($this->lifeTime))));
 		return true;
 	}
 }
