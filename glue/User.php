@@ -9,6 +9,9 @@ class User extends \glue\db\Document{
 
 	public $username;
 	public $password;
+	public $email;
+	
+	public $sessions=array();
 
 	/**
 	 * This decides when the user should no longer be "trusted" as being logged in
@@ -21,12 +24,6 @@ class User extends \glue\db\Document{
 	 * @var boolean
 	 */
 	private $allowCookies = true;
-
-	/**
-	 * Decides whether the user is allowed to login via extended cookies
-	 * @var boolean
-	 */
-	private $allowCookieLogins = true;
 
 	/**
 	 * Name of the temp cookie that is used during the $timeout period to judge if the user is logged in.
@@ -54,16 +51,9 @@ class User extends \glue\db\Document{
 	 * @var string
 	 */
 	private $path='/';
-
-	private $response;
-
-	function response(){
-		if($this->response){
-			return $this->response;
-		}else{
-			return null;
-		}
-	}
+	
+	private $logAttempts=true;
+	private $logCollectionName='session_log';
 	
 	function collectionName(){
 		return "user";
@@ -81,27 +71,13 @@ class User extends \glue\db\Document{
 
 				glue::session()->start();
 
-				// Process the user login
-				if(!isset($_SESSION['logged']))
-					$this->session_defaults();
-
 				// Are they logged in?
-				if($_SESSION['logged'] && isset($_COOKIE[$this->tempCookie])) {
-
-					/** Check session as normal */
-					$this->_checkSession();
-
-				}elseif(isset($_COOKIE[$this->permCookie])){
-
-					$this->session_defaults();
-					$this->_checkCookie($this->permCookie);
-					glue::session()->tier2_logged = false;
-
-				}else{
-
-					/** Else in any other case default session variables */
-					$this->session_defaults();
-				}
+				if(glue::session()->authed && isset($_COOKIE[$this->tempCookie])){
+					$this->validateSession();
+				}elseif($this->allowCookies && isset($_COOKIE[$this->permCookie])){
+					$this->restoreFromCookie();
+				}else
+					$this->logout(false);
 			}
 		}
 
@@ -117,39 +93,41 @@ class User extends \glue\db\Document{
 	 * @param boolean $success
 	 */
 	function log($email, $success = false){
-		if($success){
-			// If successful I wanna remove the users row so they don't get caught by it again
-			glue::db()->session_log->remove(array('email' => $email));
-		}else{
-			$doc = glue::db()->session_log->findOne(array('email' => $email));
-			if($doc){
-				if($doc['ts']->sec > time()-(60*5)){ // Last error was less than 5 mins ago update
-					glue::db()->session_log->update(array('email' => $email), array('$inc' => array('c' => 1), '$set' => array('ts' => new \MongoDate())));
-					return;
+		if($this->logAttempts){
+			if($success){
+				// If successful I wanna remove the users row so they don't get caught by it again
+				glue::db()->{$this->logCollectionName}->remove(array('email' => $email));
+			}else{
+				$doc = glue::db()->{$this->logCollectionName}->findOne(array('email' => $email));
+				if($doc){
+					if($doc['ts']->sec > time()-(60*5)){ // Last error was less than 5 mins ago update
+						glue::db()->{$this->logCollectionName}->update(array('email' => $email), array('$inc' => array('c' => 1), '$set' => array('ts' => new \MongoDate())));
+						return;
+					}
 				}
+				glue::db()->{$this->logCollectionName}->update(array('email' => $email), array('$set' => array('c' => 1, 'ts' => new \MongoDate())), array('upsert' => true));
 			}
-			glue::db()->session_log->update(array('email' => $email), array('$set' => array('c' => 1, 'ts' => new \MongoDate())), array('upsert' => true));
 		}
 	}
 
 	/**
 	 * Set the default session values
 	 */
-	function session_defaults() {
+	function defaults() {
 		glue::session()->set(array(
-			'logged' => false,
-			'tier2_logged' => false,
-			'uid' => 0,
+			'id' => 0,
+			'email'=>'',
+			'authed' => false
 		));
 	}
 
 	/**
 	 * Check the session
 	 */
-	private function _checkSession() {
+	private function validateSession() {
 
 		/** Query for the object */
-		$r=$this->getCollection()->findOne(array('_id' => new \MongoId($_SESSION['uid']), 'email' => $_SESSION['email'], 'deleted' => 0));
+		$user=$this->getCollection()->findOne(array('_id' => new \MongoId(glue::session()->id), 'email' => glue::session()->email, 'deleted' => 0));
 
 		// Set the model attributes
 		$this->clean();
@@ -159,10 +137,10 @@ class User extends \glue\db\Document{
 		//echo "here"; echo session_id();
 		if(isset($this->sessions[session_id()])){
 			if(($this->sessions[session_id()]['ts']->sec + $this->timeout) < time()){
-				$this->_checkCookie();
+				$this->restoreFromCookie();
 			}else{
 				/** VALID */
-				$this->_setSession();
+				$this->setSession();
 			}
 		}else{
 			/** Not VALID */
@@ -176,7 +154,7 @@ class User extends \glue\db\Document{
 	 * @param string $user
 	 * @param int $remember
 	 */
-	private function _setSession($remember = false, $init = false) {
+	private function setSession($remember = false, $init = false) {
 
 		/** Single sign on active? */
 		if((bool)$this->singleSignOn){
@@ -185,8 +163,8 @@ class User extends \glue\db\Document{
 		}
 
 		/** Set session */
-		glue::session()->uid=$this->_id;
-		glue::session()->logged=true;
+		glue::session()->id=$this->_id;
+		glue::session()->authed=true;
 
 		//var_dump($this->user->ins);
 		$this->sessions[session_id()] = array(
@@ -198,14 +176,10 @@ class User extends \glue\db\Document{
 		);
 
 		// Lets delete old sessions (anything older than 2 weeks)
-		$ins = $this->sessions;
-		$new_ins = array();
-		foreach($ins as $k => $v){
-			if($v['last_active']->sec > strtotime('-2 weeks')){
-				$new_ins[$k] = $v;
-			}
+		foreach($this->sessions as $k => $v){
+			if($v['last_active']->sec < strtotime('-2 weeks'))
+				unset($this->sessions[$k]);
 		}
-		$this->sessions = $new_ins;
 
 		if($init){
 			$this->sessions[session_id()]['remember'] = (int)$remember;
@@ -214,12 +188,12 @@ class User extends \glue\db\Document{
 		//var_dump($this->user->ins[session_id()]);
 
 		$this->save();
-		$this->_setCookie($remember, $init);
+		$this->setCookie($remember, $init);
 
 		/** Now if the user needs notifying via email lets do it */
 		if($init){
 			if((bool)$this->emailLogins){
-				$this->loginNotification_email();
+				$this->emailLoginNotification();
 			}
 		}
 
@@ -234,16 +208,15 @@ class User extends \glue\db\Document{
 	 * @param string $password
 	 * @param int $remember
 	 */
-	public function login($username, $password, $remember = false, $social_login = false){
+	public function login($username, $password, $remember = false, $checkPassword = true){
 
 		$this->logout(false);
 			
 		/** Find the user */
-		$r = $this->getCollection()->findOne(array('email' => $username));
+		$r=$this->getCollection()->findOne(array('email' => $username));
 
 		if(!$r){
-			//$this->logout(false);
-			echo "not valid"; exit();
+			$this->logout(false);
 			$this->addError("The username and/or password could not be be found. Please try again. If you encounter further errors please try to recover your password.");
 			return false;
 		}
@@ -251,41 +224,33 @@ class User extends \glue\db\Document{
 		$this->clean();
 		foreach($r as $k=>$v)
 			$this->$k=$v;
-
-		if($social_login){
-			$valid = true;
-		}else{
-			$valid = Crypt::verify($password, $this->password);
-		}
-
-		/** If found */
-		if($valid){
-
+		
+		if($checkPassword===false||Crypt::verify($password, $this->password)){
 			if($this->deleted){
 				$this->addError("Your account has been deleted. This process cannot be undone and may take upto 24 hours.");
 				return false;
 			}
-
+			
 			if($this->banned){
 				$this->addError('You have been banned from this site.');
 				return false;
 			}
 			/** Then log the login */
 			$this->log($this->email, true);
-			
+				
 			/** Set the session */
-			$this->_setSession($remember, true);
-			glue::session()->tier2_logged=true;
-
+			$this->setSession($remember, true);
+			
 			/** Success */
-			return true;
+			return true;			
 		}else{
+			// poop
 			glue::user()->log($this->email, false);
 			$this->addError("The username and/or password could not be be found. Please try again. If you encounter further errors please try to recover your password.");
-			return false;
+			return false;			
 		}
 	}
-
+	
 	/**
 	 * Logout a user
 	 *
@@ -303,12 +268,15 @@ class User extends \glue\db\Document{
 
 		/** Remove session from table */
 		if($this->_id){
-			User::model()->updateAll(array('_id' => $this->_id), array('$unset'=>array("sessions.".session_id()=>'')));
+			glue\User::model()->updateAll(array('_id' => $this->_id), array('$unset'=>array("sessions.".session_id()=>'')));
 		}
 
 		/** Unset session */
 		session_unset();
-		$this->session_defaults();
+		session_destroy();
+		session_write_close();
+		setcookie(session_name(),'',0,'/');
+		gue::session()->regenerateID(true);
 		$this->clean();
 
 		/** SUCCESS */
@@ -339,7 +307,7 @@ class User extends \glue\db\Document{
 	 * @param int $remember
 	 * @param array $ins
 	 */
-	private function _setCookie($remember, $init = false){
+	private function setCookie($remember, $init = false){
 
 		/** Source the cookie information */
 		$cookie_string = Crypt::AES_encrypt256($this->_id);
@@ -366,7 +334,7 @@ class User extends \glue\db\Document{
 	 * This will only ever check temporary cookies and not permanent
 	 * ones
 	 */
-	private function _checkCookie(){
+	private function restoreFromCookie(){
 
 		/** Is the cookie set? */
 		if(isset($_COOKIE[$this->tempCookie])){
@@ -383,15 +351,17 @@ class User extends \glue\db\Document{
 
 			/** Get the matching user and session */
 			$r=$this->getCollection()->findOne($criteria);
-			foreach($r as $k=>$v)
-				$this->$k=$v;
+			if($r!==null){
+				foreach($r as $k=>$v)
+					$this->$k=$v;
+			}
 
 			/** Check variable to ensure the session is valid */
 			if($this->sessions[session_id()]['ip'] == $_SERVER['REMOTE_ADDR']){
 
 				/** Auth user */
 				glue::session()->tier2_logged=true;
-				$this->_setSession();
+				$this->setSession();
 
 			}else{
 
@@ -408,11 +378,13 @@ class User extends \glue\db\Document{
 					'sessions' => array('$elemMatch' => array('id' => $s_id, 'remember' => 1)),
 					"deleted" => 0
 			));
-			foreach($r as $k=>$v)
-				$this->$k=$v;
+			if($r!==null){
+				foreach($r as $k=>$v)
+					$this->$k=$v;
+			}
 
 			if($this->_id){
-				$this->_setSession();
+				$this->setSession();
 			}else{
 				$this->logout(false);
 			}
@@ -420,9 +392,9 @@ class User extends \glue\db\Document{
 		return false;
 	}
 
-	function loginNotification_email(){
+	function emailLoginNotification(){
 		glue::mailer()->mail($this->email, array('no-reply@stagex.co.uk', 'StageX'), 'Someone has logged onto your StageX account',	"user/emailLogin.php",
-			array_merge($this->ins[session_id()], array("username"=>$this->username)));
+			array_merge($this->sessions[session_id()], array("username"=>$this->username)));
     	return true;
 	}
 }

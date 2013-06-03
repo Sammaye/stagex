@@ -31,13 +31,11 @@ class Session extends \glue\Component{
 	//private $_session;
 
 	public function __get($name){
-		var_dump($name);
 		if(!property_exists($this,$name))
 			return $this->get($name);
 	}
 
 	public function __set($name,$value){
-		var_dump($name);
 		if(!property_exists($this,$name))
 			return $this->set($name,$value);
 	}
@@ -176,4 +174,31 @@ class Session extends \glue\Component{
 		glue::db()->{$this->sessionCollectionName}->remove(array('expires' => array('$lt' => strtotime($this->lifeTime))));
 		return true;
 	}
+	
+	public function regenerateID($deleteOldSession=false)
+	{
+		$oldID=session_id();
+	
+		// if no session is started, there is nothing to regenerate
+		if(empty($oldID))
+			return;
+	
+		session_regenerate_id(false);
+		$newID=session_id();
+		
+		$row=glue::db()->{$this->sessionCollectionName}->findOne(array('session_id' => $oldID));
+		if($row!==null){
+			if($deleteOldSession)
+				glue::db()->{$this->sessionCollectionName}->update(array('session_id'=>$oldID),array('$set'=>array('session_id'=>$newID)));
+			else{
+				$row['session_id']=$newID;
+				glue::db()->{$this->sessionCollectionName}->insert($row);
+			}
+		}else{
+			glue::db()->{$this->sessionCollectionName}->insert(array(
+				'id'=>$newID,
+				'expire'=>strtotime($this->lifeTime)					
+			));
+		}
+	}	
 }
