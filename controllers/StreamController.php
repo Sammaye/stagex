@@ -1,5 +1,8 @@
 <?php
-class StreamController extends GController{
+
+use app\models\Subscription;
+
+class StreamController extends glue\Controller{
 
 	public $layout = 'user_section';
 	public $subtab;

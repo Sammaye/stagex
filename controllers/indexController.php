@@ -11,7 +11,7 @@ class indexController extends \glue\Controller{
 	public function action_index(){
 		$this->title = "Welcome to the StageX Beta";
 		if(glue::auth()->check('@')){
-			glue::route('/stream/news');
+			glue::route('stream/news');
 		}else{
 			echo $this->render('/index');
 		}
