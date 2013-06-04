@@ -55,7 +55,7 @@ class Auth extends \glue\Component{
 	public function parseControllerRights($controllerPermissions, $action){
 
 		foreach($controllerPermissions as $permission){
-			
+
 			$actions = isset($permission['actions']) && is_array($permission['actions']) ? $permission['actions'] : array();
 			//var_dump($actions); var_dump($action);
 			if((array_key_exists($action, array_flip($actions)) || count($actions) <= 0)){
@@ -64,7 +64,7 @@ class Auth extends \glue\Component{
 					//var_dump($role);
 					if(($func=$this->getFilter($role))===null)
 						throw new Exception("The auth shortcut: $role you specified within ".get_class($this->controller)." does not exist.");
-					
+
 //var_dump($func); exit();
 					if(is_callable($func)){
 						if($func()){
@@ -89,8 +89,11 @@ class Auth extends \glue\Component{
 	}
 
 	// This is used as a means to else where
-	public function checkRoles($roles, $all = false){
+	public function check($roles, $all = false){
 		$matched = true;
+
+		if(is_string($roles)) $roles=array($roles);
+
 		foreach($roles as $role=>$params){
 
 			if(is_int($role)){
