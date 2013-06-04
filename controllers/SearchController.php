@@ -20,7 +20,7 @@ class searchController extends GController{
 		$sphinx->setFilter('listing', array('2', '3'), true);
 		$sphinx->setFilter('videos', array('0', '1', '2', '3', '4'), true); // Omits small playlists from the main search
 
-		if(glue::session()->user->safe_srch == "S" || !$_SESSION['logged']){
+		if(glue::session()->user->safe_srch == "S" || !glue::session()->authed){
 			$sphinx->setFilter('adult', array('1'), true);
 		}
 

@@ -252,7 +252,7 @@ glue::clientScript()->addJsScript('watch.edit_video', "
 				<h1 class='username_outer'>
 					<a href='<?php echo glue::url()->create('/user/view', array('id' => $model->author->_id)) ?>'><?php echo $model->author->getUsername() ?></a> <span class='uploaded'><?php echo ago($model->created->sec) ?></span>
 				</h1>
-				<?php if($_SESSION['logged']){ ?>
+				<?php if(glue::session()->authed){ ?>
 					<div class='right'>
 						<?php if(Subscription::isSubscribed($model->author->_id)){ ?>
 							<div class='unsubscribe grey_css_button float_right'><div>Unsubscribe</div></div>
@@ -423,7 +423,7 @@ glue::clientScript()->addJsScript('watch.edit_video', "
 							<div class="box_head">Spread this Video</div>
 							<div class="close"><a href="#"><?php echo utf8_decode('&#215;') ?></a></div>
 						</div>
-						<?php if($_SESSION['logged']){ ?>
+						<?php if(glue::session()->authed){ ?>
 							<div class='share_item_with_subs'>
 								<?php echo html::textarea('share_status_text', 'Add some text here if you wish to describe why you shared this video or just click the share button to continue', array('class' => 'share_status_text share_status_text_unchanged')) ?>
 								<div class='green_css_button share_video_as_status'>Share</div>

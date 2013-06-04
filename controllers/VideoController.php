@@ -40,7 +40,7 @@ class videoController extends GController{
 		}
 		$sphinx->setFilter('listing', array('2', '3'), true);
 
-		if(glue::session()->user->safe_srch == "S" || !$_SESSION['logged']){
+		if(glue::session()->user->safe_srch == "S" || !glue::session()->authed){
 			$sphinx->setFilter('adult', array('1'), true);
 		}
 
@@ -254,7 +254,7 @@ class videoController extends GController{
 			$_SESSION['age_confirmed'] = $video->_id;
 
 		$age_confirm = isset($_SESSION['age_confirmed']) ? $_SESSION['age_confirmed'] : 0;
-		$safe_search = $_SESSION['logged'] ? glue::session()->user->safe_srch : "S";
+		$safe_search = glue::session()->authed ? glue::session()->user->safe_srch : "S";
 
 		if((bool)$video->adult_content && $age_confirm != strval($video->_id)){
 
@@ -267,7 +267,7 @@ class videoController extends GController{
 
 		// ELSE play the video
 		$video->recordHit();
-		if($_SESSION['logged']){
+		if(glue::session()->authed){
 			if(strval(glue::session()->user->_id) != strval($video->user_id) && $video->listing != 'u' && $video->listing != 'n'){
 				Stream::videoWatch(glue::session()->user->_id, $video->_id);
 			}

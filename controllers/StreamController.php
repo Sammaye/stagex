@@ -188,7 +188,7 @@ class StreamController extends GController{
 			GJSON::kill(array('No last stream item could be found'));
 		}
 
-		if(!$_user_id && !$_SESSION['logged'])
+		if(!$_user_id && !glue::session()->authed)
 			GJSON::kill(GJSON::UNKNOWN);
 
 		if(!$get_news){

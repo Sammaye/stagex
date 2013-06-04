@@ -54,7 +54,7 @@ class Menu extends \glue\Widget{
 				<?php if(isset($_SESSION)){ ?>
 				<div class="presence_bar-topRight" style='margin-top:5px;'>
 					<ul>
-						<?php if($_SESSION['logged']){ ?>
+						<?php if(glue::session()->authed){ ?>
 							<li>
 
 								<?php $newNotifications = \app\models\Notification::getNewCount_Notifications(); ?>

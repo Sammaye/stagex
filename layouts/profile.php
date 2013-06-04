@@ -126,7 +126,7 @@ glue::clientScript()->addJsScript('user.subscribe', "
 					</div>
 					<div class='user_subscription'>
 						<?php if($user->_id != glue::session()->user->_id){
-							if($_SESSION['logged']){
+							if(glue::session()->authed){
 								if(Subscription::isSubscribed($user->_id)){ ?>
 									<div class='unsubscribe grey_css_button_right'><div>Unsubscribe</div></div>
 								<?php }else{ ?>

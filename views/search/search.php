@@ -169,7 +169,7 @@ glue::clientScript()->addJsScript('sortChange', "
 			</div>
 		<?php } ?>
 		<div class='float_right safe_search'><a href='<?php echo glue::url()->create('/user/settings') ?>'>
-			<?php if(glue::session()->user->safe_srch == "S" || !$_SESSION['logged']){ ?>
+			<?php if(glue::session()->user->safe_srch == "S" || !glue::session()->authed){ ?>
 				Safe Search On
 			<?php }else{ ?>
 				Safe Search Off

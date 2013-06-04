@@ -167,7 +167,7 @@ return array(
 				},
 
 				'roleLogged' => function(){
-					if($_SESSION['logged']){
+					if(glue::session()->authed){
 						return true;
 					}
 					return false;
@@ -219,7 +219,7 @@ return array(
 					return true;
 				},
 				'loginRequired' => function(){
-					if($_SESSION['logged']){
+					if(glue::session()->authed){
 						return true;
 					}
 

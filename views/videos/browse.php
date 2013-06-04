@@ -192,7 +192,7 @@ glue::clientScript()->addJsScript('sortChange', "
 				</div>
 			<?php } ?>
 			<div class='float_right safe_search'><a href='<?php echo glue::url()->create('/user/settings') ?>'>
-				<?php if(glue::session()->user->safe_srch == "S" || !$_SESSION['logged']){ ?>
+				<?php if(glue::session()->user->safe_srch == "S" || !glue::session()->authed){ ?>
 					Safe Search On
 				<?php }else{ ?>
 					Safe Search Off
@@ -211,7 +211,7 @@ glue::clientScript()->addJsScript('sortChange', "
 						<div class='thumb_outer' style='position:relative; width:138px; height:77px;'>
 							<a href='<?php echo Glue::url()->create("/video/watch", array("id"=>$v->_id)) ?>'><img alt='thumbnail' class='thumb' src='<?php echo $v->getImage(138, 77) ?>' /></a>
 							<div class='duration_hover'><span><?php echo $v->get_time_string() ?></span></div>
-							<?php if($_SESSION['logged']): ?><a class='playlist_button' href='#'><img alt='add to' src='/images/add_tooltip.png'/></a><?php endif; ?>
+							<?php if(glue::session()->authed): ?><a class='playlist_button' href='#'><img alt='add to' src='/images/add_tooltip.png'/></a><?php endif; ?>
 						</div>
 						<?php if($v->author): ?>
 							<div class='details_cap'><h3 class='title'><a href='<?php echo Glue::url()->create("/video/watch", array("id"=>$v->_id)) ?>'><?php echo strlen($v->title) > 17 ? substr($v->title, 0, 17).'...' : $v->title ?></a></h3>

@@ -400,7 +400,7 @@ class Video extends MongoDocument{
 			$u_brows_key = glue::http()->get_major_ua_browser();
 
 	        $u_age_key = 'u';
-	        if($_SESSION['logged']){
+	        if(glue::session()->authed){
 		        ///Other, 13-16, 17-25, 26-35, 36-50, 50+
 		        //var_dump($user->birth_month); exit();
 		        $u_age = !empty($user->birth_day) && !empty($user->birth_month) && !empty($user->birth_year) ?

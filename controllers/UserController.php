@@ -698,7 +698,7 @@ class userController extends \glue\Controller{
 		$to = $user->temp_access_token['to'];
 
 		if($to > time() && $user->temp_access_token['hash'] == $hash && $user->temp_access_token['y'] == "E_CHANGE" && $user->temp_access_token['email'] == $email){
-			if($_SESSION['logged']){
+			if(glue::session()->authed){
 
 				$user->email = $email;
 				unset($user->temp_access_token);

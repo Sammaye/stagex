@@ -10,7 +10,7 @@ class indexController extends \glue\Controller{
 
 	public function action_index(){
 		$this->title = "Welcome to the StageX Beta";
-		if($_SESSION['logged']){
+		if(glue::session()->authed){
 			glue::route('/stream/news');
 		}else{
 			echo $this->render('/index');

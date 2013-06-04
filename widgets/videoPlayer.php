@@ -11,7 +11,7 @@ class videoPlayer extends GWidget{
 	public $ogg;
 
 	function render(){
-		if($_SESSION['logged']){
+		if(glue::session()->authed){
 			if(glue::session()->user->use_divx_player){
 				$this->divxPlayer();
 			}else{
@@ -26,7 +26,7 @@ class videoPlayer extends GWidget{
 		?>
 		<object width="<?php echo $this->width ?>" height="<?php echo $this->height ?>" data="<?php echo $this->mp4 ?>" id="ie_plugin" classid="clsid:67DABFBF-D0AB-41fa-9C46-CC0F21721616">
 		<param value="http://go.divx.com/plugin/DivXBrowserPlugin.cab" name="codebase">
-		<param value="<?php if((glue::session()->user->auto_play_vids || !$_SESSION['logged'])): echo "true"; else: echo "false"; endif; ?>" name="autoPlay">
+		<param value="<?php if((glue::session()->user->auto_play_vids || !glue::session()->authed)): echo "true"; else: echo "false"; endif; ?>" name="autoPlay">
 		<param value="<?php echo $this->mp4 ?>" name="src">
 		<embed width="<?php echo $this->width ?>" height="<?php echo $this->height ?>" pluginspage="http://go.divx.com/plugin/download/" type="video/divx" src="<?php echo $this->mp4 ?>" id="np_plugin">
 		</object>
@@ -61,7 +61,7 @@ class videoPlayer extends GWidget{
 		$mp4_url = 'http://videos.stagex.co.uk/'.pathinfo($this->mp4, PATHINFO_BASENAME);
 		$ogg_url = 'http://videos.stagex.co.uk/'.pathinfo($this->ogg, PATHINFO_BASENAME);
 		?>
-		<video width="<?php echo $this->width ?>" height="<?php echo $this->height ?>" <?php if((glue::session()->user->auto_play_vids || !$_SESSION['logged']) && !$this->embedded): echo "autoplay"; endif; ?> controls="controls" preload="none">
+		<video width="<?php echo $this->width ?>" height="<?php echo $this->height ?>" <?php if((glue::session()->user->auto_play_vids || !glue::session()->authed) && !$this->embedded): echo "autoplay"; endif; ?> controls="controls" preload="none">
 		    <source type="video/mp4" src="<?php echo $mp4_url ?>" />
 		    <source type="video/ogg" src="<?php echo $ogg_url ?>" />
 		    <object width="320" height="240" type="application/x-shockwave-flash" data="/js/MediaElement/flashmediaelement.swf">

@@ -100,7 +100,7 @@ $video_count = count($playlist->videos);
 		<div class='grid_5 alpha main_content_left'>
 			<div class='head_outer'>
 				<h1 class='head'><?php echo html::encode($playlist->title) ?></h1>
-				<?php if($_SESSION['logged']){ ?>
+				<?php if(glue::session()->authed){ ?>
 					<?php if(glue::roles()->checkRoles(array('^' => $playlist))){ ?>
 						<a href='<?php echo glue::url()->create('/playlist/edit', array('id' => strval($playlist->_id))) ?>' class='grey_css_button'>Edit Playlist</a>
 					<?php }else{ ?>
@@ -138,7 +138,7 @@ $video_count = count($playlist->videos);
 							<div class='video_thumb_pane video_thumbnail_pane' style='position:relative;'>
 								<a href="<?php echo glue::url()->create('/video/watch', array('id' => $model->_id, 'plid' => $playlist->_id)) ?>" ><img alt='thumbnail' src="<?php echo $model->getImage(138, 77) ?>"/></a>
 								<div class='duration_hover'><span><?php echo $model->get_time_string() ?></span></div>
-								<?php if($_SESSION['logged']){ ?><a class='playlist_button' href='#'><img alt='add_to' src='/images/add_tooltip.png'/></a><?php } ?></div>
+								<?php if(glue::session()->authed){ ?><a class='playlist_button' href='#'><img alt='add_to' src='/images/add_tooltip.png'/></a><?php } ?></div>
 							<div class='more_info_pane'>
 								<h3 class='title'><a href="<?php echo glue::url()->create('/video/watch', array('id' => $model->_id, 'plid' => $playlist->_id)) ?>"><?php echo $model->title ?></a></h3>
 								<div class='uploaded'>
@@ -166,7 +166,7 @@ $video_count = count($playlist->videos);
 				<div class='about_user'><a href='<?php echo glue::url()->create('/user/view', array('id' => strval($user->_id))) ?>'><?php echo $user->getUsername() ?></a><div class='subs'><?php echo $user->total_subscribers ?> subscribers</div>
 				</div>
 			</div>
-			<?php if($user->_id != glue::session()->user->_id && $_SESSION['logged']){ ?>
+			<?php if($user->_id != glue::session()->user->_id && glue::session()->authed){ ?>
 				<div class='user_subscribe'>
 					<?php if(Subscription::isSubscribed($user->_id)){ ?>
 						<div class='unsubscribe grey_css_button'><div>Unsubscribe</div></div>
@@ -180,7 +180,7 @@ $video_count = count($playlist->videos);
 
 			<div class='share_bloc'>
 				<div class='share_capt'>Share Playlist</div>
-				<?php if($_SESSION['logged']){ ?>
+				<?php if(glue::session()->authed){ ?>
 					<div class='xshare_button'><a href='#' class='green_css_button float_left block xshare_playlist'>Share to Subscribers</a></div>
 					<div class='xshare_playlist_body'>
 						<div class='block_summary' style='display:none;'></div>

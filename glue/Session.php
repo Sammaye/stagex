@@ -18,7 +18,7 @@ class Session extends \glue\Component{
 	 * @var int
 	 */
 	public $lifeTime='+2 weeks';
-	
+
 	public $sessionCollectionName='sessions';
 
 	/**
@@ -41,7 +41,7 @@ class Session extends \glue\Component{
 	}
 
 	public function get($name){
-		return $_SESSION[$name];
+		return isset($_SESSION[$name])?$_SESSION[$name]:null;
 	}
 
 	public function set($name,$value=null){
@@ -87,7 +87,7 @@ class Session extends \glue\Component{
 	function open( $save_path, $session_name ) {
 		global $sess_save_path;
 		$sess_save_path = $save_path;
-		
+
 		// Don't need to do anything. Just return TRUE.
 		return true;
 
@@ -140,10 +140,10 @@ class Session extends \glue\Component{
 		// If the user is logged in record their uid
 		glue::db()->{$this->sessionCollectionName}->update(array("session_id"=>$id), array('$set'=>array(
 			"session_id"=>$id,
-			"user_id"=>$_SESSION['logged'] ? $_SESSION['uid'] : 0,
+			//"user_id"=>glue::session()->authed ? $_SESSION['uid'] : 0,
 			"data"=>$data,
 			"expires"=>$time,
-			"active"=>1
+			//"active"=>1
 		)), array("upsert"=>true));
 
 		// DONE
@@ -174,18 +174,18 @@ class Session extends \glue\Component{
 		glue::db()->{$this->sessionCollectionName}->remove(array('expires' => array('$lt' => strtotime($this->lifeTime))));
 		return true;
 	}
-	
+
 	public function regenerateID($deleteOldSession=false)
 	{
 		$oldID=session_id();
-	
+
 		// if no session is started, there is nothing to regenerate
 		if(empty($oldID))
 			return;
-	
+
 		session_regenerate_id(false);
 		$newID=session_id();
-		
+
 		$row=glue::db()->{$this->sessionCollectionName}->findOne(array('session_id' => $oldID));
 		if($row!==null){
 			if($deleteOldSession)
@@ -197,8 +197,8 @@ class Session extends \glue\Component{
 		}else{
 			glue::db()->{$this->sessionCollectionName}->insert(array(
 				'id'=>$newID,
-				'expire'=>strtotime($this->lifeTime)					
+				'expire'=>strtotime($this->lifeTime)
 			));
 		}
-	}	
+	}
 }

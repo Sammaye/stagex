@@ -128,7 +128,7 @@ glue::clientScript()->addJsScript('user.stream', "
 				<div class='grey_css_button selected_filter'>Showing All Activity</div>
 			</div>
 			<div class='profile_stream_content'>
-				<?php if($_SESSION['logged']){ ?>
+				<?php if(glue::session()->authed){ ?>
 					<div class='comment_area'>
 						<?php echo html::textarea('comment', 'Post a message to this user or share something with them', array('class' => 'profile_comment_textarea profile_comment_textarea_unchanged')) ?>
 						<div class='green_css_button submit_comment'>Post Comment</div>

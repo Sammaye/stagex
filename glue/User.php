@@ -10,7 +10,7 @@ class User extends \glue\db\Document{
 	public $username;
 	public $password;
 	public $email;
-	
+
 	public $sessions=array();
 
 	/**
@@ -51,17 +51,17 @@ class User extends \glue\db\Document{
 	 * @var string
 	 */
 	private $path='/';
-	
+
 	private $logAttempts=true;
 	private $logCollectionName='session_log';
-	
+
 	function collectionName(){
 		return "user";
-	}	
-	
+	}
+
 	public static function model($className = __CLASS__){
 		return parent::model($className);
-	}	
+	}
 
 	function init(){
 		if(php_sapi_name() != 'cli'){
@@ -211,7 +211,7 @@ class User extends \glue\db\Document{
 	public function login($username, $password, $remember = false, $checkPassword = true){
 
 		$this->logout(false);
-			
+
 		/** Find the user */
 		$r=$this->getCollection()->findOne(array('email' => $username));
 
@@ -224,33 +224,33 @@ class User extends \glue\db\Document{
 		$this->clean();
 		foreach($r as $k=>$v)
 			$this->$k=$v;
-		
+
 		if($checkPassword===false||Crypt::verify($password, $this->password)){
 			if($this->deleted){
 				$this->addError("Your account has been deleted. This process cannot be undone and may take upto 24 hours.");
 				return false;
 			}
-			
+
 			if($this->banned){
 				$this->addError('You have been banned from this site.');
 				return false;
 			}
 			/** Then log the login */
 			$this->log($this->email, true);
-				
+
 			/** Set the session */
 			$this->setSession($remember, true);
-			
+
 			/** Success */
-			return true;			
+			return true;
 		}else{
 			// poop
 			glue::user()->log($this->email, false);
 			$this->addError("The username and/or password could not be be found. Please try again. If you encounter further errors please try to recover your password.");
-			return false;			
+			return false;
 		}
 	}
-	
+
 	/**
 	 * Logout a user
 	 *
@@ -276,7 +276,7 @@ class User extends \glue\db\Document{
 		session_destroy();
 		session_write_close();
 		setcookie(session_name(),'',0,'/');
-		gue::session()->regenerateID(true);
+		glue::session()->regenerateID(true);
 		$this->clean();
 
 		/** SUCCESS */
