@@ -347,7 +347,7 @@ class User extends \glue\db\Document{
 
 			/** Form the criteria for the search */
 			$criteria['_id'] = new \MongoId($user_id);
-			$criteria['sessions.'.$s_id] = array('$exists'=>true);
+			$criteria['sessions.id'] = $s_id;
 			$criteria['deleted'] = 0;
 
 			/** Get the matching user and session */

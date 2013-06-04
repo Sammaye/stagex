@@ -21,15 +21,6 @@ class Session extends \glue\Component{
 
 	public $sessionCollectionName='sessions';
 
-	/**
-	 * This stores the found session collection so that we don't
-	 * waste resources by constantly going back for it
-	 *
-	 * @access private
-	 * @var sessions
-	 */
-	//private $_session;
-
 	public function __get($name){
 		if(property_exists($this,$name))
 			return $this->$name;
