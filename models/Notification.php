@@ -55,7 +55,7 @@ class Notification extends \glue\db\Document{
 
 	static function getNewCount_Notifications(){
 		return Notification::model()->find(array('userId' => glue::user()->_id,
-				'created' => array('$gt' => glue::user()->lastNotificationPull)))->count();
+				'create_time' => array('$gt' => glue::user()->lastNotificationPull)))->count();
 	}
 
 	function beforeSave(){

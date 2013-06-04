@@ -398,7 +398,7 @@ class User extends \glue\User{
 		if(isset(glue::$params['imagesUrl'])){
 			return 'http://images.stagex.co.uk/user/'.strval($this->_id).'_w_'.$width.'_h_'.$height.'.png';
 		}else{
-			return Glue::url()->create("/image/user", array('file' => strval($this->_id), "w"=>$width, "h"=>$height));
+			return Glue::http()->createUrl("/image/user", array('file' => strval($this->_id), "w"=>$width, "h"=>$height));
 		}
 	}
 
@@ -412,7 +412,7 @@ class User extends \glue\User{
 	}
 
 	function getUsername(){
-		return html::encode($this->username);
+		return glue\Html::encode($this->username);
 	}
 
 	function getAbout(){

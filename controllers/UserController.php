@@ -34,12 +34,10 @@ class userController extends \glue\Controller{
 		$this->title = 'Create a new StageX Account';
 
 		$model = new User;
-		//$_SESSION['GCSRF_TOKEN'] = md5('d');
-		//var_dump($_SESSION);
 		if(isset($_POST['User'])){
 			$model->attributes=$_POST['User'];
 			if($model->validate()&&$model->save()){
-				if($model->login($model->username,$model->password)){
+				if($model->login($model->email,'',true,false)){
 					glue::http()->redirect("/user");
 				}else{
 					$model->addError("Login failed, however, it seems you are saved to our system so please try to login manually.");

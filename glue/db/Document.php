@@ -572,7 +572,7 @@ class Document extends \glue\Model{
 			$this->resetScope();
 			return $cursor;
 		}else{
-			return new EMongoCursor($this, $this->getCollection()->find($criteria, $fields));
+			return new \glue\db\Cursor($this, $this->getCollection()->find($criteria, $fields));
 		}
 	}
 
@@ -805,7 +805,7 @@ class Document extends \glue\Model{
 		// blank class properties
 		$cache = $this->attributeNames();
 		foreach($cache as $k => $v)
-			$this->$k = null;
+			$this->$v = null;
 		return true;
 	}
 

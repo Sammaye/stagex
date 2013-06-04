@@ -31,12 +31,16 @@ class Session extends \glue\Component{
 	//private $_session;
 
 	public function __get($name){
-		if(!property_exists($this,$name))
+		if(property_exists($this,$name))
+			return $this->$name;
+		else
 			return $this->get($name);
 	}
 
 	public function __set($name,$value){
-		if(!property_exists($this,$name))
+		if(property_exists($this,$name))
+			return $this->$name=$value;
+		else
 			return $this->set($name,$value);
 	}
 

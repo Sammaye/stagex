@@ -368,11 +368,10 @@ return array(
 		 * Certain error cases
 		 */
 		'404' => function(){
-			echo "404";
-			glue::http()->redirect('/error/notfound');
+			glue::route('error/notfound');
 		},
 		'403' => function(){
-			glue::http()->redirect('/error/forbidden');
+			glue::route('error/forbidden');
 		},
 
 		/**

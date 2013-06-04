@@ -77,7 +77,8 @@ class User extends \glue\db\Document{
 				}elseif($this->allowCookies && isset($_COOKIE[$this->permCookie])){
 					$this->restoreFromCookie();
 				}else
-					$this->logout(false);
+					$this->defaults();
+				
 			}
 		}
 
@@ -127,16 +128,21 @@ class User extends \glue\db\Document{
 	private function validateSession() {
 
 		/** Query for the object */
-		$user=$this->getCollection()->findOne(array('_id' => new \MongoId(glue::session()->id), 'email' => glue::session()->email, 'deleted' => 0));
+		$user=$this->getCollection()->findOne(array('_id' => new \MongoId(glue::session()->id),'deleted' => 0));
 
+		if(!$user){
+			$this->logout(false);
+			return false;
+		}
+		
 		// Set the model attributes
 		$this->clean();
-		foreach($r as $k=>$v)
+		foreach($user as $k=>$v)
 			$this->$k=$v;
 
 		//echo "here"; echo session_id();
 		if(isset($this->sessions[session_id()])){
-			if(($this->sessions[session_id()]['ts']->sec + $this->timeout) < time()){
+			if(($this->sessions[session_id()]['last_active']->sec + $this->timeout) < time()){
 				$this->restoreFromCookie();
 			}else{
 				/** VALID */
@@ -186,7 +192,6 @@ class User extends \glue\db\Document{
 			$this->sessions[session_id()]['created'] = new \MongoDate();
 		}
 		//var_dump($this->user->ins[session_id()]);
-
 		$this->save();
 		$this->setCookie($remember, $init);
 
@@ -228,27 +233,21 @@ class User extends \glue\db\Document{
 		if($checkPassword===false||Crypt::verify($password, $this->password)){
 			if($this->deleted){
 				$this->addError("Your account has been deleted. This process cannot be undone and may take upto 24 hours.");
-				return false;
-			}
-
-			if($this->banned){
+			}elseif($this->banned){
 				$this->addError('You have been banned from this site.');
-				return false;
+			}else{
+				/** Then log the login */
+				$this->log($this->email, true);
+				$this->setSession($remember, true);
+				return true;
 			}
-			/** Then log the login */
-			$this->log($this->email, true);
-
-			/** Set the session */
-			$this->setSession($remember, true);
-
-			/** Success */
-			return true;
 		}else{
 			// poop
 			glue::user()->log($this->email, false);
 			$this->addError("The username and/or password could not be be found. Please try again. If you encounter further errors please try to recover your password.");
 			return false;
 		}
+		$this->logout(false);
 	}
 
 	/**
@@ -272,10 +271,12 @@ class User extends \glue\db\Document{
 		}
 
 		/** Unset session */
-		session_unset();
-		session_destroy();
-		session_write_close();
-		setcookie(session_name(),'',0,'/');
+		if(session_id()!==''){
+			session_unset();
+			//session_destroy();
+			//session_write_close();
+			//setcookie(session_name(),'',0,'/');
+		}
 		glue::session()->regenerateID(true);
 		$this->clean();
 
