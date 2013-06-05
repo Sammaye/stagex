@@ -2,7 +2,9 @@
 
 use glue\Html,
 	app\models\loginForm,
-	app\models\User;
+	app\models\User,
+	app\models\Video,
+	app\models\Playlist;
 
 class userController extends \glue\Controller{
 
@@ -291,7 +293,7 @@ class userController extends \glue\Controller{
 
 	function action_videos(){
 
-		$this->pageTitle = 'Your Videos - StageX';
+		$this->title = 'Your Videos - StageX';
 		$this->layout = 'user_section';
 		$this->tab = 'videos';
 
@@ -310,17 +312,17 @@ class userController extends \glue\Controller{
 				break;
 		}
 
-		$video_rows = Video::model()->search(
+		$video_rows = Video::model()->fts(
 			array('title', 'description', 'tags'), isset($_GET['query']) ? $_GET['query'] : '', array_merge(
-				array('user_id' => glue::session()->user->_id, 'deleted' => 0), $filter_obj))
+				array('user_id' => glue::user()->_id, 'deleted' => 0), $filter_obj))
 			->sort(array('created' => -1));
 
-		$this->render('user/videos', array('video_rows' => $video_rows, 'filter' => $filter));
+		echo $this->render('videos', array('video_rows' => $video_rows, 'filter' => $filter));
 	}
 
 	function action_playlists(){
 
-		$this->pageTitle = 'Your Playlists - StageX';
+		$this->title = 'Your Playlists - StageX';
 
 		$this->layout = 'user_section';
 		$this->tab = 'playlists';
@@ -340,23 +342,23 @@ class userController extends \glue\Controller{
 				break;
 		}
 
-		$playlist_rows = Playlist::model()->search(
+		$playlist_rows = Playlist::model()->fts(
 			array('title', 'description'), isset($_GET['query']) ? $_GET['query'] : '', array_merge(
-				array('user_id' => glue::session()->user->_id, 'title' => array('$ne' => 'Watch Later'), 'deleted' => 0),
+				array('user_id' => glue::user()->_id, 'title' => array('$ne' => 'Watch Later'), 'deleted' => 0),
 				$filter_obj
 			))
-			->sort(array('ts' => -1));
+			->sort(array('created' => -1));
 
-		$this->render('user/playlists', array('playlist_rows' => $playlist_rows, 'filter' => $filter));
+		echo $this->render('playlists', array('playlist_rows' => $playlist_rows, 'filter' => $filter));
 	}
 
 	function action_watch_later(){
-		$this->pageTitle = 'Watch Later - StageX';
+		$this->title = 'Watch Later - StageX';
 
 		$this->layout = 'user_section';
 		$this->tab = 'watch_later';
-		$watch_later = Playlist::model()->findOne(array('title' => 'Watch Later', 'user_id' => glue::session()->user->_id));
-		$this->render('user/watch_later', array('model' => $watch_later));
+		$watch_later = Playlist::model()->findOne(array('title' => 'Watch Later', 'user_id' => glue::user()->_id));
+		echo $this->render('user/watch_later', array('model' => $watch_later));
 	}
 
 	function action_subscriptions(){
@@ -542,63 +544,29 @@ class userController extends \glue\Controller{
 	}
 
 	function action_profile(){
-		$this->pageTitle = 'Profile Settings - StageX';
-
+		$this->title = 'Profile Settings - StageX';
 		$this->layout = "user_section";
-		$model = $this->loadModel();
-		//var_dump($model->getAttributes());
-		$this->page = "settings";
-//do_dump($_FILES);
-//exit();
-
-		$success_message = '';
-		if(isset($_SESSION['success_message']) && !$_POST){
-			$model->setSuccess(true);
-			$model->setHasBeenValidated(true);
-			$success_message = $_SESSION['success_message'];
-			unset($_SESSION['success_message']);
-		}
-
 		$this->tab = "profile";
+
+		$model = $this->loadModel();
 
 		if(isset($_POST['User'])){
 			$model->setScenario($_POST['User']['action']);
-
-			switch($model->getScenario()){
-				case "updatePic":
-					if(isset($_POST['User'])){
-						$model->files($_FILES['User']);
-						if($model->validate()){
-							$model->setPic();
-
-							$_SESSION['success_message'] = "Your profile picture have been changed";
-							glue::http()->redirect("/user/profile");
-						}
-					}
-					break;
-				case "updateProfile":
-					$valid = $model->setProfilePrivacy(isset($_POST['User']['profile_privacy']) ? $_POST['User']['profile_privacy'] : array());
-					$model->_attributes($_POST['User']);
-					if($model->validate() && $valid){
-						$model->save();
-
-						$_SESSION['success_message'] = "Your profile settings have saved";
-						glue::http()->redirect("/user/profile");
-					}
-					break;
-				case "updateSocialProfiles":
-
-					$valid = $model->setExternalLinks(isset($_POST['User'], $_POST['User']['external_links']) ? $_POST['User']['external_links'] : array());
-
-					if($valid){
-						$model->save();
-						$_SESSION['success_message'] = "Your external links have been updated";
-						glue::http()->redirect("/user/profile");
-					}
-					break;
+			if($model->getScenario()=='updatePic'){
+				$model->profileImage=new glue\File(array('model'=>$model,'id'=>'profileImage'));
+				if($model->validate()&&$model->setAvatar()){
+					Html::setSuccessFlashMessage('Your profile picture have been changed');
+					glue::http()->redirect("/user/profile");
+				}
+			}else{
+				$model->attributes=$_POST['User'];
+				if($model->validate()&&$model->save()){
+					Html::setSuccessFlashMessage('Your profile settings have saved');
+					glue::http()->redirect("/user/profile");
+				}
 			}
 		}
-		$this->render('user/profile_settings', array('model' => $model, 'success_message' => $success_message));
+		echo $this->render('user/profile_settings', array('model' => $model, 'success_message' => ''));
 	}
 
 	function action_subscribe(){
@@ -793,7 +761,7 @@ class userController extends \glue\Controller{
 	 */
 
 	function loadModel(){
-		$user = User::model()->findOne(array("_id"=>glue::session()->user->_id));
+		$user = User::model()->findOne(array("_id"=>glue::user()->_id));
 		if(!$user){
 			glue::flash()->ERROR("You must be logged in to access this area.");
 			glue::http()->redirect('/user/login', array('nxt' => glue::url()->create('SELF')));

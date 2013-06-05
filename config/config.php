@@ -37,9 +37,9 @@ return array(
 	'components' => array(
 
 		'user' => array(
-			'class'=>'app\\models\\User'		
+			'class'=>'app\\models\\User'
 		),
-			
+
 		/**
 		 * Configures the session handler
 		 */
@@ -285,8 +285,8 @@ return array(
 				return true;
 			}
 		),
-		
-		
+
+
 		// Yes some MySQL
 		"mysql"=>array(
 				"host" => "localhost",
@@ -295,7 +295,7 @@ return array(
 				"db" => 'sphinx_index',
 				"class"=>"glue\\components\\mysql\\Record"
 		),
-		
+
 		// Woo Sphinx!
 		"sphinx"=>array(
 				'class' => 'sphinx_searcher',
@@ -315,27 +315,27 @@ return array(
 						)
 				)
 		),
-		
+
 		'facebook' => array(
 				'class' => 'glue\\components\\facebook\\Session',
 				'appId' => '455165987850786',
 				'secret' => '6c6336958eec554bfb2326e6824ea427',
 		),
-		
+
 		'twitter' => array(
 				'class' => 'glue\\components\\twitter\\Session',
 				'consumer_key' => "E1uIs3dzvlrodsj4R3I8w",
 				'secret_key' => "HxbMV2giKXekGI41TXp2A2rJh9P5OroGCSxlEYPogwc",
 				'callback' => "http://stagex.co.uk/autoshare/auth?network=twt"
 		),
-		
+
 		'google' => array(
 				'class' => 'glue\\components\\google\\Session',
 				'client_id' => '170938211589.apps.googleusercontent.com',
 				'client_secret' => 'lTJpybuvyAD-zWTBI-mnyT1Q',
 				'callback_uri' => 'http://stagex-local.co.uk/user/google_login'
 		),
-		
+
 		'aws' => array(
 				'class' => 'aws_bootstrap',
 				'path' => 'glue/plugins/aws/aws_bootstrap.php',
@@ -345,18 +345,18 @@ return array(
 				'input_queue' => 'https://us-west-2.queue.amazonaws.com/663341881510/stagex-uploadsQueue',
 				'output_queue' => 'https://us-west-2.queue.amazonaws.com/663341881510/stagex-outputsQueue'
 		),
-			
+
 		'purifier' => array(
 				'class' => 'glue/plugins/purifier/purify.php'
 		),
-		
+
 		'mailer' => array(
 				'class' => 'glue\\components\\phpmailer\\mailer'
 		),
-		
+
 		'sitemap' => array(
 				'class' => 'glue\\components\\sitemap\\sitemap'
-		),		
+		),
 	),
 
 	/**
@@ -423,6 +423,7 @@ return array(
 	 */
 	'aliases' => array(
 		"html"					=> "glue\\Html",
+		"Collection"			=> "glue\\Collection",
 
 		/**
 		 * Core utils

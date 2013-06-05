@@ -7,12 +7,7 @@ class StreamController extends glue\Controller{
 	public $layout = 'user_section';
 	public $subtab;
 
-	// A set of filters to be run before and after the controller action
-	public function filters(){
-		return array('rbam');
-	}
-
-	public function accessRules(){
+	public function authRules(){
 		return array(
 			array('allow', 'actions' => array('get_stream'), 'users' => array('*')),
 			array("allow", "users"=>array("@*")),
@@ -24,7 +19,7 @@ class StreamController extends glue\Controller{
 		$this->pageTitle = 'Your Stream - StageX';
 
 		$this->tab = 'stream';
-		$this->render('stream/view', array('model' => $this->load_single_stream()));
+		echo $this->render('stream/view', array('model' => $this->load_single_stream()));
 	}
 
 	public function action_news(){

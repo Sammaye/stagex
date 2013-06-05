@@ -1,7 +1,10 @@
 <?php
-include_once ROOT.'/glue/plugins/phpthumb/ThumbLib.inc.php';
+include_once glue::getPath('@glue').'/components/phpthumb/ThumbLib.inc.php';
 
-class imageController extends GController{
+use app\models\User,
+	app\models\Image;
+
+class imageController extends glue\Controller{
 
 	public $avatar_sizes = array(
 		array(30, 30),
@@ -85,9 +88,9 @@ class imageController extends GController{
 	function action_user(){
 		$this->pageTitle = 'User Avatar - StageX';
 
-		$file_name = isset($_GET['file']) ? $_GET['file'] : null;
-		$width = isset($_GET['w']) ? $_GET['w'] : 45;
-		$height = isset($_GET['h']) ? $_GET['h'] : 45;
+		$file_name = glue::http()->param('file',null);
+		$width = glue::http()->param('w',45);
+		$height = glue::http()->param('h',45);
 
 		$resize=  false;
 		$insert_cache = false;
@@ -103,16 +106,15 @@ class imageController extends GController{
 			$height = 55;
 		}
 
-		$bytes = file_get_contents(ROOT."/images/null_images/nullavatar_".$width."_".$height.".png"); // get bytes of null img
+		$bytes = file_get_contents(glue::getPath('@app')."/www/images/null_images/nullavatar_".$width."_".$height.".png"); // get bytes of null img
 
-		if(strlen($file_name) > 0){
-			$user = glue::db()->users->findOne(array('_id' => new MongoId($file_name)));
-			$file = glue::db()->image_cache->findOne(array('object_id' => new MongoId($file_name), 'width' => $width, 'height' => $height, 'type' => 'user'));
+		if(strlen($file_name) > 0 && User::model()->findOne(array('_id' => new MongoId($file_name)))){ // We have to do a user lookup to make sure they are not spamming us with ids
+			$file=Image::model()->findOne(array('ref' => MongoDBRef::create('user',new MongoId($file_name)), 'width' => $width, 'height' => $height));
 
 			if($file){
-				$bytes = $file['data']->bin; // The file is in the video row let's get EIT!!
-			}elseif(isset($user['image_src'])){ // If file exists in the user row
-				$bytes = $user['image_src'] instanceof MongoBinData ? $user['image_src']->bin : null;
+				$bytes = $file->data->bin; // The file is in the video row let's get EIT!!
+			}elseif(($original_image=Image::model()->findOne(array('ref' => MongoDBRef::create('user',new MongoId($file_name)), 'original' => true)))!==null){
+				$bytes = $original_image->data->bin; // The file is in the video row let's get EIT!!
 				$insert_cache = true;
 				$resize = true;
 			}
@@ -122,7 +124,7 @@ class imageController extends GController{
 		if($resize) $thumb->adaptiveResize($width, $height);
 
 		if($insert_cache){
-			glue::db()->image_cache->update(array('object_id' => $user['_id'], 'width' => $width, 'height' => $height, 'type' => 'user'),
+			glue::db()->image_cache->update(array('ref' => MongoDBRef::create('user',new MongoId($file_name)), 'width' => $width, 'height' => $height),
 				array('$set' => array('data' => new MongoBinData($thumb->getImageAsString()),
 			)), array('upsert' => true));
 		}

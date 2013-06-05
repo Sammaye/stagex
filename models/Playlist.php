@@ -27,7 +27,7 @@ class Playlist extends \glue\db\Document{
 	public $deleted = 0;
 
 	public function collectionName(){
-		return 'playlists';
+		return 'playlist';
 	}
 
 	function behaviours(){

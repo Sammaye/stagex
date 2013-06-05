@@ -1,4 +1,8 @@
-<?php glue::clientScript()->addJsFile('j-dropdown', '/js/jdropdown.js');
+<?php
+
+use glue\Html;
+
+$this->jsFile('j-dropdown', '/js/jdropdown.js');
 
 ob_start(); ?>
 	<div class='white_shaded_dropdown actions_menu_menu'>
@@ -12,10 +16,10 @@ ob_end_clean();
 
 ob_start(); ?>
 	<div class='white_shaded_dropdown filters_menu'>
-		<div class='item' data-caption='Showing All Playlists' data-url='<?php echo glue::url()->create('/user/playlists') ?>'>All Playlists</div>
-		<div class='item' data-caption='Showing Listed Playlists' data-url='<?php echo glue::url()->create(array('filter' => 'listed')) ?>'>Listed Playlists</div>
-		<div class='item' data-caption='Showing Unlisted Playlists' data-url='<?php echo glue::url()->create(array('filter' => 'unlisted')) ?>'>Unlisted Playlists</div>
-		<div class='item' data-caption='Showing Private Playlists' data-url='<?php echo glue::url()->create(array('filter' => 'private')) ?>'>Private Playlists</div>
+		<div class='item' data-caption='Showing All Playlists' data-url='<?php echo glue::http()->createUrl('/user/playlists') ?>'>All Playlists</div>
+		<div class='item' data-caption='Showing Listed Playlists' data-url='<?php echo glue::http()->createUrl(array('filter' => 'listed')) ?>'>Listed Playlists</div>
+		<div class='item' data-caption='Showing Unlisted Playlists' data-url='<?php echo glue::http()->createUrl(array('filter' => 'unlisted')) ?>'>Unlisted Playlists</div>
+		<div class='item' data-caption='Showing Private Playlists' data-url='<?php echo glue::http()->createUrl(array('filter' => 'private')) ?>'>Private Playlists</div>
 	</div><?php
 	$filter_html = ob_get_contents();
 ob_end_clean();
@@ -33,7 +37,7 @@ ob_start(); ?>
 	$html = ob_get_contents();
 ob_end_clean();
 
-glue::clientScript()->addJsScript('new_playlist', "
+$this->js('new_playlist', "
 	$(function(){
 
 		$('#playlist_search_submit').on('click', function(){
@@ -50,7 +54,7 @@ glue::clientScript()->addJsScript('new_playlist', "
 
 		$('#new_playlist').click(function(event){
 			event.preventDefault();
-			$.facebox(".GClientScript::encode($html).", 'add_playlist_diag');
+			$.facebox(".js_encode($html).", 'add_playlist_diag');
 		});
 
 		$(document).on('click', '.add_playlist_button', function(event){
@@ -97,7 +101,7 @@ glue::clientScript()->addJsScript('new_playlist', "
 			}, 'json');
 		});
 
-		$('body').append($(".GClientScript::encode($filter_html)."));
+		$('body').append($(".js_encode($filter_html)."));
 		$('.selected_filter').jdropdown({
 			'orientation': 'over',
 			'menu_div': '.filters_menu',
@@ -110,7 +114,7 @@ glue::clientScript()->addJsScript('new_playlist', "
 			window.location = $(this).data('url');
 	    });
 
-		$('body').append($(".GClientScript::encode($actions_html)."));
+		$('body').append($(".js_encode($actions_html)."));
 		$('.selected_actions').jdropdown({
 			'orientation': 'left',
 			'menu_div': '.actions_menu_menu',
@@ -194,7 +198,7 @@ glue::clientScript()->addJsScript('new_playlist', "
 		</div>
 	<?php $html = ob_get_contents();
 	ob_end_clean();
-	$this->widget('application/widgets/stickytoolbar.php', array(
+	app\widgets\stickytoolbar::widget(array(
 		"element" => '.grey_sticky_bar',
 		"options" => array(
 			'onFixedClass' => 'grey_sticky_bar-fixed'
@@ -208,7 +212,7 @@ glue::clientScript()->addJsScript('new_playlist', "
 			?> <div class='playlist_list'>{items}</div><div style='margin:7px;'>{pager}<div class="clearer"></div></div> <?php
 			$template = ob_get_contents();
 		ob_end_clean();
-		$this->widget('glue/widgets/GListView.php', array(
+		glue\widgets\ListView::widget(array(
 				'pageSize'	 => 20,
 				'page' 		 => isset($_GET['page']) ? $_GET['page'] : 1,
 				"cursor"	 => $playlist_rows,

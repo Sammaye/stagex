@@ -19,7 +19,6 @@ class Stream extends \glue\db\Document{
 	public $from_users = array();
 	public $items = array();
 	public $type;
-	public $ts;
 
 	public $posted_by_id;
 	public $message;

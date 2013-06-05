@@ -7,21 +7,26 @@ use \glue\Exception;
  * This represents any kind of file, including uploaded ones
  */
 class File implements Iterator,IteratorAggregate,ArrayAccess,Countable{
-	
+
 	public $model;
 	public $name;
 	public $type;
 	public $tmp_name;
 	public $error;
 	public $size;
-	
+
 	public $fh;
-	
+
 	private $upload = false;
 	private $collection = array();
 
-	function __construct(){}
-	
+	function __construct($config=array()){
+		foreach($config as $k=>$v)
+			$this->$k=$v;
+		if($this->model&&isset($config['id']))
+			$this->populateUpload($this->model, $config['id']);
+	}
+
 	function save($path=null){
 
 		if($this->upload){
@@ -40,15 +45,15 @@ class File implements Iterator,IteratorAggregate,ArrayAccess,Countable{
 				return move_uploaded_file($this->tmp_name,$path);
 			else
 				throw new Exception('An error was encountered while uploading '.$this->name);
-		}else{	
+		}else{
 			// perform save as for a file handler
 		}
 	}
-	
+
 	function hasUploadError(){
 		return $this->error !== UPLOAD_ERR_OK;
 	}
-	
+
 	function getUploadError(){
 		switch ($this->error) {
 			case UPLOAD_ERR_INI_SIZE:
@@ -67,18 +72,18 @@ class File implements Iterator,IteratorAggregate,ArrayAccess,Countable{
 				return 'ERR_EXTENSION';
 			default:
 				return 'FILE_INVALID';
-		}		
+		}
 	}
 
 	function populateMultiUpload($model,$id){
 		$vector = $_FILES[$model][$id];
-		
+
 		if(is_array($vector)){
 			$result = array();
 			foreach($vector as $key1 => $value1)
 				foreach($value1 as $key2 => $value2)
 				$result[$key2][$key1] = $value2;
-			
+
 			foreach($result as $i => $file){
 				$m=new \glue\File();
 				foreach($file as $f=>$v)
@@ -92,18 +97,18 @@ class File implements Iterator,IteratorAggregate,ArrayAccess,Countable{
 	}
 
 	function populateUpload($model,$id){
-			
+
 		$file_a = $_FILES[$model][$id];
-				
+
 		if(is_array($file_a)){
 			$this->model=$model;
 			$this->upload=true;
 			foreach($a as $k => $v)
 				$this->$k=$v;
 		}else
-			throw new Exception("Field $id in $model was not found to have a valid value");				
+			throw new Exception("Field $id in $model was not found to have a valid value");
 	}
-	
+
 	function open($handler,$mode='r'){
 
 		if(get_resource_type($handler) == 'file'){
@@ -141,11 +146,11 @@ class File implements Iterator,IteratorAggregate,ArrayAccess,Countable{
 		}
 		return $status;
 	}
-	
+
 	public function count(){
 		return count($this->collection);
 	}
-	
+
 	public function offsetSet($offset, $value) {
 		if (is_null($offset)) {
 			$this->collection[] = $value;
@@ -153,26 +158,26 @@ class File implements Iterator,IteratorAggregate,ArrayAccess,Countable{
 			$this->collection[$offset] = $value;
 		}
 	}
-	
+
 	public function offsetExists($offset) {
 		return isset($this->collection[$offset]);
 	}
-	
+
 	public function offsetUnset($offset) {
 		unset($this->collection[$offset]);
 	}
-	
+
 	public function offsetGet($offset) {
 		if(isset($this->collection[$offset])){
 			return $this->collection[$offset];
 		}
 		return null; //Else lets just return normal
 	}
-	
+
 	public function rewind() {
 		reset($this->collection);
 	}
-	
+
 	public function current() {
 		if(current($this->collection) !== false){
 			return current($this->collection);
@@ -180,15 +185,15 @@ class File implements Iterator,IteratorAggregate,ArrayAccess,Countable{
 			return false;
 		}
 	}
-	
+
 	public function key() {
 		return key($this->collection);
 	}
-	
+
 	public function next() {
 		return next($this->collection);
 	}
-	
+
 	public function valid() {
 		return $this->current() !== false;
 	}

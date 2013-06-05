@@ -6,7 +6,7 @@ class DateTime{
 	{
 		// Defaults and assume if 0 is passed in that
 		// its an error rather than the epoch
-		
+
 		if($datefrom instanceof \MongoDate)
 			$datefrom = $datefrom->sec;
 		if($dateto instanceof \MongoDate)
@@ -113,7 +113,7 @@ class DateTime{
 		return $res;
 	}
 
-	function getMonthsOfYear(){
+	static function getMonthsOfYear(){
 		$months = array(
 		1 => 'January',
 		2 => 'February',
@@ -132,7 +132,7 @@ class DateTime{
 		return $months;
 	}
 
-	function getDaysOfMonth(){
+	static function getDaysOfMonth(){
 		$ret = array();
 		$days = range(1, 32);
 
@@ -142,7 +142,7 @@ class DateTime{
 		return $ret;
 	}
 
-	function getYearRange($start = 0, $end = 100){
+	static function getYearRange($start = 0, $end = 100){
 		$data = Array();
 
 		$thisYear = $start == 0 ? date('Y') : $start;

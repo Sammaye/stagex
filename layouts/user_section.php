@@ -49,8 +49,8 @@ $this->beginPage() ?>
 			<div class='grid_970'>
 				<div class='grid_block alpha omega user_section_side_menu'>
 					<div class='about_user'>
-						<img src="<?php echo glue::session()->user->getPic(40, 40); ?>" alt='thumbnail'/>
-						<h3><a href='<?php echo glue::http()->createUrl('/user/view', array('id' => strval(glue::session()->user->_id))) ?>'><?php echo glue::session()->user->getUsername() ?></a></h3>
+						<img src="<?php echo glue::user()->getPic(40, 40); ?>" alt='thumbnail'/>
+						<h3><a href='<?php echo glue::http()->createUrl('/user/view', array('id' => strval(glue::user()->_id))) ?>'><?php echo glue::user()->getUsername() ?></a></h3>
 					</div>
 					<a href='<?php echo glue::http()->createUrl('/video/upload', array(), glue::$params['uploadBase']) ?>' class='green_css_button upload'>UPLOAD</a>
 					<div class='clearer'></div>
@@ -82,15 +82,14 @@ $this->beginPage() ?>
 					</ul>
 				</div>
 				<div class='grid_block alpha omega user_section_main_content'>
-					<?php echo $page ?>
+					<?php echo $content ?>
 				</div>
-			</div>			
-			<?php echo $content ?>
+			</div>
 			<div id="mainSearch_results"></div>
-			
+
 		    <div class="playlistBottomBar_outer" id="playlist-root"></div>
 			<div id="mainSearch_results"></div>
-			<div id="user_video_results"></div>			
+			<div id="user_video_results"></div>
 		<?php $this->endBody() ?>
 	</body>
 </html>

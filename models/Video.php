@@ -1,49 +1,55 @@
 <?php
-class Video extends MongoDocument{
+namespace app\models;
 
+use glue;
+
+class Video extends \glue\Db\Document{
+
+	/** @virtual */
 	public $response = array(); // I am unsure about this var. I don't like the way it stares at me
-	public $string_tags; // To hold the non-persistent representation of the tags field
+	/** @virtual */
+	public $stringTags; // To hold the non-persistent representation of the tags field
 
 	/**
 	 * This var denotes the public view of the video
 	 *
-	 * - 1 = public
-	 * - 2 = hidden
-	 * - 3 = private
+	 * - 0 = public
+	 * - 1 = hidden
+	 * - 2 = private
 	 *
 	 * @var int $listing
 	 */
-	protected $listing = 1;
-	protected $title;
-	protected $description;
-	protected $licence = 1;
-	protected $category = 11;
-	protected $tags;
+	public $listing = 0;
+	public $title;
+	public $description;
+	public $licence = 1;
+	public $category = 11;
+	public $tags;
 
-	protected $voteable = 1;
-	protected $embeddable = 1;
-	protected $mod_comments = 0;
-	protected $voteable_comments = 1;
-	protected $vid_coms_allowed = 1;
-	protected $txt_coms_allowed = 1;
-	protected $private_stats = 0;
-	protected $adult_content = 0;
+	public $voteable = 1;
+	public $embeddable = 1;
+	public $moderated = 0;
+	public $voteableComments = 1;
+	public $allowVideoComments = 1;
+	public $allowTextComments = 1;
+	public $privateStatistics = 0;
+	public $mature = 0;
 
-	protected $duration;
-	protected $file_size;
+	public $duration;
+	public $fileSize;
 
-	protected $unique_views = 0;
-	protected $views = 0;
-	protected $likes = 0;
-	protected $dislikes = 0;
-	protected $total_responses = 0;
-	protected $vid_responses = 0;
-	protected $txt_responses = 0;
+	public $uniqueViews = 0;
+	public $views = 0;
+	public $likes = 0;
+	public $dislikes = 0;
+	public $totalResponses = 0;
+	public $totalVideoResponses = 0;
+	public $totalTextReponses = 0;
 
-	protected $md5;
-	protected $job_id;
-	protected $upload_id;
-	protected $user_id;
+	public $md5;
+	public $jobId;
+	public $uploadId;
+	public $userId;
 
 	/**
 	 * This denotes the state of the video (as to whether it is failed or done etc)
@@ -59,21 +65,26 @@ class Video extends MongoDocument{
 	 *
 	 * @var $state
 	 */
-	protected $state;
+	public $state;
 
-	protected $original;
-	protected $mp4;
-	protected $ogg;
-	protected $image;
-	protected $image_src;
+	public $original;
+	public $mp4;
+	public $ogg;
+	public $image;
+	public $imageSrc;
 
-	protected $deleted = 0;
+	public $deleted = 0;
 
-	protected $updated;
-	protected $created;
+	function behaviours(){
+		return array(
+			'timestampBehaviour' => array(
+				'class' => 'glue\\behaviours\\Timestamp'
+			)
+		);
+	}
 
-	function getCollectionName(){
-		return "videos";
+	function collectionName(){
+		return "video";
 	}
 
 	function categories($pivot = 'all'){
@@ -154,8 +165,8 @@ class Video extends MongoDocument{
 
 	function relations(){
 		return array(
-			"author" => array(self::HAS_ONE, 'User', "_id", 'on' => 'user_id'),
-			"responses" => array(self::HAS_MANY, 'VideoResponse', "vid", 'on' => '_id'),
+			"author" => array('one', 'app\models\User', "_id", 'on' => 'userId'),
+			"responses" => array('many', 'app\models\VideoResponse', "videoId", 'on' => '_id'),
 		);
 	}
 
@@ -167,7 +178,7 @@ class Video extends MongoDocument{
 			array('listing', 'in', 'range' => array(1, 2, 3), 'message' => 'You must select a valid listing of either public, unlisted or private'),
 			array('voteable, embeddable, private_stats, voteable_comments, vid_coms_allowed, txt_coms_allowed, adult_content', 'boolean', 'allowNull' => true),
 
-			array('mod_comments', 'in', 'range' => array(0, 1), 'allowEmpty' => false, 'on' => 'update', 'message' => 'Incorrect value provided for comment settings'),
+			array('moderated', 'in', 'range' => array(0, 1), 'allowEmpty' => false, 'on' => 'update', 'message' => 'Incorrect value provided for comment settings'),
 
 			array('title', 'required', 'on' => 'update', 'message' => 'You must provide a title'), // Licence
 			array('licence', 'required', 'on' => 'update', 'message' => 'You must provide a licence type'),
@@ -176,7 +187,7 @@ class Video extends MongoDocument{
 
 			array('title', 'string', 'max' => '75', 'message' => 'You can only write 75 characters for the title'),
 			array('description', 'string', 'max' => '1500', 'message' => 'You can only write 1500 characters for the description'),
-			array('string_tags', 'tokenized', 'max' => 10, 'message' => 'You can add upto 10 tags, no more')
+			array('stringTags', 'tokenized', 'max' => 10, 'message' => 'You can add upto 10 tags, no more')
 		);
 	}
 
@@ -206,18 +217,18 @@ class Video extends MongoDocument{
 			return false;
 		}
 
-		if($_FILES[$id]['size'] > glue::session()->user->get_max_video_upload_size() || !($_FILES[$id]['error'] == "0" || $_FILES[$id]['error'] == 0)){
+		if($_FILES[$id]['size'] > glue::user()->get_max_video_upload_size() || !($_FILES[$id]['error'] == "0" || $_FILES[$id]['error'] == 0)){
 			// video did not pass last minute checks
 			$this->response("ERROR", "NOT_VALID");
 			return false;
 		}
 
-		if(glue::session()->user->get_upload_bandwidth_left() < $_FILES[$id]['size']){
+		if(glue::user()->get_upload_bandwidth_left() < $_FILES[$id]['size']){
 			unlink($_FILES[$id]['tmp_name']); // Free up space in our temp dir
 			$this->response("ERROR", "NOT_ENOUGH_SP");
 			return false;
 		}
-		glue::session()->user->change_upload_bandwidth_left_by($_FILES[$id]['size']);
+		glue::user()->change_upload_bandwidth_left_by($_FILES[$id]['size']);
 
 		// Does ffmpeg think this is a real file??
 		exec(sprintf('ffmpeg -i "'.$_FILES[$id]['tmp_name'].'" 2>&1'), $output);
@@ -311,8 +322,8 @@ class Video extends MongoDocument{
 	}
 
 	function beforeSave(){
-		if(strlen(strip_whitespace($this->string_tags)) > 0){
-			$this->tags = preg_split("/[\s]*[,][\s]*/", $this->string_tags);
+		if(strlen(strip_whitespace($this->stringTags)) > 0){
+			$this->tags = preg_split("/[\s]*[,][\s]*/", $this->stringTags);
 
 			for($i=0;$i<count($this->tags);$i++){
 				$this->tags[$i] = strip_whitespace($this->tags[$i]);
@@ -320,9 +331,6 @@ class Video extends MongoDocument{
 		}else{
 			unset($this->tags);
 		}
-
-		if(!$this->getIsNewRecord())
-			$this->updated = new MongoDate();
 		return true;
 	}
 
@@ -332,8 +340,7 @@ class Video extends MongoDocument{
 
 			if($this->getIsNewRecord()){
 
-				glue::session()->user->total_uploads = glue::session()->user->total_uploads+1;
-				glue::session()->user->save();
+				$this->author->saveCounters(array('totalUploads'=>1));
 
 				$query = "INSERT INTO documents (_id,uid,deleted,listing,title,description,category,tags,author_name,duration,views,rating,type,adult,date_uploaded)
 							VALUES(:_id,:uid,:deleted,:listing,:title,:description,:cat,:tags,:author_name,:duration,:views,:rating,:type,:adult,now())";
@@ -693,9 +700,9 @@ class Video extends MongoDocument{
 
 	function like(){
 		glue::db()->video_likes->update(
-			array("user_id" => Glue::session()->user->_id, "item" => $this->_id),
+			array("user_id" => Glue::user()->_id, "item" => $this->_id),
 			array(
-				"user_id" => Glue::session()->user->_id,
+				"user_id" => Glue::user()->_id,
 				"item" => $this->_id,
 				"like" => 1,
 				"ts" => new MongoDate()
@@ -713,9 +720,9 @@ class Video extends MongoDocument{
 
 	function dislike(){
 		glue::db()->video_likes->update(
-			array("user_id" => Glue::session()->user->_id, "item" => $this->_id),
+			array("user_id" => Glue::user()->_id, "item" => $this->_id),
 			array(
-				"user_id" => Glue::session()->user->_id,
+				"user_id" => Glue::user()->_id,
 				"item" => $this->_id,
 				"like" => 0,
 				"ts" => new MongoDate()

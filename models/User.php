@@ -360,7 +360,7 @@ class User extends \glue\User{
 		return $this->validateRules($rules, $data);
 	}
 
-	function setPic(){
+	function setAvatar(){
 
 		if(strlen($this->profile_image['tmp_name'])){
 			$thumb = PhpThumbFactory::create(file_get_contents($this->profile_image['tmp_name']), array(), true); // This will need some on spot caching soon

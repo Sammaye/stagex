@@ -33,8 +33,9 @@ abstract class Widget extends \glue\Component{
 	 * @param string $path
 	 * @param array $args
 	 */
-	static function widget(){
+	static function widget($config=array()){
 		$o=new static;
+		$o->setAttributes($config);
 		$o->render();
 		return $o;
 	}
@@ -45,8 +46,9 @@ abstract class Widget extends \glue\Component{
 	 * @param string $path
 	 * @param array $args
 	 */
-	static function begin(){
+	static function begin($config=array()){
 		$o=new static;
+		$o->setAttributes($config);
 		return $o;
 	}
 

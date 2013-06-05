@@ -59,7 +59,7 @@ class Document extends \glue\Model{
 	public function defaultScope(){ return array(); }
 
 	public function attributeLabels(){ return array(); }
-	
+
 	public function relations(){ return array(); }
 
 	/**
@@ -88,7 +88,7 @@ class Document extends \glue\Model{
 		if(isset($this->_related[$name]) || array_key_exists($name, $this->relations()))
 			return $this->_related[$name]=$value;
 		elseif(method_exists($this,'set'.$name))
-			return $this->{'set'.$name}($value);		
+			return $this->{'set'.$name}($value);
 		else{
 			return $this->setAttribute($name,$value);
 		}
@@ -192,7 +192,7 @@ class Document extends \glue\Model{
 	function primaryKey(){
 		return '_id';
 	}
-	
+
 	/**
 	 * Returns the value of the primary key
 	 */
@@ -837,6 +837,56 @@ class Document extends \glue\Model{
 			'key' => $key,
 			'query' => $query
 		));
+	}
+
+	/**
+	 * Allows for searching a subset of model fields; should not be used without a prior constraint.
+	 *
+	 * Will return an active cursor containing the search results.
+	 *
+	 * @param array $fields
+	 * @param string|int $term
+	 * @param array $extra
+	 * @param string $class
+	 *
+	 * @return GMongoCursor of the results
+	 */
+	function fts($fields = array(), $term = '', $extra = array()){
+
+		$query = array();
+
+		$working_term = trim(preg_replace('/(?:\s\s+|\n|\t)/', '', $term)); // Strip all whitespace to understand if there is actually characters in the string
+
+		if(strlen($working_term) <= 0 || empty($fields)){ // I dont want to run the search if there is no term
+			$result = $this->find($extra); // If no term is supplied just run the extra query placed in
+			return $result;
+		}
+
+		$broken_term = explode(' ', $term);
+
+		// Strip whitespace from query
+		foreach($broken_term as $k => $term){
+			$broken_term[$k] = trim(preg_replace('/(?:\s\s+|\n|\t)/', '', $term));
+		}
+
+		// Now lets build a regex query
+		$sub_query = array();
+		foreach($broken_term as $k => $term){
+
+			// Foreach of the terms we wish to add a regex to the field.
+			// All terms must exist in the document but they can exist across any and all fields
+			$field_regexes = array();
+			foreach($fields as $k => $field){
+				$field_regexes[] = array($field => new MongoRegex('/'.$term.'/i'));
+			}
+			$sub_query[] = array('$or' => $field_regexes);
+		}
+		$query['$and'] = $sub_query; // Lets make the $and part so as to make sure all terms must exist
+		$query = array_merge($query, $extra); // Lets add on the additional query to ensure we find only what we want to.
+
+		// TODO Add relevancy sorting
+		$result = $this->find($query);
+		return $result;
 	}
 
 	/**

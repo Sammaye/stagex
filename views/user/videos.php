@@ -1,10 +1,12 @@
 <?php
 
-glue::clientScript()->addJsFile('jquery-expander', "/js/jquery-expander.js");
-glue::clientScript()->addJsFile('j-dropdown', '/js/jdropdown.js');
-glue::clientScript()->addJsFile('playlist_dropdown', '/js/playlist_dropdown.js');
+use glue\Html;
 
-glue::clientScript()->addJsScript('videos.selectAll', "
+$this->JsFile('jquery-expander', "/js/jquery-expander.js");
+$this->JsFile('j-dropdown', '/js/jdropdown.js');
+$this->JsFile('playlist_dropdown', '/js/playlist_dropdown.js');
+
+$this->js('videos.selectAll', "
 	$(function(){
 		$.playlist_dropdown();
 
@@ -34,16 +36,16 @@ ob_end_clean();
 
 ob_start(); ?>
 	<div class='filters_menu'>
-		<div class='item' data-caption='Showing All Videos' data-url='<?php echo glue::url()->create('/user/videos') ?>'>All Videos</div>
-		<div class='item' data-caption='Showing Listed Videos' data-url='<?php echo glue::url()->create(array('filter' => 'listed')) ?>'>Listed Videos</div>
-		<div class='item' data-caption='Showing Unlisted Videos' data-url='<?php echo glue::url()->create(array('filter' => 'unlisted')) ?>'>Unlisted Videos</div>
-		<div class='item' data-caption='Showing Private Videos' data-url='<?php echo glue::url()->create(array('filter' => 'private')) ?>'>Private Videos</div>
+		<div class='item' data-caption='Showing All Videos' data-url='<?php echo glue::http()->createUrl('/user/videos') ?>'>All Videos</div>
+		<div class='item' data-caption='Showing Listed Videos' data-url='<?php echo glue::http()->createUrl(array('filter' => 'listed')) ?>'>Listed Videos</div>
+		<div class='item' data-caption='Showing Unlisted Videos' data-url='<?php echo glue::http()->createUrl(array('filter' => 'unlisted')) ?>'>Unlisted Videos</div>
+		<div class='item' data-caption='Showing Private Videos' data-url='<?php echo glue::http()->createUrl(array('filter' => 'private')) ?>'>Private Videos</div>
 	</div><?php
 	$filter_html = ob_get_contents();
 ob_end_clean();
 
 
-	glue::clientScript()->addJsScript('user_videos_page.base', "
+	$this->js('user_videos_page.base', "
 		$(function(){
 
 			$('#video_search_submit').on('click', function(){
@@ -56,7 +58,7 @@ ob_end_clean();
 
 			$('div.expandable').expander({slicePoint: 60});
 
-			$('body').append($(".GClientScript::encode($filter_html)."));
+			$('body').append($(".js_encode($filter_html)."));
 			$('.selected_filter').jdropdown({
 				'orientation': 'over',
 				'menu_div': '.filters_menu',
@@ -69,7 +71,7 @@ ob_end_clean();
 				window.location = $(this).data('url');
 		    });
 
-			$('body').append($(".GClientScript::encode($html)."));
+			$('body').append($(".js_encode($html)."));
 			$('.selected_actions').jdropdown({
 				'orientation': 'left',
 				'menu_div': '.actions_menu_menu',
@@ -142,13 +144,13 @@ ob_end_clean();
 				<div class='block_summary'></div>
 				<div class='inner_bar'>
 
-					<div class='checkbox_input'><?php echo html::checkbox('selectAll', 1, 0, array('class' => 'selectAll_input')) ?></div>
+					<div class='checkbox_input'><?php echo Html::checkbox('selectAll', 1, 0, array('class' => 'selectAll_input')) ?></div>
 					<div class='grey_css_button add_to_playlist left_button'>Add To</div>
 					<div class='grey_css_button selected_actions float_left'>Edit</div>
 					<div class='search_widget'>
-						<?php $form = html::form(array('method' => 'get')) ?>
+						<?php $form = Html::form(array('method' => 'get')) ?>
 						<div class='middle'><?php
-						$this->widget('application/widgets/Jqautocomplete.php', array(
+						app\widgets\Jqautocomplete::widget(array(
 							'attribute' => 'query',
 							'value' => urldecode(htmlspecialchars(isset($_GET['query']) ? $_GET['query'] : '')),
 							'options' => array(
@@ -162,7 +164,7 @@ ob_end_clean();
 									.append( '<a class=\'content\'><span>' + item.label + '</span></div></a>' )
 									.appendTo( ul );
 							")) ?></div><a href='#' id='video_search_submit' class='submit'><img alt='search' src='/images/search_icon_small.png'/></a>
-						<?php echo html::submitbutton('Search', array('class' => 'invisible_submit')); $form->end() ?>
+						<?php echo Html::submitbutton('Search', array('class' => 'invisible_submit')); $form->end() ?>
 					</div>
 					<div class='grey_css_button selected_filter right_button'>
 						<?php if($filter == 'listed'){ ?>
@@ -181,7 +183,7 @@ ob_end_clean();
 		<?php $html = ob_get_contents();
 	ob_end_clean();
 
-	$this->widget('application/widgets/stickytoolbar.php', array(
+	app\widgets\stickytoolbar::widget(array(
 		"element" => '.grey_sticky_bar',
 		"options" => array(
 			'onFixedClass' => 'grey_sticky_bar-fixed'
@@ -195,7 +197,7 @@ ob_end_clean();
 			$template = ob_get_contents();
 		ob_end_clean();
 
-		$this->widget('glue/widgets/GListView.php', array(
+		glue\widgets\ListView::widget(array(
 			'pageSize'	 => 20,
 			'page' 		 => isset($_GET['page']) ? $_GET['page'] : 1,
 			"cursor"	 => $video_rows,

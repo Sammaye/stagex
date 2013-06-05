@@ -1,11 +1,11 @@
 <?php
 
-	if(!$model) $model = new Playlist;
+	if(!$model) $model = new app\models\Playlist;
 
-	glue::clientScript()->addJsFile('jquery-expander', "/js/jquery-expander.js");
-	glue::clientScript()->addJsFile('playlist_dropdown', '/js/playlist_dropdown.js');
+	$this->jsFile('jquery-expander', "/js/jquery-expander.js");
+	$this->jsFile('playlist_dropdown', '/js/playlist_dropdown.js');
 
-	glue::clientScript()->addJsScript('watch_later', "
+	$this->js('watch_later', "
 		$(function(){
 			$.playlist_dropdown();
 			$('div.expandable').expander({slicePoint: 60});
@@ -67,7 +67,7 @@
 		</div>
 	<?php $html = ob_get_contents();
 	ob_end_clean();
-	$this->widget('application/widgets/stickytoolbar.php', array(
+	app\widgets\stickytoolbar::widget(array(
 		"element" => '.grey_sticky_bar',
 		"options" => array(
 			'onFixedClass' => 'grey_sticky_bar-fixed'
@@ -83,11 +83,11 @@
 			foreach($model->videos as $k => $item){
 				$_id_array[] = $item['_id'];
 			}
-			$videos = Video::model()->find(array('_id' => array('$in' => $_id_array)));
+			$videos = app\models\Video::model()->find(array('_id' => array('$in' => $_id_array)));
 
 			foreach($videos as $k => $item){
-				if($item instanceof Video){
-					$this->partialRender('videos/_video_ext', array('model' => $item, 'show_checkbox' => true, 'show_watched_status' => true));
+				if($item instanceof app\models\Video){
+					echo $this->renderPartial('videos/_video_ext', array('model' => $item, 'show_checkbox' => true, 'show_watched_status' => true));
 				}
 			}
 		}else{ ?>

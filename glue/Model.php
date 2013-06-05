@@ -17,13 +17,13 @@ class Model{
 
 	private $error_codes = array();
 	private $error_messages = array();
-	
+
 	private static $_meta=array();
 
 	public function behaviours(){ return array(); }
 
 	public function rules(){ return array(); }
-	
+
 	/**
 	 * Will either look for a getter function or will just get
 	 * @param string $name
@@ -36,7 +36,7 @@ class Model{
 		else
 			return null;
 	}
-	
+
 	/**
 	 * Will either look for a setter function or will just set init
 	 * @param string $name
@@ -61,7 +61,7 @@ class Model{
 	}
 
 	/**
-	 * Magically you can call any function within a behaviour as though they are part of the 
+	 * Magically you can call any function within a behaviour as though they are part of the
 	 * parent model
 	 * @param string $name
 	 * @param array $parameters
@@ -140,8 +140,8 @@ class Model{
 	}
 
 	/**
-	 * Gets the rules of the model. if not scenario is implied within the parameter it will just get all 
-	 * the rules of the model, however, if a scenario is implied within the parameter then it will return only 
+	 * Gets the rules of the model. if not scenario is implied within the parameter it will just get all
+	 * the rules of the model, however, if a scenario is implied within the parameter then it will return only
 	 * rules that shuld run on that scenario
 	 */
 	public function getRules($scenario=null){
@@ -167,7 +167,7 @@ class Model{
 	/**
 	 * Gets a list of attribute names of the model.
 	 * Attributes are considered to be any class variable which is public and not static.
-	 * 
+	 *
 	 * It will cache reflections into the meta of the model class.
 	 * @return array
 	 */
@@ -175,7 +175,7 @@ class Model{
 		if(isset(self::$_meta[get_class($this)])){
 			return self::$_meta[get_class($this)];
 		}
-		
+
 		$class = new \ReflectionClass($this);
 		$names = array();
 		foreach ($class->getProperties(\ReflectionProperty::IS_PUBLIC) as $property) {
@@ -184,9 +184,9 @@ class Model{
 				$names[] = $name;
 			}
 		}
-		return self::$_meta[get_class($this)]=$names;		
+		return self::$_meta[get_class($this)]=$names;
 	}
-	
+
 	/**
 	 * Gets a list of the attribute names currently stored within the rules of the model.
 	 * This method can be overriden to just return an array of names as the values of each element
@@ -232,12 +232,12 @@ class Model{
 		//foreach ($except as $name) {
 			//unset($values[$name]);
 		//}
-		
-		return $values;		
+
+		return $values;
 	}
 
 	/**
-	 * Gets the errors for the model. If a field parameter is provided it will get the errors only for that field 
+	 * Gets the errors for the model. If a field parameter is provided it will get the errors only for that field
 	 * and if the getFirst parameter is set to true it will only get the first error of that field.
 	 * @param string $field
 	 * @param boolean $getFirst
@@ -265,9 +265,9 @@ class Model{
 			$this->error_messages[$field][] = $message;
 		}
 	}
-	
+
 	/**
-	 * Clears all the models errors. If a field name is provided in the parameters 
+	 * Clears all the models errors. If a field name is provided in the parameters
 	 * then it will clear the errors for only one field.
 	 * @param string $field
 	 */
@@ -303,7 +303,7 @@ class Model{
 
 		$this->error_codes=\glue\Collection::mergeArray($this->error_codes,$validator->error_codes);
 		$this->error_messages=\glue\Collection::mergeArray($this->error_messages,$validator->error_messages);
-		
+
 		$this->setValidated(true);
 		$this->setValid($valid);
 
@@ -405,7 +405,7 @@ class Model{
 	 * These various functions concern themselves with attaching and detaching certain aspects of the model.
 	 * This enables us to be able to build models dynamically and even use the std::Model class to give us anon models to play with
 	 */
-	
+
 	function attachBehaviours($behaviours){
 		if(is_array($behaviours)){
 			foreach($behaviours as $name => $behaviour)

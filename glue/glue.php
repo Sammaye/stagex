@@ -183,7 +183,7 @@ class glue{
 	 * @param string $route
 	 */
 	public static function createController($route){
-		var_dump($route);
+		//var_dump($route);
 		if ($route === ''||$route === null) {
 			$route = self::$defaultController;
 		}
@@ -198,7 +198,7 @@ class glue{
 		$controllerName = $id."Controller";
 		$controllerFile = ( self::getPath('@controllers')!==null ? self::getPath('@controllers') : self::getPath('@app') . DIRECTORY_SEPARATOR . 'controllers' ) .
 								DIRECTORY_SEPARATOR . $controllerName . '.php';
-		var_dump($controllerFile);
+		//var_dump($controllerFile);
 		$className = ltrim(self::$controllerNamespace . '\\' . $controllerName, '\\');
 
 		if(isset(self::$classMap[$className])){
@@ -274,7 +274,7 @@ class glue{
 	 * @param boolean $exit
 	 */
 	public static function end($status=0,$exit=true){
-		echo "in end";
+		//echo "in end";
 //var_dump(error_get_last()); //exit();
 		if ($error = error_get_last()){
 			self::handleError($error['type'], $error['message'], $error['file'], $error['line'], true);
@@ -342,9 +342,6 @@ class glue{
 	 * @param string $cPath
 	 */
 	public static function autoload($class, $return_cName = false){
-		if($class=='glue\ErrorHandler'){
-			var_dump($class); //exit();
-		}
 		$class = ltrim($class, '\\');
 
 		if(isset(self::$aliases[$class])){
@@ -482,7 +479,7 @@ class glue{
 	public static function trigger($event, $data=array()){
 
 		$event_success = true;
-		var_dump($event);
+		//var_dump($event);
 		if(is_array(self::$events) && isset(self::$events[$event])){
 			foreach(self::$events[$event] as $i => $f){
 				if(is_array($f)){

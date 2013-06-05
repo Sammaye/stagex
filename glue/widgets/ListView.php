@@ -2,6 +2,8 @@
 
 namespace glue\widgets;
 
+use glue;
+
 /**
  * GListView Widget
  *
@@ -91,8 +93,8 @@ class ListView extends Widget{
 
 	function render(){
 
-		if(!$this->cursor instanceof GMongoCursor)
-			trigger_error("You must supply a GMongoCursor for the cursor param of the GListView widget");
+		if(!$this->cursor instanceof \glue\db\Cursor)
+			trigger_error("You must supply a Cursor for the cursor param of the ListView widget");
 
 		$this->itemCount = $this->cursor->count();
 
@@ -205,7 +207,7 @@ class ListView extends Widget{
 	}
 
 	function getUrl($morph = array()){
-		return glue::url()->create(array_merge($this->data, array_merge(
+		return glue::http()->createUrl(array_merge($this->data, array_merge(
 			array(
 				//"mode"=>urlencode($this->mode),
 				"pagesize"=>$this->pageSize,
@@ -223,17 +225,17 @@ class ListView extends Widget{
 		if(mb_substr($path, 0, 1) == '/'){
 
 			// Then this should go from doc root
-			return str_replace('/', DIRECTORY_SEPARATOR, ROOT.$path);
+			return str_replace('/', DIRECTORY_SEPARATOR, glue::getPath('@app').$path);
 
 		}elseif(strpos($path, '/')!==false){
 
 			// Then this should go from views root (/application/views) because we have something like user/edit.php
-			return str_replace('/', DIRECTORY_SEPARATOR, ROOT.'/application/views/'.$path);
+			return str_replace('/', DIRECTORY_SEPARATOR, glue::getPath('@app').'/views/'.$path);
 
 		}else{
 
 			// Then lets attempt to get the cwd from the controller. If the controller is not set we use siteController as default. This can occur for cronjobs
-			return str_replace('/', DIRECTORY_SEPARATOR, ROOT.'/application/views/'.str_replace('controller', '',
+			return str_replace('/', DIRECTORY_SEPARATOR, glue::getPath('@app').'/views/'.str_replace('controller', '',
 					strtolower(isset(glue::$action['controller']) ? glue::$action['controller'] : 'siteController')).'/'.$path);
 		}
 	}

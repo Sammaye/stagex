@@ -1,18 +1,21 @@
 <?php
-class stickytoolbar extends GWidget{
+namespace app\widgets;
+
+use glue;
+
+class stickytoolbar extends \glue\Widget{
 
 	public $element;
 	public $options = array();
 	public $html;
 
 	function render(){
-		glue::clientScript()->addJsFile('stickytoolbar', "/js/stickyToolbar.js");
-		glue::clientScript()->addJsScript('stickytoolbar.init.'.$this->element, "
+		glue::$controller->jsFile('stickytoolbar', "/js/stickyToolbar.js");
+		glue::$controller->js('stickytoolbar.init.'.$this->element, "
 			$(function(){
-				$('".$this->element."').stickytoolbar(".GClientScript::encode($this->options).");
+				$('".$this->element."').stickytoolbar(".js_encode($this->options).");
 			});
 		");
-
 		echo $this->html;
 	}
 }
