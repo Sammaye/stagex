@@ -59,8 +59,8 @@ class User extends \glue\User{
 	 */
 	public $listing = 0;
 
-	public $defaultVideoSettings = array('listing' => 1, 'voteable' => true, 'embeddable' => true, 'mod_comments' => 0,
-			'voteable_comments' => true, 'vid_coms_allowed' => true, 'txt_coms_allowed' => true, 'private_stats' => false, 'licence' => 1);
+	public $defaultVideoSettings = array('listing' => 0, 'voteable' => true, 'embeddable' => true, 'moderated' => 0,
+			'voteableComments' => true, 'allowVideoComments' => true, 'allowTextComments' => true, 'privateStatistics' => false, 'licence' => 1);
 
 	public $emailVideoResponses = 0;
 	public $emailVideoResponseReplies = 0;
@@ -154,19 +154,24 @@ class User extends \glue\User{
 
 	function rules(){
 		return array(
-
 		array('username, password, email, hash', 'required', 'on'=>'insert', 'message' => 'You must fill in all of the fields to register for this site.'),
 
-		array('single_sign, email_notify', 'required', 'on'=>'updateSecurity'),
 		array('username', 'required', 'on'=>'updateUsername', 'message' => 'You must provide a username'),
-
-		//array('auto_play_vids, use_divx_player', 'safe', 'on' => 'updatePlayback'),
-		//array('name, country, about, gender, birth_day, birth_month, birth_year', 'safe', 'on' => 'updateProfile'),
-		array('single_sign, email_notify, remember, auto_play_vids, use_divx_player', 'boolean', 'allowNull'=>true),
-
+				
+		array('autoshareUploads, autoshareResponses, autoshareLikes, autoshareAddToPlaylist, birthdayPrivacy, genderPrivacy, countryPrivacy, 
+				singleSignOn, emailLogins, autoplayVideos, useDivx, canUpload, banned', 'boolean', 'allowNull'=>true),
+				
 		array('username', 'string', 'max'=>20, 'message' => 'Please enter a max of 20 characters for your username'),
 		array('name', 'string', 'max' => 150, 'message' => 'You can only write 150 characters for your name.'),
-		array('about', 'string', 'max' => 1500, 'message' => 'You can only write 1500 characters for your bio.'),
+		array('about', 'string', 'max' => 1500, 'message' => 'You can only write 1500 characters for your bio.'),			
+		array('gender', 'in', 'range'=>array("m", "f"), 'message' => 'You must enter a valid gender'),					
+				
+		array('birthDay', 'validateBirthday', 'on' => 'updateProfile'),
+		array('birthDay', 'number', 'min'=>1, 'max'=>32, 'message' => 'Birth day was a invalid value'),
+		array('birthMonth', 'number', 'min'=>1, 'max'=>12, 'message' => 'Birth month was a invalid value'),
+		array('birthYear', 'number', 'min'=>date('Y') - 100, 'max'=>date('Y'), 'message' => 'Birth year was a invalid value'),
+				
+		array('country', 'in', 'range' => new Collection('countries', 'code'), 'on' => 'updateProfile', 'message' => 'You supplied an invalid country.'), // We only wanna do laggy functions on scenarios				
 
 		array('hash', 'hash', 'on'=>'insert', 'message' => 'CSRF not valid'),
 		array('username', 'objExist', 'class'=>'app\\models\\User', 'field'=>'username', 'notExist' => true, 'on'=>'insert, updateUsername',
@@ -177,22 +182,13 @@ class User extends \glue\User{
 		array('email', 'objExist', 'class'=>'app\\models\\User', 'field'=>'email', 'notExist' => true, 'on'=>'insert', 'message' =>
 				'That email address already exists please try and login with it, or if you have forgotten your password try to recover your account.'),
 
-		array('gender', 'in', 'range'=>array("m", "f"), 'message' => 'You must enter a valid gender'),
-
-		array('birth_day', 'validate_birthday', 'on' => 'updateProfile'),
-		array('birth_day', 'number', 'min'=>1, 'max'=>32, 'message' => 'Birth day was a invalid value'),
-		array('birth_month', 'number', 'min'=>1, 'max'=>12, 'message' => 'Birth month was a invalid value'),
-		array('birth_year', 'number', 'min'=>date('Y') - 100, 'max'=>date('Y'), 'message' => 'Birth year was a invalid value'),
-
-		array('country', 'in', 'range' => new Collection('countries', 'code'), 'on' => 'updateProfile', 'message' => 'You supplied an invalid country.'), // We only wanna do laggy functions on scenarios
-
 		array('new_email', 'required', 'on' => 'updateEmail', 'message' => 'You did not enter a valid Email Address for this account'),
 		array('new_email', 'email', 'on' => 'updateEmail', 'message' => 'You must enter a valid Email Address'),
 		array('new_email', 'objExist', 'class'=>'User', 'field'=>'email', 'notExist' => true, 'on'=>'updateEmail', 'message' =>
 				'That email address already exists please try and login with it, or if you have forgotten your password try to recover your account.'),
 
-		array('safe_srch', 'required', 'on'=>'updateSafeSearch', 'message' => 'You enterd an invalid value for safe search'),
-		array('safe_srch', 'in', 'range'=>array('S', 'T', '0'), 'message' => 'You enterd an invalid value for safe search'),
+		array('safeSearch', 'required', 'on'=>'updateSafeSearch', 'message' => 'You enterd an invalid value for safe search'),
+		array('safeSearch', 'in', 'range'=>array(0, 1, 2), 'message' => 'You enterd an invalid value for safe search'),
 
 		array('o_password, new_password, cn_password', 'required', 'on' => 'updatePassword', 'message' => 'Please fill in all fields to change your password'),
 		array('cn_password', 'compare', 'with' => 'new_password', 'field' => true, 'on' => 'updatePassword', 'message' => 'You did not confirm your new password correctly.'),
@@ -202,20 +198,21 @@ class User extends \glue\User{
 		array('avatar', 'file', 'ext' => array('png', 'jpg', 'jpeg', 'bmp'), 'type' => 'image', 'on' => 'updatePic',
 				'message' => 'You supplied an invalid file. Please upload an image file only.'),
 
-		array('clicky_uid', 'string', 'max' => 20, 'message' => 'Those are not valid anayltics accounts.'),
-		array('email_vid_responses, email_vid_response_replies, email_wall_comments, email_encoding_result', 'boolean', 'allowNull'=>true),
+		array('clickyUid', 'string', 'max' => 20, 'message' => 'Please enter a valid Clicky User Id'),
+		
+		array('emailVideoResponses, emailVideoResponseReplies, emailWallComments, emailEncodingResult', 'boolean', 'allowNull'=>true),
 
 		array('externalLinks', 'validateExternalLinks'),
 		array('defaultVideoSettings', 'glue\\db\\Subdocument', 'type' => 'one', 'rules' => array(			
-			array('listing', 'in', 'range' => array(1, 2, 3), 'message' => 'Please enter a valid value for listing'),
-			array('mod_comments', 'in', 'range' => array(0, 1), 'message' => 'Please enter a valid value for all comment options'),
-			array('voteable, embeddable, voteable_comments, vid_coms_allowed, txt_coms_allowed, private_stats', 'boolean', 'allowNull' => true),
+			array('listing', 'in', 'range' => array(0, 1, 2), 'message' => 'Please enter a valid value for listing'),
+			array('moderated', 'in', 'range' => array(0, 1), 'message' => 'Please enter a valid value for all comment options'),
+			array('voteable, embeddable, voteableComments, allowVideoComments, allowTextComments, privateStatistics', 'boolean', 'allowNull' => true),
 			array('licence', 'in', 'range' => array(1, 2), 'message' => 'Please enter a valid value for licence')
 		))
 		);
 	}
 
-	function validate_birthday($field, $params = array()){
+	function validateBirthday($field, $params = array()){
 		$filled_size = count(array_filter(array(
 			\glue\Validation::isEmpty($this->birth_day) ? null : $this->birth_day,
 			\glue\Validation::isEmpty($this->birth_month) ? null : $this->birth_month,
@@ -228,6 +225,37 @@ class User extends \glue\User{
 		}
 		return true;
 	}
+	
+	function validateExternalLinks(){
+	
+		if(count($this->externalLinks) > 6){
+			$this->setError('externalLinks', 'You can only add 6 external links for the time being. Please make sure you have entered no more and try again.');
+			return false;
+		}
+	
+		$valid=true;
+		if(is_array($this->externalLinks)){
+			foreach($this->externalLinks as $k=>$v){
+				$m=new Model();
+				$m->setRules(array(
+						array('url', 'required', 'message' => 'One or more of the external links you entered were invalid URLs.'),
+						array('url', 'url', 'message' => 'One or more of the external links you entered were invalid URLs.'),
+						array('url', 'string', 'max' => 200, 'message' => 'External URLs can only be 200 characters in length'),
+						array('title', 'string', 'max' => 20, 'message' => 'The optional external URL caption field can only be 200 characters in length')
+				));
+				$m->setAttributes($v);
+				$valid=$m->validate()&&$valid;
+				$this->externalLinks[$k]=$m->getAttributes(null,true);
+			}
+			$this->externalLinks=array_values($this->externalLinks);
+		}
+	
+		if(!$valid){
+			$this->setError('externalLinks', 'One or more of the external links you entered were invalid.');
+			return false;
+		}
+		return true;
+	}	
 
 	function beforeSave(){
 
@@ -320,37 +348,6 @@ class User extends \glue\User{
 				array( "username" => $this->username, "verify_url" => $this->temp_access_token['url'], 'new_email' => $this->new_email ));
 		}
 
-		return true;
-	}
-
-	function validateExternalLinks(){
-
-		if(count($this->externalLinks) > 6){
-			$this->setError('externalLinks', 'You can only add 6 external links for the time being. Please make sure you have entered no more and try again.');
-			return false;
-		}
-
-		$valid=true;
-		if(is_array($this->externalLinks)){
-			foreach($this->externalLinks as $k=>$v){
-				$m=new Model();
-				$m->setRules(array(
-					array('url', 'required', 'message' => 'One or more of the external links you entered were invalid URLs.'),
-					array('url', 'url', 'message' => 'One or more of the external links you entered were invalid URLs.'),
-					array('url', 'string', 'max' => 200, 'message' => 'External URLs can only be 200 characters in length'),
-					array('title', 'string', 'max' => 20, 'message' => 'The optional external URL caption field can only be 200 characters in length')
-				));
-				$m->setAttributes($v);
-				$valid=$m->validate()&&$valid;
-				$this->externalLinks[$k]=$m->getAttributes(null,true);
-			}
-			$this->externalLinks=array_values($this->externalLinks);
-		}
-
-		if(!$valid){
-			$this->setError('externalLinks', 'One or more of the external links you entered were invalid.');
-			return false;
-		}
 		return true;
 	}
 

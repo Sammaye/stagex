@@ -6,9 +6,10 @@ use \glue\Exception;
 /**
  * This represents any kind of file, including uploaded ones
  */
-class File implements Iterator,IteratorAggregate,ArrayAccess,Countable{
+class File implements \Iterator,\ArrayAccess,\Countable{
 
 	public $model;
+	public $modelClass;
 	public $name;
 	public $type;
 	public $tmp_name;
@@ -23,8 +24,14 @@ class File implements Iterator,IteratorAggregate,ArrayAccess,Countable{
 	function __construct($config=array()){
 		foreach($config as $k=>$v)
 			$this->$k=$v;
+		
+		if($this->model instanceof \glue\Model){
+			$this->modelClass=get_class($this->model);
+		}elseif(is_string($this->modelClass)){
+			$this->model=new $this->modelClass;
+		}
 		if($this->model&&isset($config['id']))
-			$this->populateUpload($this->model, $config['id']);
+			$this->populateMultiUpload($this->model, $config['id']);
 	}
 
 	function save($path=null){
@@ -76,7 +83,7 @@ class File implements Iterator,IteratorAggregate,ArrayAccess,Countable{
 	}
 
 	function populateMultiUpload($model,$id){
-		$vector = $_FILES[$model][$id];
+		$vector = $_FILES[get_class($model)];
 
 		if(is_array($vector)){
 			$result = array();

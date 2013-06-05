@@ -562,7 +562,7 @@ class userController extends \glue\Controller{
 				$model->attributes=$_POST['User'];
 				if($model->validate()&&$model->save()){
 					Html::setSuccessFlashMessage('Your profile settings have saved');
-					//glue::http()->redirect("/user/profile");
+					glue::http()->redirect("/user/profile");
 				}
 			}
 		}

@@ -24,7 +24,7 @@ $this->js('updateProfile', "
 			<div class="account_profile_ppicture_image"><img alt='thumbnail' src="<?php echo $model->getAvatar(125, 125) ?>"/></div>
 			<div class="account_profile_ppicture_upload">
 				<h2>Choose a profile picture:</h2>
-				<?php echo $form->filefield($model, "profile_image", array('id' => 'profile_pic_uploader')) ?>
+				<?php echo $form->filefield($model, "avatar", array('id' => 'profile_pic_uploader')) ?>
 				<?php echo $form->hiddenField($model, "action", array('value' => "updatePic")) ?>
 				<div class="account_profile_ppicture_capt">
 					<p>Maximum upload size: 2 Megabytes</p>
@@ -55,9 +55,9 @@ $this->js('updateProfile', "
 		</div>
 		<div class="form_row user_profile_birthday">
 			<?php echo html::label("Birthday:", "birthday"); ?>
-			<div class='float_left'><?php echo $form->selectBox($model, "birth_day", glue\util\DateTime::getDaysOfMonth(), array("head"=>array("", "Day:"), 'class' => 'birth_day'));
-			echo $form->selectBox($model, "birth_month", glue\util\DateTime::getMonthsOfYear(), array("head"=>array("", "Month:"), 'class' => 'birth_month'));
-			echo $form->selectBox($model, "birth_year", glue\util\DateTime::getYearRange(), array("head"=>array("", "Year:"))) ?></div>
+			<div class='float_left'><?php echo $form->selectBox($model, "birthDay", glue\util\DateTime::getDaysOfMonth(), array("head"=>array("", "Day:"), 'class' => 'birth_day'));
+			echo $form->selectBox($model, "birthMonth", glue\util\DateTime::getMonthsOfYear(), array("head"=>array("", "Month:"), 'class' => 'birth_month'));
+			echo $form->selectBox($model, "birthYear", glue\util\DateTime::getYearRange(), array("head"=>array("", "Year:"))) ?></div>
 			<div class='float_left'>
 				<?php echo $form->checkbox($model, 'birthdayPrivacy') ?>
 				<span>Show on profile</span>
