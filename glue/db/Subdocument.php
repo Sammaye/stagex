@@ -30,6 +30,8 @@ class Subdocument extends \glue\Validator{
 			$c=new Model();
 			$c->setRules($this->rules);
 		}
+		
+		$valid=true;
 
 		if(is_object($this->scenario) && ($this->scenario instanceof Closure)){
 			$c->setScenario($this->scenario($object));
@@ -58,10 +60,12 @@ class Subdocument extends \glue\Validator{
 					}
 				}
 
-				if($this->message!==null){
-					$object->setError($object,$attribute,$this->message);
-				}elseif(sizeof($fieldErrors)>0){
-					$object->setAttributeErrors($object, $attribute, $fieldErrors);
+				if(sizeof($fieldErrors)>0){
+					$valid=false;
+					if($this->message!==null)
+						$object->setError($attribute,$this->message);
+					else
+						$object->setAttributeErrors($attribute, $fieldErrors);
 				}
 
 				// Strip the models etc from the field value
@@ -71,11 +75,13 @@ class Subdocument extends \glue\Validator{
 			$c->clean();
 			$fieldValue = $object->$attribute instanceof $c ? $object->$attribute->getAttributes() : $object->$attribute;
 			$c->setAttributes($fieldValue);
+			
 			if(!$c->validate()){
+				$valid=false;
 				if($this->message!==null){
-					$object->addError($object,$attribute,$this->message);
+					$object->addError($attribute,$this->message);
 				}elseif(sizeof($c->getErrors())>0){
-					$object->setAttributeErrors($object, $attribute, $c->getErrors());
+					$object->setAttributeErrors($attribute, $c->getErrors());
 				}
 			}
 
@@ -83,5 +89,10 @@ class Subdocument extends \glue\Validator{
 			//$object->$attribute = $fieldValue;
 			$object->$attribute = $fieldValue instanceof $c ? $row->getAttributes(null,true) : $fieldValue;
 		}
+		
+		if($valid)
+			return true;
+		else
+			return false;
 	}
 }

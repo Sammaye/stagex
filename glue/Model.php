@@ -213,8 +213,9 @@ class Model{
 		$scenario = $this->getScenario();
 		$attributes = array_flip($safeOnly ? $this->scenarioAttributeNames() : $this->attributeNames());
 		foreach($a as $name=>$value){
-			if($safeOnly&&isset($attributes[$name])){
-				$this->$name=!is_array($value) && preg_match('/^([0-9]|[1-9]{1}\d+)$/' /* Will only match real integers, unsigned */, $value) > 0 ? (int)$value : $value;
+			if($safeOnly){
+				if(isset($attributes[$name]))
+					$this->$name=!is_array($value) && preg_match('/^([0-9]|[1-9]{1}\d+)$/' /* Will only match real integers, unsigned */, $value) > 0 ? (int)$value : $value;
 			}else{
 				$this->$name=!is_array($value) && preg_match('/^([0-9]|[1-9]{1}\d+)$/' /* Will only match real integers, unsigned */, $value) > 0 ? (int)$value : $value;
 			}
