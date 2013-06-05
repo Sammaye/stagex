@@ -100,8 +100,8 @@ $this->js('updateProfile', "
 					?>
 					<div class="socialProfile">
 						<div class='inner_block'>
-						<div class='input_block'><?php echo html::label('Url:').$form->textfield($model, "[$i][url]", array('class' => 'url')) ?></div>
-						<div class='input_block'><?php echo html::label('Link Title (optional):').$form->textfield($model, "[$i][title]", array('class' => 'url')) ?></div>
+						<div class='input_block'><?php echo html::label('Url:').$form->textfield($model, "[avatar][$i]url", array('class' => 'url')) ?></div>
+						<div class='input_block'><?php echo html::label('Link Title (optional):').$form->textfield($model, "[avatar][$i]title", array('class' => 'url')) ?></div>
 						</div>
 						<a href="#" class="removeSocialProfile">Remove</a>
 					</div>
@@ -113,8 +113,8 @@ $this->js('updateProfile', "
 			ob_start();
 				?><div class="socialProfile">
 					<div class='inner_block'>
-						<div class='input_block'><?php echo html::label('Url:').html::textfield("[0]url", null, array('class' => 'url')) ?></div>
-						<div class='input_block'><?php echo html::label('Link Title (optional):').html::textfield("[0]title", null, array('class' => 'title')) ?></div>
+						<div class='input_block'><?php echo html::label('Url:').html::activeTextField($model,"[avatar][0]url", null, array('class' => 'url')) ?></div>
+						<div class='input_block'><?php echo html::label('Link Title (optional):').html::textfield("[avatar][0]title", null, array('class' => 'title')) ?></div>
 					</div>
 					<a href="#" class="removeSocialProfile">Remove</a>
 				</div><?php

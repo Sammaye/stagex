@@ -139,6 +139,10 @@ class Model{
 		$this->rules[] = $rule;
 	}
 
+	public function setRules($rules){
+		$this->rules=$rules;
+	}
+
 	/**
 	 * Gets the rules of the model. if not scenario is implied within the parameter it will just get all
 	 * the rules of the model, however, if a scenario is implied within the parameter then it will return only

@@ -2,6 +2,8 @@
 
 namespace app\models;
 
+use glue\Model;
+
 use glue,
 	app\models\Playlist,
 	glue\util\Crypt,
@@ -15,7 +17,7 @@ class User extends \glue\User{
 	/** @virtual */
 	public $newEmail;
 	/** @virtual */
-	public $profileImage;
+	public $avatar;
 	/** @virtual */
 	public $hash;
 
@@ -196,13 +198,15 @@ class User extends \glue\User{
 		array('o_password, new_password, cn_password', 'required', 'on' => 'updatePassword', 'message' => 'Please fill in all fields to change your password'),
 		array('cn_password', 'compare', 'with' => 'new_password', 'field' => true, 'on' => 'updatePassword', 'message' => 'You did not confirm your new password correctly.'),
 
-		array('profile_image', 'file', 'size' => array('lt' => 2097152), 'on' => 'updatePic',
+		array('avatar', 'file', 'size' => array('lt' => 2097152), 'on' => 'updatePic',
 				'message' => 'The picture you provided was too large. Please upload 2MB and smaller pictures'),
-		array('profile_image', 'file', 'ext' => array('png', 'jpg', 'jpeg', 'bmp'), 'type' => 'image', 'on' => 'updatePic',
+		array('avatar', 'file', 'ext' => array('png', 'jpg', 'jpeg', 'bmp'), 'type' => 'image', 'on' => 'updatePic',
 				'message' => 'You supplied an invalid file. Please upload an image file only.'),
 
 		array('clicky_uid', 'string', 'max' => 20, 'message' => 'Those are not valid anayltics accounts.'),
 		array('email_vid_responses, email_vid_response_replies, email_wall_comments, email_encoding_result', 'boolean', 'allowNull'=>true),
+
+		array('externalLinks', 'validateExternalLinks')
 		);
 	}
 
@@ -314,31 +318,32 @@ class User extends \glue\User{
 		return true;
 	}
 
-	function setExternalLinks($ar){
-
-		$rules = array(
-			array('$.url', 'required', 'message' => 'One or more of the external links you entered were invalid URLs.'),
-			array('$.url', 'url', 'message' => 'One or more of the external links you entered were invalid URLs.'),
-			array('$.url', 'string', 'max' => 200, 'message' => 'External URLs can only be 200 characters in length'),
-			array('$.title', 'string', 'max' => 20, 'message' => 'The optional external URL caption field can only be 200 characters in length')
-		);
-
-		$valid = true;
-		foreach($ar as $k => $row){
-			$ar[$k] = filter_array_fields($row, array('url', 'title'));
-		}
-		$this->external_links = $ar;
-
-		$valid = $this->validateRules($rules, $ar) && $valid;
-
-		//if(!$valid)
-			//$this->addError('One or more of the external links you entered were incorrect. Please enter the full URL you wish to link to and optionally a title no longer than 20 characters.');
+	function validateExternalLinks(){
 
 		if(count($this->external_links) > 6){
-			$this->addError('You can only add 6 external links for the time being. Please make sure you have entered no more and try again.');
+			$this->setError('externalLinks', 'You can only add 6 external links for the time being. Please make sure you have entered no more and try again.');
+			return false;
 		}
 
-		if(count($this->getErrors()) > 0){
+		$valid=true;
+		if(is_array($this->externalLinks)){
+			foreach($this->externalLinks as $k=>$v){
+				$m=new Model();
+				$m->setRules(array(
+					array('url', 'required', 'message' => 'One or more of the external links you entered were invalid URLs.'),
+					array('url', 'url', 'message' => 'One or more of the external links you entered were invalid URLs.'),
+					array('url', 'string', 'max' => 200, 'message' => 'External URLs can only be 200 characters in length'),
+					array('title', 'string', 'max' => 20, 'message' => 'The optional external URL caption field can only be 200 characters in length')
+				));
+				$m->setAttributes($v);
+				$valid=$m->validate()&&$valid;
+				$this->externalLinks[$k]=$m->getAttributes();
+			}
+			$this->externalLinks=array_values($this->externalLinks);
+		}
+
+		if(!$valid){
+			$this->setError('externalLinks', 'One or more of the external links you entered were invalid.');
 			return false;
 		}
 		return true;
@@ -362,33 +367,17 @@ class User extends \glue\User{
 
 	function setAvatar(){
 
-		if(strlen($this->profile_image['tmp_name'])){
-			$thumb = PhpThumbFactory::create(file_get_contents($this->profile_image['tmp_name']), array(), true); // This will need some on spot caching soon
-			$thumb->adaptiveResize(800, 600);
-			$this->image_src = new MongoBinData($thumb->getImageAsString());
+		$ref=\MongoDBRef::create('user',$this->_id);
+		$bytes=file_get_contents($this->avatar['tmp_name']);
 
-			glue::db()->image_cache->remove(array('object_id' => $this->_id, 'type' => 'user'), array('safe' => true)); // Clear all cache
-
-			$thumb = PhpThumbFactory::create($this->image_src->bin, array(), true); // This will need some on spot caching soon
-			$thumb->adaptiveResize(48, 48);
-			glue::db()->image_cache->update(array('object_id' => $this->_id, 'width' => 48, 'height' => 48, 'type' => 'user'),
-				array('$set' => array('data' => new MongoBinData($thumb->getImageAsString()),
-			)), array('upsert' => true));
-
-			$thumb = PhpThumbFactory::create($this->image_src->bin, array(), true); // This will need some on spot caching soon
-			$thumb->adaptiveResize(55, 55);
-			glue::db()->image_cache->update(array('object_id' => $this->_id, 'width' => 55, 'height' => 55, 'type' => 'user'),
-				array('$set' => array('data' => new MongoBinData($thumb->getImageAsString()),
-			)), array('upsert' => true));
-
-			$thumb = PhpThumbFactory::create($this->image_src->bin, array(), true); // This will need some on spot caching soon
-			$thumb->adaptiveResize(125, 125);
-			glue::db()->image_cache->update(array('object_id' => $this->_id, 'width' => 125, 'height' => 125, 'type' => 'user'),
-				array('$set' => array('data' => new MongoBinData($thumb->getImageAsString()),
-			)), array('upsert' => true));
-
-			unlink($this->profile_image['tmp_name']); // Delte the file now
-
+		if(
+			strlen($this->avatar['tmp_name']) &&
+			Image::saveAsSize($ref, $bytes, 800, 600, true) &&
+			Image::saveAsSize($ref, $bytes, 48, 48) &&
+			Image::saveAsSize($ref, $bytes, 55, 55) &&
+			Image::saveAsSize($ref, $bytes, 125, 125)
+		){
+			unlink($this->avatar['tmp_name']); // Delte the file now
 			$this->save();
 		}
 		return true;

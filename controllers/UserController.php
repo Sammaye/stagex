@@ -553,7 +553,7 @@ class userController extends \glue\Controller{
 		if(isset($_POST['User'])){
 			$model->setScenario($_POST['User']['action']);
 			if($model->getScenario()=='updatePic'){
-				$model->profileImage=new glue\File(array('model'=>$model,'id'=>'profileImage'));
+				$model->avatar=new glue\File(array('model'=>$model,'id'=>'avatar'));
 				if($model->validate()&&$model->setAvatar()){
 					Html::setSuccessFlashMessage('Your profile picture have been changed');
 					glue::http()->redirect("/user/profile");
