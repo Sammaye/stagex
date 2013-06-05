@@ -93,15 +93,15 @@ $this->js('updateProfile', "
 		<div>
 			<div id="UserSocialProfiles">
 				<?php
-				$socialProfiles = is_array($model->external_links) ? $model->external_links : array();
+				$socialProfiles = is_array($model->externalLinks) ? $model->externalLinks : array();
 
 				$i = 0;
 				foreach($socialProfiles as $socialProfile){
 					?>
 					<div class="socialProfile">
 						<div class='inner_block'>
-						<div class='input_block'><?php echo html::label('Url:').$form->textfield($model, "[avatar][$i]url", array('class' => 'url')) ?></div>
-						<div class='input_block'><?php echo html::label('Link Title (optional):').$form->textfield($model, "[avatar][$i]title", array('class' => 'url')) ?></div>
+						<div class='input_block'><?php echo html::label('Url:').$form->textfield($model, "[externalLinks][$i]url", array('value' => $socialProfile['url'])) ?></div>
+						<div class='input_block'><?php echo html::label('Link Title (optional):').$form->textfield($model, "[externalLinks][$i]title", array('value' => $socialProfile['title'])) ?></div>
 						</div>
 						<a href="#" class="removeSocialProfile">Remove</a>
 					</div>
@@ -113,8 +113,8 @@ $this->js('updateProfile', "
 			ob_start();
 				?><div class="socialProfile">
 					<div class='inner_block'>
-						<div class='input_block'><?php echo html::label('Url:').html::activeTextField($model,"[avatar][0]url", null, array('class' => 'url')) ?></div>
-						<div class='input_block'><?php echo html::label('Link Title (optional):').html::textfield("[avatar][0]title", null, array('class' => 'title')) ?></div>
+						<div class='input_block'><?php echo html::label('Url:').html::activeTextField($model,"[externalLinks][0]url") ?></div>
+						<div class='input_block'><?php echo html::label('Link Title (optional):').html::activeTextField($model,"[externalLinks][0]title") ?></div>
 					</div>
 					<a href="#" class="removeSocialProfile">Remove</a>
 				</div><?php

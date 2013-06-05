@@ -320,7 +320,7 @@ class User extends \glue\User{
 
 	function validateExternalLinks(){
 
-		if(count($this->external_links) > 6){
+		if(count($this->externalLinks) > 6){
 			$this->setError('externalLinks', 'You can only add 6 external links for the time being. Please make sure you have entered no more and try again.');
 			return false;
 		}
@@ -337,7 +337,7 @@ class User extends \glue\User{
 				));
 				$m->setAttributes($v);
 				$valid=$m->validate()&&$valid;
-				$this->externalLinks[$k]=$m->getAttributes();
+				$this->externalLinks[$k]=$m->getAttributes(null,true);
 			}
 			$this->externalLinks=array_values($this->externalLinks);
 		}

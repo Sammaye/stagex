@@ -224,11 +224,14 @@ class Model{
 	/**
 	 * Gets the models attributes
 	 */
-	public function getAttributes($names=null) {
+	public function getAttributes($names=null,$scenario=true) {
 
 		$values = array();
 		if ($names === null) {
-			$names = $this->attributeNames();
+			if($scenario)
+				$names=$this->scenarioAttributeNames();
+			else
+				$names = $this->attributeNames();
 		}
 		foreach ($names as $name) {
 			$values[$name] = $this->$name;
