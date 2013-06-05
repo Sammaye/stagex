@@ -10,9 +10,9 @@
 	<?php endif; ?>
 
 	<?php if($item->type == Stream::WALL_POST): ?>
-		<a href='<?php echo glue::url()->create('/user/view', array('id' => strval($item->commenting_user->_id))) ?>'><img alt='thumbnail' src='<?php echo $item->commenting_user->getPic(48, 48) ?>' class='float_left'/></a>
+		<a href='<?php echo glue::url()->create('/user/view', array('id' => strval($item->commenting_user->_id))) ?>'><img alt='thumbnail' src='<?php echo $item->commenting_user->getAvatar(48, 48) ?>' class='float_left'/></a>
 	<?php else: ?>
-		<a href='<?php echo glue::url()->create('/user/view', array('id' => strval($item->status_sender->_id))) ?>'><img alt='thumbnail' src='<?php echo $item->status_sender->getPic(48, 48) ?>' class='float_left'/></a>
+		<a href='<?php echo glue::url()->create('/user/view', array('id' => strval($item->status_sender->_id))) ?>'><img alt='thumbnail' src='<?php echo $item->status_sender->getAvatar(48, 48) ?>' class='float_left'/></a>
 	<?php endif; ?>
 
 	<div class='stream_item_inner'>
@@ -167,11 +167,11 @@
 				</div>
 				<div class='stream_item_user'>
 					<?php if($item->subscribed_user){ ?>
-						<img alt='thumbnail' class='user_img' src='<?php echo $item->subscribed_user->getPic(48, 48) ?>'/>
+						<img alt='thumbnail' class='user_img' src='<?php echo $item->subscribed_user->getAvatar(48, 48) ?>'/>
 						<h3 class='username'><?php echo html::a(array('href' => glue::url()->create('/user/view', array('id' => strval($item->subscribed_user->_id))),
 							'text' => $item->subscribed_user->getUsername())) ?></h3>
 					<?php }else{ $user = new User; ?>
-						<img alt='thumbnail' class='user_img' src='<?php echo $user->getPic(48, 48) ?>'/>
+						<img alt='thumbnail' class='user_img' src='<?php echo $user->getAvatar(48, 48) ?>'/>
 						<h3 class='username'><?php echo html::a(array('href' => glue::url()->create('/user/view'), 'text' => '[User Deleted]')) ?></h3>
 					<?php } ?>
 				</div>

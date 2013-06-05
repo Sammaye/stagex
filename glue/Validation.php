@@ -73,8 +73,8 @@ class Validation extends \glue\Component{
 					$valid = $validator($field,$field_value,$params,$this) && $valid;
 				}else{//if(glue::canImport($validator)){
 					$o = new $validator($params);
-					$o->owner = $this;
-					$valid = $o->validate($field, $field_value) && $valid;
+					$o->owner = $this->model;
+					$valid = $o->validateAttribute($this->model, $field, $field_value) && $valid;
 				//}else{
 					//trigger_error("The validator $validator could not be found in the ".get_class($this)." model");
 				}

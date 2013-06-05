@@ -6,6 +6,9 @@ namespace glue;
  * Extend this class to add your own validators
  */
 class Validator extends \glue\Component{
+	
+	public $owner;
+	
 	function validateAttribute($model, $attribute, $value){}
 
 	public function isEmpty($value, $trim  = false){

@@ -162,7 +162,7 @@ $video_count = count($playlist->videos);
 		<div class='grid_3 omega main_content_right'>
 
 			<div class='avatar_block'>
-				<div class='user_image'><img alt='thumbnail' src="<?php echo $user->getPic(48, 48); ?>"/></div>
+				<div class='user_image'><img alt='thumbnail' src="<?php echo $user->getAvatar(48, 48); ?>"/></div>
 				<div class='about_user'><a href='<?php echo glue::url()->create('/user/view', array('id' => strval($user->_id))) ?>'><?php echo $user->getUsername() ?></a><div class='subs'><?php echo $user->total_subscribers ?> subscribers</div>
 				</div>
 			</div>

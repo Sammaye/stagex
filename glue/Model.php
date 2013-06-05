@@ -272,6 +272,10 @@ class Model{
 			$this->error_messages[$field][] = $message;
 		}
 	}
+	
+	function setAttributeErrors($attribute,$errors){
+		$this->error_messages[$attribute]=$errors;
+	}
 
 	/**
 	 * Clears all the models errors. If a field name is provided in the parameters
@@ -330,6 +334,19 @@ class Model{
 		}
 		return $this->validator;
 	}
+	
+	/**
+	 * Cleans the model
+	 */
+	public function clean(){
+		$names=$this->attributeNames();
+		foreach($names as $name)
+			unset($this->$name);
+		$nnames=$this->attributeNames(null,true);
+		foreach($nnames as $name)
+			unset($this->$name);
+		return true;
+	}	
 
 	/**
 	 * EVENTS

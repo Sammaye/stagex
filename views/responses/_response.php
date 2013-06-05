@@ -55,7 +55,7 @@ if($item->type == "text"){ ?>
 			<div class='reply'>
 				<div class='reply_inner'>
 					<div class='block_summary' style='display:none;'></div>
-					<div class='user_img'><img alt='thumbnail' src='<?php echo glue::session()->user->getPic(40, 40); ?>'/></div>
+					<div class='user_img'><img alt='thumbnail' src='<?php echo glue::session()->user->getAvatar(40, 40); ?>'/></div>
 					<div class='reply_right'>
 						<?php echo html::textarea('reply_comment_content', null, array('class' => 'reply_comment_content')) ?>
 						<div class='reply_footer'>

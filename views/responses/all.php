@@ -96,7 +96,7 @@ glue::clientScript()->addJsScript('videoResponses.admin', "
 		<div class='video_abstract'><?php echo $model->getLongAbstract() ?></div>
 		<div class='uploaded_by_head'>Uploaded by:</div>
 		<div class='avatar_block'>
-			<div class='user_image'><img alt='thumbnail' src="<?php echo $model->author->getPic(48, 48); ?>"/></div>
+			<div class='user_image'><img alt='thumbnail' src="<?php echo $model->author->getAvatar(48, 48); ?>"/></div>
 			<div class='about_user'><a href='<?php echo glue::url()->create('/user/view', array('id' => strval($model->author->_id))) ?>'><?php echo $model->author->getUsername() ?></a>
 			<div class='subs'><?php echo $model->author->total_subscribers ?> subscribers | <?php echo $model->author->total_uploads ?> videos</div>
 			</div>

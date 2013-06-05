@@ -182,7 +182,7 @@ glue::clientScript()->addJsScript('watch.response_list', "
 		<div class='block_summary'></div>
 
 		<div class='thread_parent' data-id='<?php echo $thread_parent->_id ?>'>
-			<img alt='thumbnail' class='float_left' src='<?php echo $thread_parent->author->getPic(48, 48) ?>'/>
+			<img alt='thumbnail' class='float_left' src='<?php echo $thread_parent->author->getAvatar(48, 48) ?>'/>
 			<div class='main_body'>
 				<div class='user'><a href='<?php echo glue::url()->create('/user/view', array('id' => $thread_parent->author->_id)) ?>'><b><?php echo $thread_parent->author->getUsername() ?></b></a> <span class='ts'>- <?php echo ago($thread_parent->ts->sec) ?></span></div>
 				<div class='thread_content'><?php echo html::encode($thread_parent->content) ?></div>

@@ -49,7 +49,7 @@ $this->beginPage() ?>
 			<div class='grid_970'>
 				<div class='grid_block alpha omega user_section_side_menu'>
 					<div class='about_user'>
-						<img src="<?php echo glue::user()->getPic(40, 40); ?>" alt='thumbnail'/>
+						<img src="<?php echo glue::user()->getAvatar(40, 40); ?>" alt='thumbnail'/>
 						<h3><a href='<?php echo glue::http()->createUrl('/user/view', array('id' => strval(glue::user()->_id))) ?>'><?php echo glue::user()->getUsername() ?></a></h3>
 					</div>
 					<a href='<?php echo glue::http()->createUrl('/video/upload', array(), glue::$params['uploadBase']) ?>' class='green_css_button upload'>UPLOAD</a>

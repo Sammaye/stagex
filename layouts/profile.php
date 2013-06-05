@@ -93,7 +93,7 @@ glue::clientScript()->addJsScript('user.subscribe', "
 
 			<div class='top' style='position:relative; min-height:135px;'>
 				<div class='head_outer'>
-					<div class='user_image'><img src="<?php echo $user->getPic(125, 125); ?>" alt='thumbnail'/></div>
+					<div class='user_image'><img src="<?php echo $user->getAvatar(125, 125); ?>" alt='thumbnail'/></div>
 					<div class='user_about'>
 						<h1 class='username'><?php echo $user->getUsername() ?></h1>
 						<div class='expandable_small'>

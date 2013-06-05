@@ -248,7 +248,7 @@ glue::clientScript()->addJsScript('watch.edit_video', "
 
 		<?php if($model->author->_id != glue::session()->user->_id){ ?>
 			<div class='video_watch_author_box'>
-				<div class="user_image"><img alt='thumbnail' src="<?php echo $model->author->getPic(30, 30); ?>"/></div>
+				<div class="user_image"><img alt='thumbnail' src="<?php echo $model->author->getAvatar(30, 30); ?>"/></div>
 				<h1 class='username_outer'>
 					<a href='<?php echo glue::url()->create('/user/view', array('id' => $model->author->_id)) ?>'><?php echo $model->author->getUsername() ?></a> <span class='uploaded'><?php echo ago($model->created->sec) ?></span>
 				</h1>

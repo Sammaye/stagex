@@ -209,7 +209,7 @@ glue::clientScript()->addJsScript('sortChange', "
 				}elseif($model instanceof User){
 					?>
 					<div class='user_search_item'>
-						<div class='user_image'><a href="/user/view?id=<?php echo strval($model->_id) ?>" ><img alt='thumbnail' src="<?php echo $model->getPic(55, 55) ?>"/></a></div>
+						<div class='user_image'><a href="/user/view?id=<?php echo strval($model->_id) ?>" ><img alt='thumbnail' src="<?php echo $model->getAvatar(55, 55) ?>"/></a></div>
 						<div class='details'>
 							<div class='title'><a href="/user/view?id=<?php echo strval($model->_id) ?>"><?php echo $model->getUsername() ?></a></div>
 							<div class='info'><?php echo $model->total_subscribers ?> subscribers <span class='divider'>|</span> <?php echo $model->total_uploads ?> videos <span class='divider'>|</span> <?php echo $model->total_playlists ?> playlists</div>

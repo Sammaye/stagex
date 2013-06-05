@@ -551,7 +551,6 @@ class userController extends \glue\Controller{
 		$model = $this->loadModel();
 
 		if(isset($_POST['User'])){
-			var_dump($_POST['User']); //exit();
 			$model->setScenario($_POST['User']['action']);
 			if($model->getScenario()=='updatePic'){
 				$model->avatar=new glue\File(array('model'=>$model,'id'=>'avatar'));

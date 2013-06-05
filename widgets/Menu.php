@@ -67,7 +67,7 @@ class Menu extends \glue\Widget{
 								} ?>
 								</a>
 							</li>
-							<li><img alt='thumbnail' class='user_image' src='<?php echo glue::user()->getPic(30,30) ?>'/></li>
+							<li><img alt='thumbnail' class='user_image' src='<?php echo glue::user()->getAvatar(30,30) ?>'/></li>
 							<li><a href="<?php echo Glue::http()->createUrl("/user/videos", array('id' => glue::user()->_id)) ?>"><?php echo glue::user()->getUsername() ?></a></li>
 							<li><a href="<?php echo Glue::http()->createUrl("/help") ?>">Help</a></li>
 							<li><a target='_blank' href="https://getsatisfaction.com/stagex">Report Bug</a></li>

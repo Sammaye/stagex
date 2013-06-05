@@ -2,9 +2,8 @@
 
 namespace app\models;
 
-use glue\Model;
-
 use glue,
+	glue\Model,
 	app\models\Playlist,
 	glue\util\Crypt,
 	glue\Collection,
@@ -206,7 +205,13 @@ class User extends \glue\User{
 		array('clicky_uid', 'string', 'max' => 20, 'message' => 'Those are not valid anayltics accounts.'),
 		array('email_vid_responses, email_vid_response_replies, email_wall_comments, email_encoding_result', 'boolean', 'allowNull'=>true),
 
-		array('externalLinks', 'validateExternalLinks')
+		array('externalLinks', 'validateExternalLinks'),
+		array('defaultVideoSettings', 'glue\\db\\Subdocument', 'type' => 'one', 'rules' => array(			
+			array('listing', 'in', 'range' => array(1, 2, 3), 'message' => 'Please enter a valid value for listing'),
+			array('mod_comments', 'in', 'range' => array(0, 1), 'message' => 'Please enter a valid value for all comment options'),
+			array('voteable, embeddable, voteable_comments, vid_coms_allowed, txt_coms_allowed, private_stats', 'boolean', 'allowNull' => true),
+			array('licence', 'in', 'range' => array(1, 2), 'message' => 'Please enter a valid value for licence')
+		))
 		);
 	}
 
@@ -349,26 +354,10 @@ class User extends \glue\User{
 		return true;
 	}
 
-	function setDefaultVideoSettings($ar){
-
-		$data = array_merge($this->default_video_settings, $ar);
-		$this->default_video_settings = filter_array_fields($data, array('listing', 'mod_comments', 'voteable', 'embeddable',
-						'voteable_comments', 'vid_coms_allowed', 'txt_coms_allowed', 'private_stats', 'licence'));
-
-		$rules = array(
-			array('listing', 'in', 'range' => array(1, 2, 3), 'message' => 'Please enter a valid value for listing'),
-			array('mod_comments', 'in', 'range' => array(0, 1), 'message' => 'Please enter a valid value for all comment options'),
-			array('voteable, embeddable, voteable_comments, vid_coms_allowed, txt_coms_allowed, private_stats', 'boolean', 'allowNull' => true),
-			array('licence', 'in', 'range' => array(1, 2), 'message' => 'Please enter a valid value for licence')
-		);
-
-		return $this->validateRules($rules, $data);
-	}
-
 	function setAvatar(){
 
 		$ref=\MongoDBRef::create('user',$this->_id);
-		$bytes=file_get_contents($this->avatar['tmp_name']);
+		$bytes=file_get_contents($this->avatar->tmp_name);
 
 		if(
 			strlen($this->avatar['tmp_name']) &&
@@ -383,7 +372,7 @@ class User extends \glue\User{
 		return true;
 	}
 
-	function getPic($width, $height){
+	function getAvatar($width, $height){
 		if(isset(glue::$params['imagesUrl'])){
 			return 'http://images.stagex.co.uk/user/'.strval($this->_id).'_w_'.$width.'_h_'.$height.'.png';
 		}else{

@@ -21,7 +21,7 @@ $this->js('updateProfile', "
 
 	<div class="profile_setpicture_outer">
 		<?php $form = html::activeForm(array("enctype"=>"multipart/form-data")) ?>
-			<div class="account_profile_ppicture_image"><img alt='thumbnail' src="<?php echo $model->getPic(125, 125) ?>"/></div>
+			<div class="account_profile_ppicture_image"><img alt='thumbnail' src="<?php echo $model->getAvatar(125, 125) ?>"/></div>
 			<div class="account_profile_ppicture_upload">
 				<h2>Choose a profile picture:</h2>
 				<?php echo $form->filefield($model, "profile_image", array('id' => 'profile_pic_uploader')) ?>
