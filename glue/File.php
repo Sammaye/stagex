@@ -24,14 +24,9 @@ class File implements \Iterator,\ArrayAccess,\Countable{
 	function __construct($config=array()){
 		foreach($config as $k=>$v)
 			$this->$k=$v;
-		
-		if($this->model instanceof \glue\Model){
-			$this->modelClass=get_class($this->model);
-		}elseif(is_string($this->modelClass)){
-			$this->model=new $this->modelClass;
-		}
-		if($this->model&&isset($config['id']))
-			$this->populateMultiUpload($this->model, $config['id']);
+
+		if(isset($config['id']))
+			$this->populateUpload(isset($config['model'])?$config['model']:null, $config['id']);
 	}
 
 	function save($path=null){
@@ -103,15 +98,38 @@ class File implements \Iterator,\ArrayAccess,\Countable{
 			throw new Exception("Field $id in $model was not found to have a valid value");
 	}
 
-	function populateUpload($model,$id){
+	function populateUpload($model=null,$id){
 
-		$file_a = $_FILES[$model][$id];
+		if(!isset($_FILES)||!is_array($_FILES))
+			return;
+
+		if($model){
+			$cnameParts=explode('\\',get_class($model));
+			$file_a = $_FILES[end($cnameParts)];
+		}else
+			$file_a = $_FILES;
 
 		if(is_array($file_a)){
+			// We will not blindly prefetch the files, instead we will pick each one out saftely according to what the user
+			// asks for
+
 			$this->model=$model;
 			$this->upload=true;
-			foreach($a as $k => $v)
-				$this->$k=$v;
+
+			if(isset($file_a[$id])){
+				foreach($a as $k => $v)
+					$this->$k=$v;
+			}else{
+				$result = array();
+				foreach($file_a as $key1 => $value1){
+					foreach($value1 as $key2 => $value2){
+						if($key2==$id)
+							$result[$key1] = $value2;
+					}
+				}
+				foreach($result as $k => $v)
+					$this->$k=$v;
+			}
 		}else
 			throw new Exception("Field $id in $model was not found to have a valid value");
 	}
