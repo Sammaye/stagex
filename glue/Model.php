@@ -220,6 +220,7 @@ class Model{
 				$this->$name=!is_array($value) && preg_match('/^([0-9]|[1-9]{1}\d+)$/' /* Will only match real integers, unsigned */, $value) > 0 ? (int)$value : $value;
 			}
 		}
+		return $this;
 	}
 
 	/**

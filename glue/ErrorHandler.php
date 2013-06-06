@@ -52,7 +52,6 @@ class ErrorHandler extends \glue\Component{
 		);
 
 		if (error_reporting() == 0) {
-
 			/** Error has been surpress via an @ **/
 			return;
 		}

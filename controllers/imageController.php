@@ -89,8 +89,8 @@ class imageController extends glue\Controller{
 		$this->pageTitle = 'User Avatar - StageX';
 
 		$file_name = glue::http()->param('file',null);
-		$width = glue::http()->param('w',45);
-		$height = glue::http()->param('h',45);
+		$width = (int)glue::http()->param('w',45);
+		$height = (int)glue::http()->param('h',45);
 
 		$resize=  false;
 		$insert_cache = false;
@@ -110,11 +110,10 @@ class imageController extends glue\Controller{
 
 		if(strlen($file_name) > 0 && User::model()->findOne(array('_id' => new MongoId($file_name)))){ // We have to do a user lookup to make sure they are not spamming us with ids
 			$file=Image::model()->findOne(array('ref' => MongoDBRef::create('user',new MongoId($file_name)), 'width' => $width, 'height' => $height));
-
 			if($file){
-				$bytes = $file->data->bin; // The file is in the video row let's get EIT!!
-			}elseif(($original_image=Image::model()->findOne(array('ref' => MongoDBRef::create('user',new MongoId($file_name)), 'original' => true)))!==null){
-				$bytes = $original_image->data->bin; // The file is in the video row let's get EIT!!
+				$bytes = $file->bytes->bin; // The file is in the video row let's get EIT!!
+			}elseif(($original_image=Image::model()->findOne(array('ref' => MongoDBRef::create('user',new MongoId($file_name)), 'original' => 1)))!==null){
+				$bytes = $original_image->bytes->bin; // The file is in the video row let's get EIT!!
 				$insert_cache = true;
 				$resize = true;
 			}
@@ -124,9 +123,7 @@ class imageController extends glue\Controller{
 		if($resize) $thumb->adaptiveResize($width, $height);
 
 		if($insert_cache){
-			glue::db()->image_cache->update(array('ref' => MongoDBRef::create('user',new MongoId($file_name)), 'width' => $width, 'height' => $height),
-				array('$set' => array('data' => new MongoBinData($thumb->getImageAsString()),
-			)), array('upsert' => true));
+			Image::saveAsSize(MongoDBRef::create('user',new MongoId($file_name)), $thumb->getImageAsString(), $width, $height);
 		}
 		$thumb->show();
 	}

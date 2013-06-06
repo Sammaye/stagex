@@ -73,8 +73,6 @@ $this->beginPage() ?>
 					<ul class='account_settings'>
 						<li><a href='<?php echo glue::http()->createUrl('/user/settings') ?>' <?php echo $this->tab == "settings" ? "class='selected'" : "" ?>>Account Overview</a></li>
 						<li><a href='<?php echo glue::http()->createUrl('/user/profile') ?>' <?php echo $this->tab == "profile" ? "class='selected'" : "" ?>>Profile Settings</a></li>
-						<li><a href='<?php echo glue::http()->createUrl('/user/autoshare') ?>' <?php echo $this->tab == "sharing" ? "class='selected'" : "" ?>>Auto-sharing</a></li>
-						<li><a href='<?php echo glue::http()->createUrl('/user/uploadpref') ?>' <?php echo $this->tab == "uploadpref" ? "class='selected'" : "" ?>>Upload Preferences</a></li>
 						<li><a href='<?php echo glue::http()->createUrl('/user/activity') ?>' <?php echo $this->tab == "activity" ? "class='selected'" : "" ?>>Account Activity</a></li>
 					</ul>
 					<ul class='main_options'>

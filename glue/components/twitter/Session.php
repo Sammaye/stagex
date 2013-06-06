@@ -84,7 +84,6 @@ class Session extends \glue\Component{
 
 	function getCurrentUser(){
 		$u = $this->get('account/verify_credentials');
-
 		if(isset($u->error)){
 			return false;
 		}else{

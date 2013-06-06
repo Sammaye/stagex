@@ -104,7 +104,8 @@ class OAuthSignatureMethod_HMAC_SHA1 extends OAuthSignatureMethod {
 	public function build_signature($request, $consumer, $token) {
 		$base_string = $request->get_signature_base_string();
 		$request->base_string = $base_string;
-
+		
+		//var_dump($request); exit();
 		$key_parts = array(
 		$consumer->secret,
 		($token) ? $token->secret : ""
@@ -360,7 +361,7 @@ class OAuthRequest {
 		$this->get_normalized_http_url(),
 		$this->get_signable_parameters()
 		);
-
+		
 		$parts = OAuthUtil::urlencode_rfc3986($parts);
 
 		return implode('&', $parts);

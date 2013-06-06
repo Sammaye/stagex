@@ -441,73 +441,12 @@ class userController extends \glue\Controller{
 			}
 		}
 
-		$this->page = "settings";
+		$this->tab = "settings";
 
-		$this->render(
+		echo $this->render(
 			"settings",
 			array("model"=>$model, 'success_message' => $success_message)
 		);
-	}
-
-	function action_autoshare(){
-		$this->pageTitle = 'Autoshare Settings - StageX';
-
-		$this->layout = "user_section";
-		$this->tab = "sharing";
-		$this->page = "settings";
-
-		$model = $this->loadModel();
-		if(isset($_SESSION['success_message']) && !isset($_POST['User'])){
-			// DONE
-			$model->setSuccess(true);
-			$model->setHasBeenValidated(true);
-			unset($_SESSION['success_message']);
-		}
-
-		if(isset($_POST['User'], $_POST['User']['autoshare_opts'])){
-			$valid = $model->setAutoshareOptions($_POST['User']['autoshare_opts']);
-			if($valid){
-				$model->save();
-
-				$_SESSION['success_message'] = "Your auto-sharing settings have been saved.";
-				glue::http()->redirect("/user/autoshare");
-			}
-		}
-
-		$this->render('user/sharing', array( 'model' => $model ));
-	}
-
-	function action_uploadpref(){
-		$this->pageTitle = 'Upload Preferences - StageX';
-
-		$this->layout = "user_section";
-		$this->tab = "uploadpref";
-		$this->page = "settings";
-
-		$model = $this->loadModel();
-
-		if(isset($_SESSION['success_message']) && !isset($_POST['User'])){
-			// DONE
-			//echo "here";
-			$model->setSuccess(true);
-			$model->setHasBeenValidated(true);
-			unset($_SESSION['success_message']);
-		}
-
-		if(isset($_POST['User'], $_POST['User']['default_video_settings'])){
-			$valid = $model->setDefaultVideoSettings($_POST['User']['default_video_settings']);
-
-			if($valid){
-				$model->save();
-
-				$_SESSION['success_message'] = "Your upload preferences have been saved";
-				glue::http()->redirect("/user/uploadpref");
-			}
-		}
-
-		$this->render('user/uploadpref', array(
-			"defaults_model"=>$model
-		));
 	}
 
 	function action_activity(){
@@ -519,7 +458,7 @@ class userController extends \glue\Controller{
 
 		$model = $this->loadModel();
 
-		$this->render('user/activity', array(
+		echo $this->render('user/activity', array(
 			'model' => $model
 		));
 	}
@@ -535,7 +474,7 @@ class userController extends \glue\Controller{
 			if(!$user)
 				echo json_encode(array("success" => false));
 
-			unset($user->ins[$_GET['id']]);
+			unset($user->sessions[$_GET['id']]);
 			$user->save();
 
 			echo json_encode(array("success" => true));
@@ -557,7 +496,7 @@ class userController extends \glue\Controller{
 				$model->avatar=new glue\File(array('model'=>$model,'id'=>'avatar'));
 				if($model->validate()&&$model->setAvatar()){
 					Html::setSuccessFlashMessage('Your profile picture have been changed');
-					glue::http()->redirect("/user/profile");
+					//glue::http()->redirect("/user/profile");
 				}
 			}else{
 				$model->attributes=$_POST['User'];

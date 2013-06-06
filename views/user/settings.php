@@ -1,5 +1,5 @@
 
-<?php $this->addJsScript('account_settings', '
+<?php $this->js('account_settings', '
 	$(document).ready(function(){
 		account_edit_click();
 	});
@@ -45,7 +45,7 @@
 		'successMessage' => $success_message
 	)) ?>
 
-	<h1 class='section_head' style='<?php if($model->hasSummary()) echo "margin-top:15px;" ?>'>General</h1>
+	<h1 class='section_head' style='<?php ?>'>General</h1>
 
 	<div class="account_part edit_username">
 		<div>
@@ -292,7 +292,100 @@
 
 	<div class='services_footer_part'>
 		<div class="caption">Delete Account</div>
-		<div class='link'><a href="<?php echo glue::url()->create("/user/deactivate") ?>">Delete account and all data</a></div>
+		<div class='link'><a href="<?php echo glue::http()->createUrl("/user/deactivate") ?>">Delete account and all data</a></div>
 		<div class='clear_left'></div>
 	</div>
+</div>
+
+<?php $this->js('account_settings', '
+	$(document).ready(function(){
+		$(".submit_changes").click(function(event){
+			event.preventDefault();
+			$(".invisible_submit").trigger("click");
+		});
+	});
+') ?>
+
+<div class="uploadPref_body">
+
+	<?php echo html::form_summary($model, array(
+		'errorHead' => '<h2>Could not save upload preferences</h2>Your upload preferences could not be saved because:',
+		'successMessage' => 'Your upload settings have been saved'
+	)) ?>
+
+	<h1 style='<?php if($model->hasSummary()) echo "margin-top:15px;" ?>'>Upload Preferences</h1>
+
+	<?php $form= html::activeForm() ?>
+		<div class="preferences_form">
+		<div>
+			<div class='form_part'>
+				<div class="grid_5 push_1 alpha watch_video_edit_listing">
+					<?php $group = $form->radio_group($model, "defaultVideoSettings[listing]") ?>
+					<label><?php echo $group->add(1) ?><span>Public</span></label>
+					<label><?php echo $group->add(2) ?><span>Unlisted</span></label>
+					<label><?php echo $group->add(3) ?><span>Private</span></label>
+
+					<div class='bordered_form_section'>
+						<label class='block_label'><?php echo $form->checkbox($model, "defaultVideoSettings[embeddable]", 1) ?><span>Allow embedding of my video</span></label>
+					</div>
+				</div>
+			</div>
+			<div class="clearer"></div>
+		</div>
+
+		<div class='spaced_part'>
+			<div class='form_part'>
+				<div class="grid_5 omega push_1 upload_pref_right">
+					<?php $group = $form->radio_group($model, "defaultVideoSettings[moderated]") ?>
+					<div class="video_watch_edit_reponses">
+						<label><?php echo $group->add(0) ?><span>Automatically post all comments</span></label>
+						<label><?php echo $group->add(1) ?><span>Make all moderated</span></label>
+					</div>
+					<div class='bordered_form_section'>
+						<label class='block_label'><?php echo $form->checkbox($model, "defaultVideoSettings[voteableComments]", 1) ?><span>Allow users to vote on responses</span></label>
+						<label class='block_label'><?php echo $form->checkbox($model, "defaultVideoSettings[allowVideoComments]", 1) ?><span>Allow video responses</span></label>
+						<label class='block_label'><?php echo $form->checkbox($model, "defaultVideoSettings[allowTextComments]", 1) ?><span>Allow text responses</span></label>
+					</div>
+				</div>
+			</div>
+			<div class="clearer"></div>
+		</div>
+
+		<div class='spaced_part'>
+			<div class='form_part'>
+				<div class="grid_5 alpha omega push_1 padded_cell">
+					<label class='block_label'><?php echo $form->checkbox($model, "defaultVideoSettings[privateStatistics]", 1) ?><span>Make my statistics private</span></label>
+				</div>
+			</div>
+			<div class="clearer"></div>
+		</div>
+
+		<div class='spaced_part'>
+			<div class='form_part'>
+				<div class="grid_5 alpha omega push_1 padded_cell">
+					<label class='block_label'><?php echo $form->checkbox($model, "defaultVideoSettings[voteable]", 1) ?><span>Allow users to vote on this video</span></label>
+				</div>
+			</div>
+			<div class="clearer"></div>
+		</div>
+
+		<div class='spaced_part'>
+			<div class='form_part'>
+				<div class="grid_5 alpha omega push_1 padded_cell">
+
+					<?php $grp = $form->radio_group($model, 'defaultVideoSettings[licence]') ?>
+					<div class="label_options">
+						<label class='first block_label'><?php echo $grp->add('1') ?><span>Standard StageX Licence</span></label>
+						<label class='block_label'><?php echo $grp->add('2') ?><span>Creative Commons Licence</span></label>
+					</div>
+
+					<?php //echo $form->selectbox($model, 'licence', array("1"=>"StageX Licence", "2"=>"Creative Commons Licence")) ?>
+				</div>
+			</div>
+			<div class="clearer"></div>
+		</div>
+		<div class="grey_css_button submit_changes" style='font-size:12px; margin-top:10px;'>Save Changes</div>
+		</div>
+		<?php echo html::submitbutton("save", array('class' => 'invisible_submit')) ?>
+	<?php $form->end() ?>
 </div>

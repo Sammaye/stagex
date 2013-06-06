@@ -1,5 +1,6 @@
 <?php
-glue::import("glue/plugins/oauth/OAuth.php");
+include glue::getPath('@glue').'/components/oauth/OAuth.php';
+
 /*
  * Abraham Williams (abraham@abrah.am) http://abrah.am
  *

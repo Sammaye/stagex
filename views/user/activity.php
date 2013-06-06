@@ -1,4 +1,4 @@
-<?php $this->addJsScript('remove_session', "
+<?php $this->js('remove_session', "
 	$(document).ready(function(){
 		$('.remove_session').click(function(event){
 			event.preventDefault();
@@ -20,7 +20,7 @@
 
 	<h2 class="account_activity_top">Your session</h2>
 
-	<?php $browser = get_browser($model->ins[session_id()]['agent']) ?>
+	<?php $browser = get_browser($model->sessions[session_id()]['agent']) ?>
 
 	<table class="concurrent_sessions current_session">
 		<thead>
@@ -34,9 +34,9 @@
 		<tbody>
 			<tr>
 				<td><?php echo $browser ? $browser->parent." on ".$browser->platform : "Unknown" ?></td>
-				<td><?php echo $model->ins[session_id()]['ip'] ?></td>
-				<td><?php echo date('d-M-Y h:i:s', $model->ins[session_id()]['last_active']->sec) ?></td>
-				<td><?php echo $model->ins[session_id()]['last_request'] ?></td>
+				<td><?php echo $model->sessions[session_id()]['ip'] ?></td>
+				<td><?php echo date('d-M-Y h:i:s', $model->sessions[session_id()]['last_active']->sec) ?></td>
+				<td><?php echo $model->sessions[session_id()]['last_request'] ?></td>
 			</tr>
 		</tbody>
 	</table>
@@ -55,8 +55,8 @@
 			</tr>
 		</thead>
 		<tbody>
-		<?php if(count($model->ins) > 1){ ?>
-			<?php foreach($model->ins as $k=>$v){
+		<?php if(count($model->sessions) > 1){ ?>
+			<?php foreach($model->sessions as $k=>$v){
 				if($k != session_id()){
 					if($v['agent']){
 						$brows = get_browser($v['agent']);

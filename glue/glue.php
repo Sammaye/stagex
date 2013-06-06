@@ -256,12 +256,14 @@ class glue{
 	 * @param boolean $fatal
 	 */
 	public static function handleError($code, $message, $file, $line, $fatal=false){
-		$e=self::getComponent('errorHandler');
-		if($fatal===true) // $fatal can sometimes be the symbol table, it depends on what mood PHP is in
-			$e->handleFatal($code,$message,$file,$line);
-		else
-			$e->handle($code,$message,$file,$line);
-		exit(1);
+		if (error_reporting() != 0){ /** Error has not been surpressed via an @ **/
+			$e=self::getComponent('errorHandler');
+			if($fatal===true) // $fatal can sometimes be the symbol table, it depends on what mood PHP is in
+				$e->handleFatal($code,$message,$file,$line);
+			else
+				$e->handle($code,$message,$file,$line);
+			exit(1);
+		}
 	}
 
 	/**

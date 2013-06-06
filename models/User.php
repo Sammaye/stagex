@@ -357,13 +357,13 @@ class User extends \glue\User{
 		$bytes=file_get_contents($this->avatar->tmp_name);
 
 		if(
-			strlen($this->avatar['tmp_name']) &&
+			strlen($this->avatar->tmp_name) &&
 			Image::saveAsSize($ref, $bytes, 800, 600, true) &&
 			Image::saveAsSize($ref, $bytes, 48, 48) &&
 			Image::saveAsSize($ref, $bytes, 55, 55) &&
 			Image::saveAsSize($ref, $bytes, 125, 125)
 		){
-			unlink($this->avatar['tmp_name']); // Delte the file now
+			unlink($this->avatar->tmp_name); // Delete the file now
 			$this->save();
 		}
 		return true;

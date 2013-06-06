@@ -548,9 +548,9 @@ class Validation extends \glue\Component{
 
 		$fieldValue = $value;
 
-		if($fieldValue['error'] === UPLOAD_ERR_OK){
+		if($fieldValue->error === UPLOAD_ERR_OK){
 			if(isset($params['ext'])){
-				$path = pathinfo($fieldValue['name']);
+				$path = pathinfo($fieldValue->name);
 
 				$found = false;
 				foreach($params['ext'] as $ext){
@@ -565,23 +565,23 @@ class Validation extends \glue\Component{
 
 			if(isset($params['size'])){
 				if(isset($params['size']['gt'])){
-					if($fieldValue['size'] < $params['size']['gt']){
+					if($fieldValue->size < $params['size']['gt']){
 						return false;
 					}
 				}elseif(isset($params['size']['lt'])){
-					if($fieldValue['size'] > $params['size']['lt']){
+					if($fieldValue->size > $params['size']['lt']){
 						return false;
 					}
 				}
 			}
 
 			if(isset($params['type'])){
-				if(preg_match("/".$params['type']."/i", $fieldValue['type']) === false || preg_match("/".$params['type']."/i", $fieldValue['type']) < 0){
+				if(preg_match("/".$params['type']."/i", $fieldValue->type) === false || preg_match("/".$params['type']."/i", $fieldValue->type) < 0){
 					return false;
 				}
 			}
 		}else{
-			switch ($fieldValue['error']) {
+			switch ($fieldValue->error) {
 				case UPLOAD_ERR_INI_SIZE:
 					return false;
 				case UPLOAD_ERR_FORM_SIZE:

@@ -1,9 +1,5 @@
 <?php
 
-namespace \glue\controllers;
-
-use \glue\components\mongodb as mongodb;
-
 class autoshareController extends \glue\Controller{
 
 	public $user;
@@ -46,10 +42,10 @@ class autoshareController extends \glue\Controller{
 	}
 
 	function action_status(){
-		$this->pageTitle = 'Autoshare - StageX';
+		$this->title = 'Autoshare - StageX';
 		$this->getConnectedUser();
 
-		if(!$this->socialUser){
+		if(!$this->socialUser||isset($this->socialUser->errors)){
 
 			switch($_GET['network']){
 				case "fb":
@@ -86,7 +82,7 @@ class autoshareController extends \glue\Controller{
 	}
 
 	function action_connect(){
-		$this->pageTitle = 'Autoshare - StageX';
+		$this->title = 'Autoshare - StageX';
 		$this->getConnectedUser();
 
 		$this->account->preAuth(); // run the pre_auth stuff to get our cookies and what not.
@@ -94,7 +90,7 @@ class autoshareController extends \glue\Controller{
 		switch($_GET['network']){
 			case "fb":
 				header("Location: ".$this->account->getLoginUrl(array(//"cancel_url"=>"http://stagex.co.uk/autoshare/auth?network=fb",
-					"redirect_uri"=>"http://www.stagex.co.uk/autoshare/auth?network=fb",
+					"redirect_uri"=>glue::http()->hostInfo()."/autoshare/auth?network=fb",
 					"scope"=>"read_stream,publish_stream,offline_access,email,user_birthday"
 				))
 				);
@@ -119,10 +115,10 @@ class autoshareController extends \glue\Controller{
 
 				switch($_GET['network']){
 					case "twt":
-						$this->user->twt_autoshare_token = $token;
+						$this->user->autoshareTwitter = $token;
 						break;
 					case 'fb':
-						$this->user->fb_autoshare_token = glue::facebook()->facebook->getAccessToken();
+						$this->user->autoshareFb = glue::facebook()->facebook->getAccessToken();
 						break;
 				}
 
@@ -147,10 +143,10 @@ class autoshareController extends \glue\Controller{
 				<?php switch($_GET['network']){
 					case "fb":
 						glue::facebook()->facebook->destroySession();
-						$this->user->fb_autoshare_token = null;
+						$this->user->autoshareFb = null;
 						break;
 					case "twt":
-						$this->user->twt_autoshare_token = null;
+						$this->user->autoshareTwitter = null;
 						break;
 				}
 
@@ -166,7 +162,7 @@ class autoshareController extends \glue\Controller{
 	<?php }
 
 	function loadModel(){
-		$user = User::model()->findOne(array("_id"=>glue::session()->user->_id));
+		$user = app\models\User::model()->findOne(array("_id"=>glue::user()->_id));
 		return $user;
 	}
 }

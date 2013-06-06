@@ -15,18 +15,18 @@ class Image extends \glue\db\Document{
 		return parent::model($className);
 	}
 
-	public static function saveAsSize(MongoDBRef $ref, $bytes, $width, $height, $original=false){
-		$thumb = PhpThumbFactory::create($bytes, array(), true); // This will need some on spot caching soon
+	public static function saveAsSize($ref, $bytes, $width, $height, $original=false){
+		$thumb = \PhpThumbFactory::create($bytes, array(), true); // This will need some on spot caching soon
 		$thumb->adaptiveResize($width, $height);
 
-		return self::model()->insert(array(
+		$m=new Image;
+		return $m->setAttributes(array(
 			'ref'=>$ref,
-			'bytes'=>new MongoBinData($thumb->getImageAsString()),
+			'bytes'=>new \MongoBinData($thumb->getImageAsString(),2),
 			'width'=>$width,
 			'height'=>$height,
 			'original'=>$original,
-			'created'=>new MongoDate()
-		));
+			'created'=>new \MongoDate()
+		),false)->insert();
 	}
-
 }
