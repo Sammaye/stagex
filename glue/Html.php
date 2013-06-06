@@ -467,7 +467,10 @@ class Html{
 				}
 
 				if(isset($options['showOnlyFirstError'])){
-					$html .= $messages[0];
+					foreach($messages as $field=>$v){
+						$html .= $messages[$field][0];
+						break;
+					}
 				}else{
 					$html .= self::openTag("ul", array());
 					foreach($messages as $message){

@@ -31,13 +31,14 @@ class loginForm extends \glue\Model{
 				$resp = recaptcha_check_answer("6LfCNb0SAAAAAK1J8rPQeDaQvz_wpIaowBiYRB2D", $_SERVER["REMOTE_ADDR"], $_POST["recaptcha_challenge_field"], $_POST["recaptcha_response_field"]);
 
 				if(!$resp->is_valid) {
-					$this->addError("captcha", $resp->error);
+					$this->setError("captcha", $resp->error);
 					return false;
 				}
 			}else{
-				$this->addError("captcha", "You must enter the Re-Captcha you see below correctly. This is because you have logged in 3 times unsuccessfully.");
+				$this->setError("captcha", "You must enter the Re-Captcha you see below correctly. This is because you have logged in 3 times unsuccessfully.");
 				return false;
 			}
 		}
+		return true;
 	}
 }

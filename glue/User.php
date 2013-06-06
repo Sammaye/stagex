@@ -167,6 +167,8 @@ class User extends \glue\db\Document{
 			/** Delete all other sessions */
 			$this->sessions = array();
 		}
+		$this->setScenario('update');
+		$this->setIsNewRecord(false);
 
 		/** Set session */
 		glue::session()->id=$this->_id;
@@ -191,7 +193,7 @@ class User extends \glue\db\Document{
 			$this->sessions[session_id()]['remember'] = (int)$remember;
 			$this->sessions[session_id()]['created'] = new \MongoDate();
 		}
-		//var_dump($this->user->ins[session_id()]);
+		//var_dump($this->sessions[session_id()]);
 		$this->save();
 		$this->setCookie($remember, $init);
 
@@ -222,7 +224,7 @@ class User extends \glue\db\Document{
 
 		if(!$r){
 			$this->logout(false);
-			$this->addError("The username and/or password could not be be found. Please try again. If you encounter further errors please try to recover your password.");
+			$this->setError("The username and/or password could not be be found. Please try again. If you encounter further errors please try to recover your password.");
 			return false;
 		}
 
@@ -232,9 +234,9 @@ class User extends \glue\db\Document{
 
 		if($checkPassword===false||Crypt::verify($password, $this->password)){
 			if($this->deleted){
-				$this->addError("Your account has been deleted. This process cannot be undone and may take upto 24 hours.");
+				$this->setError("Your account has been deleted. This process cannot be undone and may take upto 24 hours.");
 			}elseif($this->banned){
-				$this->addError('You have been banned from this site.');
+				$this->setError('You have been banned from this site.');
 			}else{
 				/** Then log the login */
 				$this->log($this->email, true);
@@ -244,7 +246,7 @@ class User extends \glue\db\Document{
 		}else{
 			// poop
 			glue::user()->log($this->email, false);
-			$this->addError("The username and/or password could not be be found. Please try again. If you encounter further errors please try to recover your password.");
+			$this->setError("The username and/or password could not be be found. Please try again. If you encounter further errors please try to recover your password.");
 			return false;
 		}
 		$this->logout(false);

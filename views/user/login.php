@@ -9,7 +9,7 @@
 
 <div class="user_login_body">
 	<?php $form = html::activeForm(); ?>
-
+<?php //var_dump($model->getErrors()); exit(); ?>
 		<?php echo html::form_summary($model, array(
 			'errorHead' => '<h2>You could not be Authenticated</h2>', 'showOnlyFirstError' => true
 		)) ?>

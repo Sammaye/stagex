@@ -65,14 +65,15 @@ class userController extends \glue\Controller{
 
 		if(isset($_POST['loginForm'])){
 			if($model->validate()){
-				if(glue::user()->login($model->username,$model->password,$model->remember)){
+				if(glue::user()->login($model->email,$model->password,$model->remember)){
 					if(isset($_GET['nxt'])){
 						glue::http()->redirect(glue::http()->param('nxt'));
 					}else{
 						glue::http()->redirect("/");
 					}
 				}else{
-					foreach(glue::user()->getErrors() as $f=>$v)
+					var_dump(glue::user()->getErrors());
+					foreach(glue::user()->getErrors() as $k=>$v)
 						$model->setError($k,$v);
 				}
 			}
