@@ -269,16 +269,16 @@ class User extends \glue\User{
 			$this->password = Crypt::blowfish_hash($this->password);
 		}
 
-		if($this->getScenario() == "updateEmail"){
+		if(!\glue\Validation::isEmpty($this->newEmail) && $this->newEmail!==$this->email){
 
 			$hash = hash("sha256", Crypt::generate_new_pass().(substr(md5(uniqid(rand(), true)), 0, 32)));
 
 			$this->accessToken = array(
 				"to" => time()+60*60*24, // 24 Hours
 				"hash" => $hash,
-				"email" => $this->new_email,
+				"email" => $this->newEmail,
 				"y" => "E_CHANGE",
-				"url" => glue::http()->createUrl("/user/confirminbox", array('e' => $this->new_email, 'h' => $hash, 'uid' => strval($this->_id)))
+				"url" => glue::http()->createUrl("/user/confirminbox", array('e' => $this->newEmail, 'h' => $hash, 'uid' => strval($this->_id)))
 			);
 		}
 		return true;
@@ -337,7 +337,7 @@ class User extends \glue\User{
 
 		if($this->getScenario() == "updateEmail"){
 			glue::mailer()->mail($this->email, array('no-reply@stagex.co.uk', 'StageX'), 'Verify your email change', 'user/verify_email_inbox.php',
-				array( "username" => $this->username, "verify_url" => $this->temp_access_token['url'], 'new_email' => $this->new_email ));
+				array( "username" => $this->username, "verify_url" => $this->accessToken['url'], 'new_email' => $this->newEmail ));
 		}
 
 		return true;

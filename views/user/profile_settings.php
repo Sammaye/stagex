@@ -101,6 +101,11 @@ $this->js('autoshare.networks', '
 
 <div class="grid_10 user_profile_body" style='margin-bottom:250px;'>
 	<?php $form = html::activeForm(); ?>
+		<div class="form_row">
+			<?php echo html::label("Username:", "username") ?>
+			<span>Usernames can be numbers, letters and _</span>
+			<div class="form_row"><?php echo $form->textField($model, "username") ?></div>
+		</div>
 
 		<div class="form_row">
 			<?php echo html::label("Name / Nick Name:", "name") ?>

@@ -44,32 +44,6 @@
 		'errorHead' => '<h2>Could not save settings</h2>Your account settings could not be saved because:'
 	)) ?>
 
-	<h1 class='section_head' style='<?php ?>'>General</h1>
-
-	<div class="account_part edit_username">
-		<div>
-			<div class='caption'>Username</div>
-			<div class='edit_link'><a href="#" class="edit_account_part">Change Username</a></div>
-			<div class="clearer"></div>
-		</div>
-		<div class="c_val"><?php echo $model->username ?></div>
-		<div class="small_submit_form_account account_part_edit">
-			<?php $form = html::activeForm() ?>
-				<ul class="description_ul">
-					<li>Usernames can be numbers and letters</li>
-					<li>Usernames are permitted to contain underscores (_)</li>
-					<li>Your username is your profile presence name when no other information is provided</li>
-				</ul>
-				<div class="account_settings_form_outer">
-					<div class="form_row"><?php echo $form->textField($model, "username") ?></div>
-				</div>
-				<?php echo $form->hiddenfield($model, "action", array("value"=>"updateUsername")) ?>
-				<?php echo html::submitbutton("save", array('class' => 'invisible_submit')) ?>
-			<?php $form->end() ?>
-		</div>
-		<div class="clearer"></div>
-	</div>
-
 	<div class="account_part edit_email_address">
 		<div>
 			<div class='caption'>Email Address</div>

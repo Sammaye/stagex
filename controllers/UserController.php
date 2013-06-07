@@ -379,8 +379,6 @@ class userController extends \glue\Controller{
 		$this->layout = "user_section";
 
 		$model = $this->loadModel();
-		//$previousModel = $model->getAttributes();
-
 		if(isset($_POST['User'])){
 			if(isset($_POST['User']['action'])){
 				$model->setScenario($_POST['User']['action']);
@@ -392,8 +390,6 @@ class userController extends \glue\Controller{
 			if($model->validate()&&$model->save()){
 				Html::setSuccessFlashMessage('Your account settings have been saved');
 				glue::http()->redirect("/user/settings");
-			}else{
-				//$model->attributes($previousModel);
 			}
 		}
 
