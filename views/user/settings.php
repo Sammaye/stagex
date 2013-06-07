@@ -112,6 +112,7 @@
 					<?php echo $form->hiddenField($model, "action", array("value"=>"updatePassword")) ?>
 					<div class="grey_css_button submit_changes" style='font-size:12px;'>Change Password</div>
 				</div>
+
 				<?php echo html::submitbutton("save", array('class' => 'invisible_submit')) ?>
 			<?php $form->end() ?>
 		</div>
@@ -150,7 +151,7 @@
 		&nbsp;
 	</div>
 
-	<h1 class='section_head'>Safe Search</h1>
+	<h1 class='section_head'>Browsing Settings</h1>
 	<div class="account_part details_account_part">
 		<div class='edit_link'><a href="#" class="edit_account_part">Edit</a></div>
 		<div class="c_val"><div><?php switch($model->safeSearch){
@@ -163,7 +164,8 @@
 				case 1:
 					echo "Strict";
 					break;
-			} ?></div></div>
+			} ?></div>		<div class='c_val'><div><?php echo $model->useDivx ? "Videos Play in DivX web player" : "DivX web player turned off" ?></div></div>
+		<div class='c_val'><div><?php echo $model->autoplayVideos ? "Autoplay is turned on" : "Autoplay is turned off" ?></div></div></div>
 
 		<div class="account_part_edit">
 				<?php $opts = $form->radio_group($model, "safeSearch") ?>
@@ -173,21 +175,6 @@
 					<label class='block_label'><?php echo $opts->add("0") ?><span>Off</span></label>
 					<div class='light_capt'><p>This gives you everything in its raw form. Not for children!</p></div>
 				</div>
-		</div>
-		<div class="clearer"></div>
-	</div>
-
-	<div class='section_hr'>
-		&nbsp;
-	</div>
-
-	<h1 class='section_head'>Playback</h1>
-	<div class="account_part details_account_part">
-		<div class='edit_link'><a href="#" class="edit_account_part">Edit</a></div>
-		<div class='c_val'><div><?php echo $model->useDivx ? "Videos Play in DivX web player" : "DivX web player turned off" ?></div></div>
-		<div class='c_val'><div><?php echo $model->autoplayVideos ? "Autoplay is turned on" : "Autoplay is turned off" ?></div></div>
-		<div class="clearer"></div>
-		<div class="account_part_edit">
 				<div class="privacy_form">
 					<label class='block_label'><?php echo $form->checkbox($model, 'useDivx', 1) ?><span>Use DivX Player</span></label>
 					<label class='block_label'><?php echo $form->checkbox($model, 'autoplayVideos', 1) ?><span>Automatically play videos</span></label>
@@ -215,8 +202,8 @@
 		<div class="account_part_edit">
 				<div class="privacy_form">
 					<label class='block_label'><?php echo $form->checkbox($model, 'emailEncodingResult', 1) ?><span>When one of my new uploads fails or finishes encoding</span></label>
-					<label class='block_label'><?php echo $form->checkbox($model, 'emailVideoResponses', 1) ?><span>When someone replies to one of my videos</span></label>
-					<label class='block_label'><?php echo $form->checkbox($model, 'emailVideoResponseReplies', 1) ?><span>When someone replies to one of my comments</span></label>
+					<label class='block_label'><?php echo $form->checkbox($model, 'emailVideoResponses', 1) ?><span>When someone replies to me</span></label>
+					<!-- <label class='block_label'><?php //echo $form->checkbox($model, 'emailVideoResponseReplies', 1) ?><span>When someone replies to one of my comments</span></label> -->
 					<label class='block_label'><?php echo $form->checkbox($model, 'emailWallComments', 1) ?><span>When someone comments on my profile</span></label>
 					<div class="clearer"></div>
 				</div>
@@ -248,50 +235,13 @@
 		<div class="clearer"></div>
 	</div>
 
-	<?php $form->end() ?>
+	<h1 class='section_head'>Default Video Settings</h1>
+	<div class="account_part details_account_part">
+		<div class='edit_link'><a href="#" class="edit_account_part">Edit</a></div>
+		<div class="clearer"></div>
+		<div class="account_part_edit">
+				<div class="privacy_form">
 
-	<div class='section_hr'>
-		&nbsp;
-	</div>
-
-	<h1 class='section_head'>Services</h1>
-
-	<!-- <div class='services_footer_part'>
-		<div class='caption'>Download All Information</div>
-		<div class='link'><a href="#">Download a copy of all information held by StageX</a></div>
-		<div class='clear_left'></div>
-	</div> -->
-
-	<div class='services_footer_part'>
-		<div class="caption">Delete Account</div>
-		<div class='link'><a href="<?php echo glue::http()->createUrl("/user/deactivate") ?>">Delete account and all data</a></div>
-		<div class='clear_left'></div>
-	</div>
-</div>
-
-<?php $this->js('account_settings', '
-	$(document).ready(function(){
-		$(".submit_changes").click(function(event){
-			event.preventDefault();
-			$(".invisible_submit").trigger("click");
-		});
-	});
-') ?>
-
-<div class="uploadPref_body">
-
-	<?php echo html::form_summary($model, array(
-		'errorHead' => '<h2>Could not save upload preferences</h2>Your upload preferences could not be saved because:',
-		'successMessage' => 'Your upload settings have been saved'
-	)) ?>
-
-	<h1 style='<?php if($model->hasSummary()) echo "margin-top:15px;" ?>'>Upload Preferences</h1>
-
-	<?php $form= html::activeForm() ?>
-		<div class="preferences_form">
-		<div>
-			<div class='form_part'>
-				<div class="grid_5 push_1 alpha watch_video_edit_listing">
 					<?php $group = $form->radio_group($model, "defaultVideoSettings[listing]") ?>
 					<label><?php echo $group->add(0) ?><span>Public</span></label>
 					<label><?php echo $group->add(1) ?><span>Unlisted</span></label>
@@ -300,14 +250,7 @@
 					<div class='bordered_form_section'>
 						<label class='block_label'><?php echo $form->checkbox($model, "defaultVideoSettings[embeddable]", 1) ?><span>Allow embedding of my video</span></label>
 					</div>
-				</div>
-			</div>
-			<div class="clearer"></div>
-		</div>
 
-		<div class='spaced_part'>
-			<div class='form_part'>
-				<div class="grid_5 omega push_1 upload_pref_right">
 					<?php $group = $form->radio_group($model, "defaultVideoSettings[moderated]") ?>
 					<div class="video_watch_edit_reponses">
 						<label><?php echo $group->add(0) ?><span>Automatically post all comments</span></label>
@@ -318,47 +261,31 @@
 						<label class='block_label'><?php echo $form->checkbox($model, "defaultVideoSettings[allowVideoComments]", 1) ?><span>Allow video responses</span></label>
 						<label class='block_label'><?php echo $form->checkbox($model, "defaultVideoSettings[allowTextComments]", 1) ?><span>Allow text responses</span></label>
 					</div>
-				</div>
-			</div>
-			<div class="clearer"></div>
-		</div>
 
-		<div class='spaced_part'>
-			<div class='form_part'>
-				<div class="grid_5 alpha omega push_1 padded_cell">
-					<label class='block_label'><?php echo $form->checkbox($model, "defaultVideoSettings[privateStatistics]", 1) ?><span>Make my statistics private</span></label>
-				</div>
-			</div>
-			<div class="clearer"></div>
-		</div>
-
-		<div class='spaced_part'>
-			<div class='form_part'>
-				<div class="grid_5 alpha omega push_1 padded_cell">
 					<label class='block_label'><?php echo $form->checkbox($model, "defaultVideoSettings[voteable]", 1) ?><span>Allow users to vote on this video</span></label>
-				</div>
-			</div>
-			<div class="clearer"></div>
-		</div>
-
-		<div class='spaced_part'>
-			<div class='form_part'>
-				<div class="grid_5 alpha omega push_1 padded_cell">
+					<label class='block_label'><?php echo $form->checkbox($model, "defaultVideoSettings[privateStatistics]", 1) ?><span>Make my statistics private</span></label>
 
 					<?php $grp = $form->radio_group($model, 'defaultVideoSettings[licence]') ?>
 					<div class="label_options">
 						<label class='first block_label'><?php echo $grp->add('1') ?><span>Standard StageX Licence</span></label>
 						<label class='block_label'><?php echo $grp->add('2') ?><span>Creative Commons Licence</span></label>
 					</div>
-
-					<?php //echo $form->selectbox($model, 'licence', array("1"=>"StageX Licence", "2"=>"Creative Commons Licence")) ?>
+					<div class="clearer"></div>
 				</div>
-			</div>
-			<div class="clearer"></div>
 		</div>
-		<div class="grey_css_button submit_changes" style='font-size:12px; margin-top:10px;'>Save Changes</div>
-		</div>
-		<?php echo $form->hiddenfield($model, "action", array("value"=>"")) ?>
-		<?php echo html::submitbutton("save", array('class' => 'invisible_submit')) ?>
+		<div class="clearer"></div>
+	</div>
+
 	<?php $form->end() ?>
+
+	<div class='section_hr'>
+		&nbsp;
+	</div>
+
+	<h1 class='section_head'>Services</h1>
+	<div class='services_footer_part'>
+		<div class="caption">Delete Account</div>
+		<div class='link'><a href="<?php echo glue::http()->createUrl("/user/deactivate") ?>">Delete account and all data</a></div>
+		<div class='clear_left'></div>
+	</div>
 </div>

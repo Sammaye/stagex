@@ -63,7 +63,7 @@ class User extends \glue\User{
 			'voteableComments' => true, 'allowVideoComments' => true, 'allowTextComments' => true, 'privateStatistics' => false, 'licence' => 1);
 
 	public $emailVideoResponses = 0;
-	public $emailVideoResponseReplies = 0;
+	//public $emailVideoResponseReplies = 0;
 	public $emailWallComments = 0;
 	public $emailEncodingResult = 0;
 
