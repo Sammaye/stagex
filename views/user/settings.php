@@ -321,9 +321,9 @@
 			<div class='form_part'>
 				<div class="grid_5 push_1 alpha watch_video_edit_listing">
 					<?php $group = $form->radio_group($model, "defaultVideoSettings[listing]") ?>
-					<label><?php echo $group->add(1) ?><span>Public</span></label>
-					<label><?php echo $group->add(2) ?><span>Unlisted</span></label>
-					<label><?php echo $group->add(3) ?><span>Private</span></label>
+					<label><?php echo $group->add(0) ?><span>Public</span></label>
+					<label><?php echo $group->add(1) ?><span>Unlisted</span></label>
+					<label><?php echo $group->add(2) ?><span>Private</span></label>
 
 					<div class='bordered_form_section'>
 						<label class='block_label'><?php echo $form->checkbox($model, "defaultVideoSettings[embeddable]", 1) ?><span>Allow embedding of my video</span></label>

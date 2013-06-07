@@ -631,6 +631,7 @@ class Html{
 			if(($pos=strpos($attribute,'['))!==false)
 			{
 				if($pos!==0){  // e.g. name[a][b]
+					//var_dump($attribute);
 					$exploded_path = explode('.', trim(strtr($attribute,array(']['=>'.','['=>'.')),']'));
 					if(count($exploded_path) > 0){
 						$previous = $model;
@@ -667,7 +668,7 @@ class Html{
 		}
 		return "";
 	}
-	
+
 	static function getModelShortName($model){
 		$d=explode('\\',get_class($model));
 		return end($d);
