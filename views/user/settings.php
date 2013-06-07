@@ -214,38 +214,30 @@
 		<div class='edit_link'><a href="#" class="edit_account_part">Edit</a></div>
 		<div class="clearer"></div>
 		<div class="account_part_edit">
-				<div class="privacy_form">
+			<div class="privacy_form">
 
-					<?php $group = $form->radio_group($model, "defaultVideoSettings[listing]") ?>
-					<label><?php echo $group->add(0) ?><span>Public</span></label>
-					<label><?php echo $group->add(1) ?><span>Unlisted</span></label>
-					<label><?php echo $group->add(2) ?><span>Private</span></label>
+				<?php $group = $form->radio_group($model, "defaultVideoSettings[listing]") ?>
+				<label><?php echo $group->add(0) ?><span>Public</span></label>
+				<label><?php echo $group->add(1) ?><span>Unlisted</span></label>
+				<label><?php echo $group->add(2) ?><span>Private</span></label>
 
-					<div class='bordered_form_section'>
-						<label class='block_label'><?php echo $form->checkbox($model, "defaultVideoSettings[embeddable]", 1) ?><span>Allow embedding of my video</span></label>
-					</div>
-
-					<?php $group = $form->radio_group($model, "defaultVideoSettings[moderated]") ?>
-					<div class="video_watch_edit_reponses">
-						<label><?php echo $group->add(0) ?><span>Automatically post all comments</span></label>
-						<label><?php echo $group->add(1) ?><span>Make all moderated</span></label>
-					</div>
-					<div class='bordered_form_section'>
-						<label class='block_label'><?php echo $form->checkbox($model, "defaultVideoSettings[voteableComments]", 1) ?><span>Allow users to vote on responses</span></label>
-						<label class='block_label'><?php echo $form->checkbox($model, "defaultVideoSettings[allowVideoComments]", 1) ?><span>Allow video responses</span></label>
-						<label class='block_label'><?php echo $form->checkbox($model, "defaultVideoSettings[allowTextComments]", 1) ?><span>Allow text responses</span></label>
-					</div>
-
+				<div class='bordered_form_section'>
+					<label class='block_label'><?php echo $form->checkbox($model, "defaultVideoSettings[embeddable]", 1) ?><span>Allow embedding of my video</span></label>
+					<label class='block_label'><?php echo $form->checkbox($model, "defaultVideoSettings[moderated]", 1) ?><span>Moderate Responses</span></label>
+					<label class='block_label'><?php echo $form->checkbox($model, "defaultVideoSettings[voteableComments]", 1) ?><span>Allow users to vote on responses</span></label>
+					<label class='block_label'><?php echo $form->checkbox($model, "defaultVideoSettings[allowVideoComments]", 1) ?><span>Allow video responses</span></label>
+					<label class='block_label'><?php echo $form->checkbox($model, "defaultVideoSettings[allowTextComments]", 1) ?><span>Allow text responses</span></label>
 					<label class='block_label'><?php echo $form->checkbox($model, "defaultVideoSettings[voteable]", 1) ?><span>Allow users to vote on this video</span></label>
 					<label class='block_label'><?php echo $form->checkbox($model, "defaultVideoSettings[privateStatistics]", 1) ?><span>Make my statistics private</span></label>
-
-					<?php $grp = $form->radio_group($model, 'defaultVideoSettings[licence]') ?>
-					<div class="label_options">
-						<label class='first block_label'><?php echo $grp->add('1') ?><span>Standard StageX Licence</span></label>
-						<label class='block_label'><?php echo $grp->add('2') ?><span>Creative Commons Licence</span></label>
-					</div>
-					<div class="clearer"></div>
 				</div>
+
+				<?php $grp = $form->radio_group($model, 'defaultVideoSettings[licence]') ?>
+				<div class="label_options">
+					<label class='first block_label'><?php echo $grp->add('1') ?><span>Standard StageX Licence</span></label>
+					<label class='block_label'><?php echo $grp->add('2') ?><span>Creative Commons Licence</span></label>
+				</div>
+				<div class="clearer"></div>
+			</div>
 		</div>
 		<div class="clearer"></div>
 	</div>

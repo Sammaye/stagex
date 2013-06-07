@@ -154,9 +154,7 @@ class User extends \glue\User{
 
 	function rules(){
 		return array(
-		array('username, password, email, hash', 'required', 'on'=>'insert', 'message' => 'You must fill in all of the fields to register for this site.'),
-
-		array('username', 'required', 'on'=>'updateUsername', 'message' => 'You must provide a username'),
+		array('username, password, email', 'required'),
 
 		array('autoshareUploads, autoshareResponses, autoshareLikes, autoshareAddToPlaylist, birthdayPrivacy, genderPrivacy, countryPrivacy,
 				singleSignOn, emailLogins, autoplayVideos, useDivx, canUpload, banned', 'boolean', 'allowNull'=>true),
@@ -171,14 +169,13 @@ class User extends \glue\User{
 		array('birthMonth', 'number', 'min'=>1, 'max'=>12, 'message' => 'Birth month was a invalid value'),
 		array('birthYear', 'number', 'min'=>date('Y') - 100, 'max'=>date('Y'), 'message' => 'Birth year was a invalid value'),
 
-		array('country', 'in', 'range' => new Collection('countries', 'code'), 'on' => 'updateProfile', 'message' => 'You supplied an invalid country.'), // We only wanna do laggy functions on scenarios
+		array('country', 'in', 'range' => new Collection('countries', 'code'), 'message' => 'You supplied an invalid country.'),
 
 		array('hash', 'hash', 'on'=>'insert', 'message' => 'CSRF not valid'),
 		array('username', 'objExist', 'class'=>'app\\models\\User', 'field'=>'username', 'notExist' => true, 'on'=>'insert, updateUsername',
 				'message' => 'That username already exists please try another.'),
 
 		array('email', 'email', 'message' => 'You must enter a valid Email Address'),
-
 		array('email', 'objExist', 'class'=>'app\\models\\User', 'field'=>'email', 'notExist' => true, 'on'=>'insert', 'message' =>
 				'That email address already exists please try and login with it, or if you have forgotten your password try to recover your account.'),
 
