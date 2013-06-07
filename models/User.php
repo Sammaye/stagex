@@ -157,21 +157,21 @@ class User extends \glue\User{
 		array('username, password, email, hash', 'required', 'on'=>'insert', 'message' => 'You must fill in all of the fields to register for this site.'),
 
 		array('username', 'required', 'on'=>'updateUsername', 'message' => 'You must provide a username'),
-				
-		array('autoshareUploads, autoshareResponses, autoshareLikes, autoshareAddToPlaylist, birthdayPrivacy, genderPrivacy, countryPrivacy, 
+
+		array('autoshareUploads, autoshareResponses, autoshareLikes, autoshareAddToPlaylist, birthdayPrivacy, genderPrivacy, countryPrivacy,
 				singleSignOn, emailLogins, autoplayVideos, useDivx, canUpload, banned', 'boolean', 'allowNull'=>true),
-				
+
 		array('username', 'string', 'max'=>20, 'message' => 'Please enter a max of 20 characters for your username'),
 		array('name', 'string', 'max' => 150, 'message' => 'You can only write 150 characters for your name.'),
-		array('about', 'string', 'max' => 1500, 'message' => 'You can only write 1500 characters for your bio.'),			
-		array('gender', 'in', 'range'=>array("m", "f"), 'message' => 'You must enter a valid gender'),					
-				
+		array('about', 'string', 'max' => 1500, 'message' => 'You can only write 1500 characters for your bio.'),
+		array('gender', 'in', 'range'=>array("m", "f"), 'message' => 'You must enter a valid gender'),
+
 		array('birthDay', 'validateBirthday', 'on' => 'updateProfile'),
 		array('birthDay', 'number', 'min'=>1, 'max'=>32, 'message' => 'Birth day was a invalid value'),
 		array('birthMonth', 'number', 'min'=>1, 'max'=>12, 'message' => 'Birth month was a invalid value'),
 		array('birthYear', 'number', 'min'=>date('Y') - 100, 'max'=>date('Y'), 'message' => 'Birth year was a invalid value'),
-				
-		array('country', 'in', 'range' => new Collection('countries', 'code'), 'on' => 'updateProfile', 'message' => 'You supplied an invalid country.'), // We only wanna do laggy functions on scenarios				
+
+		array('country', 'in', 'range' => new Collection('countries', 'code'), 'on' => 'updateProfile', 'message' => 'You supplied an invalid country.'), // We only wanna do laggy functions on scenarios
 
 		array('hash', 'hash', 'on'=>'insert', 'message' => 'CSRF not valid'),
 		array('username', 'objExist', 'class'=>'app\\models\\User', 'field'=>'username', 'notExist' => true, 'on'=>'insert, updateUsername',
@@ -182,16 +182,14 @@ class User extends \glue\User{
 		array('email', 'objExist', 'class'=>'app\\models\\User', 'field'=>'email', 'notExist' => true, 'on'=>'insert', 'message' =>
 				'That email address already exists please try and login with it, or if you have forgotten your password try to recover your account.'),
 
-		array('new_email', 'required', 'on' => 'updateEmail', 'message' => 'You did not enter a valid Email Address for this account'),
-		array('new_email', 'email', 'on' => 'updateEmail', 'message' => 'You must enter a valid Email Address'),
-		array('new_email', 'objExist', 'class'=>'User', 'field'=>'email', 'notExist' => true, 'on'=>'updateEmail', 'message' =>
+		array('newEmail', 'email', 'message' => 'You must enter a valid Email Address'),
+		array('newEmail', 'objExist', 'class'=>'User', 'field'=>'email', 'notExist' => true, 'message' =>
 				'That email address already exists please try and login with it, or if you have forgotten your password try to recover your account.'),
 
-		array('safeSearch', 'required', 'on'=>'updateSafeSearch', 'message' => 'You enterd an invalid value for safe search'),
 		array('safeSearch', 'in', 'range'=>array(0, 1, 2), 'message' => 'You enterd an invalid value for safe search'),
 
-		array('o_password, new_password, cn_password', 'required', 'on' => 'updatePassword', 'message' => 'Please fill in all fields to change your password'),
-		array('cn_password', 'compare', 'with' => 'new_password', 'field' => true, 'on' => 'updatePassword', 'message' => 'You did not confirm your new password correctly.'),
+		array('oldPassword, newPassword, confirmPassword', 'required', 'on' => 'updatePassword', 'message' => 'Please fill in all fields to change your password'),
+		array('confimPassword', 'compare', 'with' => 'newPassword', 'field' => true, 'on' => 'updatePassword', 'message' => 'You did not confirm your new password correctly.'),
 
 		array('avatar', 'file', 'size' => array('lt' => 2097152), 'on' => 'updatePic',
 				'message' => 'The picture you provided was too large. Please upload 2MB and smaller pictures'),
@@ -199,11 +197,11 @@ class User extends \glue\User{
 				'message' => 'You supplied an invalid file. Please upload an image file only.'),
 
 		array('clickyUid', 'string', 'max' => 20, 'message' => 'Please enter a valid Clicky User Id'),
-		
+
 		array('emailVideoResponses, emailVideoResponseReplies, emailWallComments, emailEncodingResult', 'boolean', 'allowNull'=>true),
 
 		array('externalLinks', 'validateExternalLinks'),
-		array('defaultVideoSettings', 'glue\\db\\Subdocument', 'type' => 'one', 'rules' => array(			
+		array('defaultVideoSettings', 'glue\\db\\Subdocument', 'type' => 'one', 'rules' => array(
 			array('listing', 'in', 'range' => array(0, 1, 2), 'message' => 'Please enter a valid value for listing'),
 			array('moderated', 'in', 'range' => array(0, 1), 'message' => 'Please enter a valid value for all comment options'),
 			array('voteable, embeddable, voteableComments, allowVideoComments, allowTextComments, privateStatistics', 'boolean', 'allowNull' => true),
@@ -220,19 +218,19 @@ class User extends \glue\User{
 		)));
 
 		if($filled_size != 3 && $filled_size > 0){
-			$this->addError('You must fill in all parts of your bithday to set one');
+			$this->setError('You must fill in all parts of your bithday to set one');
 			return false;
 		}
 		return true;
 	}
-	
+
 	function validateExternalLinks(){
-	
+
 		if(count($this->externalLinks) > 6){
 			$this->setError('externalLinks', 'You can only add 6 external links for the time being. Please make sure you have entered no more and try again.');
 			return false;
 		}
-	
+
 		$valid=true;
 		if(is_array($this->externalLinks)){
 			foreach($this->externalLinks as $k=>$v){
@@ -249,23 +247,20 @@ class User extends \glue\User{
 			}
 			$this->externalLinks=array_values($this->externalLinks);
 		}
-	
+
 		if(!$valid){
 			$this->setError('externalLinks', 'One or more of the external links you entered were invalid.');
 			return false;
 		}
 		return true;
-	}	
+	}
 
 	function beforeSave(){
 
 		if($this->getIsNewRecord()){
 			$this->lastNotificationPull = new \MongoDate();
-			//$this->ts = new MongoDate();
 			$this->nextBandwidthTopup = strtotime('+1 week', mktime(0, 0, 0, date('m'), date('d'), date('Y')));
 			$this->bandwidthLeft = glue::$params['maxUpload'];
-		}else{
-			//$this->updated = new MongoDate();
 		}
 
 		if($this->getScenario() == "updatePassword" || $this->getScenario() == "recoverPassword" || $this->getIsNewRecord()){
@@ -286,9 +281,6 @@ class User extends \glue\User{
 				"url" => glue::http()->createUrl("/user/confirminbox", array('e' => $this->new_email, 'h' => $hash, 'uid' => strval($this->_id)))
 			);
 		}
-
-		//$this->upload_left = (string)$this->upload_left;
-		//var_dump($this);
 		return true;
 	}
 

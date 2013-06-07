@@ -376,68 +376,24 @@ class userController extends \glue\Controller{
 	function action_settings(){
 
 		$this->pageTitle = 'General Settings - StageX';
-
 		$this->layout = "user_section";
 
 		$model = $this->loadModel();
-		$previousModel = $model->getAttributes();
-
-		$success_message = '';
-		if(isset($_SESSION['success_message']) && !isset($_POST['User'])){
-			// DONE
-			$model->setSuccess(true);
-			$model->setHasBeenValidated(true);
-			$success_message = $_SESSION['success_message'];
-			unset($_SESSION['success_message']);
-		}
+		//$previousModel = $model->getAttributes();
 
 		if(isset($_POST['User'])){
+			if(isset($_POST['User']['action'])){
+				$model->setScenario($_POST['User']['action']);
+				unset($_POST['User']['action']);
+			}
 
-			$model->setScenario($_POST['User']['action']);
-			unset($_POST['User']['action']);
+			$model->attributes=$_POST['User'];
 
-			$model->_attributes($_POST['User']);
-			//var_dump($model);
-
-			if($model->validate()){
-				$model->save();
-
-				switch($model->getScenario()){
-					case "updateUsername":
-						$_SESSION['success_message'] = "Your username has been changed";
-						break;
-					case "updateEmail":
-						$_SESSION['success_message'] = "A confirmation email has been sent to your current inbox. Please click on the link within that Email to confirm your switch to your new mailbox.";
-						break;
-					case "updatePassword":
-						$_SESSION['success_message'] = "Your password has been changed";
-						break;
-					case "updatePrivacy":
-						$_SESSION['success_message'] = "Your privacy settings have been changed";
-						break;
-					case "updateSecurity":
-						$_SESSION['success_message'] = "Your security settings have been changed";
-						break;
-					case "updateSafeSearch":
-						$_SESSION['success_message'] = "Your safe search settings have been saved";
-						break;
-					case "updatePlayback":
-						$_SESSION['success_message'] = "Your playback settings have been saved";
-						break;
-					case "updateENots":
-						$_SESSION['success_message'] = "Your email notification settings have been saved";
-						break;
-					case "updateAnalytics":
-						$_SESSION['success_message'] = "Your analytics settings have been saved";
-						break;
-					default:
-						$_SESSION['success_message'] = "Your account settings have been changed";
-						break;
-				}
-
+			if($model->validate()&&$model->save()){
+				Html::setSuccessFlashMessage('Your account settings have been saved');
 				glue::http()->redirect("/user/settings");
 			}else{
-				$model->attributes($previousModel);
+				//$model->attributes($previousModel);
 			}
 		}
 
@@ -445,7 +401,7 @@ class userController extends \glue\Controller{
 
 		echo $this->render(
 			"settings",
-			array("model"=>$model, 'success_message' => $success_message)
+			array("model"=>$model)
 		);
 	}
 
@@ -496,7 +452,7 @@ class userController extends \glue\Controller{
 				$model->avatar=new glue\File(array('model'=>$model,'id'=>'avatar'));
 				if($model->validate()&&$model->setAvatar()){
 					Html::setSuccessFlashMessage('Your profile picture have been changed');
-					//glue::http()->redirect("/user/profile");
+					glue::http()->redirect("/user/profile");
 				}
 			}else{
 				$model->attributes=$_POST['User'];

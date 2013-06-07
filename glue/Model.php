@@ -214,10 +214,13 @@ class Model{
 		$attributes = array_flip($safeOnly ? $this->scenarioAttributeNames() : $this->attributeNames());
 		foreach($a as $name=>$value){
 			if($safeOnly){
-				if(isset($attributes[$name]))
-					$this->$name=!is_array($value) && preg_match('/^([0-9]|[1-9]{1}\d+)$/' /* Will only match real integers, unsigned */, $value) > 0 ? (int)$value : $value;
+				if(isset($attributes[$name])){
+					$this->$name=!is_array($value) && preg_match('/^([0-9]|[1-9]{1}\d+)$/' /* Will only match real integers, unsigned */, $value) > 0
+						&& (string)$value < '9223372036854775807' ? (int)$value : $value;
+				}
 			}else{
-				$this->$name=!is_array($value) && preg_match('/^([0-9]|[1-9]{1}\d+)$/' /* Will only match real integers, unsigned */, $value) > 0 ? (int)$value : $value;
+				$this->$name=!is_array($value) && preg_match('/^([0-9]|[1-9]{1}\d+)$/' /* Will only match real integers, unsigned */, $value) > 0
+					&& (string)$value < '9223372036854775807' ? (int)$value : $value;
 			}
 		}
 		return $this;
@@ -274,7 +277,7 @@ class Model{
 			$this->error_messages[$field][] = $message;
 		}
 	}
-	
+
 	function setAttributeErrors($attribute,$errors){
 		$this->error_messages[$attribute]=$errors;
 	}
@@ -336,7 +339,7 @@ class Model{
 		}
 		return $this->validator;
 	}
-	
+
 	/**
 	 * Cleans the model
 	 */
@@ -348,7 +351,7 @@ class Model{
 		foreach($nnames as $name)
 			unset($this->$name);
 		return true;
-	}	
+	}
 
 	/**
 	 * EVENTS

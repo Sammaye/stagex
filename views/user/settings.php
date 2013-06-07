@@ -41,8 +41,7 @@
 <div class="account_settings_body">
 
 	<?php echo html::form_summary($model, array(
-		'errorHead' => '<h2>Could not save settings</h2>Your account settings could not be saved because:',
-		'successMessage' => $success_message
+		'errorHead' => '<h2>Could not save settings</h2>Your account settings could not be saved because:'
 	)) ?>
 
 	<h1 class='section_head' style='<?php ?>'>General</h1>
@@ -63,9 +62,8 @@
 				</ul>
 				<div class="account_settings_form_outer">
 					<div class="form_row"><?php echo $form->textField($model, "username") ?></div>
-					<?php echo $form->hiddenField($model, "action", array("value"=>"updateUsername")) ?>
-					<div class="grey_css_button submit_changes" style='font-size:12px;'>Update Username</div>
 				</div>
+				<?php echo $form->hiddenfield($model, "action", array("value"=>"updateUsername")) ?>
 				<?php echo html::submitbutton("save", array('class' => 'invisible_submit')) ?>
 			<?php $form->end() ?>
 		</div>
@@ -83,9 +81,7 @@
 			<?php $form = html::activeForm() ?>
 				<p><b>Note:</b> Verfication of existance of inbox must be provided before change is saved.</p>
 				<div class="account_settings_form_outer">
-					<div class="form_row"><?php echo html::label("Email Address:", "new_email") ?><?php echo $form->textField($model, "new_email") ?></div>
-					<?php echo $form->hiddenField($model, "action", array("value"=>"updateEmail")) ?>
-					<div class="grey_css_button submit_changes" style='font-size:12px;'>Change Email Address</div>
+					<div class="form_row"><?php echo html::label("Email Address:", "newEmail") ?><?php echo $form->textField($model, "newEmail") ?></div>
 					<div class="clearer"></div>
 				</div>
 				<?php echo html::submitbutton("save", array('class' => 'invisible_submit')) ?>
@@ -125,29 +121,26 @@
 	<div class='section_hr'>
 		&nbsp;
 	</div>
-
+	<?php $form = html::activeForm() ?>
+			<?php echo $form->hiddenfield($model, "action", array("value"=>"")) ?>
+		<?php echo html::submitbutton("save", array('class' => 'invisible_submit')) ?>
 	<h1 class='section_head'>Security</h1>
 	<div class="account_part details_account_part">
 		<div class='edit_link'><a href="#" class="edit_account_part">Edit</a></div>
 		<div class="c_val">
-			<div>Single sign-on turned <?php if((bool)$model->single_sign){ echo "on"; }else{ echo "off"; } ?></div>
-			<div>Email notifications turned <?php if((bool)$model->email_notify){ echo "on"; }else{ echo "off"; } ?></div>
+			<div>Single sign-on turned <?php if((bool)$model->signleSignOn){ echo "on"; }else{ echo "off"; } ?></div>
+			<div>Email notifications turned <?php if((bool)$model->emailLogins){ echo "on"; }else{ echo "off"; } ?></div>
 		</div>
 		<div class="account_part_edit">
 			<div class="clearer"></div>
 			<div class='security_form'>
 				<p>Note: These are advanced settings and should only be used by people who are like-wise in their knowledge of computing.</p>
-				<?php $form = html::activeForm() ?>
-					<label class='block_label'><?php echo $form->checkbox($model, "single_sign", 1) ?><span>Allow single sign-on</span></label>
+					<label class='block_label'><?php echo $form->checkbox($model, "singleSignOn", 1) ?><span>Allow single sign-on</span></label>
 					<div class='light_capt'>
 						<p>Single Sign-on means that only one device can be logged onto this account at any given point in time. The system works by "newest take all".</p>
 						<p>This method allows for the user to logout all devices automatically before logging in.</p>
 					</div>
-					<label class='block_label'><?php echo $form->checkbox($model, "email_notify", 1) ?><span>Notify me via email of new logins</span></label>
-					<?php echo $form->hiddenfield($model, "action", array("value"=>"updateSecurity")) ?>
-					<div class="grey_css_button submit_changes" style='font-size:12px;'>Save</div>
-					<?php echo html::submitbutton("save", array('class' => 'invisible_submit')) ?>
-				<?php $form->end() ?>
+					<label class='block_label'><?php echo $form->checkbox($model, "emailLogins", 1) ?><span>Notify me via email of new logins</span></label>
 			</div>
 			<div class="clearer"></div>
 		</div>
@@ -160,33 +153,26 @@
 	<h1 class='section_head'>Safe Search</h1>
 	<div class="account_part details_account_part">
 		<div class='edit_link'><a href="#" class="edit_account_part">Edit</a></div>
-		<div class="c_val"><div><?php switch($model->safe_srch){
-				case "0":
+		<div class="c_val"><div><?php switch($model->safeSearch){
+				case 0:
 					echo "Off";
 					break;
-				case "T":
+				case 2:
 					echo "Normal";
 					break;
-				case "S":
+				case 1:
 					echo "Strict";
 					break;
 			} ?></div></div>
 
 		<div class="account_part_edit">
-			<?php $form = html::activeForm() ?>
-				<?php $opts = $form->radio_group($model, "safe_srch") ?>
+				<?php $opts = $form->radio_group($model, "safeSearch") ?>
 				<div class="safe_search_form">
-					<label class='block_label'><?php echo $opts->add("S") ?><span>Strict</span></label>
+					<label class='block_label'><?php echo $opts->add(1) ?><span>Strict</span></label>
 					<div class='light_capt'><p>This is the safest way to browse this site, stops any and all potientially bad content from reaching your eyes.</p></div>
-					<!-- <label class='block_label'><?php //echo $opts->add("T") ?><span>Normal</span></label>
-					<div class='light_capt'><p>This is somewhere inbetween. When you set safe search to normal it will filter out all excessively voilent and pornographic content but may keep soft and more conservative content within search results etc.</p></div> -->
 					<label class='block_label'><?php echo $opts->add("0") ?><span>Off</span></label>
 					<div class='light_capt'><p>This gives you everything in its raw form. Not for children!</p></div>
 				</div>
-				<?php echo $form->hiddenfield($model, "action", array("value"=>"updateSafeSearch")) ?>
-				<div class="grey_css_button submit_changes" style='font-size:12px;'>Save</div>
-				<?php echo html::submitbutton("save", array('class' => 'invisible_submit')) ?>
-			<?php $form->end() ?>
 		</div>
 		<div class="clearer"></div>
 	</div>
@@ -198,20 +184,15 @@
 	<h1 class='section_head'>Playback</h1>
 	<div class="account_part details_account_part">
 		<div class='edit_link'><a href="#" class="edit_account_part">Edit</a></div>
-		<div class='c_val'><div><?php echo $model->use_divx_player ? "Videos Play in DivX web player" : "DivX web player turned off" ?></div></div>
-		<div class='c_val'><div><?php echo $model->auto_play_vids ? "Autoplay is turned on" : "Autoplay is turned off" ?></div></div>
+		<div class='c_val'><div><?php echo $model->useDivx ? "Videos Play in DivX web player" : "DivX web player turned off" ?></div></div>
+		<div class='c_val'><div><?php echo $model->autoplayVideos ? "Autoplay is turned on" : "Autoplay is turned off" ?></div></div>
 		<div class="clearer"></div>
 		<div class="account_part_edit">
-			<?php $form = html::activeForm() ?>
 				<div class="privacy_form">
-					<label class='block_label'><?php echo $form->checkbox($model, 'use_divx_player', 1) ?><span>Use DivX Player</span></label>
-					<label class='block_label'><?php echo $form->checkbox($model, 'auto_play_vids', 1) ?><span>Automatically play videos</span></label>
+					<label class='block_label'><?php echo $form->checkbox($model, 'useDivx', 1) ?><span>Use DivX Player</span></label>
+					<label class='block_label'><?php echo $form->checkbox($model, 'autoplayVideos', 1) ?><span>Automatically play videos</span></label>
 					<div class='light_capt'><p>This will automatically play any videos you view on this site.</p></div>
-					<?php echo $form->hiddenfield($model, "action", array("value"=>"updatePlayback")) ?>
-					<div class="grey_css_button submit_changes" style='font-size:12px;'>Save Changes</div>
 				</div>
-				<?php echo html::submitbutton("save", array('class' => 'invisible_submit')) ?>
-			<?php $form->end() ?>
 		</div>
 		<div class="clearer"></div>
 	</div>
@@ -225,25 +206,20 @@
 	<div class="account_part details_account_part">
 		<div class='edit_link'><a href="#" class="edit_account_part">Edit</a></div>
 		<div class="c_val">
-			<?php if($model->email_encoding_result){ ?><div>When my videos finish/fail encoding</div><?php } ?>
-			<?php if($model->email_vid_responses){ ?><div>When someone replies to one of my videos</div><?php } ?>
-			<?php if($model->email_vid_response_replies){ ?><div>When someone replies to one of my comments</div><?php } ?>
-			<?php if($model->email_wall_comments){ ?><div>When someone comments on my profile</div><?php } ?>
+			<?php if($model->emailEncodingResult){ ?><div>When my videos finish/fail encoding</div><?php } ?>
+			<?php if($model->emailVideoResponses){ ?><div>When someone replies to one of my videos</div><?php } ?>
+			<?php if($model->emailVideoResponseReplies){ ?><div>When someone replies to one of my comments</div><?php } ?>
+			<?php if($model->emailWallComments){ ?><div>When someone comments on my profile</div><?php } ?>
 		</div>
 		<div class="clearer"></div>
 		<div class="account_part_edit">
-			<?php $form = html::activeForm() ?>
 				<div class="privacy_form">
-					<label class='block_label'><?php echo $form->checkbox($model, 'email_encoding_result', 1) ?><span>When one of my new uploads fails or finishes encoding</span></label>
-					<label class='block_label'><?php echo $form->checkbox($model, 'email_vid_responses', 1) ?><span>When someone replies to one of my videos</span></label>
-					<label class='block_label'><?php echo $form->checkbox($model, 'email_vid_response_replies', 1) ?><span>When someone replies to one of my comments</span></label>
-					<label class='block_label'><?php echo $form->checkbox($model, 'email_wall_comments', 1) ?><span>When someone comments on my profile</span></label>
-					<?php echo $form->hiddenfield($model, "action", array("value"=>"updateENots")) ?>
-					<div class="grey_css_button submit_changes" style='font-size:12px;'>Save Changes</div>
+					<label class='block_label'><?php echo $form->checkbox($model, 'emailEncodingResult', 1) ?><span>When one of my new uploads fails or finishes encoding</span></label>
+					<label class='block_label'><?php echo $form->checkbox($model, 'emailVideoResponses', 1) ?><span>When someone replies to one of my videos</span></label>
+					<label class='block_label'><?php echo $form->checkbox($model, 'emailVideoResponseReplies', 1) ?><span>When someone replies to one of my comments</span></label>
+					<label class='block_label'><?php echo $form->checkbox($model, 'emailWallComments', 1) ?><span>When someone comments on my profile</span></label>
 					<div class="clearer"></div>
 				</div>
-				<?php echo html::submitbutton("save", array('class' => 'invisible_submit')) ?>
-			<?php $form->end() ?>
 		</div>
 		<div class="clearer"></div>
 	</div>
@@ -256,27 +232,23 @@
 	<div class="account_part details_account_part">
 		<div class='edit_link'><a href="#" class="edit_account_part">Edit</a></div>
 		<div class="c_val">
-			<?php if(strlen($model->clicky_uid) > 0){ ?><div>You are using Clicky Analytics</div><?php } ?>
+			<?php if(strlen($model->clickyUid) > 0){ ?><div>You are using Clicky Analytics</div><?php } ?>
 		</div>
 		<div class="clearer"></div>
 		<div class="account_part_edit">
-			<?php $form = html::activeForm() ?>
 				<div class="privacy_form">
 
-					<label class='block_label textbox'><span>Clicky Account:</span><?php echo $form->textfield($model, 'clicky_uid') ?></label>
+					<label class='block_label textbox'><span>Clicky Account:</span><?php echo $form->textfield($model, 'clickyUid') ?></label>
 					<div class='light_capt'><p>Entering your Clicky account number will allow you to track via Clicky.</p>
 					<p>Enter your site ID in order to begin tracking on your video pages.</p>
 					<p>Note: It would be a good idea to make a new site detached from your normal site and use that new sites ID naming the site, as an example: stagex.co.uk</p></div>
-
-					<?php echo $form->hiddenfield($model, "action", array("value"=>"updateAnalytics")) ?>
-					<div class="grey_css_button submit_changes" style='font-size:12px;'>Save Changes</div>
 					<div class="clearer"></div>
 				</div>
-				<?php echo html::submitbutton("save", array('class' => 'invisible_submit')) ?>
-			<?php $form->end() ?>
 		</div>
 		<div class="clearer"></div>
 	</div>
+
+	<?php $form->end() ?>
 
 	<div class='section_hr'>
 		&nbsp;
@@ -386,6 +358,7 @@
 		</div>
 		<div class="grey_css_button submit_changes" style='font-size:12px; margin-top:10px;'>Save Changes</div>
 		</div>
+		<?php echo $form->hiddenfield($model, "action", array("value"=>"")) ?>
 		<?php echo html::submitbutton("save", array('class' => 'invisible_submit')) ?>
 	<?php $form->end() ?>
 </div>
