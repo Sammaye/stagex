@@ -141,6 +141,7 @@ var_dump($id);
 			"expires"=>$time,
 			//"active"=>1
 		)), array("upsert"=>true)));
+		var_dump(glue::db()->{$this->sessionCollectionName}->findOne(array("session_id"=>$id)));
 exit();
 		// DONE
 		return true;

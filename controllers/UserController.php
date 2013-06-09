@@ -27,7 +27,8 @@ class userController extends \glue\Controller{
 	function action_create(){
 
 		$this->title = 'Create a new StageX Account';
-$_SESSION['ffgfgf'] = 'fgfgf';
+		
+$_SESSION['ffgfgf'] = isset($_SESSION['ffgfgf']) && $_SESSION['ffgfgf']>0 ? $_SESSION['ffgfgf']+1 : 1;
 var_dump($_SESSION);
 		$model = new User;
 		if(isset($_POST['User'])){

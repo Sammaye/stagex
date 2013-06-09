@@ -275,7 +275,7 @@ echo "i here";
 		/** Unset session */
 		if(session_id()!==''){
 			echo "calling this";
-			session_unset();
+			//session_unset();
 			//session_destroy();
 			//session_write_close();
 			//setcookie(session_name(),'',0,'/');
