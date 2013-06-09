@@ -5,10 +5,12 @@ namespace app\models;
 use glue;
 
 /** Incase this is being used somewhere where it hasn't been included in the controller */
-glue::import('@app/widgets/reCaptcha/recaptchalib.php');
+glue::import('@app/widgets/reCaptcha/recaptchalib.php',true);
 
 class loginForm extends \glue\Model{
 
+	public $captchaError;
+	
 	public $email;
 	public $password;
 	public $hash;
@@ -27,11 +29,12 @@ class loginForm extends \glue\Model{
 
 	function authenticate($field, $params){
 		if($this->getScenario() == "captcha"){
-			if ($_POST["recaptcha_response_field"]) {
+			if (isset($_POST["recaptcha_response_field"])) {
 				$resp = recaptcha_check_answer("6LfCNb0SAAAAAK1J8rPQeDaQvz_wpIaowBiYRB2D", $_SERVER["REMOTE_ADDR"], $_POST["recaptcha_challenge_field"], $_POST["recaptcha_response_field"]);
 
 				if(!$resp->is_valid) {
-					$this->setError("captcha", $resp->error);
+					$this->setError("captcha", "You must enter the Re-Captcha you see below correctly. This is because you have logged in 3 times unsuccessfully.");
+					$this->captchaError=$resp->error;
 					return false;
 				}
 			}else{

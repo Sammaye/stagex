@@ -73,7 +73,6 @@ class userController extends \glue\Controller{
 						glue::http()->redirect("/");
 					}
 				}else{
-					var_dump(glue::user()->getErrors());
 					foreach(glue::user()->getErrors() as $k=>$v)
 						$model->setError($k,$v);
 				}
@@ -512,15 +511,13 @@ class userController extends \glue\Controller{
 	}
 
 	function action_logout(){
-		$this->pageTitle = 'Logout of StageX';
+		$this->title = 'Logout of StageX';
 
-		Glue::session()->logout(false);
-
-		if(isset($_GET['nxt'])){
+		Glue::user()->logout(false);
+		if(isset($_GET['nxt']))
 			header("Location: ".$_GET['nxt']);
-			exit();
-		}
-		header("Location: /");
+		else
+			header("Location: /");
 		exit();
 	}
 
@@ -551,19 +548,18 @@ class userController extends \glue\Controller{
 
 
 	public function action_confirminbox(){
-		$this->pageTitle = 'Confirm Your New Email Address - StageX';
+		$this->title = 'Confirm Your New Email Address - StageX';
 
 		$email = urldecode(glue::http()->param('e', ''));
 		$hash = urldecode(glue::http()->param('h', ''));
 		$id = new MongoId(urldecode(glue::http()->param('uid', '')));
 
 		$user = User::model()->findOne(array('_id' => $id));
-		
-		if($user===null||!is_array($user->accessToken))
-			glue::route("error/notfound");
-		//$to = $user->accessToken['to'];
 
-		if($user->accessToken['to'] > time() && $user->accessToken['hash'] == $hash && $user->accessToken['y'] == "E_CHANGE" && $user->accessToken['email'] == $email){
+		if(
+			($user!==null&&is_array($user->accessToken)) && 
+			($user->accessToken['to'] > time() && $user->accessToken['hash'] == $hash && $user->accessToken['y'] == "E_CHANGE" && $user->accessToken['email'] == $email)
+		){
 			if(glue::session()->authed){
 				$user->email = $email;
 				$user->accessToken=null;
@@ -662,9 +658,8 @@ class userController extends \glue\Controller{
 	function loadModel(){
 		$user = User::model()->findOne(array("_id"=>glue::user()->_id));
 		if(!$user){
-			glue::flash()->ERROR("You must be logged in to access this area.");
-			glue::http()->redirect('/user/login', array('nxt' => glue::url()->create('SELF')));
-			exit();
+			Html::setErrorFlashMessage("You must be logged in to access this area.");
+			glue::http()->redirect('/user/login', array('nxt' => glue::http()->createUrl('SELF')));
 		}
 		return $user;
 	}

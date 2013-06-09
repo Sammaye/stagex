@@ -9,8 +9,6 @@ use glue,
 	glue\Collection,
 	glue\Validation;
 
-glue::import('@glue/components/phpthumb/ThumbLib.inc.php');
-
 class User extends \glue\User{
 
 	/** @virtual */
@@ -392,8 +390,8 @@ class User extends \glue\User{
 	}
 
 	function reset_upload_bandwidth(){
-		if($this->next_bandwidth_up < time()){
-			$this->next_bandwidth_up = strtotime('+1 week', mktime(0, 0, 0, date('m'), date('d'), date('Y')));
+		if($this->nextBandwidthTopup < time()){
+			$this->nextBandwidthTopup = strtotime('+1 week', mktime(0, 0, 0, date('m'), date('d'), date('Y')));
 			$this->bandwidthLeft = $this->allowedBandwidth > 0 ? $this->allowedBandwidth : glue::$params['defaultAllowedBandwidth'];
 			$this->save();
 		}

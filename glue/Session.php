@@ -182,6 +182,7 @@ class Session extends \glue\Component{
 		$newID=session_id();
 
 		$row=glue::db()->{$this->sessionCollectionName}->findOne(array('session_id' => $oldID));
+		//var_dump($row); exit();
 		if($row!==null){
 			if($deleteOldSession)
 				glue::db()->{$this->sessionCollectionName}->update(array('session_id'=>$oldID),array('$set'=>array('session_id'=>$newID)));

@@ -1,10 +1,10 @@
 <?php
 
-namespace app\widgets;
+namespace app\widgets\reCaptcha;
 
 use glue;
 
-Glue::import('@app/widgets/reCaptcha/recaptchalib.php');
+Glue::import('@app/widgets/reCaptcha/recaptchalib.php',true);
 
 class recaptcha extends \glue\Widget{
 
@@ -13,6 +13,6 @@ class recaptcha extends \glue\Widget{
 	public $errors = array();
 
 	function render(){
-		return recaptcha_get_html($this->public_key, $this->errors);
+		echo recaptcha_get_html($this->public_key, $this->errors);
 	}
 }

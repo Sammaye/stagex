@@ -421,6 +421,7 @@ class glue{
 		}
 
 		if (!isset(self::$_imported[$className])&&$include&&isset($filePath)) {
+			self::$_imported[$className]=true;
 			switch($op){
 				case "include_once":
 					return include_once $filePath;
@@ -435,7 +436,6 @@ class glue{
 					return include $filePath;
 					break;
 			}
-			self::$_imported[$className]=true;
 		}
 		return $className;
 	}
