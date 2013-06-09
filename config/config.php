@@ -37,7 +37,7 @@ return array(
 	'components' => array(
 
 		'user' => array(
-			'class'=>'app\\models\\User'
+			'userClass'=>'app\\models\\User'
 		),
 
 		/**

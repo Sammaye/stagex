@@ -21,7 +21,7 @@ class recoverForm extends \glue\Model{
 					'class'=>'app\\models\\User',
 					'field'=>'email', 'message' => 'This email does not exist on our records'
 				),
-				array('email', 'validateCaptcha')
+				array('email', '\\app\\widgets\\reCaptcha\\recaptchaValidator', 'message' => 'You entered the reCAPTCHA incorrectly. Please try again.')
 		);
 	}
 

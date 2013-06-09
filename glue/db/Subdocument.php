@@ -79,7 +79,7 @@ class Subdocument extends \glue\Validator{
 			if(!$c->validate()){
 				$valid=false;
 				if($this->message!==null){
-					$object->addError($attribute,$this->message);
+					$object->setError($attribute,$this->message);
 				}elseif(sizeof($c->getErrors())>0){
 					$object->setAttributeErrors($attribute, $c->getErrors());
 				}

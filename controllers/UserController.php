@@ -11,23 +11,16 @@ class userController extends \glue\Controller{
 	public $defaultAction='videos';
 	public $title = 'Your Stuff - StageX';
 
-	//public $tab = "settings";
-	//public $profile_tab = "settings";
-	//public $page;
+	public $tab = "settings";
 
 	public function authRules(){
 		return array(
 			array('allow',
-				'actions' => array('create', 'login', 'view', 'recover', 'view_videos', 'view_playlists', 'fb_login', 'twt_login', 'google_login'),
+				'actions' => array('create', 'login', 'view', 'recover', 'view_videos', 'view_playlists', 'fbLogin', 'googleLogin'),
 				'users' => array('*')
 			),
-			array('allow',
-				'actions' => '*',
-				'users' => array('@*')
-			),
-			array("deny",
-				"users"=>array("*")
-			),
+			array('allow', 'actions' => '*', 'users' => array('@*')),
+			array("deny", "users"=>array("*")),
 		);
 	}
 
