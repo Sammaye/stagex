@@ -180,7 +180,6 @@ class User extends \glue\User{
 
 		array('country', 'in', 'range' => new Collection('countries', 'code'), 'message' => 'You supplied an invalid country.'),
 
-		//array('hash', 'hash', 'on'=>'insert', 'message' => 'CSRF not valid'),
 		array('username', 'objExist', 'class'=>'app\\models\\User', 'field'=>'username', 'notExist' => true, 'on'=>'insert, updateUsername',
 				'message' => 'That username already exists please try another.'),
 
