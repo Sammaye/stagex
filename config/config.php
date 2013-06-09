@@ -22,9 +22,9 @@ return array(
 
 	// Global variables which are accessible via glue::params('example')
 	'params' => array(
-		'maxUpload' => 4294967296,
+		'defaultAllowedBandwidth' => 4294967296,
 		'uploadBase' => '/',
-		'maxVideoFileSize' => 524288000,
+		'maxFileSize' => 524288000,
 	),
 
 	// load startup components. These components will be loaded at the start and always required before execution of any script.

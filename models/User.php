@@ -16,6 +16,14 @@ class User extends \glue\User{
 	/** @virtual */
 	public $newEmail;
 	/** @virtual */
+	public $oldPassword;
+	/** @virtual */
+	public $newPassword;
+	/** @virtual */
+	public $confirmPassword;
+	/** @virtual */
+	public $textPassword;
+	/** @virtual */
 	public $avatar;
 	/** @virtual */
 	public $hash;
@@ -78,6 +86,7 @@ class User extends \glue\User{
 	public $autoshareTwitter;
 
 	public $maxFileSize;
+	public $allowedBandwidth;
 	public $bandwidthLeft;
 	public $nextBandwidthTopup;
 
@@ -142,10 +151,10 @@ class User extends \glue\User{
 
 	function beforeValidate(){
 		if($this->getScenario() == "updatePassword"){
-			if(Crypt::verify($this->o_password, $this->password)){
+			if(Crypt::verify($this->oldPassword, $this->password)){
 				return true;
 			}else{
-				$this->addError('The old password did not match the one we have on record for you');
+				$this->setError('The old password did not match the one we have on record for you');
 				return false;
 			}
 		}
@@ -171,22 +180,20 @@ class User extends \glue\User{
 
 		array('country', 'in', 'range' => new Collection('countries', 'code'), 'message' => 'You supplied an invalid country.'),
 
-		array('hash', 'hash', 'on'=>'insert', 'message' => 'CSRF not valid'),
+		//array('hash', 'hash', 'on'=>'insert', 'message' => 'CSRF not valid'),
 		array('username', 'objExist', 'class'=>'app\\models\\User', 'field'=>'username', 'notExist' => true, 'on'=>'insert, updateUsername',
 				'message' => 'That username already exists please try another.'),
 
-		array('email', 'email', 'message' => 'You must enter a valid Email Address'),
+		array('email,newEmail', 'email', 'message' => 'You must enter a valid Email Address'),
 		array('email', 'objExist', 'class'=>'app\\models\\User', 'field'=>'email', 'notExist' => true, 'on'=>'insert', 'message' =>
 				'That email address already exists please try and login with it, or if you have forgotten your password try to recover your account.'),
-
-		array('newEmail', 'email', 'message' => 'You must enter a valid Email Address'),
-		array('newEmail', 'objExist', 'class'=>'User', 'field'=>'email', 'notExist' => true, 'message' =>
-				'That email address already exists please try and login with it, or if you have forgotten your password try to recover your account.'),
+		array('newEmail', 'objExist', 'class'=>'app\\models\\User', 'field'=>'email', 'notExist' => true, 'message' =>
+				'That email address already exists please try and login with it, or if you have forgotten your password try to recover your account.'),				
 
 		array('safeSearch', 'in', 'range'=>array(0, 1, 2), 'message' => 'You enterd an invalid value for safe search'),
 
 		array('oldPassword, newPassword, confirmPassword', 'required', 'on' => 'updatePassword', 'message' => 'Please fill in all fields to change your password'),
-		array('confimPassword', 'compare', 'with' => 'newPassword', 'field' => true, 'on' => 'updatePassword', 'message' => 'You did not confirm your new password correctly.'),
+		array('confirmPassword', 'compare', 'with' => 'newPassword', 'field' => true, 'on' => 'updatePassword', 'message' => 'You did not confirm your new password correctly.'),
 
 		array('avatar', 'file', 'size' => array('lt' => 2097152), 'on' => 'updatePic',
 				'message' => 'The picture you provided was too large. Please upload 2MB and smaller pictures'),
@@ -257,17 +264,18 @@ class User extends \glue\User{
 		if($this->getIsNewRecord()){
 			$this->lastNotificationPull = new \MongoDate();
 			$this->nextBandwidthTopup = strtotime('+1 week', mktime(0, 0, 0, date('m'), date('d'), date('Y')));
-			$this->bandwidthLeft = glue::$params['maxUpload'];
+			$this->bandwidthLeft = glue::$params['defaultAllowedBandwidth'];
 		}
 
 		if($this->getScenario() == "updatePassword" || $this->getScenario() == "recoverPassword" || $this->getIsNewRecord()){
 			if($this->getScenario() == "updatePassword")
-				$this->password = $this->new_password;
+				$this->password = $this->newPassword;
+			$this->textPassword=$this->password;
 			$this->password = Crypt::blowfish_hash($this->password);
 		}
 
 		if(!\glue\Validation::isEmpty($this->newEmail) && $this->newEmail!==$this->email){
-
+			$this->setScenario('updateEmail'); // This is so we get some response in the controller about what happened
 			$hash = hash("sha256", Crypt::generate_new_pass().(substr(md5(uniqid(rand(), true)), 0, 32)));
 
 			$this->accessToken = array(
@@ -321,7 +329,6 @@ class User extends \glue\User{
 			));
 		}
 
-
 		if($this->getScenario() == "updatePassword"){
 			glue::mailer()->mail($this->email, array('no-reply@stagex.co.uk', 'StageX'), 'StageX Password Changed',
 				"user/passwordChange.php", array( "username"=>$this->username ));
@@ -329,7 +336,7 @@ class User extends \glue\User{
 
 		if($this->getScenario() == "recoverPassword"){
 			glue::mailer()->mail($this->email, array('no-reply@stagex.co.uk', 'StageX'), 'StageX Password Recovery', "user/forgotPassword.php", array(
-	      		"username"=>$this->username, "email"=>$this->email, "password"=>$this->oldRecord()->password ));
+	      		"username"=>$this->username, "email"=>$this->email, "password"=>$this->textPassword ));
 		}
 
 		if($this->getScenario() == "updateEmail"){
@@ -368,10 +375,8 @@ class User extends \glue\User{
 
 	function getGroup(){
 		$groups = array_flip($this->groups());
-
-		if(array_key_exists((int)$this->group, $groups)){
+		if(array_key_exists((int)$this->group, $groups))
 			return $groups[$this->group];
-		}
 		return false;
 	}
 
@@ -383,48 +388,23 @@ class User extends \glue\User{
 		return nl2br(html::encode($this->about));
 	}
 
-	function should_autoshare($action){
-
-		if(!is_array($this->autoshare_opts)){
-			return false;
-		}
-
-		if(!isset($this->autoshare_opts[$action])){
-			return false;
-		}
-
-		if((bool)$this->autoshare_opts[$action]){
-			return true;
-		}
-		return false;
-	}
-
-	function get_max_upload_bandwidth(){
-		return $this->max_upload > 0 ? $this->max_upload : glue::$params['maxUpload'];
-	}
-
-	function change_upload_bandwidth_left_by($number, $percentage = false, $save = true){
-		$this->upload_left = $this->upload_left-$number;
-		$this->save();
+	function get_allowed_bandwidth(){
+		return $this->allowedBandwidth > 0 ? $this->allowedBandwidth : glue::$params['defaultAllowedBandwidth'];
 	}
 
 	function reset_upload_bandwidth(){
 		if($this->next_bandwidth_up < time()){
 			$this->next_bandwidth_up = strtotime('+1 week', mktime(0, 0, 0, date('m'), date('d'), date('Y')));
-			$this->upload_left = $this->max_upload > 0 ? $this->max_upload : glue::$params['maxUpload'];
+			$this->bandwidthLeft = $this->allowedBandwidth > 0 ? $this->allowedBandwidth : glue::$params['defaultAllowedBandwidth'];
 			$this->save();
 		}
 	}
 
 	function get_max_video_upload_size(){
-		if(isset($this->max_video_file_size) && $this->max_video_file_size != null){
-			return $this->max_video_file_size;
+		if(isset($this->maxFileSize) && $this->maxFileSize != null){
+			return $this->maxFileSize;
 		}
-		return glue::$params['maxVideoFileSize'];
-	}
-
-	function get_upload_bandwidth_left(){
-		return $this->upload_left;
+		return glue::$params['maxFileSize'];
 	}
 
 	function create_username_from_social_signup($username){

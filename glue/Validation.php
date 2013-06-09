@@ -66,7 +66,7 @@ class Validation extends \glue\Component{
 				}
 
 				if(method_exists($this, $validator)){
-					$valid=self::$validator($field, $field_value, $params)&&$valid;
+					$valid=$this->$validator($field, $field_value, $params)&&$valid;
 				}elseif($this->model instanceof \glue\Model && $this->model->method_exists($validator)){
 					$valid = $this->model->$validator($field, $field_value, $params) && $valid;
 				}elseif($validator instanceof \Closure||(is_string($validator) && function_exists($validator))){
@@ -237,7 +237,7 @@ class Validation extends \glue\Component{
 	/**
 	 * Field is required
 	 */
-	public static function required($field, $value){
+	public function required($field, $value){
 		if(self::isEmpty($value)){
 			return false;
 		}
@@ -251,7 +251,7 @@ class Validation extends \glue\Component{
 	 * @param mixed $value The field value to be tested
 	 * @param array $params The parameters for the validator
 	 */
-	public static function boolean($field, $value, $params){
+	public function boolean($field, $value, $params){
 
 		$params = array_merge(array(
 				'allowNull' => false,
@@ -276,7 +276,7 @@ class Validation extends \glue\Component{
 	 * @param $value
 	 * @param $params
 	 */
-	public static function string($field, $value, $params){
+	public function string($field, $value, $params){
 
 		$params = array_merge(array(
 				'allowEmpty' => true,
@@ -309,7 +309,7 @@ class Validation extends \glue\Component{
 		return true;
 	}
 
-	public static function objExist($field, $value, $params){
+	public function objExist($field, $value, $params){
 
 		$params = array_merge(array(
 				'allowEmpty' => true,
@@ -341,7 +341,7 @@ class Validation extends \glue\Component{
 		}
 	}
 
-	public static function in($field, $value, $params){
+	public function in($field, $value, $params){
 
 		$params = array_merge(array(
 				'allowEmpty' => true,
@@ -365,7 +365,7 @@ class Validation extends \glue\Component{
 		return true;
 	}
 
-	public static function nin($field, $value, $params){
+	public function nin($field, $value, $params){
 
 		$params = array_merge(array(
 				'allowEmpty' => true,
@@ -389,7 +389,7 @@ class Validation extends \glue\Component{
 		return true;
 	}
 
-	public static function regex($field, $value, $params){
+	public function regex($field, $value, $params){
 
 		$params = array_merge(array(
 				'allowEmpty' => true,
@@ -413,7 +413,7 @@ class Validation extends \glue\Component{
 		return true;
 	}
 
-	public static function compare($field, $value, $params){
+	public function compare($field, $value, $params){
 
 		$params = array_merge(array(
 				'allowEmpty' => true,
@@ -428,7 +428,7 @@ class Validation extends \glue\Component{
 
 		$with_val = $params['with'];
 		if($params['field']){
-			$with_val = $this->{$params['with']};
+			$with_val = $this->model->{$params['with']};
 		}
 
 		switch($params['operator']){
@@ -467,7 +467,7 @@ class Validation extends \glue\Component{
 		return false;
 	}
 
-	public static function number($field, $value, $params){
+	public function number($field, $value, $params){
 
 		$params = array_merge(array(
 				'allowEmpty' => true,
@@ -506,7 +506,7 @@ class Validation extends \glue\Component{
 		return true;
 	}
 
-	public static function url($field, $value, $params){
+	public function url($field, $value, $params){
 
 		$params = array_merge(array(
 				'allowEmpty' => true,
@@ -533,7 +533,7 @@ class Validation extends \glue\Component{
 		return false;
 	}
 
-	public static function file($field, $value, $params){
+	public function file($field, $value, $params){
 
 		$params = array_merge(array(
 				'allowEmpty' => true,
@@ -603,7 +603,7 @@ class Validation extends \glue\Component{
 		return true;
 	}
 
-	public static function tokenized($field, $value, $params){
+	public function tokenized($field, $value, $params){
 
 		$params = array_merge(array(
 				'allowEmpty' => true,
@@ -625,7 +625,7 @@ class Validation extends \glue\Component{
 		return true;
 	}
 
-	public static function email($field, $value, $params = array()){
+	public function email($field, $value, $params = array()){
 
 		$params = array_merge(array(
 				'allowEmpty' => true,
@@ -642,18 +642,18 @@ class Validation extends \glue\Component{
 		return false;
 	}
 
-	public static function hash($field, $value, $params = array()){
+	public function hash($field, $value, $params = array()){
 		if(glue::http()->validateCsrfToken($value)){
 			return true;
 		}
 		return false;
 	}
 
-	public static function safe($field, $value, $params = array()){
+	public function safe($field, $value, $params = array()){
 		return true; // Just do this so the field gets sent through
 	}
 
-	public static function date($field, $value, $params = array()){
+	public function date($field, $value, $params = array()){
 
 		$params = array_merge(array(
 				'format' => 'd/m/yyyy'

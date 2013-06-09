@@ -279,7 +279,7 @@ class User extends \glue\db\Document{
 			//session_write_close();
 			//setcookie(session_name(),'',0,'/');
 		}
-		glue::session()->regenerateID(true);
+		//glue::session()->regenerateID(true);
 		$this->clean();
 
 		/** SUCCESS */

@@ -135,12 +135,16 @@ class Model{
 		$this->valid=$valid;
 	}
 
-	public function setRule(){
+	public function setRule($rule){
 		$this->rules[] = $rule;
 	}
 
 	public function setRules($rules){
 		$this->rules=$rules;
+	}
+	
+	public function resetRules(){
+		$this->rules=array();
 	}
 
 	/**

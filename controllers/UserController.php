@@ -38,6 +38,7 @@ class userController extends \glue\Controller{
 		$model = new User;
 		if(isset($_POST['User'])){
 			$model->attributes=$_POST['User'];
+			$model->setRule(array('hash', 'hash', 'message' => 'CSRF not valid'));
 			if($model->validate()&&$model->save()){
 				if($model->login($model->email,'',true,false)){
 					glue::http()->redirect("/user");
@@ -388,7 +389,11 @@ class userController extends \glue\Controller{
 			$model->attributes=$_POST['User'];
 
 			if($model->validate()&&$model->save()){
-				Html::setSuccessFlashMessage('Your account settings have been saved');
+				if($model->getScenario()=='updateEmail'){
+					Html::setSuccessFlashMessage('An email has been sent asking for confirmation of your new address');
+				}else{
+					Html::setSuccessFlashMessage('Your account settings have been saved');
+				}
 				glue::http()->redirect("/user/settings");
 			}
 		}
@@ -553,24 +558,26 @@ class userController extends \glue\Controller{
 		$id = new MongoId(urldecode(glue::http()->param('uid', '')));
 
 		$user = User::model()->findOne(array('_id' => $id));
-		$to = $user->temp_access_token['to'];
+		
+		if($user===null||!is_array($user->accessToken))
+			glue::route("error/notfound");
+		//$to = $user->accessToken['to'];
 
-		if($to > time() && $user->temp_access_token['hash'] == $hash && $user->temp_access_token['y'] == "E_CHANGE" && $user->temp_access_token['email'] == $email){
+		if($user->accessToken['to'] > time() && $user->accessToken['hash'] == $hash && $user->accessToken['y'] == "E_CHANGE" && $user->accessToken['email'] == $email){
 			if(glue::session()->authed){
-
 				$user->email = $email;
-				unset($user->temp_access_token);
-				unset($user->ins);
+				$user->accessToken=null;
+				$user->sessions=array();
 				$user->save();
 
-				Glue::session()->logout(false);
+				Glue::user()->logout(false);
 
 				html::setSuccessFlashMessage("Email Changed! All devices have been signed out. You must login again.");
-				header("Location: ".Glue::url()->create("/user/login"));
+				header("Location: ".Glue::http()->createUrl("/user/login"));
 				exit();
 			}else{
 				html::setErrorFlashMessage("You must be logged in to change your email address");
-				header("Location: ".Glue::url()->create("/user/login", array("next"=>$user->temp_access_token['url'])));
+				header("Location: ".Glue::http()->createUrl("/user/login", array("next"=>$user->accessToken['url'])));
 				exit();
 			}
 		}else{

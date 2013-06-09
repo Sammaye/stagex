@@ -53,7 +53,7 @@
 		<div class="c_val"><?php echo $model->email ?></div>
 		<div class="small_submit_form_account account_part_edit">
 			<?php $form = html::activeForm() ?>
-				<p><b>Note:</b> Verfication of existance of inbox must be provided before change is saved.</p>
+				<p><b>Note:</b> Verfication email will need to be confirmed before change takes effect.</p>
 				<div class="account_settings_form_outer">
 					<div class="form_row"><?php echo html::label("Email Address:", "newEmail") ?><?php echo $form->textField($model, "newEmail") ?></div>
 					<div class="clearer"></div>
@@ -80,9 +80,9 @@
 				</ul>
 
 				<div class='account_settings_form_outer'>
-					<div class="form_row"><?php echo html::label("Old Password:", "o_password") ?><?php echo $form->passwordField($model, "o_password") ?></div>
-					<div class="form_row"><?php echo html::label("New Password:", "n_password") ?><?php echo $form->passwordField($model, "new_password") ?></div>
-					<div class="form_row"><?php echo html::label("Confirm Password:", "cn_password") ?><?php echo $form->passwordField($model, "cn_password") ?></div>
+					<div class="form_row"><?php echo html::label("Old Password:", "oldPassword") ?><?php echo $form->passwordField($model, "oldPassword") ?></div>
+					<div class="form_row"><?php echo html::label("New Password:", "newPassword") ?><?php echo $form->passwordField($model, "newPassword") ?></div>
+					<div class="form_row"><?php echo html::label("Confirm Password:", "confirmPassword") ?><?php echo $form->passwordField($model, "confirmPassword") ?></div>
 					<?php echo $form->hiddenField($model, "action", array("value"=>"updatePassword")) ?>
 					<div class="grey_css_button submit_changes" style='font-size:12px;'>Change Password</div>
 				</div>
