@@ -320,6 +320,7 @@ return array(
 				'class' => 'glue\\components\\facebook\\Session',
 				'appId' => '455165987850786',
 				'secret' => '6c6336958eec554bfb2326e6824ea427',
+				'redirect_uri' => 'http://www.stagex.co.uk/user/fbLogin'
 		),
 
 		'twitter' => array(
@@ -333,7 +334,7 @@ return array(
 				'class' => 'glue\\components\\google\\Session',
 				'client_id' => '170938211589.apps.googleusercontent.com',
 				'client_secret' => 'lTJpybuvyAD-zWTBI-mnyT1Q',
-				'callback_uri' => 'http://stagex-local.co.uk/user/google_login'
+				'callback_uri' => 'http://stagex-local.co.uk/user/googleLogin'
 		),
 
 		'aws' => array(
@@ -372,6 +373,9 @@ return array(
 		},
 		'403' => function(){
 			glue::route('error/forbidden');
+		},
+		'500' => function(){
+			glue::route('error');
 		},
 
 		/**

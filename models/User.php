@@ -405,7 +405,7 @@ class User extends \glue\User{
 	}
 
 	function create_username_from_social_signup($username){
-		if(glue::db()->users->findOne(array('username' => $username))){
+		if($this->getCollection()->findOne(array('username' => $username))){
 			for($i=0;$i<5;$i++){
 				if($i == 3 || $i == 4){ // Lets go for even more unique and nuke the username
 					$new_username = substr(substr($username, 0, 10).(md5( uniqid( rand(1,255).rand(45,80).rand(112,350), true ))), 0, 20);
@@ -413,7 +413,7 @@ class User extends \glue\User{
 					$new_username = substr($username.uniqid(), 0, 20);
 				}
 
-				if(!glue::db()->users->findOne(array('username' => $new_username))){
+				if(!$this->getCollection()->findOne(array('username' => $new_username))){
 					$username = $new_username;
 					break;
 				}

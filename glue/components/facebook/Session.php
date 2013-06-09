@@ -10,6 +10,7 @@ class Session extends \glue\Component{
 
 	public $appId;
 	public $secret;
+	public $redirect_uri;
 
 	public $facebook;
 
@@ -51,6 +52,7 @@ class Session extends \glue\Component{
 	}
 
 	public function getLoginUrl($params = array()){
+		if(!isset($params['redirect_uri'])) $params['redirect_uri'] = $this->redirect_uri;
 		return $this->facebook->getLoginUrl($params);
 	}
 

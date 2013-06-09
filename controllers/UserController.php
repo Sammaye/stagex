@@ -126,7 +126,7 @@ class userController extends \glue\Controller{
 			exit();
 		}
 
-		if($user->login($user->email, $user->password, false, true)){
+		if($user->login($user->email, '', false, false)){
 			if(isset($_GET['nxt'])){
 				glue::http()->redirect(glue::http()->param('nxt'));
 			}else{
@@ -138,7 +138,7 @@ class userController extends \glue\Controller{
 	}
 
 	function action_googleLogin(){
-		$this->pageTitle = 'Logging into Stagex';
+		$this->title = 'Logging into Stagex';
 
 		if(isset($_REQUEST['code'])){
 			if(glue::google()->authorize()){
@@ -174,7 +174,7 @@ class userController extends \glue\Controller{
 					exit();
 				}
 
-				if(glue::session()->login($user->email, $user->password, false, true)){
+				if(glue::session()->login($user->email, '', false, false)){
 					if(isset($_GET['nxt'])){
 						glue::http()->redirect(glue::http()->param('nxt'));
 					}else{

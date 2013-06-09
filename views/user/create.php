@@ -42,7 +42,7 @@ $this->js('account_settings', "
 
 	<div class='social_login_opts_outer'>
 		<ul class='social_login_options'>
-			<li><a href='<?php echo glue::facebook()->getLoginUrl(array( "redirect_uri"=>"http://www.stagex.co.uk/user/fb_login", "scope"=>"email" )) ?>'>
+			<li><a href='<?php echo glue::facebook()->getLoginUrl(array( "scope"=>"email" )) ?>'>
 				<img src='/images/fb_large.png'/><span>Login with Facebook</span></a></li>
 			<li style='margin-left:45px;'><a href='<?php echo glue::google()->getLoginURI(array('email', 'profile')) ?>'>
 				<img src='/images/google_large.png'/><span>Login with Google Accounts</span></a></li>
