@@ -1,4 +1,4 @@
-<?php $this->addJsScript('account_settings', "
+<?php $this->js('account_settings', "
 	$(document).ready(function(){
 		$('.recover_submit').click(function(event){
 			event.preventDefault();
@@ -13,7 +13,6 @@
 		<div class='form'>
 			<?php echo html::form_summary($model, array(
 				'errorHead' => 'Could not recover your account because:',
-				'successMessage' => "Your password was successfully reset and has been emailed to you. It is advised you change your password as soon as you login."
 			)) ?>
 
 			<div class="form-caption">
@@ -30,9 +29,9 @@
 
 		<div class="password-Captcha">
 			<?php
-				echo $this->widget('application/widgets/reCaptcha/recaptcha.php', array(
+				app\widgets\reCaptcha\recaptcha::widget(array(
 					"public_key"=>"6LfCNb0SAAAAAF4EZ2hV_4JCxbY3lfq0ren11EfM",
-					"errors"=>$model->getFirstError("captcha"))
+					"errors"=>$model->captchaError)
 				);
 			?>
 		</div>

@@ -191,28 +191,24 @@ class userController extends \glue\Controller{
 
 	function action_recover(){
 
-		$this->pageTitle = 'Recover your StageX Account';
+		$this->title = 'Recover your StageX Account';
 
-		$model = new recoverForm();
+		$model = new app\models\recoverForm();
 		if(isset($_POST['recoverForm'])){
-			$model->_attributes($_POST['recoverForm']);
+			$model->attributes=$_POST['recoverForm'];
 			if($model->validate()){
 				$user =  User::model()->findOne(array('email' => $model->email));
 				if($user){
 					$user->setScenario('recoverPassword');
-					$user->password = generate_new_pass();
+					$user->password = \glue\util\Crypt::generate_new_pass();
 					$user->save();
+					
+					Html::setSuccessFlashMessage('Your password was successfully reset and has been emailed to you. It is advised you change your password as soon as you login.');
 					glue::http()->redirect('/user/recover', array('success'=>true));
 				}
 			}
 		}
-
-		if(isset($_GET['success']) && !$model->hasErrors()){
-			$model->setSuccess(true);
-			$model->setHasBeenValidated(true);
-		}
-//var_dump($model->getErrors());
-		$this->render('user/forgot_password', array('model' => $model));
+		echo $this->render('user/forgot_password', array('model' => $model));
 	}
 
 	function action_view(){
