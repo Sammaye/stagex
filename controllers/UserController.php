@@ -27,11 +27,12 @@ class userController extends \glue\Controller{
 	function action_create(){
 
 		$this->title = 'Create a new StageX Account';
-
+$_SESSION['ffgfgf'] = 'fgfgf';
+var_dump($_SESSION);
 		$model = new User;
 		if(isset($_POST['User'])){
-			$model->attributes=$_POST['User'];
 			$model->setRule(array('hash', 'hash', 'message' => 'CSRF not valid'));
+			$model->attributes=$_POST['User'];
 			if($model->validate()&&$model->save()){
 				if($model->login($model->email,'',true,false)){
 					glue::http()->redirect("/user");

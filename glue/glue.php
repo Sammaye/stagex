@@ -116,7 +116,9 @@ class glue{
 				foreach(self::$startUp as $c)
 					self::getComponent($c);
 			}
+			echo "beofer";
 			self::getComponent('user'); // force the user to be inited
+			echo "after";
 			self::route($url);
 		}
 	}

@@ -68,7 +68,7 @@ class User extends \glue\db\Document{
 			if(session_id()===''){
 				if($this->domain)
 					ini_set("session.cookie_domain", $this->domain);
-
+echo "i here";
 				glue::session()->start();
 
 				// Are they logged in?
@@ -129,7 +129,7 @@ class User extends \glue\db\Document{
 
 		/** Query for the object */
 		$user=$this->getCollection()->findOne(array('_id' => new \MongoId(glue::session()->id),'deleted' => 0));
-
+		var_dump($user); exit();
 		if(!$user){
 			$this->logout(false);
 			return false;
@@ -169,7 +169,7 @@ class User extends \glue\db\Document{
 		}
 		$this->setScenario('update');
 		$this->setIsNewRecord(false);
-
+		
 		/** Set session */
 		glue::session()->id=$this->_id;
 		glue::session()->authed=true;
@@ -274,12 +274,14 @@ class User extends \glue\db\Document{
 
 		/** Unset session */
 		if(session_id()!==''){
+			echo "calling this";
 			session_unset();
 			//session_destroy();
 			//session_write_close();
 			//setcookie(session_name(),'',0,'/');
 		}
-		glue::session()->regenerateID(true);
+		//$this->defaults();
+		//glue::session()->regenerateID(true);
 		$this->clean();
 
 		/** SUCCESS */
@@ -367,7 +369,6 @@ class User extends \glue\db\Document{
 				$this->setSession();
 
 			}else{
-
 				/** Logout */
 				$this->logout(false);
 			}

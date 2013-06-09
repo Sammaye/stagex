@@ -131,16 +131,17 @@ class Session extends \glue\Component{
 
 		//Write details to session table
 		$time = strtotime($this->lifeTime);
-
+var_dump($data);
+var_dump($id);
 		// If the user is logged in record their uid
-		glue::db()->{$this->sessionCollectionName}->update(array("session_id"=>$id), array('$set'=>array(
+		var_dump(glue::db()->{$this->sessionCollectionName}->update(array("session_id"=>$id), array('$set'=>array(
 			"session_id"=>$id,
 			//"user_id"=>glue::session()->authed ? $_SESSION['uid'] : 0,
 			"data"=>$data,
 			"expires"=>$time,
 			//"active"=>1
-		)), array("upsert"=>true));
-
+		)), array("upsert"=>true)));
+exit();
 		// DONE
 		return true;
 	}
@@ -182,11 +183,10 @@ class Session extends \glue\Component{
 		$newID=session_id();
 
 		$row=glue::db()->{$this->sessionCollectionName}->findOne(array('session_id' => $oldID));
-		//var_dump($row); exit();
 		if($row!==null){
-			if($deleteOldSession)
+			if($deleteOldSession){
 				glue::db()->{$this->sessionCollectionName}->update(array('session_id'=>$oldID),array('$set'=>array('session_id'=>$newID)));
-			else{
+			}else{
 				$row['session_id']=$newID;
 				glue::db()->{$this->sessionCollectionName}->insert($row);
 			}
