@@ -27,7 +27,7 @@ class userController extends \glue\Controller{
 	function action_create(){
 
 		$this->title = 'Create a new StageX Account';
-		
+
 $_SESSION['ffgfgf'] = isset($_SESSION['ffgfgf']) && $_SESSION['ffgfgf']>0 ? $_SESSION['ffgfgf']+1 : 1;
 var_dump($_SESSION);
 		$model = new User;
@@ -35,10 +35,10 @@ var_dump($_SESSION);
 			$model->setRule(array('hash', 'hash', 'message' => 'CSRF not valid'));
 			$model->attributes=$_POST['User'];
 			if($model->validate()&&$model->save()){
-				if($model->login($model->email,'',true,false)){
+				if(glue::user()->login($model->email,'',true,false)){
 					glue::http()->redirect("/user");
 				}else{
-					$model->addError("Login failed, however, it seems you are saved to our system so please try to login manually.");
+					$model->setError("Login failed, however, it seems you are saved to our system so please try to login manually.");
 				}
 			}
 		}
@@ -197,7 +197,7 @@ var_dump($_SESSION);
 					$user->setScenario('recoverPassword');
 					$user->password = \glue\util\Crypt::generate_new_pass();
 					$user->save();
-					
+
 					Html::setSuccessFlashMessage('Your password was successfully reset and has been emailed to you. It is advised you change your password as soon as you login.');
 					glue::http()->redirect('/user/recover', array('success'=>true));
 				}
@@ -548,7 +548,7 @@ var_dump($_SESSION);
 		$user = User::model()->findOne(array('_id' => $id));
 
 		if(
-			($user!==null&&is_array($user->accessToken)) && 
+			($user!==null&&is_array($user->accessToken)) &&
 			($user->accessToken['to'] > time() && $user->accessToken['hash'] == $hash && $user->accessToken['y'] == "E_CHANGE" && $user->accessToken['email'] == $email)
 		){
 			if(glue::session()->authed){

@@ -68,7 +68,7 @@ class User extends \glue\db\Document{
 			if(session_id()===''){
 				if($this->domain)
 					ini_set("session.cookie_domain", $this->domain);
-echo "i here";
+//echo "i here";
 				glue::session()->start();
 
 				// Are they logged in?
@@ -78,7 +78,7 @@ echo "i here";
 					$this->restoreFromCookie();
 				}else
 					$this->defaults();
-				
+
 			}
 		}
 
@@ -129,12 +129,12 @@ echo "i here";
 
 		/** Query for the object */
 		$user=$this->getCollection()->findOne(array('_id' => new \MongoId(glue::session()->id),'deleted' => 0));
-		var_dump($user); exit();
+		//$_SESSION['authed']=false;
 		if(!$user){
 			$this->logout(false);
 			return false;
 		}
-		
+
 		// Set the model attributes
 		$this->clean();
 		foreach($user as $k=>$v)
@@ -169,7 +169,7 @@ echo "i here";
 		}
 		$this->setScenario('update');
 		$this->setIsNewRecord(false);
-		
+
 		/** Set session */
 		glue::session()->id=$this->_id;
 		glue::session()->authed=true;
@@ -182,7 +182,7 @@ echo "i here";
 			"last_request"=>$_SERVER['REQUEST_URI'],
 			"last_active"=>new \MongoDate()
 		);
-
+//var_dump($this); exit();
 		// Lets delete old sessions (anything older than 2 weeks)
 		foreach($this->sessions as $k => $v){
 			if($v['last_active']->sec < strtotime('-2 weeks'))
@@ -194,7 +194,10 @@ echo "i here";
 			$this->sessions[session_id()]['created'] = new \MongoDate();
 		}
 		//var_dump($this->sessions[session_id()]);
+		//var_dump($_SESSION);
+		//var_dump($this->hash);
 		$this->save();
+		//var_dump($this->getErrors()); exit();
 		$this->setCookie($remember, $init);
 
 		/** Now if the user needs notifying via email lets do it */
@@ -274,14 +277,14 @@ echo "i here";
 
 		/** Unset session */
 		if(session_id()!==''){
-			echo "calling this";
-			//session_unset();
+			//echo "calling this";
+			session_unset();
 			//session_destroy();
 			//session_write_close();
 			//setcookie(session_name(),'',0,'/');
 		}
-		//$this->defaults();
-		//glue::session()->regenerateID(true);
+		$this->defaults();
+		glue::session()->regenerateID(true);
 		$this->clean();
 
 		/** SUCCESS */
