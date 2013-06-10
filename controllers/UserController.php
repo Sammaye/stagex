@@ -28,8 +28,6 @@ class userController extends \glue\Controller{
 
 		$this->title = 'Create a new StageX Account';
 
-$_SESSION['ffgfgf'] = isset($_SESSION['ffgfgf']) && $_SESSION['ffgfgf']>0 ? $_SESSION['ffgfgf']+1 : 1;
-var_dump($_SESSION);
 		$model = new User;
 		if(isset($_POST['User'])){
 			$model->setRule(array('hash', 'hash', 'message' => 'CSRF not valid'));
@@ -366,7 +364,7 @@ var_dump($_SESSION);
 
 	function action_settings(){
 
-		$this->pageTitle = 'General Settings - StageX';
+		$this->title = 'Account Settings - StageX';
 		$this->layout = "user_section";
 
 		$model = $this->loadModel();

@@ -1,3 +1,11 @@
+body{
+	direction:ltr;
+    margin: 0;
+    padding: 0;	
+	font-family:Arial, Helvetica, sans-serif;
+	unicode-bidi: embed;
+}
+
 a,a:hover,a:visited{
 	color: #3861BD;
 	text-decoration:none;
@@ -9,6 +17,11 @@ a:hover{
 
 .clearer{
 	clear:both;
+  	display: block;
+  	overflow: hidden;
+  	visibility: hidden;
+  	width: 0;
+  	height: 0;	
 }
 
 .menu{
@@ -22,7 +35,8 @@ a:hover{
 
 .menu_right{
 	float:right;
-	margin:7px 10px 0px 0;
+	height:44px;
+	margin:0px 45px 0px 0;
 }
 
 .menu li{
@@ -45,7 +59,7 @@ a:hover{
 
 .menu .logo{
 	height:44px;
-	margin-left:5px;
+	margin-left:45px;
 }
 
 .menu .logo a{
@@ -86,7 +100,12 @@ a:hover{
 }
 
 .menu .search .submit_search{
-	background: -moz-linear-gradient(center top , #F5F5F5 0%, #F1F1F1 100%) repeat scroll 0 0 transparent;
+	background-image: linear-gradient(center top, #F5F5F5 0%, #F1F1F1 100%);
+	background-image: -o-linear-gradient(center top, #F5F5F5 0%, #F1F1F1 100%);
+	background-image: -moz-linear-gradient(center top, #F5F5F5 0%, #F1F1F1 100%);
+	background-image: -webkit-linear-gradient(center top, #F5F5F5 0%, #F1F1F1 100%);
+	background-image: -ms-linear-gradient(center top, #F5F5F5 0%, #F1F1F1 100%);
+	/*background: -moz-linear-gradient(center top , #F5F5F5 0%, #F1F1F1 100%) repeat scroll 0 0 transparent;*/
     border: 1px solid #BBBBBB;
     border-radius: 0 3px 3px 0;
     display: block;
@@ -106,4 +125,64 @@ a:hover{
 
 .menu_right li a{
 	padding: 8px 4px 0;
+}
+
+.menu_right li a.notification_area{
+	color:#999999;
+	font-size:16px;
+	font-weight:bold;
+	display:block;
+	padding:15px 10px 0 10px;
+	height:29px;
+	margin:0 10px 0 0;
+}
+
+.menu_right li a.notification_area:hover{
+	text-decoration:none;
+	background:#eeeeee;
+}
+
+.menu_right li{
+	padding:7px 0 0;
+}
+
+.menu_right li.notification_outer{
+	margin:0; padding:0;
+}
+
+.menu_right li a.new_notifications{
+	color:#ffffff;
+	background:#b22a18;
+}
+
+.userbody{
+	margin:15px 45px 0 45px;
+}
+
+.userbody .side_menu{
+	width:145px; margin:0 15px 0 0;
+}
+
+.userbody .side_menu li a{
+	font-size:13px;
+	line-height:20px;
+	display:block;
+	padding:2px 0px 2px 5px;	
+}
+
+.userbody .side_menu li a.selected{
+	background:#f5f5f5;
+}
+
+.userbody .side_menu .head_divider{
+	color:#666666;
+	border-top:1px solid #eeeeee;
+	font-size:13px;
+	padding:5px 0;
+	margin:10px 0 0;
+	line-height:20px;
+}
+
+.userbody .side_menu .end_list{
+	margin:15px 0 0;
 }

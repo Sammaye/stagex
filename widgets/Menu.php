@@ -52,10 +52,10 @@ class Menu extends \glue\Widget{
 				<div class="menu_right">
 					<ul>
 						<?php if(glue::session()->authed){ ?>
-							<li>
+							<li class="notification_outer">
 
 								<?php $newNotifications = \app\models\Notification::getNewCount_Notifications(); ?>
-								<a class='notification_area <?php if($newNotifications > 0): echo "new_nots"; endif; ?>' href='/stream/notifications'>
+								<a class='notification_area <?php if($newNotifications > 0): echo "new_notifications"; endif; ?>' href='/stream/notifications'>
 								<?php
 								if($newNotifications > 100){ ?>
 									100+

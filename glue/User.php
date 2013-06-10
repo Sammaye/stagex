@@ -277,7 +277,7 @@ class User extends \glue\db\Document{
 
 		/** Unset session */
 		if(session_id()!==''){
-			//echo "calling this";
+			echo "calling this";
 			session_unset();
 			//session_destroy();
 			//session_write_close();

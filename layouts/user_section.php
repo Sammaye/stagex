@@ -46,15 +46,11 @@ $this->beginPage() ?>
 	<body>
 		<?php $this->beginBody() ?>
 			<?php app\widgets\Menu::widget() ?>
-			<div class='grid_970'>
-				<div class='grid_block alpha omega user_section_side_menu'>
-					<div class='about_user'>
-						<img src="<?php echo glue::user()->getAvatar(40, 40); ?>" alt='thumbnail'/>
-						<h3><a href='<?php echo glue::http()->createUrl('/user/view', array('id' => strval(glue::user()->_id))) ?>'><?php echo glue::user()->getUsername() ?></a></h3>
-					</div>
+			<div class='userbody'>
+				<div class='side_menu' style='float:left;'>
 					<a href='<?php echo glue::http()->createUrl('/video/upload', array(), glue::$params['uploadBase']) ?>' class='green_css_button upload'>UPLOAD</a>
 					<div class='clearer'></div>
-					<ul class='main_options'>
+					<ul>
 						<li><a href='<?php echo glue::http()->createUrl('/stream/news') ?>' <?php echo $this->tab == "news_feed" ? "class='selected'" : "" ?>>News Feed</a></li>
 						<li class='wl_item'><a href='<?php echo glue::http()->createUrl('/user/watch_later') ?>' <?php echo $this->tab == "watch_later" ? "class='selected'" : "" ?>>Watch Later</a></li>
 						<li><a href='<?php echo glue::http()->createUrl('/user/videos') ?>' <?php echo $this->tab == "videos" ? "class='selected'" : "" ?>>Videos</a></li>
@@ -70,18 +66,19 @@ $this->beginPage() ?>
 						<li><a href='<?php echo glue::http()->createUrl('/stream/notifications') ?>' <?php echo $this->tab == "notifications" ? "class='selected'" : "" ?>>Notifications</a></li>
 					</ul>
 					<h3 class='head_divider'>Settings</h3>
-					<ul class='account_settings'>
-						<li><a href='<?php echo glue::http()->createUrl('/user/settings') ?>' <?php echo $this->tab == "settings" ? "class='selected'" : "" ?>>Account Overview</a></li>
+					<ul>
+						<li><a href='<?php echo glue::http()->createUrl('/user/settings') ?>' <?php echo $this->tab == "settings" ? "class='selected'" : "" ?>>Account Settings</a></li>
 						<li><a href='<?php echo glue::http()->createUrl('/user/profile') ?>' <?php echo $this->tab == "profile" ? "class='selected'" : "" ?>>Profile Settings</a></li>
 						<li><a href='<?php echo glue::http()->createUrl('/user/activity') ?>' <?php echo $this->tab == "activity" ? "class='selected'" : "" ?>>Account Activity</a></li>
 					</ul>
-					<ul class='main_options'>
+					<ul class='end_list'>
 						<li><a href='<?php echo glue::http()->createUrl('/user/logout') ?>'>Logout</a></li>
 					</ul>
 				</div>
-				<div class='grid_block alpha omega user_section_main_content'>
+				<div class='grid_block alpha omega user_section_main_content' style='float:left; width:820px;'>
 					<?php echo $content ?>
 				</div>
+				<div class="clearer"></div>
 			</div>
 			<div id="mainSearch_results"></div>
 
