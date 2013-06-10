@@ -31,7 +31,7 @@ class Jqautocomplete extends \glue\Widget{
 
 				if($this->renderItem){
 					$js .= "
-						.data( 'autocomplete' )._renderItem = function( ul, item ) {
+						.data( 'uiAutocomplete' )._renderItem = function( ul, item ) {
 							" . $this->renderItem . "
 						};
 					";

@@ -8,22 +8,21 @@ use glue,
 class Menu extends \glue\Widget{
 
 	function render(){ ?>
-			<div class='presence_bar'>
-				<div class='grid_970'>
-				<div class="presence_bar-topLeft">
+			<div class='menu' style=''>
+				<div class="menu_left">
 					<ul>
 						<li class='logo'><a href='<?php echo glue::http()->createUrl('/') ?>'><img src='/images/main_logo.png' alt='StageX'/></a></li>
-						<li class="presenceBar_mainSearch_li">
-							<form action="/search" method="get"><div class="search_bar">
-									<label><?php
+						<li class="search">
+							<form action="/search" method="get"><div class="search_input">
+								<?php
 									$val = '';
 									if(preg_match('/\/search/i', $_SERVER['REQUEST_URI'])){
-										$val = glue::http()->param('mainSearch', '');
+										$val = glue::http()->param('term', '');
 									}
 
-									glue::$controller->js('mainSearch_click', "
+									glue::$controller->js('submitsearch_click', "
 										$(function(){
-											$('#mainSearch_submit').click(function(event){
+											$('.submit_search').click(function(event){
 												event.preventDefault();
 												$(this).parents('form').submit();
 											});
@@ -31,7 +30,7 @@ class Menu extends \glue\Widget{
 									");
 
 									\app\widgets\Jqautocomplete::widget(array(
-										'attribute' => 'mainSearch',
+										'attribute' => 'term',
 										'value' => $val,
 										'options' => array(
 											'appendTo' => '#mainSearch_results',
@@ -44,15 +43,14 @@ class Menu extends \glue\Widget{
 												.append( '<a class=\'content\'>' + item.label + '</a>' )
 												.appendTo( ul );
 											"
-									)) ?></label></div><a href='#' class='search_submit' id='mainSearch_submit'><img src='/images/search_icon_small.png' alt='search'/></a>
+									)) ?></div><button class="submit_search"><span>&nbsp;</span></button>
 							</form>
 						</li>
-
-						<li class='link_item'><a href="<?php echo Glue::http()->createUrl("/video") ?>">Videos</a></li>
+						<li class='link'><a href="<?php echo Glue::http()->createUrl("/video") ?>">Browse</a></li>
 					</ul>
 				</div>
 				<?php if(isset($_SESSION)){ ?>
-				<div class="presence_bar-topRight" style='margin-top:5px;'>
+				<div class="menu_right">
 					<ul>
 						<?php if(glue::session()->authed){ ?>
 							<li>
@@ -80,7 +78,6 @@ class Menu extends \glue\Widget{
 					</ul>
 				</div>
 				<div class="clearer"></div>
-				</div>
 				<?php } ?>
 			</div>
 
