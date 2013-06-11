@@ -1,4 +1,4 @@
-<?php 
+<?php
 $js=<<<JS
 
 $('.edit_acccount_form').css({display:'none'});
@@ -16,7 +16,7 @@ $('.account_settings_part').on('click','.cancel_edit',function(e){
 	var part=$(this).parents('.account_settings_part');
 	part.find('.value').css({display:'block'});
 	part.find('.edit_acccount_form').css({display:'none'});
-	$(this).removeClass('cancel_edit').addClass('edit').text($(this).attr('title'));	
+	$(this).removeClass('cancel_edit').addClass('edit').text($(this).attr('title'));
 });
 
 JS;
@@ -64,37 +64,38 @@ $this->js('accountsettings',$js);
 		&nbsp;
 	</div>
 	<?php $form = html::activeForm() ?>
-		<?php echo html::submitbutton("Save Settings") ?>
+	<button type="button" class="btn">Save Settings</button>
+		<?php echo html::submitbutton("Save Settings",array('class'=>'btn-success')) ?>
 	<h1 class='section_head'>Security</h1>
 		<div class='security_form'>
-			<label class='block_label'><?php echo $form->checkbox($model, "singleSignOn", 1) ?><span>Allow single sign-on</span></label>
+			<label class='checkbox'><?php echo $form->checkbox($model, "singleSignOn", 1) ?>Allow single sign-on</label>
 			<div class='light_capt'>
 				<p>Single Sign-on means that only one device can be logged onto this account at any given point in time. The system works by "newest take all".</p>
 				<p>This method allows for the user to logout all devices automatically before logging in.</p>
 			</div>
-			<label class='block_label'><?php echo $form->checkbox($model, "emailLogins", 1) ?><span>Notify me via email of new logins</span></label>
+			<label class='checkbox'><?php echo $form->checkbox($model, "emailLogins", 1) ?>Notify me via email of new logins</label>
 		</div>
 		<div class="clearer"></div>
 		<h1 class='section_head'>Browsing</h1>
 		<?php $opts = $form->radio_group($model, "safeSearch") ?>
 		<div class="safe_search_form">
-			<label class='block_label'><?php echo $opts->add(1) ?><span>Strict</span></label>
+			<label class='radio'><?php echo $opts->add(1) ?><span>Strict</span></label>
 			<div class='light_capt'><p>This is the safest way to browse this site, stops any and all potientially bad content from reaching your eyes.</p></div>
-			<label class='block_label'><?php echo $opts->add("0") ?><span>Off</span></label>
+			<label class='radio'><?php echo $opts->add("0") ?><span>Off</span></label>
 			<div class='light_capt'><p>This gives you everything in its raw form. Not for children!</p></div>
 		</div>
 		<div class="privacy_form">
-			<label class='block_label'><?php echo $form->checkbox($model, 'useDivx', 1) ?><span>Use DivX Player</span></label>
-			<label class='block_label'><?php echo $form->checkbox($model, 'autoplayVideos', 1) ?><span>Automatically play videos</span></label>
+			<label class='checkbox'><?php echo $form->checkbox($model, 'useDivx', 1) ?><span>Use DivX Player</span></label>
+			<label class='checkbox'><?php echo $form->checkbox($model, 'autoplayVideos', 1) ?><span>Automatically play videos</span></label>
 			<div class='light_capt'><p>This will automatically play any videos you view on this site.</p></div>
 		</div>
 		<div class="clearer"></div>
 		<h1 class='section_head'>Email Notifications</h1>
 		<div class="privacy_form">
-			<label class='block_label'><?php echo $form->checkbox($model, 'emailEncodingResult', 1) ?><span>When one of my new uploads fails or finishes encoding</span></label>
-			<label class='block_label'><?php echo $form->checkbox($model, 'emailVideoResponses', 1) ?><span>When someone replies to me</span></label>
+			<label class='checkbox'><?php echo $form->checkbox($model, 'emailEncodingResult', 1) ?><span>When one of my new uploads fails or finishes encoding</span></label>
+			<label class='checkbox'><?php echo $form->checkbox($model, 'emailVideoResponses', 1) ?><span>When someone replies to me</span></label>
 			<!-- <label class='block_label'><?php //echo $form->checkbox($model, 'emailVideoResponseReplies', 1) ?><span>When someone replies to one of my comments</span></label> -->
-			<label class='block_label'><?php echo $form->checkbox($model, 'emailWallComments', 1) ?><span>When someone comments on my profile</span></label>
+			<label class='checkbox'><?php echo $form->checkbox($model, 'emailWallComments', 1) ?><span>When someone comments on my profile</span></label>
 		</div>
 		<div class="clearer"></div>
 		<h1 class='section_head'>Analytics</h1>
@@ -108,20 +109,22 @@ $this->js('accountsettings',$js);
 
 	<h1 class='section_head'>Default Video Settings</h1>
 			<div class="privacy_form">
+				<div class="listing_settings">
+					<h3>Listing</h3>
+					<?php $group = $form->radio_group($model, "defaultVideoSettings[listing]") ?>
+					<label class="radio"><?php echo $group->add(0) ?><span>Public</span></label>
+					<label class="radio"><?php echo $group->add(1) ?><span>Unlisted</span></label>
+					<label class="radio"><?php echo $group->add(2) ?><span>Private</span></label>
+				</div>
 
-				<?php $group = $form->radio_group($model, "defaultVideoSettings[listing]") ?>
-				<label><?php echo $group->add(0) ?><span>Public</span></label>
-				<label><?php echo $group->add(1) ?><span>Unlisted</span></label>
-				<label><?php echo $group->add(2) ?><span>Private</span></label>
-
-				<div class='bordered_form_section'>
-					<label class='block_label'><?php echo $form->checkbox($model, "defaultVideoSettings[embeddable]", 1) ?><span>Allow embedding of my video</span></label>
-					<label class='block_label'><?php echo $form->checkbox($model, "defaultVideoSettings[moderated]", 1) ?><span>Moderate Responses</span></label>
-					<label class='block_label'><?php echo $form->checkbox($model, "defaultVideoSettings[voteableComments]", 1) ?><span>Allow users to vote on responses</span></label>
-					<label class='block_label'><?php echo $form->checkbox($model, "defaultVideoSettings[allowVideoComments]", 1) ?><span>Allow video responses</span></label>
-					<label class='block_label'><?php echo $form->checkbox($model, "defaultVideoSettings[allowTextComments]", 1) ?><span>Allow text responses</span></label>
-					<label class='block_label'><?php echo $form->checkbox($model, "defaultVideoSettings[voteable]", 1) ?><span>Allow users to vote on this video</span></label>
-					<label class='block_label'><?php echo $form->checkbox($model, "defaultVideoSettings[privateStatistics]", 1) ?><span>Make my statistics private</span></label>
+				<div class='bordered_form_section' style='margin-top:20px;'>
+					<label class='checkbox'><?php echo $form->checkbox($model, "defaultVideoSettings[embeddable]", 1) ?><span>Allow embedding of my video</span></label>
+					<label class='checkbox'><?php echo $form->checkbox($model, "defaultVideoSettings[moderated]", 1) ?><span>Moderate Responses</span></label>
+					<label class='checkbox'><?php echo $form->checkbox($model, "defaultVideoSettings[voteableComments]", 1) ?><span>Allow users to vote on responses</span></label>
+					<label class='checkbox'><?php echo $form->checkbox($model, "defaultVideoSettings[allowVideoComments]", 1) ?><span>Allow video responses</span></label>
+					<label class='checkbox'><?php echo $form->checkbox($model, "defaultVideoSettings[allowTextComments]", 1) ?><span>Allow text responses</span></label>
+					<label class='checkbox'><?php echo $form->checkbox($model, "defaultVideoSettings[voteable]", 1) ?><span>Allow users to vote on this video</span></label>
+					<label class='checkbox'><?php echo $form->checkbox($model, "defaultVideoSettings[privateStatistics]", 1) ?><span>Make my statistics private</span></label>
 				</div>
 
 				<?php $grp = $form->radio_group($model, 'defaultVideoSettings[licence]') ?>
