@@ -30,16 +30,14 @@ $this->js('accountsettings',$js);
 	)) ?>
 
 	<div class="account_settings_part edit_email_address">
-		<h1>Email Address</h1>
-		<div><div class="value" style='float:left;'><?php echo $model->email ?></div><a href="#" class="edit" title="Change Email Address">Change Email Address</a></div>
-		<div class="small_submit_form_account edit_acccount_form">
+		<h1 style='margin-top:0;'>Email Address</h1>
+		<div><div class="value" style='float:left;display:block;margin-right:10px;''><?php echo $model->email ?></div><a href="#" class="edit" title="Change Email Address">Change Email Address</a></div>
+		<div class="clearer"></div>
+		<div class="edit_acccount_form" style='margin-top:10px;'>
 			<?php $form = html::activeForm() ?>
 				<p><b>Note:</b> Verfication email will need to be confirmed before change takes effect.</p>
-				<div class="account_settings_form_outer">
-					<div class="form_row"><?php echo html::label("Email Address:", "newEmail") ?><?php echo $form->textField($model, "newEmail", array('value'=>$model->email)) ?></div>
-					<div class="clearer"></div>
-				</div>
-				<?php echo html::submitbutton("save", array('class' => 'invisible_submit')) ?>
+				<div class="form_row"><?php echo html::label("Email Address:", "newEmail") ?><?php echo $form->textField($model, "newEmail", array('value'=>$model->email)) ?></div>
+				<?php echo html::submitbutton("Change Email Address", array('class' => 'btn-success')) ?>
 			<?php $form->end() ?>
 		</div>
 		<div class="clearer"></div>
@@ -48,33 +46,31 @@ $this->js('accountsettings',$js);
 	<div class="account_settings_part edit_password">
 		<h1>Password</h1>
 		<a href="#" class="edit" title="Change Password" style='display:block;float:left;'>Change Password</a>
-		<div class="edit_acccount_form">
+		<div class="clearer"></div>
+		<div class="edit_acccount_form" style='margin-top:10px;'>
 			<?php $form = html::activeForm() ?>
 					<div class="form_row"><?php echo html::label("Old Password:", "oldPassword") ?><?php echo $form->passwordField($model, "oldPassword") ?></div>
 					<div class="form_row"><?php echo html::label("New Password:", "newPassword") ?><?php echo $form->passwordField($model, "newPassword") ?></div>
 					<div class="form_row"><?php echo html::label("Confirm Password:", "confirmPassword") ?><?php echo $form->passwordField($model, "confirmPassword") ?></div>
 					<?php echo $form->hiddenField($model, "action", array("value"=>"updatePassword")) ?>
-					<?php echo html::submitbutton("Change Password") ?>
+					<?php echo html::submitbutton("Change Password", array('class' => 'btn-success')) ?>
 			<?php $form->end() ?>
 		</div>
 		<div class="clearer"></div>
 	</div>
 
-	<div class='section_hr'>
+	<div class='section_hr' style='margin-top:30px; padding-top:10px; border-top:1px solid #cccccc;'>
 		&nbsp;
 	</div>
 	<?php $form = html::activeForm() ?>
-	<button type="button" class="btn">Save Settings</button>
-		<?php echo html::submitbutton("Save Settings",array('class'=>'btn-success')) ?>
+		<?php echo html::submitbutton("Save Account Settings",array('class'=>'btn-success')) ?>
 	<h1 class='section_head'>Security</h1>
-		<div class='security_form'>
-			<label class='checkbox'><?php echo $form->checkbox($model, "singleSignOn", 1) ?>Allow single sign-on</label>
-			<div class='light_capt'>
-				<p>Single Sign-on means that only one device can be logged onto this account at any given point in time. It will logout all devices before
-				logging in the user.</p>
-			</div>
-			<label class='checkbox'><?php echo $form->checkbox($model, "emailLogins", 1) ?>Notify me via email of new logins</label>
+		<label class='checkbox'><?php echo $form->checkbox($model, "singleSignOn", 1) ?>Allow single sign-on</label>
+		<div class='light_capt' style='padding-left:20px;'>
+			<p style='color:#666666;'>Single Sign-on means that only one device can be logged onto this account at any given point in time. It will logout all devices before
+			logging in the user.</p>
 		</div>
+		<label class='checkbox'><?php echo $form->checkbox($model, "emailLogins", 1) ?>Notify me via email of new logins</label>
 		<div class="clearer"></div>
 		<h1 class='section_head'>Browsing</h1>
 		<label class='checkbox'><?php echo $form->checkbox($model, 'safeSearch', 1) ?><span>Use Safe Search to hide mature videos</span></label>
@@ -107,8 +103,8 @@ $this->js('accountsettings',$js);
 					<h5>Licence</h5>
 					<?php $grp = $form->radio_group($model, 'defaultVideoSettings[licence]') ?>
 					<div>
-						<label class='radio'><?php echo $grp->add('1') ?><span>Standard StageX Licence</span></label>
-						<label class='radio'><?php echo $grp->add('2') ?><span>Creative Commons Licence</span></label>
+						<label class='radio'><?php echo $grp->add(1) ?><span>Standard StageX Licence</span></label>
+						<label class='radio'><?php echo $grp->add(2) ?><span>Creative Commons Licence</span></label>
 					</div>
 				</div>
 

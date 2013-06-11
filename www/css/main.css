@@ -4,6 +4,7 @@ body{
     padding: 0;
 	font-family:Arial, Helvetica, sans-serif;
 	unicode-bidi: embed;
+	font-size:14px;
 }
 
 h1{
@@ -33,6 +34,18 @@ a,a:hover,a:visited{
 
 a:hover{
 	text-decoration:underline;
+}
+
+label{
+	float: left;
+    padding-top: 5px;
+    text-align: right;
+    width: 160px;
+    margin-bottom: 5px;
+    font-size: 14px;
+    font-weight: normal;
+    line-height: 20px;
+	margin-right:12px;
 }
 
 select, textarea,
@@ -71,6 +84,8 @@ textarea{
 }
 
 .radio,.checkbox{
+	padding:0;
+	margin:0;
     min-height: 20px;
     padding-left: 20px;
     display: block;
@@ -79,6 +94,9 @@ textarea{
     font-weight: normal;
     line-height: 20px;
 	cursor: pointer;
+	text-align:left;
+	float:none;
+	width:auto;
 }
 
 .radio input[type="radio"],.checkbox input[type="checkbox"]{
