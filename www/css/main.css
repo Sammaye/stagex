@@ -13,6 +13,19 @@ h1{
 	color:#333333;
 }
 
+h5{
+	font-weight:bold;
+	color:#333333;
+	font-size:13px;
+	margin:0 0 10px 0;
+}
+
+p{
+	margin: 0 0 10px;
+	font-size:14px;
+	line-height:20px;
+}
+
 a,a:hover,a:visited{
 	color: #3861BD;
 	text-decoration:none;
@@ -295,14 +308,4 @@ textarea{
 
 .userbody .side_menu .end_list{
 	margin:15px 0 0;
-}
-
-.account_settings_body .listing_settings h3{
-	font-weight:bold;
-	color:#333333;
-	margin:0 0 10px 0;
-}
-
-.account_settings_body .listing_settings label{
-	display:inline-block;
 }

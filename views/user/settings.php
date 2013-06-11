@@ -70,25 +70,16 @@ $this->js('accountsettings',$js);
 		<div class='security_form'>
 			<label class='checkbox'><?php echo $form->checkbox($model, "singleSignOn", 1) ?>Allow single sign-on</label>
 			<div class='light_capt'>
-				<p>Single Sign-on means that only one device can be logged onto this account at any given point in time. The system works by "newest take all".</p>
-				<p>This method allows for the user to logout all devices automatically before logging in.</p>
+				<p>Single Sign-on means that only one device can be logged onto this account at any given point in time. It will logout all devices before
+				logging in the user.</p>
 			</div>
 			<label class='checkbox'><?php echo $form->checkbox($model, "emailLogins", 1) ?>Notify me via email of new logins</label>
 		</div>
 		<div class="clearer"></div>
 		<h1 class='section_head'>Browsing</h1>
-		<?php $opts = $form->radio_group($model, "safeSearch") ?>
-		<div class="safe_search_form">
-			<label class='radio'><?php echo $opts->add(1) ?><span>Strict</span></label>
-			<div class='light_capt'><p>This is the safest way to browse this site, stops any and all potientially bad content from reaching your eyes.</p></div>
-			<label class='radio'><?php echo $opts->add("0") ?><span>Off</span></label>
-			<div class='light_capt'><p>This gives you everything in its raw form. Not for children!</p></div>
-		</div>
-		<div class="privacy_form">
-			<label class='checkbox'><?php echo $form->checkbox($model, 'useDivx', 1) ?><span>Use DivX Player</span></label>
-			<label class='checkbox'><?php echo $form->checkbox($model, 'autoplayVideos', 1) ?><span>Automatically play videos</span></label>
-			<div class='light_capt'><p>This will automatically play any videos you view on this site.</p></div>
-		</div>
+		<label class='checkbox'><?php echo $form->checkbox($model, 'safeSearch', 1) ?><span>Use Safe Search to hide mature videos</span></label>
+		<label class='checkbox'><?php echo $form->checkbox($model, 'useDivx', 1) ?><span>Use DivX Player</span></label>
+		<label class='checkbox'><?php echo $form->checkbox($model, 'autoplayVideos', 1) ?><span>Automatically play videos</span></label>
 		<div class="clearer"></div>
 		<h1 class='section_head'>Email Notifications</h1>
 		<div class="privacy_form">
@@ -99,38 +90,36 @@ $this->js('accountsettings',$js);
 		</div>
 		<div class="clearer"></div>
 		<h1 class='section_head'>Analytics</h1>
-		<div class="privacy_form">
-			<label class='block_label textbox'><span>Clicky Account:</span><?php echo $form->textfield($model, 'clickyUid') ?></label>
-			<div class='light_capt'><p>Entering your Clicky account number will allow you to track via Clicky.</p>
-			<p>Enter your site ID in order to begin tracking on your video pages.</p>
-			<p>Note: It would be a good idea to make a new site detached from your normal site and use that new sites ID naming the site, as an example: stagex.co.uk</p></div>
-		</div>
+			<p>Entering your Clicky site ID will allow you to track via Clicky. Enter a site ID to start tracking:</p>
+			<div class=''><label>Clicky Site ID:</label> <?php echo $form->textfield($model, 'clickyUid') ?></div>
 		<div class="clearer"></div>
 
 	<h1 class='section_head'>Default Video Settings</h1>
+		<p>These settings change what options, by default, any uploaded videos will get. Please be aware that changing these settings will not change the settings of
+		any videos previously uploaded, only future uploads.</p>
 			<div class="privacy_form">
-				<div class="listing_settings">
-					<h3>Listing</h3>
+				<div class="listing_settings" style='float:left;'>
+					<h5>Listing</h5>
 					<?php $group = $form->radio_group($model, "defaultVideoSettings[listing]") ?>
 					<label class="radio"><?php echo $group->add(0) ?><span>Public</span></label>
 					<label class="radio"><?php echo $group->add(1) ?><span>Unlisted</span></label>
 					<label class="radio"><?php echo $group->add(2) ?><span>Private</span></label>
+					<h5>Licence</h5>
+					<?php $grp = $form->radio_group($model, 'defaultVideoSettings[licence]') ?>
+					<div>
+						<label class='radio'><?php echo $grp->add('1') ?><span>Standard StageX Licence</span></label>
+						<label class='radio'><?php echo $grp->add('2') ?><span>Creative Commons Licence</span></label>
+					</div>
 				</div>
 
-				<div class='bordered_form_section' style='margin-top:20px;'>
-					<label class='checkbox'><?php echo $form->checkbox($model, "defaultVideoSettings[embeddable]", 1) ?><span>Allow embedding of my video</span></label>
-					<label class='checkbox'><?php echo $form->checkbox($model, "defaultVideoSettings[moderated]", 1) ?><span>Moderate Responses</span></label>
-					<label class='checkbox'><?php echo $form->checkbox($model, "defaultVideoSettings[voteableComments]", 1) ?><span>Allow users to vote on responses</span></label>
-					<label class='checkbox'><?php echo $form->checkbox($model, "defaultVideoSettings[allowVideoComments]", 1) ?><span>Allow video responses</span></label>
-					<label class='checkbox'><?php echo $form->checkbox($model, "defaultVideoSettings[allowTextComments]", 1) ?><span>Allow text responses</span></label>
-					<label class='checkbox'><?php echo $form->checkbox($model, "defaultVideoSettings[voteable]", 1) ?><span>Allow users to vote on this video</span></label>
-					<label class='checkbox'><?php echo $form->checkbox($model, "defaultVideoSettings[privateStatistics]", 1) ?><span>Make my statistics private</span></label>
-				</div>
-
-				<?php $grp = $form->radio_group($model, 'defaultVideoSettings[licence]') ?>
-				<div class="label_options">
-					<label class='first block_label'><?php echo $grp->add('1') ?><span>Standard StageX Licence</span></label>
-					<label class='block_label'><?php echo $grp->add('2') ?><span>Creative Commons Licence</span></label>
+				<div class='bordered_form_section' style='float:left; margin-left:120px;'>
+					<label class='checkbox'><?php echo $form->checkbox($model, "defaultVideoSettings[embeddable]", 1) ?>Allow embedding of my video</label>
+					<label class='checkbox'><?php echo $form->checkbox($model, "defaultVideoSettings[moderated]", 1) ?>Moderate Responses</label>
+					<label class='checkbox'><?php echo $form->checkbox($model, "defaultVideoSettings[voteableComments]", 1) ?>Allow users to vote on responses</label>
+					<label class='checkbox'><?php echo $form->checkbox($model, "defaultVideoSettings[allowVideoComments]", 1) ?>Allow video responses</label>
+					<label class='checkbox'><?php echo $form->checkbox($model, "defaultVideoSettings[allowTextComments]", 1) ?>Allow text responses</label>
+					<label class='checkbox'><?php echo $form->checkbox($model, "defaultVideoSettings[voteable]", 1) ?>Allow users to vote on this video</label>
+					<label class='checkbox'><?php echo $form->checkbox($model, "defaultVideoSettings[privateStatistics]", 1) ?>Make my statistics private</label>
 				</div>
 			</div>
 <div class="clearer"></div>
