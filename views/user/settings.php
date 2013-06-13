@@ -36,7 +36,8 @@ $this->js('accountsettings',$js);
 		<div class="edit_acccount_form" style='margin-top:10px;'>
 			<?php $form = html::activeForm() ?>
 				<p><b>Note:</b> Verfication email will need to be confirmed before change takes effect.</p>
-				<div class="form_row"><?php echo html::label("Email Address:", "newEmail") ?><?php echo $form->textField($model, "newEmail", array('value'=>$model->email)) ?></div>
+				<div class="form_row"><?php echo html::label("Email Address:", "newEmail") ?>
+					<?php echo $form->textField($model, "newEmail", array('value'=>$model->email, 'class'=>'input-large')) ?></div>
 				<?php echo html::submitbutton("Change Email Address", array('class' => 'btn-success')) ?>
 			<?php $form->end() ?>
 		</div>
@@ -49,9 +50,12 @@ $this->js('accountsettings',$js);
 		<div class="clearer"></div>
 		<div class="edit_acccount_form" style='margin-top:10px;'>
 			<?php $form = html::activeForm() ?>
-					<div class="form_row"><?php echo html::label("Old Password:", "oldPassword") ?><?php echo $form->passwordField($model, "oldPassword") ?></div>
-					<div class="form_row"><?php echo html::label("New Password:", "newPassword") ?><?php echo $form->passwordField($model, "newPassword") ?></div>
-					<div class="form_row"><?php echo html::label("Confirm Password:", "confirmPassword") ?><?php echo $form->passwordField($model, "confirmPassword") ?></div>
+					<div class="form_row"><?php echo html::label("Old Password:", "oldPassword") ?>
+						<?php echo $form->passwordField($model, "oldPassword", array('class'=>'input-large')) ?></div>
+					<div class="form_row"><?php echo html::label("New Password:", "newPassword") ?>
+						<?php echo $form->passwordField($model, "newPassword", array('class'=>'input-large')) ?></div>
+					<div class="form_row"><?php echo html::label("Confirm Password:", "confirmPassword") ?>
+						<?php echo $form->passwordField($model, "confirmPassword", array('class'=>'input-large')) ?></div>
 					<?php echo $form->hiddenField($model, "action", array("value"=>"updatePassword")) ?>
 					<?php echo html::submitbutton("Change Password", array('class' => 'btn-success')) ?>
 			<?php $form->end() ?>

@@ -27,6 +27,15 @@ p{
 	line-height:20px;
 }
 
+p.light{
+	color:#666666;
+}
+
+
+p.small{
+	font-size:12px;
+}
+
 a,a:hover,a:visited{
 	color: #3861BD;
 	text-decoration:none;
@@ -61,7 +70,7 @@ input[type="password"]{
     padding: 4px 6px;
     vertical-align: middle;
     background-color: #FFFFFF;
-    border: 1px solid #aaaaaa;
+    border: 1px solid #BBBBBB;
 	font-family:Arial, Helvetica, sans-serif;
     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;
 }
@@ -94,7 +103,7 @@ textarea{
     font-weight: normal;
     line-height: 20px;
 	cursor: pointer;
-	text-align:left;
+	text-align:left!important;
 	float:none;
 	width:auto;
 }
@@ -102,6 +111,56 @@ textarea{
 .radio input[type="radio"],.checkbox input[type="checkbox"]{
 	float: left;
     margin-left: -20px;
+}
+
+.input-mini{
+	width:60px;
+}
+
+.input-small{
+	width:90px;
+}
+
+.input-medium{
+	width:150px;
+}
+
+.input-large{
+	width:210px;
+}
+
+.input-xlarge{
+	width:270px;
+}
+
+.input-xxlarge{
+	width:530px;
+}
+
+.form-vertical .row{}
+
+.form-vertical label{
+    padding-top: 5px;
+    text-align: right;
+    width: 160px;
+    margin-bottom: 5px;
+    font-size: 14px;
+    font-weight: normal;
+    line-height: 20px;
+	margin-right:12px;	
+}
+
+.form-vertical .noninput_row{
+	padding-left:170px;
+}
+
+.form-vertical .submit{}
+
+.form-vertical .footer{
+	border-top:1px solid #cccccc;
+	text-align:center;
+	padding-top:10px;
+	margin-top:20px;
 }
 
 .btn{
@@ -327,4 +386,77 @@ textarea{
 
 .userbody .side_menu .end_list{
 	margin:15px 0 0;
+}
+
+.error{
+	margin:auto;
+	margin-top:80px;
+	width:600px;
+}
+
+.error .options a{
+	margin-right:10px;
+}
+
+.user_create_body{
+	width:600px;
+	margin:auto;
+	margin-top:80px;
+}
+
+.user_create_body h1{
+	margin-bottom:25px;
+}
+
+.user_create_body .submit_row{
+	padding-left:170px;
+	margin-top:20px;
+	margin-bottom:25px;
+}
+
+.user_create_body .declaration_footer{
+	width:480px;
+	margin:auto;
+	margin-top:15px;
+	margin-bottom:15px;
+}
+
+.social_logins_outer{
+	width:440px;
+	margin:auto;
+}
+
+.social_logins_outer li{
+	float:left;
+	margin-left:45px;
+}
+
+.social_logins_outer li.first{
+	margin-left:0;
+}
+
+.social_logins_outer li img{
+	margin-right:10px;
+	float:left;
+}
+
+.social_logins_outer li span{
+	float:left;
+	display:block;
+	margin:8px 0 0;
+}
+
+.user_login_body{
+	width:600px;
+	margin:auto;
+	margin-top:80px;
+}
+
+.user_login_body .social_logins_outer{
+	margin-top:20px;
+}
+
+.user_login_body .captcha{
+	padding-left:170px;
+	margin:10px 0;
 }
