@@ -1,12 +1,7 @@
 <?php
-class videoresponseController extends GController{
+class videoresponseController extends \glue\Controller{
 
-	// A set of filters to be run before and after the controller action
-	public function filters(){
-		return array('rbam');
-	}
-
-	public function accessRules(){
+	public function authRules(){
 		return array(
 			array('allow',
 				'actions' => array('get_comments', 'live_comments', 'index', 'view_all', 'thread'),
@@ -24,7 +19,7 @@ class videoresponseController extends GController{
 		glue::route('error/notfound');
 	}
 
-	public function action_view_all(){
+	public function action_list(){
 		$video = Video::model()->findOne(array('_id' => new MongoId($_GET['id'])));
 
 		$this->pageTitle = 'View All Responses - StageX';
@@ -80,7 +75,7 @@ class videoresponseController extends GController{
 		$this->render('responses/thread', array('thread_parent' => $thread_parent, 'thread' => $thread, 'video' => $video));
 	}
 
-	public function action_add_response(){
+	public function action_add(){
 		$this->pageTitle = 'Add Video Response - StageX';
 		if(!glue::http()->isAjax())
 			glue::route('error/notfound');
@@ -151,29 +146,29 @@ class videoresponseController extends GController{
 		}
 	}
 
+// 	public function action_approve(){
+// 		$this->pageTitle = 'Approve Video Response - StageX';
+// 		if(!glue::http()->isAjax())
+// 			glue::route('error/notfound');
+
+// 		$comment = VideoResponse::model()->findOne(array("_id"=>new MongoId($_GET['id'])));
+
+// 		if($comment){
+// 			if(!glue::roles()->checkRoles(array('^' => $comment->video)))
+// 				GJSON::kill(GJSON::DENIED);
+
+// 			$comment->approve();
+// 			ob_start();
+// 				$this->partialRender('responses/_response', array('item' => $comment, 'mode' => isset($_GET['mode']) ? $_GET['mode'] : ''));
+// 				$comment_html = ob_get_contents();
+// 			ob_end_clean();
+// 			GJSON::kill(array('html' => $comment_html), true);
+// 		}else{
+// 			GJSON::kill(GJSON::UNKNOWN);
+// 		}
+// 	}
+
 	public function action_approve(){
-		$this->pageTitle = 'Approve Video Response - StageX';
-		if(!glue::http()->isAjax())
-			glue::route('error/notfound');
-
-		$comment = VideoResponse::model()->findOne(array("_id"=>new MongoId($_GET['id'])));
-
-		if($comment){
-			if(!glue::roles()->checkRoles(array('^' => $comment->video)))
-				GJSON::kill(GJSON::DENIED);
-
-			$comment->approve();
-			ob_start();
-				$this->partialRender('responses/_response', array('item' => $comment, 'mode' => isset($_GET['mode']) ? $_GET['mode'] : ''));
-				$comment_html = ob_get_contents();
-			ob_end_clean();
-			GJSON::kill(array('html' => $comment_html), true);
-		}else{
-			GJSON::kill(GJSON::UNKNOWN);
-		}
-	}
-
-	public function action_approve_many(){
 		$this->pageTitle = 'Approve Many Video Responses - StageX';
 		if(!glue::http()->isAjax())
 			glue::route('error/notfound');
@@ -242,24 +237,24 @@ class videoresponseController extends GController{
 		}
 	}
 
+// 	public function action_delete(){
+// 		$this->pageTitle = 'Delete Video Response - StageX';
+// 		if(!glue::http()->isAjax())
+// 			glue::route('error/notfound');
+
+// 		$comment = VideoResponse::model()->findOne(array("_id"=>new MongoId($_GET['id'])));
+// 		if($comment){
+// 			if(!glue::roles()->checkRoles(array('^' => array($comment->video, $comment))))
+// 				GJSON::kill(GJSON::DENIED);
+
+// 			$comment->delete();
+// 			echo json_encode(array("success"=>true));
+// 		}else{
+// 			GJSON::kill(GJSON::UNKNOWN);
+// 		}
+// 	}
+
 	public function action_delete(){
-		$this->pageTitle = 'Delete Video Response - StageX';
-		if(!glue::http()->isAjax())
-			glue::route('error/notfound');
-
-		$comment = VideoResponse::model()->findOne(array("_id"=>new MongoId($_GET['id'])));
-		if($comment){
-			if(!glue::roles()->checkRoles(array('^' => array($comment->video, $comment))))
-				GJSON::kill(GJSON::DENIED);
-
-			$comment->delete();
-			echo json_encode(array("success"=>true));
-		}else{
-			GJSON::kill(GJSON::UNKNOWN);
-		}
-	}
-
-	public function action_delete_many(){
 		$this->pageTitle = 'Remove Video Responses - StageX';
 		if(!glue::http()->isAjax())
 			glue::route('error/notfound');
@@ -295,7 +290,7 @@ class videoresponseController extends GController{
 		GJSON::kill('The comments you specified were deleted', true);
 	}
 
-	function action_get_comments(){
+	function action_getmore(){
 		// Potential sort options:
 		// * user_id - Displays all comments only by that user
 		// * approved=true - Displays only approved comments
@@ -382,7 +377,7 @@ class videoresponseController extends GController{
 	 * For the minute gettting live comments will refresh the list and filters and sorts. I am not sure whether I wish
 	 * to keep it this way or make it keep the filters and sorts.
 	 */
-	function action_live_comments(){
+	function action_liveresponses(){
 		$this->pageTitle = 'Get live Responses - StageX';
 
 		if(!glue::http()->isAjax())
@@ -403,7 +398,7 @@ class videoresponseController extends GController{
 		echo json_encode(array('success' => true, 'number_comments' => $comments->count()));
 	}
 
-	function action_response_suggestions(){
+	function action_videosuggestions(){
 		$this->pageTitle = 'Suggest Responses - StageX';
 
 		if(!glue::http()->isAjax())

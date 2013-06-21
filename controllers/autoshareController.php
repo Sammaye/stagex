@@ -6,7 +6,7 @@ class autoshareController extends \glue\Controller{
 	public $socialUser;
 	public $account;
 
-	public function accessRules(){
+	public function authRules(){
 		return array(
 			array('allow',
 				'users' => array('@*')
