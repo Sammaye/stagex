@@ -13,7 +13,7 @@
 			&nbsp;-&nbsp; <a href='<?php echo glue::url()->create('/videoresponse/view_all', array('id' => $item->_id)) ?>'><img alt='comments' src='/images/responses_icon.png'/> <?php echo $item->total_responses ?></a> &nbsp;-&nbsp;
 			<?php echo date('d F Y', $item->created->sec) ?></span> <?php if($item->state == 'failed'): ?><span class='encoding_failed'>Encoding FAILED</span><?php elseif($item->is_processing()): ?><span class='encoding'>Encoding In Progress</span><?php endif; ?>
 	</div>
-	<div class="clearer"></div>
+	<div class="clear"></div>
 
 	<div class='xtra_info_icons'>
 		<span class='video_listing'>

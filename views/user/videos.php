@@ -193,7 +193,7 @@ ob_end_clean();
 
 	<?php if($video_rows->count() > 0){
 		ob_start();
-			?> <div class='video_list'>{items}</div><div style='margin:7px;'>{pager}<div class="clearer"></div></div> <?php
+			?> <div class='video_list'>{items}</div><div style='margin:7px;'>{pager}<div class="clear"></div></div> <?php
 			$template = ob_get_contents();
 		ob_end_clean();
 

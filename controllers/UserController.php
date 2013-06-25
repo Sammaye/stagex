@@ -599,7 +599,7 @@ class userController extends \glue\Controller{
 
 		if($users->count() > 0){
 			ob_start();
-			?> <div class='list' style='padding:7px 10px;'>{items}<div style='margin-top:7px;'>{pager}<div class="clearer"></div></div></div> <?php
+			?> <div class='list' style='padding:7px 10px;'>{items}<div style='margin-top:7px;'>{pager}<div class="clear"></div></div></div> <?php
 			$template = ob_get_contents();
 			ob_end_clean();
 

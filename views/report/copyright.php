@@ -36,7 +36,7 @@
 					<span>I do not represent the owner and/or legal representation of the ownership of this claim</span>
 				</label>
 			</div>
-			<div class="clearer"></div>
+			<div class="clear"></div>
 		</div>
 		<h2 class="report_form_large_textboxes_head">Explanation and Reason</h2>
 		<div class="formRow report_form_large_textboxes">

@@ -386,7 +386,7 @@ return array(
 			if(!glue::http()->isAjax()){
 				$size = memory_get_peak_usage(true);
 				$unit=array('','KB','MB','GB','TB','PB');
-				echo '<div class="clearer"></div>';
+				echo '<div class="clear"></div>';
 				var_dump($size/pow(1024,($i=floor(log($size,1024)))));
 			}
 		}

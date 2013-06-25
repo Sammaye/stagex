@@ -203,7 +203,7 @@ glue::clientScript()->addJsScript('sortChange', "
 							<?php endif; ?>
 							<div class='expandable'><?php echo $model->description ?></div>
 						</div>
-						<div class="clearer"></div>
+						<div class="clear"></div>
 					</div>
 					<?php
 				}elseif($model instanceof User){
@@ -215,7 +215,7 @@ glue::clientScript()->addJsScript('sortChange', "
 							<div class='info'><?php echo $model->total_subscribers ?> subscribers <span class='divider'>|</span> <?php echo $model->total_uploads ?> videos <span class='divider'>|</span> <?php echo $model->total_playlists ?> playlists</div>
 							<div class='about'><?php echo substr($model->about, 0, 60) ?></div>
 						</div>
-						<div class="clearer"></div>
+						<div class="clear"></div>
 					</div>
 					<?php
 				}elseif($model instanceof Playlist){ ?>
@@ -259,7 +259,7 @@ glue::clientScript()->addJsScript('sortChange', "
 			</div>
 		<?php } ?>
 
-		<div class='search_pager'><?php echo $sphinx->renderPager('grid_list_pager') ?><div class="clearer"></div></div>
+		<div class='search_pager'><?php echo $sphinx->renderPager('grid_list_pager') ?><div class="clear"></div></div>
 	</div>
 	<div class="grid_4 omega" style='width:300px;'>
 		<?php $this->widget("application/widgets/Advertising/Ad_box.php", array( "configuration"=>'300_box' )); ?>

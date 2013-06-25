@@ -256,7 +256,7 @@ glue::clientScript()->addJsScript('watch.response_list', "
 						)) ?>
 						<input type='hidden' id='video_response_id' name='_id'/>
 						<a href='#' class='green_css_button post_video_response new_video_response' id=''>Post Response</a>
-						<div class="clearer"></div>
+						<div class="clear"></div>
 					</div>
 					<div class='upload_video'>
 						<p class='dark_grey_text'>Don't see your video there? <?php echo html::a(array('href' => 'http://upload.stagex.co.uk/video/upload', 'text' => 'Upload more videos'))?></p>
@@ -264,7 +264,7 @@ glue::clientScript()->addJsScript('watch.response_list', "
 				</div>
 			<?php } ?>
 		</div>
-		<div class="clearer"></div>
+		<div class="clear"></div>
 	<?php } ?>
 </div>
 <div class="video_response_list" data-sort='<?php echo isset($sort) ? $sort : '' ?>' data-mode='<?php echo isset($mode) ? $mode : '' ?>'
@@ -272,7 +272,7 @@ glue::clientScript()->addJsScript('watch.response_list', "
 	<div class="new_comments_notifier"><a href="#"></a></div>
 	<?php
 		ob_start();
-			?> <div class='list'>{items}<div style='margin-top:7px;'>{pager}<div class="clearer"></div></div></div> <?php
+			?> <div class='list'>{items}<div style='margin-top:7px;'>{pager}<div class="clear"></div></div></div> <?php
 		$template = ob_get_contents();
 		ob_end_clean();
 		

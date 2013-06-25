@@ -76,12 +76,14 @@ class Menu extends \glue\Widget{
 						<?php } ?>
 					</ul>
 				</div>
-				<div class="clearer"></div>
+				<div class="clear"></div>
 			<?php } ?>
 		</div>
 
+		<div style='width:980px; margin:15px 45px;'>
 		<?php if(html::hasFlashMessage()){
 			echo html::getFlashMessage();
-		}
+		} ?>
+		</div><?php 
 	}
 }

@@ -32,7 +32,7 @@ $this->js('accountsettings',$js);
 	<div class="account_settings_part edit_email_address">
 		<h1 style='margin-top:0;'>Email Address</h1>
 		<div><div class="value" style='float:left;display:block;margin-right:10px;''><?php echo $model->email ?></div><a href="#" class="edit" title="Change Email Address">Change Email Address</a></div>
-		<div class="clearer"></div>
+		<div class="clear"></div>
 		<div class="edit_acccount_form" style='margin-top:10px;'>
 			<?php $form = html::activeForm() ?>
 				<p><b>Note:</b> Verfication email will need to be confirmed before change takes effect.</p>
@@ -41,13 +41,13 @@ $this->js('accountsettings',$js);
 				<?php echo html::submitbutton("Change Email Address", array('class' => 'btn-success')) ?>
 			<?php $form->end() ?>
 		</div>
-		<div class="clearer"></div>
+		<div class="clear"></div>
 	</div>
 
 	<div class="account_settings_part edit_password">
 		<h1>Password</h1>
 		<a href="#" class="edit" title="Change Password" style='display:block;float:left;'>Change Password</a>
-		<div class="clearer"></div>
+		<div class="clear"></div>
 		<div class="edit_acccount_form" style='margin-top:10px;'>
 			<?php $form = html::activeForm() ?>
 					<div class="form_row"><?php echo html::label("Old Password:", "oldPassword") ?>
@@ -60,7 +60,7 @@ $this->js('accountsettings',$js);
 					<?php echo html::submitbutton("Change Password", array('class' => 'btn-success')) ?>
 			<?php $form->end() ?>
 		</div>
-		<div class="clearer"></div>
+		<div class="clear"></div>
 	</div>
 
 	<div class='section_hr' style='margin-top:30px; padding-top:10px; border-top:1px solid #cccccc;'>
@@ -75,12 +75,12 @@ $this->js('accountsettings',$js);
 			logging in the user.</p>
 		</div>
 		<label class='checkbox'><?php echo $form->checkbox($model, "emailLogins", 1) ?>Notify me via email of new logins</label>
-		<div class="clearer"></div>
+		<div class="clear"></div>
 		<h1 class='section_head'>Browsing</h1>
 		<label class='checkbox'><?php echo $form->checkbox($model, 'safeSearch', 1) ?><span>Use Safe Search to hide mature videos</span></label>
 		<label class='checkbox'><?php echo $form->checkbox($model, 'useDivx', 1) ?><span>Use DivX Player</span></label>
 		<label class='checkbox'><?php echo $form->checkbox($model, 'autoplayVideos', 1) ?><span>Automatically play videos</span></label>
-		<div class="clearer"></div>
+		<div class="clear"></div>
 		<h1 class='section_head'>Email Notifications</h1>
 		<div class="privacy_form">
 			<label class='checkbox'><?php echo $form->checkbox($model, 'emailEncodingResult', 1) ?><span>When one of my new uploads fails or finishes encoding</span></label>
@@ -88,11 +88,11 @@ $this->js('accountsettings',$js);
 			<!-- <label class='block_label'><?php //echo $form->checkbox($model, 'emailVideoResponseReplies', 1) ?><span>When someone replies to one of my comments</span></label> -->
 			<label class='checkbox'><?php echo $form->checkbox($model, 'emailWallComments', 1) ?><span>When someone comments on my profile</span></label>
 		</div>
-		<div class="clearer"></div>
+		<div class="clear"></div>
 		<h1 class='section_head'>Analytics</h1>
 			<p>Entering your Clicky site ID will allow you to track via Clicky. Enter a site ID to start tracking:</p>
 			<div class=''><label>Clicky Site ID:</label> <?php echo $form->textfield($model, 'clickyUid') ?></div>
-		<div class="clearer"></div>
+		<div class="clear"></div>
 
 	<h1 class='section_head'>Default Video Settings</h1>
 		<p>These settings change what options, by default, any uploaded videos will get. Please be aware that changing these settings will not change the settings of
@@ -122,7 +122,7 @@ $this->js('accountsettings',$js);
 					<label class='checkbox'><?php echo $form->checkbox($model, "defaultVideoSettings[privateStatistics]", 1) ?>Make my statistics private</label>
 				</div>
 			</div>
-<div class="clearer"></div>
+<div class="clear"></div>
 	<?php $form->end() ?>
 	<div class='section_hr'>
 		&nbsp;

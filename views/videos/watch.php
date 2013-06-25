@@ -261,7 +261,7 @@ glue::clientScript()->addJsScript('watch.edit_video', "
 						<?php } ?>
 					</div>
 				<?php } ?>
-				<div class="clearer"></div>
+				<div class="clear"></div>
 			</div>
 		<?php }else{ ?>
 			<div class='video_details_edit edit_video_settings_form'>
@@ -345,7 +345,7 @@ glue::clientScript()->addJsScript('watch.edit_video', "
 				</div>
 			</div>
 		<?php } ?>
-		<div class="clearer"></div>
+		<div class="clear"></div>
 	</div>
 
 	<div class="container_16">
@@ -401,7 +401,7 @@ glue::clientScript()->addJsScript('watch.edit_video', "
 										<g:plusone size="medium" annotation="inline" href="<?php echo glue::url()->create('/video/watch', array('id' => $model->_id)) ?>"></g:plusone>
 									</li>
 								</ul>
-								<div class="clearer"></div>
+								<div class="clear"></div>
 							</div>
 						</div>
 
@@ -449,7 +449,7 @@ glue::clientScript()->addJsScript('watch.edit_video', "
 								<li><a rel='new_window' href="http://www.plurk.com/?status=<?php echo urlencode(Glue::url()->create("/video/watch", array("id"=>$model->_id))) ?>"><img alt='plurk' src="/images/plurk_large.png"/></a></li>
 								<li><g:plusone size="medium" annotation="inline" href="<?php echo glue::url()->create('/video/watch', array('id' => $model->_id)) ?>"></g:plusone></li>
 							</ul>
-							<div class="clearer"></div>
+							<div class="clear"></div>
 						</div>
 					</div>
 
@@ -475,7 +475,7 @@ glue::clientScript()->addJsScript('watch.edit_video', "
 								)
 							)) ?>
 							<a href='#' class='grey_css_button report_video_submit float_right'>Report Video</a>
-							<div class="clearer"></div>
+							<div class="clear"></div>
 					</div>
 
 					<?php if(!$model->private_stats){ ?>
@@ -524,7 +524,7 @@ glue::clientScript()->addJsScript('watch.edit_video', "
 									<p><?php echo $textResponseCount ?> text <?php if($textResponseCount > 1): echo "responses"; else: echo "response"; endif ?></p>
 									<p><?php echo $videoResponseCount ?> video <?php if($videoResponseCount > 1): echo "responses"; else: echo "response"; endif ?></p>
 								</div>
-								<div class="clearer"></div>
+								<div class="clear"></div>
 							</div>
 						</div>
 					<?php } ?>
@@ -570,7 +570,7 @@ glue::clientScript()->addJsScript('watch.edit_video', "
 									</div>
 								<?php } ?>
 							</div>
-							<div class="clearer"></div>
+							<div class="clear"></div>
 							<a href="#" class='expand_info expand_video_details_info'>Show Less Information</a>
 						</div>
 					</div>

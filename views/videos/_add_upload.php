@@ -14,7 +14,7 @@
 				<h1 class="file_title"><img alt='video' src="/images/videos_small.png"/> <span></span></h1>
 				<div class="uploadBar">
 					<div class="uploadProgOuter"><div class="uploadProgInner">&nbsp;</div></div>
-					<span class="percent_complete">0%</span><a href="#" class="cancel">Cancel</a><div class="clearer"></div>
+					<span class="percent_complete">0%</span><a href="#" class="cancel">Cancel</a><div class="clear"></div>
 					<div class="message" id="upload_status_<?php echo $u_id ?>"><span>Connecting to server...</span></div>
 				</div>
 				<div class='remove'><a href='#'><?php echo utf8_decode('&#215;') ?></a></div>

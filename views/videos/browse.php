@@ -221,7 +221,7 @@ glue::clientScript()->addJsScript('sortChange', "
 					<?php } ?>
 				<?php } ?>
 			</ul>
-			<div class='clearer'></div><div style='margin-top:10px;'><?php echo $sphinx->renderPager('grid_list_pager') ?><div class="clearer"></div></div>
+			<div class='clearer'></div><div style='margin-top:10px;'><?php echo $sphinx->renderPager('grid_list_pager') ?><div class="clear"></div></div>
 			<?php }else{ ?>
 				<div class='no_videos'>No videos found in this category</div>
 			<?php } ?>

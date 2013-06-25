@@ -194,7 +194,7 @@ glue::clientScript()->addJsScript('watch.response_list', "
 						<div class='green_css_button post_comment_reply float_left'>Post reply</div>
 						<div class='grey_css_button cancel'>Cancel</div>
 					</div>
-					<div class="clearer"></div>
+					<div class="clear"></div>
 				</div>
 
 				<div class='thread_video'>

@@ -514,7 +514,7 @@ class Html{
 	 * @param string $message
 	 */
 	public static function setErrorFlashMessage($message){
-		$_SESSION['flash_message'] = array($message, "MOTD_ERROR");
+		$_SESSION['flash_message'] = array($message, "flash-error");
 	}
 
 	/**
@@ -524,7 +524,7 @@ class Html{
 	 * @param string $message
 	 */
 	public static function setSuccessFlashMessage($message){
-		$_SESSION['flash_message'] = array($message, "MOTD_SUCCESS");
+		$_SESSION['flash_message'] = array($message, "flash-success");
 	}
 
 	/**
@@ -538,11 +538,11 @@ class Html{
 		$message = $session_flash[0] ? $session_flash[0] : $message;
 		$class = $session_flash[1] ? $session_flash[1] : $class;
 
-		$html = html::openTag('div', array('class' => 'MOTD '.$class));
-		$html .= html::openTag('div', array('class' => 'MOTD_message')).$message.html::closeTag('div');
+		$html = html::openTag('div', array('class' => 'flash '.$class));
+		$html .= html::openTag('div', array('class' => 'message')).$message.html::closeTag('div');
 
-		$html .= html::openTag('div', array('class' => 'MOTD_action')).html::a(array('href' => glue::http()->createUrl('SELF'), 'text' => utf8_decode('&#215;'))).self::closeTag('div');
-		$html .= html::open_closeTag(array('class' => 'clearer'));
+		$html .= html::a(array('href' => glue::http()->createUrl('SELF'), 'text' => utf8_decode('&#215;'), 'class' => 'close'));
+		$html .= html::open_closeTag('div', array('class' => 'clear'));
 
 		$html .= html::closeTag('div');
 

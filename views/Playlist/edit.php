@@ -144,7 +144,7 @@ glue::clientScript()->addJsScript('playlist_ops', "
 					</div>
 					<div class='delete'><a href='#'><?php echo utf8_decode('&#215;') ?></a></div>
 					<div class='position_val'><?php echo $k+1 ?></div>
-					<div class="clearer"></div>
+					<div class="clear"></div>
 				</li>
 			<?php } ?>
 			</ul>

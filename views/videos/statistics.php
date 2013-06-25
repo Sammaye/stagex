@@ -55,7 +55,7 @@
 					<p><?php echo $textResponseCount ?> text <?php if($textResponseCount > 1): echo "responses"; else: echo "response"; endif ?></p>
 					<p><?php echo $videoResponseCount ?> video <?php if($videoResponseCount > 1): echo "responses"; else: echo "response"; endif ?></p>
 				</div>
-				<div class="clearer"></div>
+				<div class="clear"></div>
 			</div>
 		</div>
 

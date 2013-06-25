@@ -209,7 +209,7 @@ $this->js('new_playlist', "
 
 	<?php if($playlist_rows->count() > 0){
 		ob_start();
-			?> <div class='playlist_list'>{items}</div><div style='margin:7px;'>{pager}<div class="clearer"></div></div> <?php
+			?> <div class='playlist_list'>{items}</div><div style='margin:7px;'>{pager}<div class="clear"></div></div> <?php
 			$template = ob_get_contents();
 		ob_end_clean();
 		glue\widgets\ListView::widget(array(

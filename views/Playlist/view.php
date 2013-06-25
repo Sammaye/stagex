@@ -150,7 +150,7 @@ $video_count = count($playlist->videos);
 								<?php } ?>
 							</div>
 						<?php } ?>
-						<div class="clearer"></div>
+						<div class="clear"></div>
 					</div>
 					<?php $i++;
 				} ?>

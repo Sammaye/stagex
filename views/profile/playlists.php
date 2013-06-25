@@ -31,7 +31,7 @@
 				</div>
 			<?php } ?>
 
-			<?php if($sphinx->total_found > 20): ?><div class='profile_media_pager'><?php echo $sphinx->renderPager('grid_list_pager') ?><div class="clearer"></div></div><?php endif ?>
+			<?php if($sphinx->total_found > 20): ?><div class='profile_media_pager'><?php echo $sphinx->renderPager('grid_list_pager') ?><div class="clear"></div></div><?php endif ?>
 		</div>
 		<div class='grid_3 omega' style='width:300px;'>
 			<?php $this->widget("application/widgets/Advertising/Ad_box.php", array( "configuration"=>'300_box' )); ?>

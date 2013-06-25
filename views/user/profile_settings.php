@@ -94,7 +94,7 @@ $this->js('autoshare.networks', '
 				</div>
 				<span class="account_profile_ppicture_span"><?php echo html::submitButton("Set Profile Picture") ?></span>
 			</div>
-			<div class="clearer"></div>
+			<div class="clear"></div>
 		<?php $form->end() ?>
 	</div>
 </div>
@@ -110,7 +110,7 @@ $this->js('autoshare.networks', '
 		<div class="form_row">
 			<?php echo html::label("Name / Nick Name:", "name") ?>
 			<div class="textfield"><?php echo $form->textField($model, "name") ?></div>
-			<div class="clearer"></div>
+			<div class="clear"></div>
 		</div>
 		<div class="form_row">
 			<?php echo html::label("Gender:", "gender") ?>
@@ -119,7 +119,7 @@ $this->js('autoshare.networks', '
 				<?php echo $form->checkbox($model, 'genderPrivacy') ?>
 				<span>Show on profile</span>
 			</div>
-			<div class="clearer"></div>
+			<div class="clear"></div>
 		</div>
 		<div class="form_row user_profile_birthday">
 			<?php echo html::label("Birthday:", "birthday"); ?>
@@ -130,7 +130,7 @@ $this->js('autoshare.networks', '
 				<?php echo $form->checkbox($model, 'birthdayPrivacy') ?>
 				<span>Show on profile</span>
 			</div>
-			<div class="clearer"></div>
+			<div class="clear"></div>
 		</div>
 		<div class="form_row">
 			<?php echo html::label("Country:", "country"); ?>
@@ -140,18 +140,18 @@ $this->js('autoshare.networks', '
 				<?php echo $form->checkbox($model, 'countryPrivacy') ?>
 				<span>Show on profile</span>
 			</div>
-			<div class="clearer"></div>
+			<div class="clear"></div>
 		</div>
 		<div class="form_row about">
 			<?php echo html::label("About Yourself:", "about"); ?>
 			<div class="textarea"><?php echo $form->textarea($model, "about") ?></div>
-			<div class="clearer"></div>
+			<div class="clear"></div>
 		</div>
 		<?php echo $form->hiddenField($model, "action", array('value' => 'updateProfile')) ?>
 		<?php echo html::submitbutton('Save Profile Information', array('class' => 'invisible_submit'))?>
 		<div class="grey_css_button submit_info_changes" style='font-size:12px;'>Change Profile Information</div>
 
-		<div class="clearer"></div>
+		<div class="clear"></div>
 		<div class='form_divider'>
 			&nbsp;
 		</div>
@@ -215,11 +215,11 @@ $this->js('autoshare.networks', '
 			"); ?>
 
 			<a href="#" class="addSocialProfile">Add New External Link</a>
-			<div class="clearer"></div>
+			<div class="clear"></div>
 		</div>
 	<?php $form->end() ?>
 </div>
-<div class="clearer"></div>
+<div class="clear"></div>
 </div>
 <div style='margin-top:30px;'>
 
@@ -263,7 +263,7 @@ $this->js('autoshare.networks', '
 			<?php echo $form->hiddenfield($model, 'action', array('value' => 'UserAutoShare')) ?>
 			<div class="grey_css_button submit_changes">Save Changes</div>
 		</div>
-		<div class="clearer"></div>
+		<div class="clear"></div>
 		<?php echo html::submitbutton("save", array('class' => 'invisible_submit')) ?>
 	<?php $form->end() ?>
 </div>

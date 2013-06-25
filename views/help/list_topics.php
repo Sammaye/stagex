@@ -68,7 +68,7 @@ glue::clientScript()->addJsScript('addTopic', "
 			</div>
 			<a href='<?php echo glue::url()->create('/help/add_topic') ?>' class='create_topic'>Add new topic</a>
 		</div>
-		<div class="clearer"></div></div>
+		<div class="clear"></div></div>
 	</div>
 
 	<div class="grid_16 alpha omega">

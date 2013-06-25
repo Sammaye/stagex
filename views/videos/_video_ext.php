@@ -38,7 +38,7 @@
 			<?php } ?>
 		</div>
 	<?php } ?>
-	<div class="clearer"></div>
+	<div class="clear"></div>
 
 	<?php if($model->userHasWatched() && $show_watched_status){ ?>
 		<div class='xtra_info_icons tags_outer'>

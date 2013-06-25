@@ -63,7 +63,7 @@ if($item->type == "text"){ ?>
 							<div class='grey_css_button cancel' style='float:left; margin-left:7px;'>Cancel</div>
 						</div>
 					</div>
-					<div class="clearer"></div>
+					<div class="clear"></div>
 				</div>
 			</div>
 		<?php } ?>
@@ -98,7 +98,7 @@ if($item->type == "text"){ ?>
 						<div class='warning_message'>Comment Awaiting Moderation</div>
 					<?php } ?>
 				</div>
-				<div class="clearer"></div>
+				<div class="clear"></div>
 				<?php if(!$item->approved && glue::roles()->checkRoles(array('^' => $item->video))){ ?>
 					<div class="moderate_response_actions">
 						<div class='grey_button_left delete_button'>Remove</div>

@@ -307,7 +307,7 @@ class videoresponseController extends \glue\Controller{
 		}
 
 		ob_start();
-			?>{items}<div style='margin-top:7px;'>{pager}<div class="clearer"></div></div><?php
+			?>{items}<div style='margin-top:7px;'>{pager}<div class="clear"></div></div><?php
 			$template = ob_get_contents();
 		ob_end_clean();
 

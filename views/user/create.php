@@ -19,7 +19,7 @@
 			</div>
 			<div class="submit_row">
 				<?php echo html::submitbutton('Create Account', array('class' => 'btn-success')) ?>
-				<div class="clearer"></div>
+				<div class="clear"></div>
 			</div>
 		</div>
 		<p class="light small declaration_footer">By clicking "Create Account" you agree to the <a href="http://www.stagex.co.uk/help/view?title=terms-and-conditions">terms and conditions</a> laid out by StageX.</p>

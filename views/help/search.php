@@ -62,7 +62,7 @@ glue::clientScript()->addJsScript('search_page', "
 					} ?>
 				<?php } ?>
 			</div>
-			<div class='list_pager'><?php echo $sphinx->renderPager('grid_list_pager') ?><div class="clearer"></div></div>
+			<div class='list_pager'><?php echo $sphinx->renderPager('grid_list_pager') ?><div class="clear"></div></div>
 		<?php }else{ ?>
 			<p>You can try searching with different parts of what you entered to see if you get hits</p>
 		<?php } ?>

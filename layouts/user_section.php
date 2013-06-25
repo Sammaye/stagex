@@ -78,7 +78,7 @@ $this->beginPage() ?>
 				<div class='grid_block alpha omega user_section_main_content' style='float:left; width:820px;'>
 					<?php echo $content ?>
 				</div>
-				<div class="clearer"></div>
+				<div class="clear"></div>
 			</div>
 			<div id="mainSearch_results"></div>
 
