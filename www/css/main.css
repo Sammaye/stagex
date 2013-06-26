@@ -256,7 +256,23 @@ textarea{
 }
 
 .flash-success{
-	background:#2ECC71;
+	background:#17AA56;
+}
+
+.flash-info{
+	background:#0E83CD;
+}
+
+.flash-warning{
+	background:#FCAD26;
+}
+
+.flash-error{
+	background:#CB4E4E;
+}
+
+.hr{
+	margin-top:30px; padding-top:10px; border-top:1px solid #cccccc;
 }
 
 .menu{
@@ -497,4 +513,126 @@ textarea{
 .user_login_body .captcha{
 	padding-left:170px;
 	margin:10px 0;
+}
+
+.account_settings_body .section_head{
+	margin:20px 0 10px 0;
+}
+
+.account_settings_body .account_settings_part.edit_password{
+	margin:20px 0 0;	
+}
+
+.account_settings_part .btn-success{
+	margin:0 0 0 170px;
+}
+
+.account_settings_body .edit_email_address h1{
+	margin-top:0;
+}
+
+.account_settings_body .edit_email_address .value{
+	float:left;display:block;margin-right:10px;
+}
+
+.account_settings_body .account_settings_part .form{
+	margin-top:10px;
+}
+
+.account_settings_body .help-block{
+	padding-left:20px;
+}
+
+.account_settings_body .edit_password .edit{
+	display:block;float:left;
+}
+
+.account_settings_body .upload_settings .left{
+	float:left;
+}
+
+.account_settings_body .upload_settings .right{
+	margin-left:320px;	
+}
+
+.account_settings_body .autoshare_settings .left{
+	float:left; width:300px;
+}
+
+.account_settings_body .autoshare_settings .right{
+	margin:0 0 0 310px;	
+}
+
+.account_settings_body .autoshare_networks .twitter{
+	margin:10px 0 0;
+}
+
+.account_settings_body .deactivate{
+	margin:40px 0;
+	display:block;
+	float:left;
+}
+
+.account_settings_body .footer_submit{
+	margin:20px 0 0;
+}
+
+.profile_settings{
+	padding:0 0 0 55px;
+}
+
+.profile_settings .show_on_profile{
+	display:inline-block; margin:0 0 0 15px;
+}
+
+.profile_settings .birthday select{
+	margin-right:15px;
+}
+
+.profile_settings .birthday .show_on_profile{
+	margin:0;	
+}
+
+.profile_settings .upload_avatar{
+	margin:0 0 40px 30px;
+}
+
+.profile_settings .upload_avatar .left{
+	float:left;
+}
+
+.profile_settings .upload_avatar .right{
+	margin:0 0 0 145px;
+}
+
+.profile_settings .form_row .help-block{
+	margin:0 0 20px 170px;
+}
+
+.profile_settings .about textarea{
+	width:370px; height:110px;
+}
+
+.profile_settings .external_links_head{
+	margin:20px 0 5px 0;
+}
+
+.profile_settings .external_links{
+	margin:0 0 30px 0;
+}
+
+.profile_settings .external_link{
+	margin:0 0 10px 0;
+}
+
+.profile_settings .external_link label{
+	float:none;
+}
+
+.profile_settings .external_link input{
+	margin:0 15px 0 0;
+}
+
+.profile_settings .external_link div{
+	display:inline;
 }

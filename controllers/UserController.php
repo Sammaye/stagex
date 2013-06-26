@@ -436,17 +436,18 @@ class userController extends \glue\Controller{
 		$model = $this->loadModel();
 
 		if(isset($_POST['User'])){
-			$model->setScenario($_POST['User']['action']);
+			if(isset($_POST['User']['action']))
+				$model->setScenario($_POST['User']['action']);
 			if($model->getScenario()=='updatePic'){
 				$model->avatar=new glue\File(array('model'=>$model,'id'=>'avatar'));
 				if($model->validate()&&$model->setAvatar()){
-					Html::setSuccessFlashMessage('Your profile picture have been changed');
+					Html::setSuccessFlashMessage('Your profile picture has been changed');
 					glue::http()->redirect("/user/profile");
 				}
 			}else{
 				$model->attributes=$_POST['User'];
 				if($model->validate()&&$model->save()){
-					Html::setSuccessFlashMessage('Your profile settings have saved');
+					Html::setSuccessFlashMessage('Your profile settings have been saved');
 					glue::http()->redirect("/user/profile");
 				}
 			}
