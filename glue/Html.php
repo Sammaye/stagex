@@ -457,8 +457,8 @@ class Html{
 		// Has model been validated?
 		if($model_validated){
 			if(count($messages) > 0){ // If the model/s did not validate
-				$html .= self::openTag('div', array('class' => 'block_summary error_summary'));
-				$html .= self::openTag('div', array('class' => 'close')).self::a(array('href' => '#', 'text' => utf8_decode('&#215;'))).self::closeTag('div');
+				$html .= self::openTag('div', array('class' => 'alert alert-error form_summary'));
+				$html .= self::a(array('href' => '#', 'text' => utf8_decode('&#215;'), 'class'=>'close'));
 
 				if(isset($options['errorHead'])){
 					$html .= $options['errorHead'];

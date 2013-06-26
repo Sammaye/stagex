@@ -1,13 +1,10 @@
-<?php
-
-use glue\Html;
-
-echo html::form_summary($model, array(
-	'errorHead' => '<h2>Could not save profile settings</h2>Your profile settings could not be saved because:',
-	'successMessage' => ''
-)) ?>
-
+<?php use glue\Html; ?>
 <div class="profile_settings">
+
+	<?php echo html::form_summary($model, array(
+		'errorHead' => '<h4>Could not save profile settings</h4>Your profile settings could not be saved because:',
+		'successMessage' => ''
+	)) ?>
 
 	<?php $form = html::activeForm(array("enctype"=>"multipart/form-data")) ?>
 		<div class="upload_avatar">

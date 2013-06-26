@@ -271,6 +271,53 @@ textarea{
 	background:#CB4E4E;
 }
 
+.alert{
+	font-size:14px;	line-height:20px; padding:10px; border-radius:3px;	
+}
+
+.alert .close{
+	display:block;
+	float:right;
+	float: right;
+	font-size: 20px;
+	font-weight: bold;
+	line-height: 20px;
+	color: #000000;
+	text-shadow: 0px 1px 0px rgb(255, 255, 255);
+	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=20)";
+	filter: alpha(opacity = 20);
+	-moz-opacity: 0.2;
+	-khtml-opacity: 0.2;
+	opacity: 0.2;
+	text-decoration:none;	
+	margin:2px 5px 0 0;
+}
+
+.alert .close:hover{
+	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=60)";
+	filter: alpha(opacity = 60);
+	-moz-opacity: 0.6;
+	-khtml-opacity: 0.6;
+	opacity: 0.6;	
+	text-decoration:none;
+}
+
+.alert h4{
+	font-weight:bold;
+}
+
+.alert ul{
+	margin:5px 0 5px 40px;
+}
+
+.alert ul li{
+	list-style:disc;
+}
+
+.alert-error{
+	background:#F2DEDE; border:1px solid #EED3D7;
+}
+
 .hr{
 	margin-top:30px; padding-top:10px; border-top:1px solid #cccccc;
 }
@@ -635,4 +682,8 @@ textarea{
 
 .profile_settings .external_link div{
 	display:inline;
+}
+
+.profile_settings .form_summary{
+	margin:0 0 10px 0;
 }
