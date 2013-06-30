@@ -421,4 +421,11 @@ class User extends \glue\User{
 		}
 		return $this->username=$username;
 	}
+	
+	function deactivate(){
+		$this->deleted=1;
+		$this->save();
+		//$this->getCollection()->save(array('_id' => $this->_id, 'date_deleted' => new \MongoDate(), 'deleted' => 1, 'username' => '[User Deleted]')); // Empty the document
+		glue::db()->qeue->insert(array('id' => $this->_id, 'type' => 'user', 'ts' => new \MongoDate()));		
+	}
 }

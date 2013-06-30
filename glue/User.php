@@ -44,13 +44,16 @@ class User extends \glue\db\Document{
 	 *
 	 * @var string
 	 */
-	private $domain;
-
-	/**
-	 * The cookie path
-	 * @var string
-	 */
-	private $path='/';
+	private $cookie_domain;
+	private $cookie_path='/';
+	
+	/*
+	 * Not currently used
+	private $use_cookies;
+	private $use_only_cookies;	
+	private $cookie_secure;
+	private $cookie_httponly;
+	*/
 
 	private $logAttempts=true;
 	private $logCollectionName='session_log';
@@ -64,10 +67,14 @@ class User extends \glue\db\Document{
 	}
 
 	function init(){
+		//$this->setCookie($this->permCookie, 'fgfgfgf');
 		if(php_sapi_name() != 'cli'){
 			if(session_id()===''){
-				if($this->domain)
+				if($this->domain!==null)
 					ini_set("session.cookie_domain", $this->domain);
+				
+				if($this->cookie_path!==null)
+					ini_set("session.cookie_path", $this->cookie_domain);
 //echo "i here";
 				glue::session()->start();
 
@@ -198,7 +205,7 @@ class User extends \glue\db\Document{
 		//var_dump($this->hash);
 		$this->save();
 		//var_dump($this->getErrors()); exit();
-		$this->setCookie($remember, $init);
+		$this->setAuthCookie($remember, $init);
 
 		/** Now if the user needs notifying via email lets do it */
 		if($init){
@@ -263,28 +270,33 @@ class User extends \glue\db\Document{
 	public function logout($remember = true){
 
 		/** Deletes the temporary cookie */
-		setcookie($this->tempCookie, "", 1);
+		$this->setCookie($this->tempCookie, "", 1);
 
 		if(!$remember){
 			/** Deletes the permanent cookie */
-			setcookie($this->permCookie, "", 1);
+// 			var_dump($_COOKIE);
+// 			var_dump(ini_get("session.cookie_domain"));
+// 			var_dump($this->domain);
+// 			var_dump($this->permCookie);
+			$this->setCookie($this->permCookie, "", 1);
 		}
 
 		/** Remove session from table */
 		if($this->_id){
 			glue\User::model()->updateAll(array('_id' => $this->_id), array('$unset'=>array("sessions.".session_id()=>'')));
 		}
+		
+		//echo "in logout";
 
 		/** Unset session */
 		if(session_id()!==''){
-			echo "calling this";
 			session_unset();
 			//session_destroy();
 			//session_write_close();
 			//setcookie(session_name(),'',0,'/');
 		}
 		$this->defaults();
-		glue::session()->regenerateID(true);
+		//glue::session()->regenerateID(true);
 		$this->clean();
 
 		/** SUCCESS */
@@ -315,25 +327,23 @@ class User extends \glue\db\Document{
 	 * @param int $remember
 	 * @param array $ins
 	 */
-	private function setCookie($remember, $init = false){
+	private function setAuthCookie($remember, $init = false){
 
 		/** Source the cookie information */
 		$cookie_string = Crypt::AES_encrypt256($this->_id);
 		$session_cookie = Crypt::AES_encrypt256(session_id());
 
-		$domain = isset($this->domain) ? $this->domain : '';
-
 		/** If remember is set create the permanent cookie */
 		if($init){
 			if($remember){
-				setcookie($this->permCookie, serialize(array($cookie_string, $session_cookie)), time()+60*60*24*365*10, "/", $domain);
+				$this->setCookie($this->permCookie, serialize(array($cookie_string, $session_cookie)), time()+60*60*24*365*10);
 			}else{
-				setcookie($this->permCookie, "", 1);
+				$this->setCookie($this->permCookie, "", 1);
 			}
 		}
 
 		/** Set the temporary cookie anyway */
-		setcookie($this->tempCookie, serialize(array($cookie_string, $session_cookie)), 0, "/", $domain);
+		$this->setCookie($this->tempCookie, serialize(array($cookie_string, $session_cookie)), 0);
 
 	}
 
@@ -343,6 +353,7 @@ class User extends \glue\db\Document{
 	 * ones
 	 */
 	private function restoreFromCookie(){
+//echo "restoring from cookie";
 
 		/** Is the cookie set? */
 		if(isset($_COOKIE[$this->tempCookie])){
@@ -397,6 +408,14 @@ class User extends \glue\db\Document{
 			}
 		}
 		return false;
+	}
+	
+	function setCookie($name,$content,$expire=0,$path=null,$domain=null,$secure=false,$httponly=false){
+		if($path===null&&$this->cookie_path!==null)
+			$path=$this->cookie_path;
+		if($domain===null&&$this->cookie_domain!==null)
+			$domain=$this->cookie_domain;
+		return setCookie($name,$content,$expire,$path,$domain,$secure,$httponly);
 	}
 
 	function emailLoginNotification(){

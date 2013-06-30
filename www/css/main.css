@@ -14,6 +14,13 @@ h1{
 	color:#333333;
 }
 
+h2{
+	font-size:18px;
+	font-weight:bold;
+	margin:10px 0;
+	color:#333333;
+}
+
 h5{
 	font-weight:bold;
 	color:#333333;
@@ -316,6 +323,32 @@ textarea{
 
 .alert-error{
 	background:#F2DEDE; border:1px solid #EED3D7;
+}
+
+.table{
+	width:100%;
+}
+
+.table th{
+	vertical-align:bottom;
+	font-weight:bold;
+	padding:8px;
+	text-align:left;
+	line-height:20px;
+	font-size:14px;
+}
+
+.table td{
+	vertical-align:top;
+	padding:8px;
+	text-align:left;
+	line-height:20px;
+	font-size:14px;	
+	border-top:1px solid #cccccc;
+}
+
+.table .no_results td{
+	padding:12px;
 }
 
 .hr{
@@ -686,4 +719,20 @@ textarea{
 
 .form_summary{
 	margin:0 0 10px 0;
+}
+
+.deactivate_body{
+	width:600px; margin:auto; margin-top:40px;
+}
+
+.deactivate_body form{
+	margin-top:20px;
+}
+
+.deactivate_body .btn-success{
+	float:left; margin-right:25px;
+}
+
+.deactivate_body .submit{
+	float:left; display:block; margin:10px 0 0 10px;
 }

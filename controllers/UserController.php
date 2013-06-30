@@ -395,11 +395,10 @@ class userController extends \glue\Controller{
 	}
 
 	function action_activity(){
-		$this->pageTitle = 'Account Activity - StageX';
+		$this->title = 'Account Activity - StageX';
 
 		$this->tab = 'activity';
 		$this->layout = "user_section";
-		$this->page = "settings";
 
 		$model = $this->loadModel();
 
@@ -409,9 +408,9 @@ class userController extends \glue\Controller{
 	}
 
 	function action_removesession(){
-		$this->pageTitle = 'Remove Session - StageX';
+		$this->title = 'Remove Session - StageX';
 		if(!glue::http()->isAjax())
-			glue::getController("error/notfound");
+			glue::trigger('404');
 
 		if(isset($_GET['id'])){
 			$user = $this->loadModel();
@@ -512,28 +511,20 @@ class userController extends \glue\Controller{
 	}
 
 	function action_deactivate(){
-		$this->pageTitle = 'Deactivate Your StageX Account';
+		$this->title = 'Deactivate Your StageX Account - StageX';
 		$this->layout = "blank_page";
 
 		$model = $this->loadModel();
 		$toDelete = isset($_GET['delete']) ? $_GET['delete'] : null;
 
 		if($toDelete == 1){
-			$model->deleted = true;
-			unset($model->ins);
-			$model->save();
-
-			glue::db()->users->save(array('_id' => $model->_id, 'deleted' => 1, 'username' => '[User Deleted]')); // Empty the document
-
-			glue::db()->delete_queue->insert(array('object_id' => $model->_id, 'type' => 'user', 'ts' => new MongoDate()));
-
-			glue::session()->logout(false);
-			html::setSuccessFlashMessage("Your account has been deleted!");
+			$model->deactivate();
+			glue::user()->logout(false);
+			html::setSuccessFlashMessage("Your account has been deactivated and is awaiting deletion!");
 			header("Location: /user/login");
 			exit();
 		}
-
-		$this->render('user/deactivate');
+		echo $this->render('deactivate');
 	}
 
 

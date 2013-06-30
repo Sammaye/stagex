@@ -16,13 +16,11 @@
 ") ?>
 
 <div class="UserActivity_body">
-	<h1>Account Activity</h1>
+	<h2>Your session</h2>
 
-	<h2 class="account_activity_top">Your session</h2>
+	<?php $browser = get_browser($model->sessions[session_id()]['agent']); //var_dump($browser); exit(); ?>
 
-	<?php $browser = get_browser($model->sessions[session_id()]['agent']) ?>
-
-	<table class="concurrent_sessions current_session">
+	<table class="table">
 		<thead>
 			<tr>
 				<th>Device</th>
@@ -33,7 +31,7 @@
 		</thead>
 		<tbody>
 			<tr>
-				<td><?php echo $browser ? $browser->parent." on ".$browser->platform : "Unknown" ?></td>
+				<td><?php echo $browser ? $browser->browser." on ".$browser->platform : "Unknown" ?></td>
 				<td><?php echo $model->sessions[session_id()]['ip'] ?></td>
 				<td><?php echo date('d-M-Y h:i:s', $model->sessions[session_id()]['last_active']->sec) ?></td>
 				<td><?php echo $model->sessions[session_id()]['last_request'] ?></td>
@@ -41,10 +39,10 @@
 		</tbody>
 	</table>
 
-	<h2 class="account_activity_mid">Other sessions</h2>
+	<h2>Other sessions</h2>
 	<p><b>Please Note:</b> These session may not be currently active but rather dormant. To be safe you can clear dormant connections.</p>
 
-	<table class="concurrent_sessions">
+	<table class="table">
 		<thead>
 			<tr>
 				<th>Device</th>
@@ -62,7 +60,7 @@
 						$brows = get_browser($v['agent']);
 					} ?>
 					<tr class="session_row">
-						<td><?php echo $brows ? $brows->parent." on ".$brows->platform : "Unknown" ?></td>
+						<td><?php echo $brows ? $brows->browser." on ".$brows->platform : "Unknown" ?></td>
 						<td><?php echo $v['ip'] ?></td>
 						<td><?php echo date('d-M-Y h:i:s', $v['last_active']->sec) ?></td>
 						<td><?php echo $v['last_request'] ?></td>
@@ -71,7 +69,7 @@
 				<?php }
 			}
 		}else{ ?>
-			<tr><td class="no_border"><span class='no_sess_found'>There are no concurrent sessions</span></td></tr>
+			<tr class="no_results"><td colspan="5">There are no concurrent sessions</td></tr>
 		<?php } ?>
 		</tbody>
 	</table>
