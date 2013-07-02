@@ -88,20 +88,16 @@ class videoController extends GController{
 	}
 
 	function action_upload(){
-		$this->pageTitle = "Upload a new video";
+		$this->title = "Upload a new video - StageX";
+		$this->layout = 'user_section';
 
-		glue::session()->user->reset_upload_bandwidth();
-
-		if((!strstr($_SERVER['SERVER_NAME'], 'upload.')) && glue::$params['uploadBase'] == 'http://upload.stagex.co.uk/'){
-			header('Location: '.glue::$params['uploadBase'].'video/upload');
-			exit();
-		}
-
-		if((bool)glue::session()->user->upload_enabled){
-			$this->render('videos/upload', array());
-		}else{
-			$this->render('videos/upload_not_allowed', array());
-		}
+		glue::user()->reset_upload_bandwidth();
+		if((!strstr($_SERVER['SERVER_NAME'], 'upload.')) && glue::$params['uploadBase'] == 'http://upload.stagex.co.uk/')
+			glue::http()->redirect(glue::$params['uploadBase'].'video/upload');
+		if(glue::user()->canUpload)
+			$this->render('upload', array('model'=>glue::user()));
+		else
+			$this->render('uploadForbidden', array());
 	}
 
 	function action_add_upload(){

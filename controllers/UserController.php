@@ -631,6 +631,10 @@ class userController extends \glue\Controller{
 		}
 		echo json_encode($ret);
 	}
+	
+	function action_manage(){
+		$this->render('manage');
+	}	
 
 	/**
 	 * UTIL functions
@@ -643,9 +647,5 @@ class userController extends \glue\Controller{
 			glue::http()->redirect('/user/login', array('nxt' => glue::http()->createUrl('SELF')));
 		}
 		return $user;
-	}
-
-	function action_manage(){
-		$this->render('manage');
 	}
 }

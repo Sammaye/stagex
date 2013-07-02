@@ -11,9 +11,9 @@ class Timestamp extends \glue\Behaviour{
 		return true;
 	}
 
-	function getTs($ts){
+	function getTs($ts,$format=null){
 		if($ts instanceof \MongoDate)
-			return $ts->sec;
+			return $format!==null?date('l',$ts->sec):$ts->sec;
 		else
 			return null;
 	}

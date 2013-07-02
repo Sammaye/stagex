@@ -1,6 +1,6 @@
 <?php
-glue::clientScript()->addJsFile('video_uploader', '/js/video_uploader.js');
-glue::clientScript()->addJsScript('upload_video', "
+$this->jsFile('video_uploader', '/js/video_uploader.js');
+$this->js('upload_video', "
 	$(function(){
 
 		// Add a new upload form
@@ -71,9 +71,8 @@ glue::clientScript()->addJsScript('upload_video', "
 
 <div class="container_16 upload_video_body">
 	<div class='upload_cap_not'><div class='float_left'><?php
-		$user = glue::session()->user;
-		echo  $user->upload_left > 0 ? convert_size_human($user->upload_left) : 0 ?>/<?php echo convert_size_human($user->get_max_upload_bandwidth()) ?> left renewing on <?php echo date('l', $user->getTs())
-		?><span>This figure is not realtime so please plan ahead.</span></div>
+		echo  $model->bandwidthLeft > 0 ? convert_size_human($model->bandwidthLeft) : 0 ?>/<?php echo convert_size_human($model->get_allowed_bandwidth()) ?> left renewing on 
+		<?php echo $model->getTs($model->nextBandwidthTopup,'l') ?><span>This figure is not realtime so please plan ahead.</span></div>
 		<div class='float_right'>Max file size: 500MB</div>
 	</div>
 

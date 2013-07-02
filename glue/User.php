@@ -67,18 +67,18 @@ class User extends \glue\db\Document{
 	}
 
 	function init(){
-		//$this->setCookie($this->permCookie, 'fgfgfgf');
 		if(php_sapi_name() != 'cli'){
 			if(session_id()===''){
-				if($this->domain!==null)
+				if($this->cookie_domain!==null)
 					ini_set("session.cookie_domain", $this->domain);
-				
 				if($this->cookie_path!==null)
 					ini_set("session.cookie_path", $this->cookie_domain);
-//echo "i here";
+				
 				glue::session()->start();
 
 				// Are they logged in?
+				// I use the temp cookie here because it is like augmenting the PHPSESS cookie with 
+				// something relatively trustable
 				if(glue::session()->authed && isset($_COOKIE[$this->tempCookie])){
 					$this->validateSession();
 				}elseif($this->allowCookies && isset($_COOKIE[$this->permCookie])){
@@ -136,7 +136,6 @@ class User extends \glue\db\Document{
 
 		/** Query for the object */
 		$user=$this->getCollection()->findOne(array('_id' => new \MongoId(glue::session()->id),'deleted' => 0));
-		//$_SESSION['authed']=false;
 		if(!$user){
 			$this->logout(false);
 			return false;
@@ -146,8 +145,6 @@ class User extends \glue\db\Document{
 		$this->clean();
 		foreach($user as $k=>$v)
 			$this->$k=$v;
-
-		//echo "here"; echo session_id();
 		if(isset($this->sessions[session_id()])){
 			if(($this->sessions[session_id()]['last_active']->sec + $this->timeout) < time()){
 				$this->restoreFromCookie();
@@ -181,7 +178,6 @@ class User extends \glue\db\Document{
 		glue::session()->id=$this->_id;
 		glue::session()->authed=true;
 
-		//var_dump($this->user->ins);
 		$this->sessions[session_id()] = array(
 			'id' => session_id(),
 			"ip"=>$_SERVER['REMOTE_ADDR'],
@@ -189,7 +185,7 @@ class User extends \glue\db\Document{
 			"last_request"=>$_SERVER['REQUEST_URI'],
 			"last_active"=>new \MongoDate()
 		);
-//var_dump($this); exit();
+
 		// Lets delete old sessions (anything older than 2 weeks)
 		foreach($this->sessions as $k => $v){
 			if($v['last_active']->sec < strtotime('-2 weeks'))
@@ -200,9 +196,7 @@ class User extends \glue\db\Document{
 			$this->sessions[session_id()]['remember'] = (int)$remember;
 			$this->sessions[session_id()]['created'] = new \MongoDate();
 		}
-		//var_dump($this->sessions[session_id()]);
-		//var_dump($_SESSION);
-		//var_dump($this->hash);
+
 		$this->save();
 		//var_dump($this->getErrors()); exit();
 		$this->setAuthCookie($remember, $init);
