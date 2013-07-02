@@ -1,12 +1,12 @@
 <?php
-class videoController extends GController{
 
-	// A set of filters to be run before and after the controller action
-	public function filters(){
-		return array('rbam');
-	}
+use app\models\Video;
 
-	public function accessRules(){
+class videoController extends glue\Controller{
+
+	public $tab='';
+	
+	public function authRules(){
 		return array(
 			array("allow",
 				"actions"=>array( 'upload', 'add_upload', 'get_upload_info', 'upload_to_server', 'upload_info_save', 'save', 'set_detail',
@@ -95,18 +95,21 @@ class videoController extends GController{
 		if((!strstr($_SERVER['SERVER_NAME'], 'upload.')) && glue::$params['uploadBase'] == 'http://upload.stagex.co.uk/')
 			glue::http()->redirect(glue::$params['uploadBase'].'video/upload');
 		if(glue::user()->canUpload)
-			$this->render('upload', array('model'=>glue::user()));
+			echo $this->render('upload', array('model'=>glue::user()));
 		else
-			$this->render('uploadForbidden', array());
+			echo $this->render('uploadForbidden', array());
 	}
 
 	function action_add_upload(){
 		$this->pageTitle = 'Add a New Upload - StageX';
 
 		$video = new Video();
-		$video->merge_with_user_defaults();
+		$video->populateDefaults();
 
-		$this->partialRender('videos/_add_upload', array( 'u_id' => strval(new MongoId()), 'model' => $video ));
+		echo json_encode(array(
+			'success' => true, 
+			'html' => $this->renderPartial('_upload', array( 'u_id' => strval(new MongoId()), 'model' => $video ))
+		));
 	}
 
 	function action_get_upload_info(){

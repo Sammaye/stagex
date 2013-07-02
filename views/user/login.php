@@ -2,7 +2,7 @@
 	<?php $form = html::activeForm(array('class'=>'form-vertical')); ?>
 
 		<?php echo html::form_summary($model, array(
-			'errorHead' => '<h2>You could not be Authenticated</h2>', 'showOnlyFirstError' => true
+			'errorHead' => '<h4>You could not be Authenticated</h4>', 'showOnlyFirstError' => true
 		)) ?>
 
 		<div class="form">

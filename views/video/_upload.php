@@ -1,7 +1,7 @@
-<div class="upload_item" data-id='<?php echo $u_id ?>' id="upload_item_<?php echo $u_id ?>">
+<div class="upload" data-id='<?php echo $u_id ?>' id="upload_<?php echo $u_id ?>">
 
-	<div class="uploadForm" id="uploadForm_<?php echo $u_id ?>">
-		<form action="<?php echo glue::url()->create('/video/upload_to_server', array('id' => $u_id), glue::$params['uploadBase']) ?>" target="u_ifr<?php echo $u_id ?>" method="post" enctype="multipart/form-data">
+	<div class="form" id="uploadForm_<?php echo $u_id ?>">
+		<form action="<?php echo $this->createUrl('/video/upload_to_server', array('id' => $u_id), glue::$params['uploadBase']) ?>" target="u_ifr<?php echo $u_id ?>" method="post" enctype="multipart/form-data">
 			<a href="javascript: void(0)" class='add_upload'>Click here to Upload a Video
 			<input type="hidden" name="UPLOAD_IDENTIFIER" value="<?php echo $u_id ?>" /><input type="file" name="<?php echo $u_id ?>" id="<?php echo $u_id ?>" class='file_upload' /></a>
 		</form><iframe name="u_ifr<?php echo $u_id ?>" style="display:none;" id="u_ifr<?php echo $u_id ?>"></iframe>

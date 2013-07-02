@@ -1,12 +1,3 @@
-<?php $this->js('account_settings', "
-	$(document).ready(function(){
-		$('.recover_submit').click(function(event){
-			event.preventDefault();
-			$(this).parents('form').submit();
-		});
-	});
-") ?>
-
 <div class="recover_account_body">
 	<?php $form = html::activeForm() ?>
 
@@ -36,8 +27,7 @@
 			?>
 		</div>
 		<div class="submit_row">
-			<div class="green_css_button recover_submit" style='float:left;'>Generate New Password</div>
-			<?php echo html::submitbutton('Generate New Password', array('class' => 'invisible_submit')) ?>
+			<?php echo html::submitbutton('Generate New Password', array('class' => 'btn-success')) ?>
 		</div>
 	<?php $form->end() ?>
 </div>

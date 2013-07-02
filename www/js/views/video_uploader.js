@@ -80,13 +80,13 @@ function add_upload(){
 	ts = Math.round(new Date().getTime() / 1000);
 
 	// How many forms already exist?
-	count = $(".upload_item").length;
+	count = $(".upload").length;
 
 	// Generate the form
 	$.get("/video/add_upload", {ts: ts}, function(data){
 
 		// Add to the page
-		$("#uploadForm_container-outer").append(data);
+		$(".list").append(data.html);
 
 		// If this is the first form then add the updater iframe
 		//if(count == 0 && $('#uInfo_ifr').length == 0){
@@ -94,10 +94,10 @@ function add_upload(){
 		//}
 
 		// Add the upload id to the list of IDs
-		var e = $(".upload_item").last().find("input[name=UPLOAD_IDENTIFIER]").val();
+		var e = $(".upload").last().find("input[name=UPLOAD_IDENTIFIER]").val();
 		count_ids = u_ids.length;
 		u_ids[count_ids] = e;
-	});
+	}, 'json');
 }
 
 /**
@@ -113,6 +113,10 @@ function update_progress(info){
 		// Sometimes uploadprogress can return null for a upload
 		if(info[i] != null){
 			// Ascertain the IDs for the elements needing change
+			
+			var el = $('.upload[data-id='+info[i].id+']');
+			
+			
 			var id = "#uploading_pane_"+info[i].id;
 			var message_id = "#upload_status_"+info[i].id;
 

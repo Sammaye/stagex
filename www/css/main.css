@@ -736,3 +736,21 @@ textarea{
 .deactivate_body .submit{
 	float:left; display:block; margin:10px 0 0 10px;
 }
+
+.upload .form{
+ 	display: block; position:relative; width: 820px; height: 60px; overflow: hidden; border:1px dashed #cccccc;
+}
+
+.upload .form .add_upload{
+	font-size:22px; display:block; overflow:hidden; font-weight:bold; width: 780px; height: 30px; position: absolute; 
+	top:0; left:0; padding:15px 18px; text-align:center; cursor:pointer; text-decoration:none; color:#333333; 
+	opacity:0.4; filter: alpha(opacity = 40);
+}
+
+.upload .form .add_upload:hover{
+	text-decoration:none;
+}
+
+.upload .form input.file_upload{
+	font-size: 50px; width: 820px; opacity: 0; filter: alpha(opacity = 0);  position: absolute; height:60px; top:0px; left:0px; cursor:pointer; zoom:1;
+}

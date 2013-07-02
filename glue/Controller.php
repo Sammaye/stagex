@@ -293,4 +293,8 @@ class Controller {
 		$buffer = preg_replace('/(?:\s\s+|\n|\t)/', '', $buffer);
 		return $buffer;
 	}
+	
+	function createUrl($path = '/', $params = array(), $host = '/', $scheme = 'http'){
+		return glue::http()->createUrl($path, $params, $host, $scheme);
+	}
 }
