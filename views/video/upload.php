@@ -6,26 +6,12 @@ $this->js('upload_video', "
 		// Add a new upload form
 		add_upload();
 
-		$(document).on('change', '.upload_item input[type=file]', function(event){
-
-			reset_bar_message($(this).parents('.upload_item'));
-
-			if(check_upload($(this).parents('.upload_item').data().id)){
-				$(this).parents('.upload_item').find('.uploadForm').hide();
-				$(this).parents('.upload_item').find('.uploading_pane').show();
-				$(this).parents('form').submit();
-				add_upload();
-			}else{
-				alert('The file you selected did not match our requirements. Please try a different file.');
-			}
-		});
-
-		$(document).on('click', '.upload_item .uploadBar .cancel', function(event){
+		$(document).on('click', '.upload .uploadBar .cancel', function(event){
 			event.preventDefault();
 			stop_upload($(this).parents('.upload_item').data().id);
 		});
 
-		$(document).on('click', '.upload_item .form_top .remove a', function(event){
+		$(document).on('click', '.upload .form_top .remove a', function(event){
 			event.preventDefault();
 			remove_upload($(this).parents('.upload_item').data().id);
 		});
@@ -60,7 +46,7 @@ $this->js('upload_video', "
 			}, 'json');
 		});
 
-		$(document).on('click', '.upload_item .bar_summary .close', function(event){
+		$(document).on('click', '.upload .bar_summary .close', function(event){
 			event.preventDefault();
 			reset_bar_message($(this).parents('.upload_item'));
 		});
@@ -79,6 +65,6 @@ $this->js('upload_video', "
 	<div class="clear"></div>
 	</div>
 
-	<div class="file_list"></div>
+	<div class="upload_list"></div>
 	<div id="u_iframe_container" class="u_iframe_container"></div>
 </div>

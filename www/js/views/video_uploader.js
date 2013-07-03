@@ -2,6 +2,22 @@ var upload_timer;
 var timeout = 10000;
 var u_ids = [];
 
+$(document).on('change', '.upload input[type=file]', function(event){
+
+	el=$(this).parents('.upload');
+
+	reset_bar_message(el);
+
+	if(check_upload(el.data().id)){
+		el.find('.uploadForm').hide();
+		el.find('.uploading_pane').show();
+		$(this).parents('form').submit();
+		add_upload();
+	}else{
+		alert('The file you selected did not match our requirements. Please try a different file.');
+	}
+});
+
 function finish_upload(id, success, message){
 	reset_bar_message($("#upload_item_"+id));
 	show_bar_message($("#upload_item_"+id), success, message);
@@ -35,7 +51,7 @@ function stop_upload(id){
 		// Show Cancel message
 		show_bar_message($(p_id).parents('.upload_item'), false, 'The upload was cancelled by the user.');
 
-		$(p_id).parents('.upload_item').find('.uploadForm').remove();
+		$(p_id).parents('.upload').find('.uploadForm').remove();
 
 		// Hide parts of the form
 		$(p_id).parents('.upload_item').find('.uploadBar,.toggle_panel,.upload_details').hide();
@@ -86,7 +102,7 @@ function add_upload(){
 	$.get("/video/add_upload", {ts: ts}, function(data){
 
 		// Add to the page
-		$(".list").append(data.html);
+		$(".upload_list").append(data.html);
 
 		// If this is the first form then add the updater iframe
 		//if(count == 0 && $('#uInfo_ifr').length == 0){
