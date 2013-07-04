@@ -188,6 +188,7 @@ class Html{
 	 * @param array $options
 	 */
 	public static function textfield($name, $value = null, $options = array()){
+		if(!isset($options['id'])) $options['id']=self::getIdByName($name);
 		return "<input ".implode(" ", self::formOptions($options))."  type='text' name='{$name}' value='{$value}'/>";
 	}
 
@@ -576,32 +577,6 @@ class Html{
 		return preg_replace('/<[^>]*>/', '', $html);
 	}
 
-	static function getModelAttributeId($attribute, $model){
-		if(($pos=strpos($attribute,'['))!==false)
-		{
-			if($pos!==0){  // e.g. name[a][b]
-				$id = str_replace(']', '_', strtr(self::getModelShortName($model).'['.substr($attribute,0,$pos).']'.substr($attribute,$pos),array(']['=>']','['=>']')));
-				return $id;
-			}
-			if(($pos=strrpos($attribute,']'))!==false && $pos!==strlen($attribute)-1)  // e.g. [a][b]name
-			{
-				$sub=substr($attribute,0,$pos+1);
-				$attribute=substr($attribute,$pos+1);
-				$id = str_replace(']', '_', trim(strtr(self::getModelShortName($model).$sub.'['.$attribute.']',array(']['=>']','['=>']'))));
-				return $id;
-			}
-			if(preg_match('/\](\w+\[.*)$/',$attribute,$matches))
-			{
-				$id = str_replace('[', '_', self::getModelShortName($model).'['.str_replace(']','_',trim(strtr($attribute,array(']['=>']','['=>']')),']')));
-				$name=self::getModelShortName($model).'['.str_replace(']','][',trim(strtr($attribute,array(']['=>']','['=>']')),']')).']';
-				$attribute=$matches[1];
-				return $id;
-			}
-		}
-		else
-			return str_replace('[', '_', trim(self::getModelShortName($model).'['.$attribute.']', ']'));
-	}
-
 	public static function getModelFormVariableName($attribute, $model){
 		if(($pos=strpos($attribute,'['))!==false)
 		{
@@ -672,6 +647,10 @@ class Html{
 	static function getModelShortName($model){
 		$d=explode('\\',get_class($model));
 		return end($d);
+	}
+	
+	static function getIdByName($name){
+		return str_replace(array('[]', '][', '[', ']', ' '), array('', '_', '_', '', '_'), $name);		
 	}
 }
 

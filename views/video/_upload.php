@@ -7,16 +7,13 @@
 		</form><iframe name="u_ifr<?php echo $u_id ?>" style="display:none;" id="u_ifr<?php echo $u_id ?>"></iframe>
 	</div>
 
-	<div class="upload_details">
+	<div class="upload_details" style='display:none;'>
 		<div class='alert' style='display:none;'><a href='#' class="close"><?php echo utf8_decode('&#215;') ?></a></div>
 		<div class='inner'>
-			<div class="upload_status">
-				<h1 class="file_title"><img alt='video' src="/images/video_small.png"/> <span></span></h1>
-				<div class="progress_bar">
-					<div class="progress">&nbsp;</div>
-				</div>
-				<span class="status">0% Connecting to server...</span><a href="#" class="cancel">Cancel</a>
+			<div class="progress_bar">
+				<div class="progress">&nbsp;</div>
 			</div>
+			<span class="status">0% Connecting to server...</span><a href="#" class="cancel">Cancel</a>
 			<div class="edit_information">
 
 				<div class='alert' style='display:none;'>
@@ -25,7 +22,7 @@
 
 				<?php $form = html::activeForm(array('action' => '')) ?>
 					<div class="form-stacked left">
-						<div class="form_row"><?php echo html::label('Title', 'title') ?><?php echo html::activeTextField($model, 'title', array('id' => 'video_title_input')) ?></div>
+						<div class="form_row"><?php echo html::label('Title', 'title') ?><?php echo html::activeTextField($model, 'title') ?></div>
 						<div class="form_row"><?php echo html::label('Description', 'description')?><?php echo html::activeTextarea($model, 'description') ?></div>
 						<div class="form_row last"><?php echo html::label('Tags', 'string_tags') ?><?php echo html::activeTextField($model, 'string_tags') ?></div>			
 						<input type="button" class="btn-success" value="Save Video Details"/>

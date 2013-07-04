@@ -8,14 +8,32 @@ $(document).on('change', '.upload input[type=file]', function(event){
 
 	reset_bar_message(el);
 
-	if(check_upload(el.data().id)){
-		el.find('.uploadForm').hide();
-		el.find('.uploading_pane').show();
-		$(this).parents('form').submit();
-		add_upload();
-	}else{
-		alert('The file you selected did not match our requirements. Please try a different file.');
-	}
+	var filename = el.find('input[type=file]').val(),
+		path_parts = filename.split('\\');		
+		
+	el.find("#Video_title").val(path_parts[path_parts.length-1]);
+	
+	el.find('.upload_form').hide();
+	el.find('.upload_details').show();
+	
+	$(this).parents('form').submit();
+	add_upload();
+});
+
+$(document).on('click', '.upload .remove', function(event){
+	event.preventDefault();
+	$('.upload[data-id='+id+']').remove();
+	u_ids.splice(u_ids.indexOf(id), 1);
+});
+
+$(document).on('click', '.upload .cancel', function(event){
+	event.preventDefault();
+	stop_upload($(this).parents('.upload').data().id);
+});
+
+$(document).on('click', '.upload .alert .close', function(event){
+	event.preventDefault();
+	reset_bar_message($(this).parents('.upload'));
 });
 
 function finish_upload(id, success, message){
@@ -62,30 +80,6 @@ function stop_upload(id){
 	}
 }
 
-function remove_upload(id){
-	$("#upload_item_"+id).remove();
-	u_ids.splice(u_ids.indexOf(id), 1);
-}
-
-/**
- * This function runs when a upload is submitted. It checks the
- * file field as best it can for a valid file. TBH there are some things
- * we just have to do AFTER the file has been uploaded to /temp
- *
- * @param id
- * @returns {Boolean}
- */
-function check_upload(id){
-	var file = $("#"+id).val(), end = file.length, start = end - 5;
-	var path_parts = file.split('\\');
-	var ext = file.substring(start, end);
-
-	// Is the file a divx extension?
-	$("#uploading_pane_"+id+" .file_title span").html(path_parts[path_parts.length-1]);
-	$("#uploading_pane_"+id+" .upload_details #video_title_input").val(path_parts[path_parts.length-1]);
-	return true;
-}
-
 /**
  * This adds a new upload form to the screen
  */
@@ -104,78 +98,55 @@ function add_upload(){
 		// Add to the page
 		$(".upload_list").append(data.html);
 
-		// If this is the first form then add the updater iframe
-		//if(count == 0 && $('#uInfo_ifr').length == 0){
-			//$("#u_iframe_container").html("<iframe id='uInfo_ifr' src='/video/get_upload_info' name='uInfo_ifr'></iframe>");
-		//}
-
 		// Add the upload id to the list of IDs
 		var e = $(".upload").last().find("input[name=UPLOAD_IDENTIFIER]").val();
 		count_ids = u_ids.length;
 		u_ids[count_ids] = e;
+		
+		// trigger
+		get_upload_progress();
 	}, 'json');
 }
 
-/**
- * This gets the updated status of the uploads
- *
- * @param info
- */
-function update_progress(info){
-
-	// Scrolls through the IDs assigning the information.
-	for(i = 0; i < info.length; i++){
-
-		// Sometimes uploadprogress can return null for a upload
-		if(info[i] != null){
-			// Ascertain the IDs for the elements needing change
-			
-			var el = $('.upload[data-id='+info[i].id+']');
-			
-			
-			var id = "#uploading_pane_"+info[i].id;
-			var message_id = "#upload_status_"+info[i].id;
-
-			if(info[i].hasOwnProperty('message')){
-				// Calculate how much has been uploaded
-				var done = 90;
-
-				// Change the width of the progress bar to match done and set a message for the upload status
-				$(id+" .uploadProgInner").css("width", done+"%");
-				$(id+" .percent_complete").html(done+"%");
-
-				$(message_id+" span").html(info[i]['message']);
-			}else{
-				// Calculate how much has been uploaded
-				var done = Math.floor(100 * parseInt(info[i].uploaded) / parseInt(info[i].total));
-
-				// Change the width of the progress bar to match done and set a message for the upload status
-				$(id+" .uploadProgInner").css("width", done+"%");
-				$(id+" .percent_complete").html(done+"%");
-
-				$(message_id+" span").html("Estimated Time Left: "+info[i].left+" at "+info[i].speed+"ps");
-			}
-		}
-	}
-}
-
 function reset_bar_message(selector){
-	selector.find('.bar_summary').removeClass('success error').css({ 'display': 'none' }).find('span').html('');
+	selector.find('.alert').removeClass('success error').css({ 'display': 'none' }).find('span').html('');
 }
 
 function show_bar_message(selector, success, message){
 	if(success){
-		selector.find('.bar_summary').addClass('success').css({ 'display': 'block' }).find('span').html(message);
+		selector.find('.alert').addClass('success').css({ 'display': 'block' }).find('span').html(message);
 	}else{
-		selector.find('.bar_summary').addClass('error').css({ 'display': 'block' }).find('span').html(message);
+		selector.find('.alert').addClass('error').css({ 'display': 'block' }).find('span').html(message);
 	}
 }
 
 function get_upload_progress(){
-	$.getJSON('/video/get_upload_info', {ids: u_ids}, function(data){
-		update_progress(data);
-	});
+	if(u_ids.length>0){
+		$.getJSON('/video/get_upload_info', {ids: u_ids}, function(data){
+			// Scrolls through the IDs assigning the information.
+			for(i = 0; i < info.length; i++){
+	
+				// Sometimes uploadprogress can return null for a upload
+				if(info[i] != null){
+					// Ascertain the IDs for the elements needing change
+					
+					var el = $('.upload[data-id='+info[i].id+']');
+	
+					if(info[i].hasOwnProperty('message')){
+						// Change the width of the progress bar to match done and set a message for the upload status
+						el.find('.progress_bar .progress').css("width", 90+"%");
+						el.find('.upload_details .status').html('90% - '+info[i]['message']);
+					}else{
+						// Calculate how much has been uploaded
+						var done = Math.floor(100 * parseInt(info[i].uploaded) / parseInt(info[i].total));
+	
+						// Change the width of the progress bar to match done and set a message for the upload status
+						el.find('.progress_bar .progress').css("width", done+"%");
+						el.find('.upload_details .status').html(done+'% - '+"Estimated Time Left: "+info[i].left+" at "+info[i].speed+"ps");
+					}
+				}
+			}
+		});
+	}
 	upload_timer = setTimeout("get_upload_progress()", timeout);
 }
-
-var upload_timer = setTimeout("get_upload_progress()", timeout);
