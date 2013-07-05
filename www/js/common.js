@@ -44,7 +44,7 @@ $(function(){
  * 
  * Let's set some content:
  * 
- * $('.alert').summarise('setContent', 'Sorry it did not succeed; please try again');
+ * $('.alert').summarise('content', {message: 'Sorry it did not succeed; please try again', list: ['message1','message2']});
  * 
  * After an Ajax request lets show an error message as well as init:
  * 
@@ -128,8 +128,10 @@ $(function(){
 					
 					$this.html('');
 					
+					if(settings.tpl_close!==null&&settings.tpl_close!==undefined)
+						$this.append($(settings.tpl_close));					
 					if(content['message']!==undefined&&content['message']!==null)
-						$this.append(content);
+						$this.append(content['message']);
 					if(content['list']!==undefined&&content['list']!==null){	
 						var list=$('<ul/>').appendTo($this);
 						$.each(content['list'], function(i, v){
@@ -138,8 +140,6 @@ $(function(){
 					}
 				}else
 					$this.html(content);
-				if(settings.tpl_close!==null&&settings.tpl_close!==undefined)
-					$this.append($(settings.tpl_close));
 				$this.css({display:'block'});
 			}			
 		},
