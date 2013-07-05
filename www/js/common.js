@@ -11,10 +11,7 @@ $(document).on('click', '.radio,.checkbox', function(e){
 
 /**
  * Open link in new Window Plugin
- *
- * Sam Millman 2011 (sammaye.wordpress.com)
- * Licensed under MIT and GPL Licenses
- *
+ * 
  * This plugin allows for a person to attach an action to all links with
  * rel = new_window to open that link in a new window.
  *
@@ -36,6 +33,31 @@ $(function(){
     };
 })(jQuery);
 
+/**
+ * This plugin basically makes alerts more...responsive
+ * 
+ * @example
+ * 
+ * Lets init all our alerts:
+ * 
+ * $('.alert').summarise();
+ * 
+ * Let's set some content:
+ * 
+ * $('.alert').summarise('setContent', 'Sorry it did not succeed; please try again');
+ * 
+ * After an Ajax request lets show an error message as well as init:
+ * 
+ * $('.alert').summarise('error','Sorry but it did not succeed; please try again.');
+ * 
+ * Or just set an error:
+ * 
+ * $('.alert').summarise('set', {'error', 'Sorry but it did not succeed; please try again.'});
+ * 
+ * To close the alert
+ * 
+ * $('.alert').alert('close');
+ */
 ;(function($, window, document, undefined){
 	
 	var options = {
@@ -46,17 +68,115 @@ $(function(){
 		'warning_class' : 'alert-warning',
 		'info_class' : 'alert-info',
 		
-		'tpl_close' : '<a href="#" class="close">&#215;</a>'
+		'tpl_close' : '<a href="#" class="close">&#215;</a>',
 	},
 	methods = {
-		init : function(){
+		init : function(type, content, opts){
 			
+			settings=$.extend(true, {}, options, opts);
+			
+			return this.each(function(){
+				data = $(this).data('summarise');
+				$this=$(this);
+				
+				
+				if(!data){
+					$this.data('summarise', {
+						'_' : this,
+						'options' : settings
+					});
+					
+					if(!$this.hasClass('alert')){
+						$this.addClass('alert');
+					}
+					$this.addClass('summarise-alert');
+					
+					setType(type);
+					setContent(content);
+				}
+			});
 		},
-		setType : function(){},
-		setMessage : function(){},
-		reset : function(){},
-		close : function(){}
+		destroy : function(){
+			$this=$(this);
+			data=$this.data('summarise');
+			
+			// TODO Make this more complete
+			if(data)
+				$this.removeData('summarise');
+		},
+		set : function(type, content){
+			setType(type,$(this));
+			setContent(content,$(this));
+		},
+		setType : function(type,el){
+			$this=$(this)||el;
+			settings=$.extend(true, {}, options, $this.data('summarise').options);
+			if(type!==null&&type!==undefined){
+				type='alert-'+type;			
+				$this.removeClass([
+				    settings['error_class'],
+				    settings['success_class'],
+				    settings['warning_class'],
+				    settings['info_class']
+				].join(' ')).addClass(type);
+			}
+		},
+		setContent : function(content,el){
+			$this=$(this)||el;
+			settings=$.extend(true, {}, options, $this.data('summarise').options);			
+			if(content!==null&&content!==undefined){
+				if(typeof content == "object"){
+					
+					$this.html('');
+					
+					if(content['message']!==undefined&&content['message']!==null)
+						$this.append(content);
+					if(content['list']!==undefined&&content['list']!==null){	
+						var list=$('<ul/>').appendTo($this);
+						$.each(content['list'], function(i, v){
+							list.append($('<li/>').text(v));
+						});
+					}
+				}else
+					$this.html(content);
+				if(settings.tpl_close!==null&&sellings.tpl_close!==undefined)
+					$this.append($(settings.tpl_close));
+				$this.css({display:'block'});
+			}			
+		},
+		reset : function(){
+			reset($(this));
+		},
+		close : function(){
+			$this=$(this);
+			reset($this);
+			$this.css({display:'none'});			
+		}
+	},
+	reset = function(el){
+		$this=el;
+		settings=$.extend(true, {}, options, $this.data('summarise').options);
+		$this.removeClass([
+			settings['error_class'],
+			settings['success_class'],
+			settings['warning_class'],
+			settings['info_class']
+		].join(' ')).html('');			
 	};
+	
+	
+	$(document).on('click', '.summarise-alert .close', function(event){
+		event.preventDefault();
+		
+		$this=el;
+		settings=$.extend(true, {}, options, $this.data('summarise').options);
+		$this.removeClass([
+		    settings['error_class'],
+		    settings['success_class'],
+		    settings['warning_class'],
+		    settings['info_class']
+		].join(' ')).html('').css({display:'none'});				
+	});
 	
 	$.fn.summarise = function(method) {
 		// Method calling logic
@@ -71,63 +191,10 @@ $(function(){
 	
 })(jQuery, window, document);
 
-/**
- * Form plugin
- *
- * Sam Millman 2011 (sammaye.wordpress.com)
- * Licensed under MIT and GPL Licenses
- *
- * This plugin allows for the StageX forms to work without me having to constantly
- * copy and paste code around the place.
- *
- * The main shrine of this plugin is the form summary which uses a element pointing to a normal HTML
- * object to form correct summaries of each and every form on the site in realtime.
- */
-
-
-
-
-var forms = {
-	htmlSummary: function(el, html, success){
-		if(!success){
-			el.css({ 'display': 'block' }).html('').append($(html).css({ 'display': 'block' }));
-		}else{
-			el.css({ 'display': 'block' }).html('').append($(html).css({ 'display': 'block' }));
-		}
-	},
-	summary: function(el, success, html, error_list, singleLine){
-		el.empty();
-		if(!success){
-			el.append("<div class='close'><a href='#'>&#215;</a></div>");
-			el.append(html);
-
-			if(!singleLine && !$.isEmptyObject(error_list) && error_list != null){
-				el.append($('<ul/>'));
-
-				if(el.find('ul').length > 0){
-					for(var i=0;i<error_list.length;i++){
-						el.find('ul').append($('<li>').html(error_list[i]));
-					}
-				}
-			}
-
-			el.addClass('error_summary').removeClass('success_summary');
-			el.css({ 'display': 'block' });
-		}else{
-			el.append("<a href='#' class='close'>&#215;</a>");
-			el.append(html);
-			el.addClass('success_summary').removeClass('error_summary');
-			el.css({ 'display': 'block' });
-		}
-	},
-	reset: function(el){
-		el.css({ 'display': 'none' }).removeClass('error_message_curved').removeClass('success_message_curved').find('.message_content').html('');
-	}
-};
-
+/** This catches all not covered by the plugin */
 $(function(){
 	$(document).on('click', '.alert .close', function(event){
 		event.preventDefault();
-		$(this).parents('.block_summary').css({ 'display': 'none' }).removeClass('error_message_curved').removeClass('success_message_curved').find('.message_content').html('');
+		$(this).parents('.alert').css({ 'display': 'none' }).removeClass('alert-error alert-success alert-warning alert-info').html('');
 	});
 });
