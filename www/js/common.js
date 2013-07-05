@@ -33,31 +33,6 @@ $(function(){
     };
 })(jQuery);
 
-/**
- * This plugin basically makes alerts more...responsive
- * 
- * @example
- * 
- * Lets init all our alerts:
- * 
- * $('.alert').summarise();
- * 
- * Let's set some content:
- * 
- * $('.alert').summarise('content', {message: 'Sorry it did not succeed; please try again', list: ['message1','message2']});
- * 
- * After an Ajax request lets show an error message as well as init:
- * 
- * $('.alert').summarise('error','Sorry but it did not succeed; please try again.');
- * 
- * Or just set an error:
- * 
- * $('.alert').summarise('set', 'error', 'Sorry but it did not succeed; please try again.');
- * 
- * To close the alert
- * 
- * $('.alert').alert('close');
- */
 ;(function($, window, document, undefined){
 	
 	var options = {
@@ -71,7 +46,7 @@ $(function(){
 		'tpl_close' : '<a href="#" class="close">&#215;</a>',
 	},
 	methods = {
-		init : function(type, content, opts){
+		init : function(opts, type, content){
 			
 			settings=$.extend(true, {}, options, opts);
 			
@@ -85,8 +60,8 @@ $(function(){
 						'options' : settings
 					});
 					
-					if(!$this.hasClass('alert')){
-						$this.addClass('alert');
+					if(!$this.hasClass(settings.base_class)){
+						$this.addClass(settings.base_class);
 					}
 					$this.addClass('summarise-alert');
 					
@@ -111,13 +86,13 @@ $(function(){
 			$this=el||$(this);
 			settings=$.extend(true, {}, options, $this.data('summarise').options);
 			if(type!==null&&type!==undefined){
-				type='alert-'+type;			
+				cssClass=settings[type+'_class'];			
 				$this.removeClass([
 				    settings['error_class'],
 				    settings['success_class'],
 				    settings['warning_class'],
 				    settings['info_class']
-				].join(' ')).addClass(type);
+				].join(' ')).addClass(cssClass);
 			}
 		},
 		content : function(content,el){
