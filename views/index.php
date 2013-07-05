@@ -1,3 +1,17 @@
+<?php 
+$js=<<<JS
+	$('.alert').summarise();
+	$('.alert').summarise('set', 'error', 'Oh Noes!!');
+	$('.alert').summarise('type', 'success');
+	$('.alert').summarise('content', 'whoop!!');
+JS;
+$this->js('g', $js)
+?>
+
+
+<div class="alert"></div>
+
+
 <div class='container_16 homepage_body'>
 
 	<div class='page_head'>Welcome to the StageX video site Beta!</div>

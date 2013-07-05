@@ -349,6 +349,10 @@ textarea{
 	background:#F2DEDE; border:1px solid #EED3D7;
 }
 
+.alert-success{
+	background:#dff0d8; border:1px solid #d6e9c6;
+}
+
 .table{
 	width:100%;
 }

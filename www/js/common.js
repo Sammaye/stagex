@@ -52,7 +52,7 @@ $(function(){
  * 
  * Or just set an error:
  * 
- * $('.alert').summarise('set', {'error', 'Sorry but it did not succeed; please try again.'});
+ * $('.alert').summarise('set', 'error', 'Sorry but it did not succeed; please try again.');
  * 
  * To close the alert
  * 
@@ -79,7 +79,6 @@ $(function(){
 				data = $(this).data('summarise');
 				$this=$(this);
 				
-				
 				if(!data){
 					$this.data('summarise', {
 						'_' : this,
@@ -91,8 +90,8 @@ $(function(){
 					}
 					$this.addClass('summarise-alert');
 					
-					setType(type);
-					setContent(content);
+					methods.type(type,$this);
+					methods.content(content,$this);
 				}
 			});
 		},
@@ -105,11 +104,11 @@ $(function(){
 				$this.removeData('summarise');
 		},
 		set : function(type, content){
-			setType(type,$(this));
-			setContent(content,$(this));
+			methods.type(type,$(this));
+			methods.content(content,$(this));
 		},
-		setType : function(type,el){
-			$this=$(this)||el;
+		type : function(type,el){
+			$this=el||$(this);
 			settings=$.extend(true, {}, options, $this.data('summarise').options);
 			if(type!==null&&type!==undefined){
 				type='alert-'+type;			
@@ -121,9 +120,9 @@ $(function(){
 				].join(' ')).addClass(type);
 			}
 		},
-		setContent : function(content,el){
-			$this=$(this)||el;
-			settings=$.extend(true, {}, options, $this.data('summarise').options);			
+		content : function(content,el){
+			$this=el||$(this);
+			settings=$.extend(true, {}, options, $this.data('summarise').options);		
 			if(content!==null&&content!==undefined){
 				if(typeof content == "object"){
 					
@@ -139,7 +138,7 @@ $(function(){
 					}
 				}else
 					$this.html(content);
-				if(settings.tpl_close!==null&&sellings.tpl_close!==undefined)
+				if(settings.tpl_close!==null&&settings.tpl_close!==undefined)
 					$this.append($(settings.tpl_close));
 				$this.css({display:'block'});
 			}			
@@ -164,18 +163,9 @@ $(function(){
 		].join(' ')).html('');			
 	};
 	
-	
 	$(document).on('click', '.summarise-alert .close', function(event){
 		event.preventDefault();
-		
-		$this=el;
-		settings=$.extend(true, {}, options, $this.data('summarise').options);
-		$this.removeClass([
-		    settings['error_class'],
-		    settings['success_class'],
-		    settings['warning_class'],
-		    settings['info_class']
-		].join(' ')).html('').css({display:'none'});				
+		$(this).parents('.summarise-alert').summarise('close');
 	});
 	
 	$.fn.summarise = function(method) {
