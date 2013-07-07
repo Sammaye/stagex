@@ -99,12 +99,13 @@ $(function(){
 			$this=el||$(this);
 			settings=$.extend(true, {}, options, $this.data('summarise').options);		
 			if(content!==null&&content!==undefined){
+				
+				$this.html('');
+				
+				if(settings.tpl_close!==null&&settings.tpl_close!==undefined)
+					$this.append($(settings.tpl_close));					
+				
 				if(typeof content == "object"){
-					
-					$this.html('');
-					
-					if(settings.tpl_close!==null&&settings.tpl_close!==undefined)
-						$this.append($(settings.tpl_close));					
 					if(content['message']!==undefined&&content['message']!==null)
 						$this.append(content['message']);
 					if(content['list']!==undefined&&content['list']!==null){	
@@ -114,7 +115,7 @@ $(function(){
 						});
 					}
 				}else
-					$this.html(content);
+					$this.append(content);
 				$this.css({display:'block'});
 			}			
 		},

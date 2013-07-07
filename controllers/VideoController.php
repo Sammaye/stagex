@@ -101,7 +101,8 @@ class videoController extends glue\Controller{
 	}
 
 	function action_add_upload(){
-		$this->pageTitle = 'Add a New Upload - StageX';
+		if(!glue::http()->isAjax())
+			glue::trigger('404');
 
 		$video = new Video();
 		$video->populateDefaults();
@@ -127,7 +128,7 @@ class videoController extends glue\Controller{
 
 				// Then this file is done uploading. Get the queue
 				// If it dont have a queue row return null
-				$video = Video::model()->findOne(array('upload_id' => strval($upload_id)));
+				$video = Video::model()->findOne(array('uploadId' => strval($upload_id)));
 				if(!$video){
 					$ret[$i] = null;
 				}elseif($video->state == 'uploading'){
@@ -142,7 +143,7 @@ class videoController extends glue\Controller{
 								'left' => gmdate("H:i:s", $info['est_sec']), 'speed' => convert_size_human($info['speed_average']));
 			}
 		}
-		echo json_encode($ret);
+		echo json_encode(array('success'=>true,'status'=>$ret));
 	}
 
 	function action_upload_to_server(){

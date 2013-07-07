@@ -813,7 +813,7 @@ textarea{
 }
 
 .upload .progress_bar{
-	border:1px solid #2a7ef0; margin:0 15px 5px 0; border-radius:3px;
+	border:1px solid #2a7ef0; margin:0 0 5px 0; border-radius:3px;
 }
 
 .upload .progress{
@@ -822,4 +822,8 @@ textarea{
 
 .upload .status{
 	font-weight:bold; color:#999999; margin: 0 10px 0 0;
+}
+
+.upload .alert{
+	margin:0 0 10px 0;
 }

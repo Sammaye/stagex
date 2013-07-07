@@ -4,7 +4,7 @@ namespace app\models;
 use glue;
 
 class Video extends \glue\Db\Document{
-
+	
 	/** @virtual */
 	public $response = array(); // I am unsure about this var. I don't like the way it stares at me
 	/** @virtual */
@@ -147,19 +147,19 @@ class Video extends \glue\Db\Document{
 		return parent::model($className);
 	}
 
-	function if_is_public(){
+	function isPublic(){
+		return $this->listing == 0;
+	}
+
+	function isUnlisted(){
 		return $this->listing == 1;
 	}
 
-	function if_is_unlisted(){
+	function isPrivate(){
 		return $this->listing == 2;
 	}
 
-	function if_is_private(){
-		return $this->listing == 3;
-	}
-
-	function is_processing(){
+	function isProcessing(){
 		return $this->state == 'pending' || $this->state == 'submitting' || $this->state == 'transcoding';
 	}
 
@@ -172,30 +172,32 @@ class Video extends \glue\Db\Document{
 
 	function rules(){
 		return array(
-			array('listing, category, licence', 'required', 'message' => 'Listing, category and licence have invalid values. Please enter a correct value'),
-			array('title, description, string_tags', 'safe', 'on' => 'upload'),
+			array('title', 'required', 'message' => 'You must provide a title'),
+			array('title', 'string', 'max' => '75', 'message' => 'You can only write 75 characters for the title'),
 
-			array('listing', 'in', 'range' => array(1, 2, 3), 'message' => 'You must select a valid listing of either public, unlisted or private'),
-			array('voteable, embeddable, private_stats, voteable_comments, vid_coms_allowed, txt_coms_allowed, adult_content', 'boolean', 'allowNull' => true),
-
-			array('moderated', 'in', 'range' => array(0, 1), 'allowEmpty' => false, 'on' => 'update', 'message' => 'Incorrect value provided for comment settings'),
-
-			array('title', 'required', 'on' => 'update', 'message' => 'You must provide a title'), // Licence
-			array('licence', 'required', 'on' => 'update', 'message' => 'You must provide a licence type'),
+			array('description', 'string', 'max' => '1500', 'message' => 'You can only write 1500 characters for the description'),
+				
 			array('category', 'in', 'range' => $this->categories('values'), 'message' => 'You must provide a valid category'),
 			array('licence', 'in', 'range' => array(1, 2), 'message' => 'You must provide a licence type'),
-
-			array('title', 'string', 'max' => '75', 'message' => 'You can only write 75 characters for the title'),
-			array('description', 'string', 'max' => '1500', 'message' => 'You can only write 1500 characters for the description'),
+				
+			array('listing', 'in', 'range' => array(1, 2, 3), 'message' => 'You must select a valid listing of either public, unlisted or private'),
+			array('voteable, embeddable, privateStatistics, voteableComments, allowVideoComments, allowTextComments, mature, moderated', 'boolean', 'allowNull' => true),
+			
 			array('stringTags', 'tokenized', 'max' => 10, 'message' => 'You can add upto 10 tags, no more')
 		);
 	}
 
 	function afterFind(){
 		if(is_array($this->tags)){
-			$this->string_tags = implode(',', $this->tags);
+			$this->stringTags = implode(',', $this->tags);
 		}
 		return true;
+	}
+	
+	public function populateDefaults(){
+		$defaults=glue::user()->defaultVideoSettings;
+		foreach($defaults as $k => $v)
+			$this->$k=$v;
 	}
 
 	function getImage($width, $height){
@@ -212,81 +214,67 @@ class Video extends \glue\Db\Document{
 
 	function upload($id){
 
-		if (empty($_FILES) && strtolower($_SERVER['REQUEST_METHOD']) == 'post' && !isset($_FILES[$id])) {
-			$this->response("ERROR", "FILE_A_EMPTY");
-			return false;
-		}
-
-		if($_FILES[$id]['size'] > glue::user()->get_max_video_upload_size() || !($_FILES[$id]['error'] == "0" || $_FILES[$id]['error'] == 0)){
-			// video did not pass last minute checks
+		$file=new \glue\File(array('model'=>$this,'id'=>'file'));
+		if(strlen($file->tmp_name)<=0){
 			$this->response("ERROR", "NOT_VALID");
 			return false;
 		}
-
-		if(glue::user()->get_upload_bandwidth_left() < $_FILES[$id]['size']){
-			unlink($_FILES[$id]['tmp_name']); // Free up space in our temp dir
+	
+		if(glue::user()->bandwidthLeft < $_FILES[$id]['size']){
+			unlink($file->tmp_name); // Free up space in our temp dir
 			$this->response("ERROR", "NOT_ENOUGH_SP");
 			return false;
 		}
-		glue::user()->change_upload_bandwidth_left_by($_FILES[$id]['size']);
+		glue::user()->saveCounters(array('bandwidthLeft'=>"-$file->size"));
 
 		// Does ffmpeg think this is a real file??
 		exec(sprintf('ffmpeg -i "'.$_FILES[$id]['tmp_name'].'" 2>&1'), $output);
 		$ffmpeg_details = implode("\r", $output);
 		if(!preg_match('!Duration: ([0-9:.]*)[, ]!', $ffmpeg_details) || preg_match('!Duration: ([0-9:.]*)[, ]!', $ffmpeg_details) <= 0){
-			unlink($_FILES[$id]['tmp_name']); // Free up space in our temp dir
+			unlink($file->tmp_name); // Free up space in our temp dir
 			// FAIL the file might not be a video
 			$this->response("ERROR", "NOT_VALID");
 			return false;
 		}
 
-		$file_hash = md5_file($_FILES[$id]['tmp_name']);
-		$matched_video = self::model()->findOne(array('md5' => $file_hash));
-
 		// Now lets make a new video
-		$this->user_id = glue::session()->user->_id;
-		$this->file_size = $_FILES[$id]['size'];
-		$this->title = substr(substr($_FILES[$id]['name'], 0, strrpos($_FILES[$id]['name'], '.')), 0, 75);
+		$this->populateDefaults();
+		/*
+		 *	This takes the form from the upload page and places the data in
+		*/
+		if(isset($_SESSION['_upload_save'][$id]) && is_array($_SESSION['_upload_save'][$id])){
+			foreach($_SESSION['_upload_save'][$id] as $k=>$v){
+				$this->$k = $v;
+			}
+		}		
+		$this->userId = glue::session()->user->_id;
+		$this->fileSize = $file->size;
+		$this->title = substr(substr($file->name, 0, strrpos($file->name, '.')), 0, 75);
 		$this->md5 = $file_hash;
-		$this->upload_id = $id;
+		$this->uploadId = $id;
 		$this->created = new MongoDate();
 		$this->state = 'uploading';
 
-		if($matched_video && $matched_video->state == 'finished'){
+		if(
+			($matched_video=self::model()->findOne(array('md5' => md5_file($file->tmp_name)))) 
+			&& $matched_video->state == 'finished'
+		){
 			$this->duration = $matched_video->duration;
 			$this->state = $matched_video->state;
 			$this->original = $matched_video->original;
 			$this->mp4 = $matched_video->mp4;
 			$this->ogg = $matched_video->ogg;
 			$this->image = $matched_video->image;
-			$this->image_src = $matched_video->image_src;
-			$this->job_id = $matched_video->job_id;
+			$this->imageSrc = $matched_video->imageSrc;
+			$this->jobId = $matched_video->jobId;
 		}else{
 			$this->deleted = 1; // Mark this as deleted to stop it from showing
 		}
-
-		// Do video defaults
-		$defaults = isset(glue::session()->user->default_video_settings) ? glue::session()->user->default_video_settings : array();
-		if(is_array($defaults)){
-			foreach($defaults as $item => $val){
-				$this->$item = $val;
-			}
-		}
-
-		/*
-		 *	This takes the form from the upload page and places the data in
-		 */
-		if(isset($_SESSION['_upload_save'][$id]) && is_array($_SESSION['_upload_save'][$id])){
-			foreach($_SESSION['_upload_save'][$id] as $k=>$v){
-				$this->$k = $v;
-			}
-		}
-
 		$this->save();
 
 		if(!$matched_video){
 			// Lets transfer to S3
-			$file_name = new MongoId().'.'.pathinfo($_FILES[$id]['name'], PATHINFO_EXTENSION);
+			$file_name = new MongoId().'.'.pathinfo($file->name, PATHINFO_EXTENSION);
 			if(glue::aws()->s3_upload($file_name, array('fileUpload' => $_FILES[$id]['tmp_name']))){
 				$this->original = glue::aws()->get_s3_obj_url($file_name);
 				unlink($_FILES[$id]['tmp_name']); // Free up space in our temp dir

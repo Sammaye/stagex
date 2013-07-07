@@ -6,7 +6,7 @@ $(document).on('change', '.upload input[type=file]', function(event){
 
 	el=$(this).parents('.upload');
 
-	reset_bar_message(el);
+	el.find('.alert').summarise('reset');
 
 	var filename = el.find('input[type=file]').val(),
 		path_parts = filename.split('\\');		
@@ -22,46 +22,14 @@ $(document).on('change', '.upload input[type=file]', function(event){
 
 $(document).on('click', '.upload .remove', function(event){
 	event.preventDefault();
-	$('.upload[data-id='+id+']').remove();
+	id=$(this).parents('.upload').data().id;
+	$(this).parents('.upload').remove();
 	u_ids.splice(u_ids.indexOf(id), 1);
 });
 
 $(document).on('click', '.upload .cancel', function(event){
 	event.preventDefault();
-	stop_upload($(this).parents('.upload').data().id);
-});
-
-$(document).on('click', '.upload .alert .close', function(event){
-	event.preventDefault();
-	reset_bar_message($(this).parents('.upload'));
-});
-
-function finish_upload(id, success, message){
-	reset_bar_message($("#upload_item_"+id));
-	show_bar_message($("#upload_item_"+id), success, message);
-
-	$("#upload_item_"+id).find('.uploadBar .uploadProgInner').css("width", "100%");
-	$("#upload_item_"+id).find('.uploadBar .percent_complete').html('100%');
-	$("#upload_item_"+id).find('.uploadBar .cancel').hide();
-
-	u_ids.splice(u_ids.indexOf(id), 1);
-	if(success){
-		$("#upload_item_"+id).find('.uploadBar .message span').html('Completed');
-	}else{
-		$("#upload_item_"+id).find('.toggle_panel').hide();
-		$("#upload_item_"+id).find('.upload_details').hide();
-		$("#upload_item_"+id).find('.uploadBar .message span').html('Failed');
-		$("#upload_item_"+id).find('.form_top .remove').show();
-	}
-}
-
-/**
- * Stops an upload
- *
- * @param id
- */
-function stop_upload(id){
-
+	
 	var answer = confirm("Are you sure you wish to cancel this upload?"), p_id = "#uploading_pane_"+id;
 
 	// Only remove the upload if it has not completed.
@@ -77,7 +45,35 @@ function stop_upload(id){
 		u_ids.splice(u_ids.indexOf(id), 1);
 	}else{
 		show_bar_message($(p_id).parents('.upload_item'), false, 'An unknown error occurred. The upload could not be stopped.');
-	}
+	}	
+});
+
+$(document).on('click', '.upload_details .btn-success', function(event){
+	event.preventDefault();
+	var $this = $(this),
+		data = this.parents('form').find('select, textarea, input').serializeArray();
+	data[data.length] = {name: 'upload_id', value: this.parents('.upload').data().id};
+
+	$.post('/video/ajaxSave', data, function(data){
+		if(data.success){
+			forms.summary(this_o.parents('.upload_details').find('.block_summary'), true,
+				'The details to this upload were saved.', data.errors);
+		}else{
+			forms.summary(this_o.parents('.upload_details').find('.block_summary'), false,
+				'The details to this upload could not be saved because:', data.errors);
+		}
+	}, 'json');
+});
+
+function finish_upload(id, success, message){
+	el=$('.upload[data-id='+id+']');
+	el.find('.upload_details').children('.alert').summarise('set',success?'success':'error',message);
+	el.find('.status,.progress_bar').css({display:'none'});
+	el.find('.cancel').removeClass('cancel').addClass('remove').text('Remove');
+	
+	u_ids.splice(u_ids.indexOf(id), 1);
+	if(!success)
+		el.find('.edit_information').css({display:'none'});
 }
 
 /**
@@ -100,6 +96,9 @@ function add_upload(){
 
 		// Add the upload id to the list of IDs
 		var e = $(".upload").last().find("input[name=UPLOAD_IDENTIFIER]").val();
+		$(".upload").last().find('.upload_details').children('.alert').summarise({tpl_close:''});
+		$('.upload').last().find('.edit_information .alert').summarise();
+		
 		count_ids = u_ids.length;
 		u_ids[count_ids] = e;
 		
@@ -108,22 +107,16 @@ function add_upload(){
 	}, 'json');
 }
 
-function reset_bar_message(selector){
-	selector.find('.alert').removeClass('success error').css({ 'display': 'none' }).find('span').html('');
-}
-
-function show_bar_message(selector, success, message){
-	if(success){
-		selector.find('.alert').addClass('success').css({ 'display': 'block' }).find('span').html(message);
-	}else{
-		selector.find('.alert').addClass('error').css({ 'display': 'block' }).find('span').html(message);
-	}
-}
-
 function get_upload_progress(){
 	if(u_ids.length>0){
 		$.getJSON('/video/get_upload_info', {ids: u_ids}, function(data){
 			// Scrolls through the IDs assigning the information.
+			
+			if(data.success)
+				info=data.status;
+			else
+				return;
+			
 			for(i = 0; i < info.length; i++){
 	
 				// Sometimes uploadprogress can return null for a upload
