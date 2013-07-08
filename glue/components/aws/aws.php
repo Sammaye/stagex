@@ -17,11 +17,7 @@ class aws extends \glue\Component{
 	public $input_queue;
 	public $output_queue;
 
-	public $aws;
-
-	function init(){
-		//glue::registerAutoloader(array('CFLoader', 'autoloader'));
-	}
+	private $aws;
 
 	function get($obj){
 		if($this->aws===null){
@@ -43,13 +39,17 @@ class aws extends \glue\Component{
 	function S3Upload($filename,$opt = array()){
 
 		$s3 = $this->get('S3Client');
-		$response=$s3->putObject(array_merge(array(
-			'Bucket' => $this->bucket,
-			'Key' => $filename,
-			'Body' => '',
-			'ACL' => 'public-read',
-			'StorageClass' => 'REDUCED_REDUNDANCY'		
-		), $opt));
+		try{
+			$response=$s3->putObject(array_merge(array(
+				'Bucket' => $this->bucket,
+				'Key' => $filename,
+				'Body' => '',
+				'ACL' => 'public-read',
+				'StorageClass' => 'REDUCED_REDUNDANCY'		
+			), $opt));
+		}catch(\Exception $e){
+			return false;
+		}
 
 		if($response instanceof \Guzzle\Service\Resource\Model && strlen($response['ObjectURL'])>0)
 			return true;
@@ -78,16 +78,20 @@ class aws extends \glue\Component{
 
 	function sendEncodingMessage($file_name, $job_id, $output){
 		$sqs = $this->get('sqs');
-		$response = $sqs->sendMessage(array(
-			'QueueUrl' => $this->input_queue, 
-			'MessageBody' => json_encode(array(
-				'input_file' => $file_name,
-				'bucket' => $this->bucket,
-				'output_format' => $output,	
-				'output_queue' => $this->output_queue,
-				'job_id' => $job_id
-			)
-		));
+		try{
+			$response = $sqs->sendMessage(array(
+				'QueueUrl' => $this->input_queue, 
+				'MessageBody' => json_encode(array(
+					'input_file' => $file_name,
+					'bucket' => $this->bucket,
+					'output_format' => $output,	
+					'output_queue' => $this->output_queue,
+					'job_id' => $job_id
+				)
+			));
+		}catch(\Exception $e){
+			return false;
+		}
 
 		if($response instanceof \Guzzle\Service\Resource\Model && strlen($response['MessageId'])>0)
 			return true;
@@ -97,10 +101,14 @@ class aws extends \glue\Component{
 
 	function receiveEncodingMessage(){
 		$sqs = $this->get('sqs');
-		return $sqs->receiveMessage(array(
-			'QueueUrl' => $this->output_queue
-		    'VisibilityTimeout' => 1
-		));
+		try{
+			return $sqs->receiveMessage(array(
+				'QueueUrl' => $this->output_queue
+			    'VisibilityTimeout' => 1
+			));
+		}catch(\Exception $e){
+			return false;	
+		}
 	}
 
 	/**

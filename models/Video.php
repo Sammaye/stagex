@@ -124,11 +124,16 @@ class Video extends \glue\Db\Document{
 		}
 	}
 
-	function licences(){
-		return array(
+	function licences($index=null){
+		
+		$d=array(
 			1 => "StageX Licence",
 			2 => "Creative Commons Licence (Re-use Allowed)"
 		);
+		if($index===null)
+			return $d;
+		else
+			return isset($d[$index]) ? $d[$index] : null;
 	}
 
 	function response($k = null, $v = null){
@@ -231,7 +236,7 @@ class Video extends \glue\Db\Document{
 		}
 
 		// Does ffmpeg think this is a real file??
-		exec(sprintf('ffmpeg -i "'.$_FILES[$id]['tmp_name'].'" 2>&1'), $output);
+		exec(sprintf('ffmpeg -i "'.$file->tmp_name.'" 2>&1'), $output);
 		$ffmpeg_details = implode("\r", $output);
 		if(!preg_match('!Duration: ([0-9:.]*)[, ]!', $ffmpeg_details) || preg_match('!Duration: ([0-9:.]*)[, ]!', $ffmpeg_details) <= 0){
 			unlink($file->tmp_name); // Free up space in our temp dir
@@ -281,7 +286,7 @@ class Video extends \glue\Db\Document{
 			// Lets transfer to S3
 			$file_name = new \MongoId().'.'.pathinfo($file->name, PATHINFO_EXTENSION);
 			if(glue::aws()->S3Upload($file_name, array('Body' => fopen($file->tmp_name, 'r+')))){
-				$this->original = glue::aws()->get_s3_obj_url($file_name);
+				$this->original = glue::aws()->getS3ObjectURL($file_name);
 				unlink($file->tmp_name); // Free up space in our temp dir
 
 				/*
@@ -289,12 +294,12 @@ class Video extends \glue\Db\Document{
 				 * to keep track of encoding over possibly many videos and many outputs and also to keep track of which
 				 * videos received an AWS cURL error while trying to send messages
 				 */
-				$job = array('job_id' => md5( uniqid( rand(1,255).rand(45,80).rand(112,350), true ) )); // Pre-pop the job with an id
+				$job = array('jobId' => md5( uniqid( rand(1,255).rand(45,80).rand(112,350), true ) )); // Pre-pop the job with an id
 
 				// So lets send the command to SQS now
-				$img_submit = glue::aws()->send_video_encoding_message($file_name, $job['job_id'], 'img');
-				$mp4_submit = glue::aws()->send_video_encoding_message($file_name, $job['job_id'], 'mp4');
-				$ogv_submit = glue::aws()->send_video_encoding_message($file_name, $job['job_id'], 'ogv');
+				$img_submit = glue::aws()->sendEncodingMessage($file_name, $job['jobId'], 'img');
+				$mp4_submit = glue::aws()->sendEncodingMessage($file_name, $job['jobId'], 'mp4');
+				$ogv_submit = glue::aws()->sendEncodingMessage($file_name, $job['jobId'], 'ogv');
 
 				if($img_submit && $mp4_submit && $ogv_submit){
 					$state = 'transcoding';
@@ -302,12 +307,13 @@ class Video extends \glue\Db\Document{
 					$state = 'pending';
 				}
 
-				glue::db()->videos->update(array('_id' => $this->_id), array('$set' => array('state' => $state, 'deleted' => 0, 'job_id' => $job['job_id'])));
+				$this->updateAll(array('_id' => $this->_id), array('$set' => array('state' => $state, 'jobId' => $job['jobId'])));
 				glue::db()->encoding_jobs->insert(array_merge($job, array('file_name' => $file_name, 'img_submit' => $img_submit, 'mp4_submit' => $mp4_submit,
 					'ogv_submit' => $ogv_submit, 'state' => $state)));
 			}else{
-				// If it won't upload to S3 don't bother, mark video as deleted and carry on
-				glue::db()->videos->update(array('_id' => $this->_id), array('$set' => array('deleted' => 1, 'state' => 'failed')));
+				
+				// FAIL
+				$this->updateAll(array('_id' => $this->_id), array('$set' => array('state' => 'failed')));
 				$this->response("ERROR", "UNKNOWN");
 				return false;
 			}
@@ -350,12 +356,12 @@ class Video extends \glue\Db\Document{
 				":title" => $this->title,
 				":description" => $this->description,
 				":cat" => $this->category,
-				":tags" => $this->string_tags,
+				":tags" => $this->stringTags,
 				":duration" => $this->duration,
 				":rating" => $this->likes - $this->dislikes,
 				":views" => $this->views,
 				":type" => "video",
-				":adult" => $this->adult_content,
+				":adult" => $this->mature,
 				":author_name" => $this->author->username,
 			));
 		}
@@ -661,11 +667,6 @@ class Video extends \glue\Db\Document{
 		if(is_array($this->tags)){
 			return implode(", ", $this->tags);
 		}
-	}
-
-	function get_licence_text(){
-		$licence = $this->licences();
-		return $licence[$this->licence];
 	}
 
 	function get_category_text(){
