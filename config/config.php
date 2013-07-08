@@ -338,13 +338,12 @@ return array(
 		),
 
 		'aws' => array(
-				'class' => 'aws_bootstrap',
-				'path' => 'glue/plugins/aws/aws_bootstrap.php',
-				'key' => 'AKIAICYRUYXAXE3MTUXA',
-				'secret' => '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',
-				'bucket' => 'videos.stagex.co.uk',
-				'input_queue' => 'https://us-west-2.queue.amazonaws.com/663341881510/stagex-uploadsQueue',
-				'output_queue' => 'https://us-west-2.queue.amazonaws.com/663341881510/stagex-outputsQueue'
+			'class' => 'glue\\components\\aws\\aws',
+			'key' => 'AKIAICYRUYXAXE3MTUXA',
+			'secret' => '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',
+			'bucket' => 'videos.stagex.co.uk',
+			'input_queue' => 'https://us-west-2.queue.amazonaws.com/663341881510/stagex-uploadsQueue',
+			'output_queue' => 'https://us-west-2.queue.amazonaws.com/663341881510/stagex-outputsQueue'
 		),
 
 		'purifier' => array(

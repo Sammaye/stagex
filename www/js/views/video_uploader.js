@@ -12,6 +12,7 @@ $(document).on('change', '.upload input[type=file]', function(event){
 		path_parts = filename.split('\\');		
 		
 	el.find("#Video_title").val(path_parts[path_parts.length-1]);
+	el.find('.progress_bar .progress').css({width:'5%'});
 	
 	el.find('.upload_form').hide();
 	el.find('.upload_details').show();
@@ -30,37 +31,32 @@ $(document).on('click', '.upload .remove', function(event){
 $(document).on('click', '.upload .cancel', function(event){
 	event.preventDefault();
 	
-	var answer = confirm("Are you sure you wish to cancel this upload?"), p_id = "#uploading_pane_"+id;
+	var answer = confirm("Are you sure you wish to cancel and remove this upload?"), 
+		el = $(this).parents('.upload');
 
 	// Only remove the upload if it has not completed.
-	if (answer && ($(p_id+" .uploadProgInner").css("width") != "100%")){
-		// Show Cancel message
-		show_bar_message($(p_id).parents('.upload_item'), false, 'The upload was cancelled by the user.');
-
-		$(p_id).parents('.upload').find('.uploadForm').remove();
-
-		// Hide parts of the form
-		$(p_id).parents('.upload_item').find('.uploadBar,.toggle_panel,.upload_details').hide();
-		$("#upload_item_"+id).find('.form_top .remove').show();
-		u_ids.splice(u_ids.indexOf(id), 1);
+	if (answer && (el.find(".progress_bar .progress").css("width") != "100%")){
+		el.find('.upload_form').remove();
+		finish_upload(el.data().id,false,'The upload was cancelled');
 	}else{
-		show_bar_message($(p_id).parents('.upload_item'), false, 'An unknown error occurred. The upload could not be stopped.');
+		el.find('.upload_details').children('.alert').summarise('set', 'error', 'An unknown error occurred. The upload could not be stopped.')
 	}	
 });
 
 $(document).on('click', '.upload_details .btn-success', function(event){
 	event.preventDefault();
 	var $this = $(this),
-		data = this.parents('form').find('select, textarea, input').serializeArray();
-	data[data.length] = {name: 'upload_id', value: this.parents('.upload').data().id};
+		data = $this.parents('form').find('select, textarea, input').serializeArray();
+	data[data.length] = {name: 'uploadId', value: this.parents('.upload').data().id};
 
-	$.post('/video/ajaxSave', data, function(data){
+	$.post('/video/saveUpload', data, function(data){
 		if(data.success){
-			forms.summary(this_o.parents('.upload_details').find('.block_summary'), true,
-				'The details to this upload were saved.', data.errors);
+			$this.find('.edit_information .alert').summarise('set', 'success', 'The details to this upload were saved.');
 		}else{
-			forms.summary(this_o.parents('.upload_details').find('.block_summary'), false,
-				'The details to this upload could not be saved because:', data.errors);
+			$this.find('.edit_information .alert').summarise('set', 'error', {
+				message: 'The details to this upload were saved.',
+				list: data.errors
+			});
 		}
 	}, 'json');
 });

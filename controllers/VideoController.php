@@ -192,10 +192,14 @@ class videoController extends glue\Controller{
 
 	}
 
-	function action_upload_info_save(){
-		$this->pageTitle = 'Save Your Video Information - StageX';
+	function action_saveUpload(){
+		
+		if(!glue::http()->isAjax()){
+			glue::trigger('404');
+			return;	
+		}
 
-		$video = Video::model()->findOne(array('user_id' => glue::session()->user->_id, 'upload_id' => $_POST['upload_id']));
+		$video = Video::model()->findOne(array('userId' => glue::user()->_id, 'uploadId' => $_POST['uploadId']));
 		$exists = true;
 
 		if(!$video){
@@ -203,9 +207,8 @@ class videoController extends glue\Controller{
 			$exists = false;
 		}
 
-		$video->setScenario('upload');
-		$upload_id = $_POST['upload_id'];
-		unset($_POST['upload_id']);
+		$upload_id = $_POST['uploadId'];
+		unset($_POST['uploadId']);
 
 		if(isset($_POST['Video'])){
 			$video->_attributes($_POST['Video']);
@@ -213,17 +216,17 @@ class videoController extends glue\Controller{
 				if($exists){
 					$video->save();
 				}else{
-					if(isset($_SESSION['_upload_save'])){
-						$_SESSION['_upload_save'][$upload_id] = $_POST['Video'];
+					if(isset($_SESSION['_upload'])){
+						$_SESSION['_upload'][$upload_id] = $_POST['Video'];
 					}else{
-						$_SESSION['_upload_save'] = array($upload_id => $_POST['Video']);
+						$_SESSION['_upload'] = array($upload_id => $_POST['Video']);
 					}
 				}
 				//Success
-				echo json_encode(array('success' => true, 'errors' => $video->getErrorMessages()));
+				echo json_encode(array('success' => true, 'errors' => $video->getErrors()));
 			}else{
 				//fail
-				echo json_encode(array('success' => false, 'errors' => $video->getErrorMessages()));
+				echo json_encode(array('success' => false, 'errors' => $video->getErrors()));
 			}
 		}
 	}

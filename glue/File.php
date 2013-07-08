@@ -105,7 +105,7 @@ class File implements \Iterator,\ArrayAccess,\Countable{
 
 		if($model){
 			$cnameParts=explode('\\',get_class($model));
-			$file_a = $_FILES[end($cnameParts)];
+			$file_a = isset($_FILES[end($cnameParts)]) ? $_FILES[end($cnameParts)] : null;
 		}else
 			$file_a = $_FILES;
 
@@ -117,7 +117,7 @@ class File implements \Iterator,\ArrayAccess,\Countable{
 			$this->upload=true;
 
 			if(isset($file_a[$id])){
-				foreach($a as $k => $v)
+				foreach($file_a[$id] as $k => $v)
 					$this->$k=$v;
 			}else{
 				$result = array();

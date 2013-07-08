@@ -1,10 +1,15 @@
 <div class="upload" data-id='<?php echo $u_id ?>'>
 
 	<div class="upload_form">
-		<form action="<?php echo $this->createUrl('/video/upload_to_server', array('id' => $u_id), glue::$params['uploadBase']) ?>" target="u_ifr<?php echo $u_id ?>" method="post" enctype="multipart/form-data">
+		<?php $form = html::activeForm(array(
+				'action' => $this->createUrl('/video/upload_to_server', array('id' => $u_id), glue::$params['uploadBase']), 
+				'method' => 'post', 'enctype' => 'multipart/form-data', 'target' => "u_ifr$u_id"
+		)) ?>
 			<a href="javascript: void(0)" class='add_upload'>Click here to Upload a Video
-			<input type="hidden" name="UPLOAD_IDENTIFIER" value="<?php echo $u_id ?>" /><input type="file" name="<?php echo $u_id ?>" id="<?php echo $u_id ?>" class='file_upload' /></a>
-		</form><iframe name="u_ifr<?php echo $u_id ?>" style="display:none;" id="u_ifr<?php echo $u_id ?>"></iframe>
+			<input type="hidden" name="UPLOAD_IDENTIFIER" value="<?php echo $u_id ?>" />
+			<input type="file" name="<?php echo $u_id ?>" id="<?php echo $u_id ?>" class='file_upload' /></a>
+		<?php $form->end() ?>
+		<iframe name="u_ifr<?php echo $u_id ?>" style="display:none;" id="u_ifr<?php echo $u_id ?>"></iframe>
 	</div>
 
 	<div class="upload_details" style='display:none;'>

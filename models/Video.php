@@ -186,6 +186,10 @@ class Video extends \glue\Db\Document{
 			array('stringTags', 'tokenized', 'max' => 10, 'message' => 'You can add upto 10 tags, no more')
 		);
 	}
+	
+	public function init(){
+		$this->populateDefaults();
+	}
 
 	function afterFind(){
 		if(is_array($this->tags)){
@@ -214,7 +218,7 @@ class Video extends \glue\Db\Document{
 
 	function upload($id){
 
-		$file=new \glue\File(array('model'=>$this,'id'=>'file'));
+		$file=new \glue\File(array('model'=>null,'id'=>$id));
 		if(strlen($file->tmp_name)<=0){
 			$this->response("ERROR", "NOT_VALID");
 			return false;
@@ -225,7 +229,6 @@ class Video extends \glue\Db\Document{
 			$this->response("ERROR", "NOT_ENOUGH_SP");
 			return false;
 		}
-		glue::user()->saveCounters(array('bandwidthLeft'=>"-$file->size"));
 
 		// Does ffmpeg think this is a real file??
 		exec(sprintf('ffmpeg -i "'.$_FILES[$id]['tmp_name'].'" 2>&1'), $output);
@@ -237,11 +240,13 @@ class Video extends \glue\Db\Document{
 			return false;
 		}
 
+		glue::user()->saveCounters(array('bandwidthLeft'=>-$file->size));
+		
 		// Now lets make a new video
 		$this->populateDefaults();
 		/*
 		 *	This takes the form from the upload page and places the data in
-		*/
+		 */
 		if(isset($_SESSION['_upload_save'][$id]) && is_array($_SESSION['_upload_save'][$id])){
 			foreach($_SESSION['_upload_save'][$id] as $k=>$v){
 				$this->$k = $v;
@@ -250,13 +255,13 @@ class Video extends \glue\Db\Document{
 		$this->userId = glue::session()->user->_id;
 		$this->fileSize = $file->size;
 		$this->title = substr(substr($file->name, 0, strrpos($file->name, '.')), 0, 75);
-		$this->md5 = $file_hash;
+		$this->md5 = md5_file($file->tmp_name);
 		$this->uploadId = $id;
 		$this->created = new MongoDate();
 		$this->state = 'uploading';
 
 		if(
-			($matched_video=self::model()->findOne(array('md5' => md5_file($file->tmp_name)))) 
+			($matched_video=self::model()->findOne(array('md5' => $this->md5))) 
 			&& $matched_video->state == 'finished'
 		){
 			$this->duration = $matched_video->duration;
@@ -268,16 +273,16 @@ class Video extends \glue\Db\Document{
 			$this->imageSrc = $matched_video->imageSrc;
 			$this->jobId = $matched_video->jobId;
 		}else{
-			$this->deleted = 1; // Mark this as deleted to stop it from showing
+			//$this->deleted = 1; // Mark this as deleted to stop it from showing
 		}
 		$this->save();
 
-		if(!$matched_video){
+		if(!$matched_video&&$matched_video->state!='finished'){
 			// Lets transfer to S3
-			$file_name = new MongoId().'.'.pathinfo($file->name, PATHINFO_EXTENSION);
-			if(glue::aws()->s3_upload($file_name, array('fileUpload' => $_FILES[$id]['tmp_name']))){
+			$file_name = new \MongoId().'.'.pathinfo($file->name, PATHINFO_EXTENSION);
+			if(glue::aws()->S3Upload($file_name, array('Body' => fopen($file->tmp_name, 'r+')))){
 				$this->original = glue::aws()->get_s3_obj_url($file_name);
-				unlink($_FILES[$id]['tmp_name']); // Free up space in our temp dir
+				unlink($file->tmp_name); // Free up space in our temp dir
 
 				/*
 				 * I create and insert a new job here into Mongo. This is the easiest way by far
