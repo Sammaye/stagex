@@ -1,8 +1,10 @@
 <?php
 
+namespace glue\components\Sphinx;
+
 require_once ( "sphinxapi.php" );
 
-class sphinx_searcher extends GApplicationComponent{
+class Sphinx extends \glue\Component{
 
 	public $host;
 	public $port;
@@ -30,6 +32,10 @@ class sphinx_searcher extends GApplicationComponent{
 		$this->sphinx->SetFilter('deleted', array(1), true);
 
 		return $this;
+	}
+	
+	function find(){
+		return new \SphinxCursor($matches);
 	}
 
 	public function getSearcher(){

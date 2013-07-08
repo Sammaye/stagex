@@ -298,21 +298,18 @@ return array(
 
 		// Woo Sphinx!
 		"sphinx"=>array(
-				'class' => 'sphinx_searcher',
-				'path' => 'glue/plugins/sphinx/sphinx_searcher.php',
+				'class' => 'glue\\components\\Sphinx\\Sphinx',
 				"host"=>"localhost",
 				"port"=>9312,
 				'indexes' => array(
-						'main' => array(
-								'type' => 'delta',
-								'delta' => 'main_delta',
-								'cursor' => 'MainSearch_SphinxCursor',
-								'query_fields' => array( 'title', 'description', 'tags', 'author_name' ),
-						),
-						'help' => array(
-								'cursor' => 'HelpSearch_SphinxCursor',
-								'query_fields' => array( 'title', 'content', 'tags', 'path' ),
-						)
+					'main' => array(
+						'delta' => 'main_delta',
+						'fields' => array( 'title', 'description', 'tags', 'author_name' ),
+					),
+					'help' => array(
+						'cursor' => 'HelpSearch_SphinxCursor',
+						'fields' => array( 'title', 'content', 'tags', 'path' ),
+					)
 				)
 		),
 

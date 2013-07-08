@@ -1,7 +1,39 @@
 <?php
-class HelpSearch_SphinxCursor implements ArrayAccess, Iterator, Countable{
+class SphinxCursor implements ArrayAccess, Iterator, Countable{
 
 	private $_container;
+	
+	public function setRankingMode(){
+		
+	}
+	
+	public function setMatchMode(){
+		
+	}
+	
+	public function setSortMode(){
+		
+	}
+	
+	public function setWeights(){
+		
+	}
+	
+	public function setFieldWeights(){
+		
+	}
+	
+	public function setLimits(){
+		
+	}
+	
+	public function setMaxQueryTime(){
+		
+	}
+	
+	public function SetOverride(){
+		
+	}
 
     public function __construct($matches) {
     	$this->_container = $matches;
@@ -45,16 +77,20 @@ class HelpSearch_SphinxCursor implements ArrayAccess, Iterator, Countable{
 
 			if($c['type']){
 	        	switch($c['type']){
-					case "topic":
-						$o = HelpTopic::model()->findOne(array('_id' => new MongoId($c['_id'])));
+					case "video":
+						$o = Video::model()->findOne(array('_id' => new MongoId($c['_id'])));
 						break;
-					case "article":
-						$o = HelpArticle::model()->findOne(array('_id' => new MongoId($c['_id'])));
+					case "user":
+						$o = User::model()->findOne(array('_id' => new MongoId($c['_id'])));
+						break;
+					case "playlist":
+						$o = Playlist::model()->findOne(array('_id' => new MongoId($c['_id'])));
 						break;
 	        	}
 			}else{
 				$o = (Object)$c;
 			}
+			$o->sphinxdocId = $c['id'];
 			return $o;
         }
 
@@ -69,19 +105,24 @@ class HelpSearch_SphinxCursor implements ArrayAccess, Iterator, Countable{
 
     	if(current($this->_container) !== false){
 	    	$c = current($this->_container);
-
+//var_dump($c);
 	    	if($c['attrs']['type']){
 	    		switch($c['attrs']['type']){
-					case "topic":
-						$o = HelpTopic::model()->findOne(array('_id' => new MongoId($c['attrs']['_id'])));
+					case "video":
+						$o = Video::model()->findOne(array('_id' => new MongoId($c['attrs']['_id'])));
 						break;
-					case "article":
-						$o = HelpArticle::model()->findOne(array('_id' => new MongoId($c['attrs']['_id'])));
+					case "user":
+						$o = User::model()->findOne(array('_id' => new MongoId($c['attrs']['_id'])));
+						break;
+					case "playlist":
+						//var_dump($c);
+						$o = Playlist::model()->findOne(array('_id' => new MongoId($c['attrs']['_id'])));
 						break;
 				}
 	    	}else{
 				$o = (Object)$c['attrs'];
 	    	}
+	    	//$o->sphinxdocId = $c['id'];
 	        return $o;
     	}else{
     		return  false;
