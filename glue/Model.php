@@ -32,7 +32,7 @@ class Model{
 		if(method_exists($this,'get'.$name)){
 			return $this->{'get'.$name}();
 		}elseif(property_exists($this,$name))
-			return $this->$name;
+			return @$this->$name;
 		else
 			return null;
 	}

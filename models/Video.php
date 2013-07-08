@@ -252,17 +252,17 @@ class Video extends \glue\Db\Document{
 		/*
 		 *	This takes the form from the upload page and places the data in
 		 */
-		if(isset($_SESSION['_upload_save'][$id]) && is_array($_SESSION['_upload_save'][$id])){
-			foreach($_SESSION['_upload_save'][$id] as $k=>$v){
+		if(isset($_SESSION['_upload'][$id]) && is_array($_SESSION['_upload'][$id])){
+			foreach($_SESSION['_upload'][$id] as $k=>$v){
 				$this->$k = $v;
 			}
 		}		
-		$this->userId = glue::session()->user->_id;
+		$this->userId = glue::user()->_id;
 		$this->fileSize = $file->size;
 		$this->title = substr(substr($file->name, 0, strrpos($file->name, '.')), 0, 75);
 		$this->md5 = md5_file($file->tmp_name);
 		$this->uploadId = $id;
-		$this->created = new MongoDate();
+		$this->created = new \MongoDate();
 		$this->state = 'uploading';
 
 		if(
@@ -282,7 +282,7 @@ class Video extends \glue\Db\Document{
 		}
 		$this->save(); // We save now to stop race conditions
 
-		if(!$matched_video&&$matched_video->state!='finished'){
+		if(!$matched_video||$matched_video->state!='finished'){
 			// Lets transfer to S3
 			$file_name = new \MongoId().'.'.pathinfo($file->name, PATHINFO_EXTENSION);
 			if(glue::aws()->S3Upload($file_name, array('Body' => fopen($file->tmp_name, 'r+')))){

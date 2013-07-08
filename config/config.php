@@ -335,7 +335,7 @@ return array(
 		),
 
 		'aws' => array(
-			'class' => 'glue\\components\\aws\\aws',
+			'class' => 'glue\\components\\aws\\Bootstrap',
 			'key' => 'AKIAICYRUYXAXE3MTUXA',
 			'secret' => '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',
 			'bucket' => 'videos.stagex.co.uk',

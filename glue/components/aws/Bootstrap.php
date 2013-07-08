@@ -5,10 +5,9 @@ namespace glue\components\aws;
 require_once 'aws.phar';
 
 use Aws\Common\Aws,
-	Aws\Common\Enum\Region, 
-	Aws\S3\S3Client;
+	Aws\Common\Enum\Region;
 
-class aws extends \glue\Component{
+class Bootstrap extends \glue\Component{
 
 	public $key;
 	public $secret;
@@ -23,7 +22,8 @@ class aws extends \glue\Component{
 		if($this->aws===null){
 			$this->aws=Aws::factory(array(
 				'key' => $this->key,
-				'secret' => $this->secret						
+				'secret' => $this->secret,
+				'region' => Region::US_WEST_2					
 			));
 		}
 		return $this->aws->get($obj);
@@ -38,7 +38,9 @@ class aws extends \glue\Component{
 
 	function S3Upload($filename,$opt = array()){
 
-		$s3 = $this->get('S3Client');
+		$s3 = $this->get('S3');
+		$s3->setRegion('us-east-1');
+		//var_dump($s3->getRegion()); exit();
 		try{
 			$response=$s3->putObject(array_merge(array(
 				'Bucket' => $this->bucket,
@@ -48,10 +50,11 @@ class aws extends \glue\Component{
 				'StorageClass' => 'REDUCED_REDUNDANCY'		
 			), $opt));
 		}catch(\Exception $e){
+			var_dump($e->getMessage());
 			return false;
 		}
 
-		if($response instanceof \Guzzle\Service\Resource\Model && strlen($response['ObjectURL'])>0)
+		if($response instanceof \Guzzle\Service\Resource\Model && strlen($response['ObjectURL'])>0){
 			return true;
 		}else{
 			return false;
@@ -59,7 +62,8 @@ class aws extends \glue\Component{
 	}
 
 	function S3GetObject($file_name){
-		$s3 = $this->get('AmazonS3');
+		$s3 = $this->get('S3');
+		$s3->setRegion('us-east-1');
 
 		$real_name = trim($file_name);
 		if(strlen($real_name) <= 0) 
@@ -87,7 +91,7 @@ class aws extends \glue\Component{
 					'output_format' => $output,	
 					'output_queue' => $this->output_queue,
 					'job_id' => $job_id
-				)
+				))
 			));
 		}catch(\Exception $e){
 			return false;
@@ -95,7 +99,6 @@ class aws extends \glue\Component{
 
 		if($response instanceof \Guzzle\Service\Resource\Model && strlen($response['MessageId'])>0)
 			return true;
-		}
 		return false;
 	}
 
@@ -103,7 +106,7 @@ class aws extends \glue\Component{
 		$sqs = $this->get('sqs');
 		try{
 			return $sqs->receiveMessage(array(
-				'QueueUrl' => $this->output_queue
+				'QueueUrl' => $this->output_queue,
 			    'VisibilityTimeout' => 1
 			));
 		}catch(\Exception $e){

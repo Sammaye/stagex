@@ -46,14 +46,15 @@ $(document).on('click', '.upload .cancel', function(event){
 $(document).on('click', '.upload_details .btn-success', function(event){
 	event.preventDefault();
 	var $this = $(this),
+		el = $(this).parents('.upload'),
 		data = $this.parents('form').find('select, textarea, input').serializeArray();
-	data[data.length] = {name: 'uploadId', value: this.parents('.upload').data().id};
-
+	data[data.length] = {name: 'uploadId', value: $this.parents('.upload').data().id};
+	
 	$.post('/video/saveUpload', data, function(data){
 		if(data.success){
-			$this.find('.edit_information .alert').summarise('set', 'success', 'The details to this upload were saved.');
+			el.find('.edit_information .alert').summarise('set', 'success', 'The details to this upload were saved.');
 		}else{
-			$this.find('.edit_information .alert').summarise('set', 'error', {
+			el.find('.edit_information .alert').summarise('set', 'error', {
 				message: 'The details to this upload were saved.',
 				list: data.errors
 			});
@@ -94,7 +95,7 @@ function add_upload(){
 		var e = $(".upload").last().find("input[name=UPLOAD_IDENTIFIER]").val();
 		$(".upload").last().find('.upload_details').children('.alert').summarise({tpl_close:''});
 		$('.upload').last().find('.edit_information .alert').summarise();
-		
+		console.log($('.upload').last().find('.edit_information .alert').data());
 		count_ids = u_ids.length;
 		u_ids[count_ids] = e;
 		

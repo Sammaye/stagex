@@ -9,7 +9,7 @@ class videoController extends glue\Controller{
 	public function authRules(){
 		return array(
 			array("allow",
-				"actions"=>array( 'upload', 'add_upload', 'get_upload_info', 'upload_to_server', 'upload_info_save', 'save', 'set_detail',
+				"actions"=>array( 'upload', 'addUpload', 'getUploadStatus', 'createUpload', 'saveUpload', 'save', 'set_detail',
 					'delete_responses', 'batch_delete', 'remove', 'report', 'like', 'dislike', 'statistics', 'get_more_statistics' ),
 				"users"=>array("@*")
 			),
@@ -211,7 +211,7 @@ class videoController extends glue\Controller{
 		unset($_POST['uploadId']);
 
 		if(isset($_POST['Video'])){
-			$video->_attributes($_POST['Video']);
+			$video->attributes=$_POST['Video'];
 			if($video->validate()){
 				if($exists){
 					$video->save();
