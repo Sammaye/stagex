@@ -100,7 +100,7 @@ class videoController extends glue\Controller{
 			echo $this->render('uploadForbidden', array());
 	}
 
-	function action_add_upload(){
+	function action_addUpload(){
 		if(!glue::http()->isAjax())
 			glue::trigger('404');
 
@@ -113,7 +113,7 @@ class videoController extends glue\Controller{
 		));
 	}
 
-	function action_get_upload_info(){
+	function action_getUploadStatus(){
 
 		$ret = array();
 
@@ -146,7 +146,7 @@ class videoController extends glue\Controller{
 		echo json_encode(array('success'=>true,'status'=>$ret));
 	}
 
-	function action_upload_to_server(){
+	function action_createUpload(){
 
 		header('P3P: CP="CAO PSA OUR"');
 

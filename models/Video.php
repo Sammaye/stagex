@@ -280,7 +280,7 @@ class Video extends \glue\Db\Document{
 		}else{
 			//$this->deleted = 1; // Mark this as deleted to stop it from showing
 		}
-		$this->save();
+		$this->save(); // We save now to stop race conditions
 
 		if(!$matched_video&&$matched_video->state!='finished'){
 			// Lets transfer to S3

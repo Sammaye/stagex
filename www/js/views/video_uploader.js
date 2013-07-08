@@ -85,7 +85,7 @@ function add_upload(){
 	count = $(".upload").length;
 
 	// Generate the form
-	$.get("/video/add_upload", {ts: ts}, function(data){
+	$.get("/video/addUpload", {ts: ts}, function(data){
 
 		// Add to the page
 		$(".upload_list").append(data.html);
@@ -105,7 +105,7 @@ function add_upload(){
 
 function get_upload_progress(){
 	if(u_ids.length>0){
-		$.getJSON('/video/get_upload_info', {ids: u_ids}, function(data){
+		$.getJSON('/video/getUploadStatus', {ids: u_ids}, function(data){
 			// Scrolls through the IDs assigning the information.
 			
 			if(data.success)
