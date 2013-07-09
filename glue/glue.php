@@ -100,27 +100,23 @@ class glue{
 		// Import the includes
 		foreach(self::$include as $path)
 			self::import($path,true);
+		
+		if(is_array(self::$startUp)){
+			foreach(self::$startUp as $c)
+				self::getComponent($c);
+		}		
 
 		// Let's start processing the request
 		if(php_sapi_name() == 'cli'){
 			$args = self::http()->parseArgs($_SERVER['argv']);
-			self::$www='/cli';
-
-			self::runCliAction();
+			self::$www='/cli';		
 		}else{
 			self::$www = self::$www?:null;
-
-			// since there is no controller as such for CLI atm lets not run the startUp stuff on cli actions
-			// So after that lets touch all startup items and get them to run their contructors and init functions
-			if(is_array(self::$startUp)){
-				foreach(self::$startUp as $c)
-					self::getComponent($c);
-			}
-			//echo "beofer";
 			self::getComponent('user'); // force the user to be inited
 			//echo "after";
-			self::route($url);
+			//self::route($url);
 		}
+		self::route($url);
 	}
 
 	/**
@@ -159,28 +155,6 @@ class glue{
 	}
 
 	/**
-	 * Runs a CLI script, may be redone in the future to make CLI run like controllers
-	 * @throws Exception
-	 */
-	public static function runCliAction(){
-		if ($route === '') {
-			throw new Exception('You must provide a cli file to run');
-		}
-		if (($pos = strpos($route, '/')) !== false) {
-			$id = substr($route, 0, $pos); // Lets get the first bit before the first /
-			$route = substr($route, $pos + 1); // then lets get everything else
-		} else {
-			$id = $route;
-			$route = '';
-		}
-
-		$controllerName = $id;
-		$controllerFile = ( self::getPath('@cli')!==null ? self::getPath('@cli') : self::getPath('@app'). DRIECTORY_SEPARATOR . 'cli' ) . DIRECTORY_SEPARATOR .
-								$controllerName . '.php';
-		include($controllerFile);
-	}
-
-	/**
 	 * Create a new controller
 	 * @param string $route
 	 */
@@ -198,8 +172,12 @@ class glue{
 		}
 
 		$controllerName = $id."Controller";
-		$controllerFile = ( self::getPath('@controllers')!==null ? self::getPath('@controllers') : self::getPath('@app') . DIRECTORY_SEPARATOR . 'controllers' ) .
-								DIRECTORY_SEPARATOR . $controllerName . '.php';
+		if(php_sapi_name() == 'cli')
+			$controllerFile = ( self::getPath('@cli')!==null ? self::getPath('@cli') : self::getPath('@app') . DIRECTORY_SEPARATOR . 'cli' ) .
+				DIRECTORY_SEPARATOR . $controllerName . '.php';			
+		else
+			$controllerFile = ( self::getPath('@controllers')!==null ? self::getPath('@controllers') : self::getPath('@app') . DIRECTORY_SEPARATOR . 'controllers' ) .
+				DIRECTORY_SEPARATOR . $controllerName . '.php';
 		//var_dump($controllerFile);
 		$className = ltrim(self::$controllerNamespace . '\\' . $controllerName, '\\');
 
