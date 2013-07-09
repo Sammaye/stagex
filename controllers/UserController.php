@@ -304,7 +304,7 @@ class userController extends \glue\Controller{
 
 		$video_rows = Video::model()->fts(
 			array('title', 'description', 'tags'), isset($_GET['query']) ? $_GET['query'] : '', array_merge(
-				array('user_id' => glue::user()->_id, 'deleted' => 0), $filter_obj))
+				array('userId' => glue::user()->_id, 'deleted' => 0), $filter_obj))
 			->sort(array('created' => -1));
 
 		echo $this->render('videos', array('video_rows' => $video_rows, 'filter' => $filter));

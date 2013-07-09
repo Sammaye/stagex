@@ -519,6 +519,7 @@ textarea{
 }
 
 .userbody{
+	min-width:980px;
 	margin:15px 45px 0 45px;
 }
 
@@ -763,6 +764,22 @@ textarea{
 
 .deactivate_body .submit{
 	float:left; display:block; margin:10px 0 0 10px;
+}
+
+.upload_caption .left{
+	float:left;
+}
+
+.upload_caption .left span{
+	font-size:18px; line-height:24px;
+}
+
+.upload_caption .left .light{
+	font-size:12px;
+}
+
+.upload_caption .right{
+	float:right; font-size:18px; line-height:24px;
 }
 
 .upload{

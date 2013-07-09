@@ -9,8 +9,8 @@
 		<?php if($item->description){ ?>
 			<div class='expandable description'><?php echo $item->description ?></div>
 		<?php } ?>
-		<span class='option_info'><a href='<?php echo glue::url()->create('/video/statistics', array('id' => $item->_id)) ?>'><img alt='stats' src='/images/stats_icon.png'/> <?php echo $item->views ?></a>
-			&nbsp;-&nbsp; <a href='<?php echo glue::url()->create('/videoresponse/view_all', array('id' => $item->_id)) ?>'><img alt='comments' src='/images/responses_icon.png'/> <?php echo $item->total_responses ?></a> &nbsp;-&nbsp;
+		<span class='option_info'><a href='<?php echo glue::http()->createUrl('/video/statistics', array('id' => $item->_id)) ?>'><img alt='stats' src='/images/stats_icon.png'/> <?php echo $item->views ?></a>
+			&nbsp;-&nbsp; <a href='<?php echo glue::http()->createUrl('/videoresponse/view_all', array('id' => $item->_id)) ?>'><img alt='comments' src='/images/responses_icon.png'/> <?php echo $item->total_responses ?></a> &nbsp;-&nbsp;
 			<?php echo date('d F Y', $item->created->sec) ?></span> <?php if($item->state == 'failed'): ?><span class='encoding_failed'>Encoding FAILED</span><?php elseif($item->is_processing()): ?><span class='encoding'>Encoding In Progress</span><?php endif; ?>
 	</div>
 	<div class="clear"></div>

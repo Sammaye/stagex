@@ -202,7 +202,7 @@ ob_end_clean();
 			'page' 		 => isset($_GET['page']) ? $_GET['page'] : 1,
 			"cursor"	 => $video_rows,
 			'template' 	 => $template,
-			'itemView' 	 => 'videos/_video.php',
+			'itemView' 	 => 'video/_video.php',
 			'pagerCssClass' => 'grid_list_pager'
 		));
 	}else{ ?>

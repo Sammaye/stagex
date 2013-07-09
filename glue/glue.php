@@ -113,8 +113,6 @@ class glue{
 		}else{
 			self::$www = self::$www?:null;
 			self::getComponent('user'); // force the user to be inited
-			//echo "after";
-			//self::route($url);
 		}
 		self::route($url);
 	}

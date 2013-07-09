@@ -34,7 +34,7 @@ class Cursor implements \Iterator, \Countable{
 	    if(is_string($modelClass)){
 			$this->modelClass=$modelClass;
 			$this->model=EMongoDocument::model($this->modelClass);
-		}elseif($modelClass instanceof EMongoDocument){
+		}elseif($modelClass instanceof \glue\db\Document){
 			$this->modelClass=get_class($modelClass);
 			$this->model=$modelClass;
 		}

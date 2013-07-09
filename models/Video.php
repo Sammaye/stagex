@@ -185,7 +185,7 @@ class Video extends \glue\Db\Document{
 			array('category', 'in', 'range' => $this->categories('values'), 'message' => 'You must provide a valid category'),
 			array('licence', 'in', 'range' => array(1, 2), 'message' => 'You must provide a licence type'),
 				
-			array('listing', 'in', 'range' => array(1, 2, 3), 'message' => 'You must select a valid listing of either public, unlisted or private'),
+			array('listing', 'in', 'range' => array(0, 1, 2), 'message' => 'You must select a valid listing of either public, unlisted or private'),
 			array('voteable, embeddable, privateStatistics, voteableComments, allowVideoComments, allowTextComments, mature, moderated', 'boolean', 'allowNull' => true),
 			
 			array('stringTags', 'tokenized', 'max' => 10, 'message' => 'You can add upto 10 tags, no more')
@@ -213,7 +213,7 @@ class Video extends \glue\Db\Document{
 		if(isset(glue::$params['thumbnailBase'])){
 			return 'http://'.glue::$params['thumbnailBase'].strval($this->_id).'_w_'.$width.'_h_'.$height.'.png';
 		}else{
-			return Glue::url()->create("/image/video", array(
+			return Glue::http()->createUrl("/image/video", array(
 				'file' => strval($this->_id),
 				"w"=>$width,
 				"h"=>$height

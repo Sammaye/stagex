@@ -12,7 +12,7 @@ use glue;
  *
  * @author Sam Millman
  */
-class ListView extends Widget{
+class ListView extends \glue\Widget{
 
 	public $id; // The id of the widget, mostly used for AJAX and JQuery stuff
 
@@ -146,7 +146,7 @@ class ListView extends Widget{
 		$end = $this->page + 5 <= $this->maxPage ? $this->page + 5 : $this->maxPage;
 		$ret = "";
 
-		$ret .= "<div class='GListView_Pager {$this->pagerCssClass}'>";
+		$ret .= "<div class='ListView_Pager {$this->pagerCssClass}'>";
 
 	    if($this->page != 1 && $this->maxPage > 1) {
 	    	if($this->enableAjaxPagination){
@@ -236,7 +236,7 @@ class ListView extends Widget{
 
 			// Then lets attempt to get the cwd from the controller. If the controller is not set we use siteController as default. This can occur for cronjobs
 			return str_replace('/', DIRECTORY_SEPARATOR, glue::getPath('@app').'/views/'.str_replace('controller', '',
-					strtolower(isset(glue::$action['controller']) ? glue::$action['controller'] : 'siteController')).'/'.$path);
+					strtolower(isset(glue::$action['controller']) ? glue::$action['controller'] : 'indexController')).'/'.$path);
 		}
 	}
 
