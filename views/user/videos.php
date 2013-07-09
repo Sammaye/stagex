@@ -206,6 +206,6 @@ ob_end_clean();
 			'pagerCssClass' => 'grid_list_pager'
 		));
 	}else{ ?>
-		<div class='padded_list_not_found'>No videos were found for you</div>
+		<div class=''>No videos were found for you</div>
 	<?php } ?>
 </div>

@@ -844,3 +844,57 @@ textarea{
 .upload .alert{
 	margin:0 0 10px 0;
 }
+
+.video{
+	margin:0 0 10px 0;
+}
+
+.video .thumbnail{
+	margin:0 10px 0 0;
+}
+
+.video .thumbnail img{
+	border-radius:3px;
+}
+
+.video .info h3{
+	font-size:20px;
+	line-height:32px;
+	margin:0;
+}
+
+.video .info .description{
+	font-size:13px;
+	line-height:18px;
+}
+
+.video .info .detail{
+	color:#999999;
+	font-size:11px;
+	line-height:18px;
+}
+
+.video .infocons{
+	float:right;
+}
+
+.video .infocons .listing,
+.video .infocons .comments{
+	float:right;
+	display:block;
+	margin:25px 0 0;
+  	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=70)";
+  	filter: alpha(opacity=70);
+  	-moz-opacity: 0.7;
+  	-khtml-opacity: 0.7;
+  	opacity: 0.7;	
+}
+
+.video .infocons .listing{
+	margin-right:10px;
+}
+
+.user_videos_body .video{
+	padding:10px;
+	border-bottom:1px solid #eeeeee;
+}
