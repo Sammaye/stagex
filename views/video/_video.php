@@ -1,5 +1,5 @@
 <div class='video' data-id='<?php echo strval($item->_id) ?>'>
-	<div class='checkbox' style='float:left;'><?php echo html::checkbox(strval(isset($custid) ? $custid : $item->_id), 1, 0) ?></div>
+	<div class='checkbox_custom' style='float:left;'><div class="checkbox_input" style='margin:25px 15px 0 0;'><?php echo html::checkbox(strval(isset($custid) ? $custid : $item->_id), 1, 0) ?></div></div>
 	<div class='thumbnail' style='position:relative;float:left;'><a href="/video/watch?id=<?php echo strval($item->_id) ?>" >
 		<img alt='<?php echo Html::encode($item->title) ?>' src="<?php echo $item->getImage(138, 77) ?>"/></a>
 		<?php if($item->state == 'finished'): ?>
@@ -13,16 +13,23 @@
 			<div class='expandable description'><?php echo $item->description ?></div>
 		<?php } ?>
 		<div class="detail">
-			<?php if($item->state == 'failed'): ?>
-			<span class='encoding_failed'>Encoding FAILED</span> &nbsp;-&nbsp;
-			<?php elseif($item->isProcessing()): ?>
-			<span class='currently_encoding'>Encoding In Progress</span> &nbsp;-&nbsp;
-			<?php endif; ?>
 			<?php echo date('d F Y', $item->created->sec) ?>
 		</div>
 	</div>
+	<div class="" style="float:left;">
+		<?php if($item->isProcessing() || $item->state=='failed'): ?>
+			<?php if($item->state == 'failed'): ?>
+			<span class='encoding_failed'>Encoding FAILED</span>
+			<?php elseif($item->isProcessing()): ?>
+			<span class='currently_encoding'>Encoding In Progress</span>
+			<?php endif; ?>		
+		<?php else: ?>
+			<span><?php echo $item->views ?> Views</span>
+			<span><?php echo $item->totalResponses ?> Responses</span>
+		<?php endif; ?>
+	</div>
 	<div class='infocons'>
-	
+
 		<span class='comments'>
 			<?php if(!$item->allowTextComments && !$item->allowVideoComments){ ?>
 				<img alt='Comments Allowed' src='/images/comments_disabled_icon.png'/>

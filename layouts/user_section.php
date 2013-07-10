@@ -48,8 +48,6 @@ $this->beginPage() ?>
 			<?php app\widgets\Menu::widget() ?>
 			<div class='userbody'>
 				<div class='side_menu' style='float:left;'>
-					<a href='<?php echo glue::http()->createUrl('/video/upload', array(), glue::$params['uploadBase']) ?>' class='green_css_button upload'>UPLOAD</a>
-					<div class='clearer'></div>
 					<ul>
 						<li><a href='<?php echo glue::http()->createUrl('/stream/news') ?>' <?php echo $this->tab == "news_feed" ? "class='selected'" : "" ?>>News Feed</a></li>
 						<li class='wl_item'><a href='<?php echo glue::http()->createUrl('/user/watch_later') ?>' <?php echo $this->tab == "watch_later" ? "class='selected'" : "" ?>>Watch Later</a></li>

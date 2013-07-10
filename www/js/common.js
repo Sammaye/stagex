@@ -9,6 +9,14 @@ $(document).on('click', '.radio,.checkbox', function(e){
 		input.prop('checked',true);
 });
 
+$(document).on('click', '.checkbox_input input', function(e){
+	if($(this).prop('checked')==true){
+		$(this).parent().addClass('checked');
+	}else{
+		$(this).parent().removeClass('checked');
+	}
+});
+
 /**
  * Open link in new Window Plugin
  * 

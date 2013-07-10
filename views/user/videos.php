@@ -131,25 +131,29 @@ ob_end_clean();
 		});
 	");
 ?>
-<div class="boxed_page_layout_outer user_videos_body">
+<div class="user_videos_body">
 
-	<div class='borderless_head'>
-		<div class='head'>Videos</div>
+	<div style='margin:0 0 15px 0;'>
+		<div style='float:left; width: 300px;'>
+		<h1 style='margin-top:0;'>Videos</h1>
     	<div class='amnt_found'><?php echo $video_rows->count() ?> found</div>
+    	</div>
+    	<div style='float:right;'>
+    		<a href="<?php echo glue::http()->createUrl('/video/upload', array(), glue::$params['uploadBase']) ?>">Add New Upload</a>
+    	</div>
+    	<div class="clear"></div>
     </div>
 
 	<?php ob_start(); ?>
-		<div class='stickytoolbar-placeholder grey_sticky_bar'>
+		<div class='stickytoolbar-placeholder grey_sticky_toolbar'>
 			<div class='stickytoolbar-bar'>
 				<div class='block_summary'></div>
 				<div class='inner_bar'>
-
-					<div class='checkbox_input'><?php echo Html::checkbox('selectAll', 1, 0, array('class' => 'selectAll_input')) ?></div>
-					<div class='grey_css_button add_to_playlist left_button'>Add To</div>
-					<div class='grey_css_button selected_actions float_left'>Edit</div>
-					<div class='search_widget'>
-						<?php $form = Html::form(array('method' => 'get')) ?>
-						<div class='middle'><?php
+					<div class='checkbox_button checkbox_input'><?php echo Html::checkbox('selectAll', 1, 0, array('class' => 'selectAll_input')) ?></div>
+					<button class='button selected_actions'>Edit</button>
+					<button class='button add_to_playlist'>Add To</button>
+					<div class='search'>
+						<?php $form = Html::form(array('method' => 'get'));
 						app\widgets\Jqautocomplete::widget(array(
 							'attribute' => 'query',
 							'value' => urldecode(htmlspecialchars(isset($_GET['query']) ? $_GET['query'] : '')),
@@ -163,19 +167,7 @@ ob_end_clean();
 									.data( 'item.autocomplete', item )
 									.append( '<a class=\'content\'><span>' + item.label + '</span></div></a>' )
 									.appendTo( ul );
-							")) ?></div><a href='#' id='video_search_submit' class='submit'><img alt='search' src='/images/search_icon_small.png'/></a>
-						<?php echo Html::submitbutton('Search', array('class' => 'invisible_submit')); $form->end() ?>
-					</div>
-					<div class='grey_css_button selected_filter right_button'>
-						<?php if($filter == 'listed'){ ?>
-							Showing Listed Videos
-						<?php }elseif($filter == 'unlisted'){ ?>
-							Showing Unlisted Videos
-						<?php }elseif($filter == 'private'){ ?>
-							Showing Private Videos
-						<?php }else{ ?>
-							Showing All Videos
-						<?php } ?>
+							")) ?>
 					</div>
 				</div>
 			</div>
