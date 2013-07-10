@@ -133,13 +133,30 @@ ob_end_clean();
 ?>
 <div class="user_videos_body">
 
-	<div style='margin:0 0 15px 0;'>
-		<div style='float:left; width: 300px;'>
-		<h1 style='margin-top:0;'>Videos</h1>
-    	<div class='amnt_found'><?php echo $video_rows->count() ?> found</div>
+	<div class="header">
+		<div class="left">
+    	    <a class="btn-success" href="<?php echo glue::http()->createUrl('/video/upload', array(), glue::$params['uploadBase']) ?>">Add New Upload</a>
     	</div>
-    	<div style='float:right;'>
-    		<a href="<?php echo glue::http()->createUrl('/video/upload', array(), glue::$params['uploadBase']) ?>">Add New Upload</a>
+    	<div class="right" style=''>   
+    		<span class='light small amount_found'><?php echo $video_rows->count() ?> found</span>
+    		<div class='search form-search'>
+			<?php $form = Html::form(array('method' => 'get')); ?><div class="search_input">
+				<?php app\widgets\Jqautocomplete::widget(array(
+					'attribute' => 'query',
+					'value' => urldecode(htmlspecialchars(isset($_GET['query']) ? $_GET['query'] : '')),
+					'options' => array(
+						'appendTo' => '#user_video_results',
+						'source' => '/user/video_search_suggestions',
+						'minLength' => 2,
+					),
+					'renderItem' => "
+						return $( '<li></li>' )
+							.data( 'item.autocomplete', item )
+							.append( '<a class=\'content\'><span>' + item.label + '</span></div></a>' )
+							.appendTo( ul );
+				"))  ?></div><button class="submit_search"><span>&nbsp;</span></button>
+			<?php $form->end() ?>
+			</div>    	
     	</div>
     	<div class="clear"></div>
     </div>
@@ -152,23 +169,6 @@ ob_end_clean();
 					<div class='checkbox_button checkbox_input'><?php echo Html::checkbox('selectAll', 1, 0, array('class' => 'selectAll_input')) ?></div>
 					<button class='button selected_actions'>Edit</button>
 					<button class='button add_to_playlist'>Add To</button>
-					<div class='search'>
-						<?php $form = Html::form(array('method' => 'get'));
-						app\widgets\Jqautocomplete::widget(array(
-							'attribute' => 'query',
-							'value' => urldecode(htmlspecialchars(isset($_GET['query']) ? $_GET['query'] : '')),
-							'options' => array(
-								'appendTo' => '#user_video_results',
-								'source' => '/user/video_search_suggestions',
-								'minLength' => 2,
-							),
-							'renderItem' => "
-								return $( '<li></li>' )
-									.data( 'item.autocomplete', item )
-									.append( '<a class=\'content\'><span>' + item.label + '</span></div></a>' )
-									.appendTo( ul );
-							")) ?>
-					</div>
 				</div>
 			</div>
 		</div>
