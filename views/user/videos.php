@@ -48,6 +48,8 @@ ob_end_clean();
 	$this->js('user_videos_page.base', "
 		$(function(){
 
+			$('.dropdown-group').jdropdown();
+			
 			$('#video_search_submit').on('click', function(){
 				$(this).parents('form').submit();
 			});
@@ -168,7 +170,7 @@ ob_end_clean();
 				<div class='inner_bar'>
 					<div class='checkbox_button checkbox_input'><?php echo Html::checkbox('selectAll', 1, 0, array('class' => 'selectAll_input')) ?></div>
 					<div class="btn-group dropdown-group">
-						<button class='button selected_actions dropdown-toggle'>Edit <span class="caret">&#9660;</span></button>
+						<button class='button selected_actions dropdown-anchor'>Edit <span class="caret">&#9660;</span></button>
 						<ul class="dropdown-menu">
 							<li>Title</li>
 							<li>Description</li>
