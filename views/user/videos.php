@@ -8,13 +8,13 @@ $this->JsFile('playlist_dropdown', '/js/playlist_dropdown.js');
 
 $this->js('videos.selectAll', "
 	$(function(){
-		$.playlist_dropdown();
+		//$.playlist_dropdown();
 
 		$('.selectAll_input').click(function(){
-			if($(this).attr('checked')){
-				$('.video_list input:checkbox').attr('checked', true);
+			if($(this).prop('checked')==true){
+				$('.video_list input:checkbox').prop('checked', false).trigger('click');
 			}else{
-				$('.video_list input:checkbox').attr('checked', false);
+				$('.video_list input:checkbox').prop('checked', true).trigger('click');
 			}
 		});
 	});
@@ -167,8 +167,25 @@ ob_end_clean();
 				<div class='block_summary'></div>
 				<div class='inner_bar'>
 					<div class='checkbox_button checkbox_input'><?php echo Html::checkbox('selectAll', 1, 0, array('class' => 'selectAll_input')) ?></div>
-					<button class='button selected_actions'>Edit</button>
-					<button class='button add_to_playlist'>Add To</button>
+					<div class="btn-group dropdown-group">
+						<button class='button selected_actions dropdown-toggle'>Edit <span class="caret">&#9660;</span></button>
+						<ul class="dropdown-menu">
+							<li>Title</li>
+							<li>Description</li>
+							<li>Listing</li>
+							<li>Licence</li>
+							<li>Statistics</li>
+							<li>Voting</li>
+							<li>Embedding</li>
+							<li>Comments</li>
+							<li class="divider"></li>
+							<li>Delete</li>
+						</ul>
+					</div>
+					<div class="btn-group dropdown-group playlist-drodown">
+						<button class='button add_to_playlist'>Add To <span class="caret">&#9660;</span></button>
+						<ul class="dropdown-menu"></ul>
+					</div>
 				</div>
 			</div>
 		</div>

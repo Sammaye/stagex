@@ -292,6 +292,17 @@ textarea{
 	border:1px solid #3861BD;
 }
 
+.btn-group{
+	position:relative;
+	display:inline-block;
+}
+
+.btn .caret,
+.btn-group .caret{
+	font-size:9px;
+	line-height:12px;
+}
+
 .clear{
 	clear:both;
   	display: block;
