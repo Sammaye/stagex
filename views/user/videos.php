@@ -17,38 +17,8 @@ $this->js('videos.selectAll', "
 				$('.video_list input:checkbox').prop('checked', true).trigger('click');
 			}
 		});
-	});
-");
 
-ob_start(); ?>
-	<div class='actions_menu_menu'>
-		<div class='item' data-action='delete'>Delete</div>
-		<div class='dividing_header'>Set Privacy</div>
-		<div class='item' data-action='set_privacy' data-val='1'>Listed</div>
-		<div class='item' data-action='set_privacy' data-val='2'>Unlisted</div>
-		<div class='item' data-action='set_privacy' data-val='3'>Private</div>
-		<div class='dividing_header'>Set Licensing</div>
-		<div class='item' data-action='set_lic' data-val='1'>Stagex Common Licence</div>
-		<div class='item' data-action='set_lic' data-val='2'>Creative Commons Licence</div>
-	</div><?php
-	$html = ob_get_contents();
-ob_end_clean();
-
-ob_start(); ?>
-	<div class='filters_menu'>
-		<div class='item' data-caption='Showing All Videos' data-url='<?php echo glue::http()->createUrl('/user/videos') ?>'>All Videos</div>
-		<div class='item' data-caption='Showing Listed Videos' data-url='<?php echo glue::http()->createUrl(array('filter' => 'listed')) ?>'>Listed Videos</div>
-		<div class='item' data-caption='Showing Unlisted Videos' data-url='<?php echo glue::http()->createUrl(array('filter' => 'unlisted')) ?>'>Unlisted Videos</div>
-		<div class='item' data-caption='Showing Private Videos' data-url='<?php echo glue::http()->createUrl(array('filter' => 'private')) ?>'>Private Videos</div>
-	</div><?php
-	$filter_html = ob_get_contents();
-ob_end_clean();
-
-
-	$this->js('user_videos_page.base', "
-		$(function(){
-
-			$('.dropdown-group').jdropdown();
+		$('.dropdown-group').jdropdown();
 			
 			$('#video_search_submit').on('click', function(){
 				$(this).parents('form').submit();
@@ -58,27 +28,7 @@ ob_end_clean();
 				$(this).parents('form').submit();
 			});
 
-			$('div.expandable').expander({slicePoint: 60});
-
-			$('body').append($(".js_encode($filter_html)."));
-			$('.selected_filter').jdropdown({
-				'orientation': 'over',
-				'menu_div': '.filters_menu',
-				'item': '.filters_menu .item'
-			});
-
-		    $(document).on('jdropdown.selectItem', '.filters_menu .item', function(e, event){
-		        //event.preventDefault();
-				$('.selected_filter').html($(this).data('caption'));
-				window.location = $(this).data('url');
-		    });
-
-			$('body').append($(".js_encode($html)."));
-			$('.selected_actions').jdropdown({
-				'orientation': 'left',
-				'menu_div': '.actions_menu_menu',
-				'item': '.actions_menu_menu .item'
-			});
+			//$('div.expandable').expander({slicePoint: 60});
 
 		    $(document).on('jdropdown.selectItem', '.actions_menu_menu .item', function(e, event){
 
@@ -162,31 +112,149 @@ ob_end_clean();
     	</div>
     	<div class="clear"></div>
     </div>
+    
+    <div style='margin:0 0 15px 0; background:#f5f5f5; padding:10px;'>
+    	<?php $form=Html::activeForm(); 
+    	
+    	$vModel=new app\models\Video();
+    	$vModel->populateDefaults(); 
+    	
+    	?>
+	   	<div style='margin:0 0 10px 0;'>
+    		<h3 style='float:left; margin-right:15px;'>Edit Videos</h3>
+			<div class="btn-group dropdown-group">
+				<button class='btn-grey selected_actions dropdown-anchor'>Add section <span class="caret">&#9660;</span></button>
+				<div class="dropdown-menu">
+					<div class="item" data-section="title">Title</div>
+					<div class="item" data-section="description">Description</div>
+					<div class="item" data-section="listing">Listing</div>
+					<div class="item" data-section="licence">Licence</div>
+					<div class="item" data-section="statistics">Statistics</div>
+					<div class="item" data-section="voting">Voting</div>
+					<div class="item" data-section="embedding">Embedding</div>
+					<div class="item" data-section="comments">Comments</div>
+				</div>
+			</div>    	
+    	
+    		<input type="button" class="btn-success" style='float:right;' value="Save"/>
+    		<input type="button" class="btn-grey" style='float:right; margin-right:15px;' value="Cancel"/>
+    		<div class="clear"></div>
+    	</div>    	
+    	
+    	<div class="mass_edit_block form-stacked">
+    		<div class="remove">
+    			<a href="#">Remove</a>
+    		</div><div>    	
+    		<label>Title:</label><?php echo $form->textField($vModel,'title') ?>
+    		</div><div class="clear"></div>
+    	</div>
+    	<div class="mass_edit_block form-stacked">
+    		<div class="remove">
+    			<a href="#">Remove</a>
+    		</div>
+    		<div>
+    		<label>Description:</label><?php echo $form->textArea($vModel,'description') ?>
+    		</div><div class="clear"></div>
+    	</div>
+    	<div class="mass_edit_block form-stacked">
+    		<div class="remove">
+    			<a href="#">Remove</a>
+    		</div>
+    		<div>
+			<label>Tags:</label>
+    	    <?php echo html::activeTextField($vModel, 'string_tags') ?>	
+			</div><div class="clear"></div>
+    	</div>     	
+    	<div class="mass_edit_block form-stacked">
+    		<div class="remove">
+    			<a href="#">Remove</a>
+    		</div>
+    		<div>
+			<label>Category:</label><?php echo html::activeSelectbox($vModel, 'category', $vModel->categories('selectBox')) ?>
+			</div><div class="clear"></div>
+    	</div>    	
+    	<div class="mass_edit_block">
+    		<div class="remove">
+    			<a href="#">Remove</a>
+    		</div>
+    		<div>
+			<?php $grp = html::activeRadio_group($vModel, 'listing') ?>
+			<div class="label_options">
+				<label class="radio"><?php echo $grp->add(0) ?>Listed</label>
+				<p class='light'>Your video is public to all users of StageX</p>
+				<label class="radio"><?php echo $grp->add(1) ?>Unlisted</label>
+				<p class='light'>Your video is hidden from listings but can still be accessed directly using the video URL</p>
+				<label class="radio"><?php echo $grp->add(2) ?>Private</label>
+				<p class='light'>No one but you can access this video</p>
+			</div>
+			</div><div class="clear"></div>
+    	</div>
+    	<div class="mass_edit_block form-stacked">
+    		<div class="remove">
+    			<a href="#">Remove</a>
+    		</div>
+    		<div>
+			<label>Licence:</label>
+    	    <?php $grp = html::activeRadio_group($vModel, 'licence') ?>
+			<div class="label_options">
+				<label class="radio"><?php echo $grp->add('1') ?>Standard StageX Licence</label>
+				<label class="radio"><?php echo $grp->add('2') ?>Creative Commons Licence</label>
+			</div>			
+			</div><div class="clear"></div>
+    	</div>     	
+    	<div class="mass_edit_block">
+    		<div class="remove">
+    			<a href="#">Remove</a>
+    		</div><div>    	
+    		<label class="checkbox"><?php echo $form->checkbox($vModel, 'mature') ?>This video is not suitable for family viewing</label>
+    		</div><div class="clear"></div>
+    	</div>    	
+    	<div class="mass_edit_block">
+    		<div class="remove">
+    			<a href="#">Remove</a>
+    		</div><div>    	
+    		<label class="checkbox"><?php echo $form->checkbox($vModel,'privateStatistics') ?>Make my statistics private</label>
+    		</div><div class="clear"></div>
+    	</div>
+    	<div class="mass_edit_block">
+    		<div class="remove">
+    			<a href="#">Remove</a>
+    		</div><div>    	
+    		<label class='checkbox'><?php echo $form->checkbox($vModel, "voteable", 1) ?>Allow users to vote on this video</label>
+    		</div><div class="clear"></div>
+    	</div>
+    	<div class="mass_edit_block">
+    		<div class="remove">
+    			<a href="#">Remove</a>
+    		</div><div>    	
+    		<label class="checkbox"><?php echo $form->checkbox($vModel,'embeddable') ?>Allow my video to be embedded</label>
+    		</div><div class="clear"></div>
+    	</div>
+    	<div class="mass_edit_block">
+    		<div class="remove">
+    			<a href="#">Remove</a>
+    		</div><div>    	
+			<label class='checkbox'><?php echo $form->checkbox($vModel, "moderated") ?>Moderate Responses</label>
+			<label class='checkbox'><?php echo $form->checkbox($vModel, "voteableComments") ?>Allow users to vote on responses</label>
+			<label class='checkbox'><?php echo $form->checkbox($vModel, "allowVideoComments") ?>Allow video responses</label>
+			<label class='checkbox'><?php echo $form->checkbox($vModel, "allowTextComments") ?>Allow text responses</label>
+			</div><div class="clear"></div>
+    	</div>
+    	<div class="clear"></div>
+    	<?php $form->end(); ?>
+    </div>
 
 	<?php ob_start(); ?>
 		<div class='stickytoolbar-placeholder grey_sticky_toolbar'>
-			<div class='stickytoolbar-bar'>
+			<div class='stickytoolbar-bar' style='background:#ffffff;'>
 				<div class='block_summary'></div>
 				<div class='inner_bar'>
 					<div class='checkbox_button checkbox_input'><?php echo Html::checkbox('selectAll', 1, 0, array('class' => 'selectAll_input')) ?></div>
-					<div class="btn-group dropdown-group">
-						<button class='button selected_actions dropdown-anchor'>Edit <span class="caret">&#9660;</span></button>
-						<ul class="dropdown-menu">
-							<li>Title</li>
-							<li>Description</li>
-							<li>Listing</li>
-							<li>Licence</li>
-							<li>Statistics</li>
-							<li>Voting</li>
-							<li>Embedding</li>
-							<li>Comments</li>
-							<li class="divider"></li>
-							<li>Delete</li>
-						</ul>
-					</div>
+					<button class='btn-grey selected_actions dropdown-anchor'>Edit</button>
+					<button class='btn-grey selected_actions dropdown-anchor'>Delete</button>
 					<div class="btn-group dropdown-group playlist-drodown">
-						<button class='button add_to_playlist'>Add To <span class="caret">&#9660;</span></button>
-						<ul class="dropdown-menu"></ul>
+						<button class='btn-grey add_to_playlist'>Add To <span class="caret">&#9660;</span></button>
+						<div class="dropdown-menu"></div>
 					</div>
 				</div>
 			</div>

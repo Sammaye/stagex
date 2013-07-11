@@ -21,6 +21,13 @@ h2{
 	color:#333333;
 }
 
+h3{
+	font-size:16px;
+	font-weight:bold;
+	margin:10px 0;
+	color:#333333;
+}
+
 h4{
 	margin:10px 0;
 	font-weight:bold;
@@ -292,6 +299,26 @@ textarea{
 	border:1px solid #3861BD;
 }
 
+.btn-grey{
+	-moz-user-select: none;
+    background-color: #F5F5F5;
+    background-image: -moz-linear-gradient(center top , #F5F5F5, #F1F1F1);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 2px 2px 2px 2px;
+    color: #6d6d6d;
+    cursor: default;
+    display: inline-block;
+    font: normal 14px/27px Roboto,arial,sans-serif;
+    height: 34px;
+    min-width: 54px;
+    padding: 0 10px;
+    text-align: center;
+}
+
+.btn-grey:hover{
+	border:1px solid #c6c6c6;
+}
+
 .btn-group{
 	position:relative;
 	display:inline-block;
@@ -301,6 +328,46 @@ textarea{
 .btn-group .caret{
 	font-size:9px;
 	line-height:12px;
+}
+
+.dropdown-menu{
+	
+}
+
+.dropdown-menu{
+	width:250px; padding-bottom: 6px;
+    padding-top: 6px; z-index: 10;
+	display:none;
+	-moz-transition: opacity 0.218s ease 0s;
+    background: none repeat scroll 0 0 #FFFFFF;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    cursor: default;
+    font-size: 13px;
+    margin: 0;
+    outline: medium none;
+    padding: 6px 0; z-index:1000; overflow:hidden;
+}
+
+.dropdown-menu .divider{
+	border-top: 1px solid #EBEBEB;
+    margin-bottom: 6px;
+    margin-top: 6px;
+}
+
+.dropdown-menu .item{
+    color: #333333;
+    cursor: pointer;
+    list-style: none outside none;
+    margin: 0;
+    padding: 6px 7em 6px 30px;
+    position: relative;
+    white-space: nowrap;
+	font-size:13px;
+}
+
+.dropdown-menu .item:hover{
+	background:#eeeeee;
 }
 
 .clear{
@@ -1070,6 +1137,30 @@ textarea{
 
 .user_videos_body .header .right .form-search{
 	float:left;
+}
+
+.user_videos_body .mass_edit_block > div{
+	float:left;
+}
+
+.user_videos_body .mass_edit_block .remove{
+	margin-right:20px;
+}
+
+.user_videos_body .mass_edit_block.form-stacked label{
+	padding:0;
+}
+
+.user_videos_body .mass_edit_block.form-stacked textarea{
+	width:400px; height:120px;
+}
+
+.user_videos_body .mass_edit_block.form-stacked input[type="text"]{
+	width:400px;
+}
+
+.user_videos_body .mass_edit_block.form-stacked label.radio{
+	padding: 0 0 0 20px;
 }
 
 .checkbox_input{
