@@ -24,77 +24,34 @@ $this->js('videos.selectAll', "
 			$('.mass_edit_form').css({display:'block'});
 		});
 		
-		$(document).on('click', '.mass_edit_form .cancel', function(){
-			$('.mass_edit_form').css({display:'none'});
-		});
-		
 		$(document).on('click', '.mass_edit_block .edit', function(e){
 			e.preventDefault();
-			$(this).parents('.mass_edit_block').find('.form').css({display:'block'});
+			$(this).parents('.mass_edit_block').addClass('active').find('.form').css({display:'block'});
 			$(this).css({display:'none'});
 		});
 		
 		$(document).on('click', '.mass_edit_block .remove', function(e){
 			e.preventDefault();
 			$(this).parents('.form').css({display:'none'});
-			$(this).parents('.mass_edit_block').find('.edit').css({display:'block'});
+			$(this).parents('.mass_edit_block').removeClass('active').find('.edit').css({display:'block'});
 		});			
-
-			//$('div.expandable').expander({slicePoint: 60});
 		
-	
-
-		    $(document).on('jdropdown.selectItem', '.actions_menu_menu .item', function(e, event){
-
-				var action = $(this).data('action'),
-					value = $(this).data('val'),
-					selected = [];
-
-				$('.video_list .video_item input:checkbox').each(function(){
-					if($(this).attr('checked')){
-						selected[selected.length] = $(this).attr('name');
-					}
-				});
-
-				switch(true){
-					case action == 'delete':
-						$.post('/video/batch_delete', { videos: selected }, function(data){
-							if(data.success){
-								forms.summary($('.grey_sticky_bar .block_summary'), true, 'The videos you selected were deleted', data.messages);
-								$('.video_list .video_item').each(function(){
-									if($(this).find('.checkbox_pane input:checkbox').attr('checked')){
-										$(this).empty().addClass('deleted').html('This video has been deleted.');
-									}
-								});
-							}else{
-								forms.summary($('.grey_sticky_bar .block_summary'), false, 'The videos you selected could not be deleted because:', data.messages);
-							}
-						}, 'json');
-						break;
-					case action == 'set_privacy' || action == 'set_lic':
-						field = action == 'set_privacy' ? 'listing' : 'licence';
-						$.post('/video/set_detail', { field: field, value: value, videos: selected }, function(data){
-							if(data.success){
-								forms.summary($('.grey_sticky_bar .block_summary'), true, 'Video settings changes were saved', data.messages);
-								$('.video_list .video_item').each(function(){
-									if($(this).find('.checkbox_pane input:checkbox').attr('checked')){
-										if(value == 1){
-											$(this).find('.video_listing').html('');
-										}else if(value == 2 && field == 'listing'){
-											$(this).find('.video_listing').html('<img alt=\'unlisted\' src=\'/images/unlisted_icon.png\' style=\'opacity:0.4; margin-right:7px;\'/>');
-										}else if(value == 3 && field == 'listing'){
-											$(this).find('.video_listing').html('<img alt=\'private\' src=\'/images/private_icon.png\' style=\'opacity:0.4; margin-right:7px;\'/>');
-										}
-									}
-								});
-							}else{
-								forms.summary($('.grey_sticky_bar .block_summary'), false, 'Video settings changes could not be saved because:', data.messages);
-							}
-						}, 'json');
-						break;
-				}
-		    });
+		$(document).on('click', '.mass_edit_form .cancel', function(){
+			$('.mass_edit_form').css({display:'none'});
 		});
+		
+		$(document).on('click', '.mass_edit_form .save', function(){
+			var params = $(this).parents('.mass_edit_form').find('\
+				.mass_edit_block.active input,.mass_edit_block.active textarea,.mass_edit_block.active select\
+			').serializeArray();
+			$('.video_list .video .checkbox_col input:checked').each(function(i,item){
+				params[0]['ids['+i+']']=$(item).val();
+			});
+			$.post('/video/massEdit', params).done(function(data){
+
+			});
+		});		
+	});
 	");
 ?>
 <div class="user_videos_body">
@@ -136,8 +93,8 @@ $this->js('videos.selectAll', "
     	?>
 	   	<div class="header">
     		<h3>Edit Videos</h3>
-    		<input type="button" class="btn-success" value="Save"/>
-    		<input type="button" class="btn-grey" class="cancel" value="Cancel"/>
+    		<input type="button" class="btn-success save" value="Save"/>
+    		<input type="button" class="btn-grey cancel" value="Cancel"/>
     		<div class="clear"></div>
     	</div>    	
     	
