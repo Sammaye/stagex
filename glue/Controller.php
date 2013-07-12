@@ -53,8 +53,11 @@ class Controller {
 		$this->css[$map] = Html::css($media, $script);
 	}
 
-	function jsFile($map, $path, $POS = self::HEAD){
-		$this->jsFiles[$POS][$map] = Html::jsFile($path);
+	function jsFile($map, $path=null, $POS = self::HEAD){
+		if($path===null)
+			$this->jsFiles[$POS][basename($map,'.js')] = Html::jsFile($map);
+		else
+			$this->jsFiles[$POS][$map] = Html::jsFile($path);
 	}
 
 	function js($map, $script, $POS = self::BODY_END){

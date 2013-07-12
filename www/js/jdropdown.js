@@ -128,8 +128,6 @@
 				'position': 'absolute',
 				left:0,
 				top:0,				
-				//'left': offset.left,
-				//'top': (offset.top),
 				'display': 'block',
 				'z-index' : 99999999999
 			});
@@ -138,8 +136,6 @@
 				'position': 'absolute',
 				left:0,
 				top:$(this).outerHeight(),
-				//'left': (offset.left - container.outerWidth()),
-				//'top': (offset.top + $(this).outerHeight()),
 				'display': 'block',
 				'z-index' : 99999999999
 			});
