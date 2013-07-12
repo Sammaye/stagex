@@ -120,7 +120,7 @@ $this->js('videos.selectAll', "
     		<a href="#" class="remove">Remove</a>
     		<div class="right">
 			<label>Tags:</label>
-    	    <?php echo html::activeTextField($vModel, 'string_tags') ?>	
+    	    <?php echo html::activeTextField($vModel, 'stringTags') ?>	
 			</div></div><div class="clear"></div>
     	</div>     	
     	<div class="mass_edit_block form-stacked">

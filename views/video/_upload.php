@@ -29,7 +29,7 @@
 					<div class="form-stacked left">
 						<div class="form_row"><?php echo html::label('Title', 'title') ?><?php echo html::activeTextField($model, 'title') ?></div>
 						<div class="form_row"><?php echo html::label('Description', 'description')?><?php echo html::activeTextarea($model, 'description') ?></div>
-						<div class="form_row last"><?php echo html::label('Tags', 'string_tags') ?><?php echo html::activeTextField($model, 'string_tags') ?></div>			
+						<div class="form_row last"><?php echo html::label('Tags', 'stringTags') ?><?php echo html::activeTextField($model, 'string_tags') ?></div>			
 						<input type="button" class="btn-success" value="Save Video Details"/>
 					</div>
 					<div class='right'>
