@@ -1,6 +1,7 @@
 <?php
 
-use app\models\Video;
+use app\models\Video,
+	app\models\Queue;
 
 class videoController extends glue\Controller{
 
@@ -10,7 +11,7 @@ class videoController extends glue\Controller{
 		return array(
 			array("allow",
 				"actions"=>array( 'upload', 'addUpload', 'getUploadStatus', 'createUpload', 'saveUpload', 'save', 'set_detail',
-					'delete_responses', 'batch_delete', 'remove', 'report', 'like', 'dislike', 'statistics', 'get_more_statistics' ),
+					'delete_responses', 'batch_delete', 'delete', 'report', 'like', 'dislike', 'statistics', 'get_more_statistics' ),
 				"users"=>array("@*")
 			),
 			array('allow', 'actions' => array('index', 'watch', 'process_encoding', 'embedded', 'tst_sqs')),
@@ -458,75 +459,36 @@ class videoController extends glue\Controller{
 		}
 	}
 
-	function action_remove(){
-		$this->pageTitle = 'Remove Video - StageX';
+	function action_delete(){
+		$this->title = 'Remove Videos - StageX';
 		if(!glue::http()->isAjax())
 			Glue::route("error/notfound");
 
-		$video = Video::model()->findOne(array("_id"=>new MongoId($_GET['id'])));
-		if(!$video){
-			GJSON::kill('This video could not be found. Most likely refreshing the page will fix this error.');
+		$ids = glue::http()->param('ids',null);
+		if(count($ids) <= 0 || count($ids)>1000){
+			$this->json_error("No videos were selected");
 		}
 
-		if(!glue::roles()->checkRoles(array('^' => $video))){
-			GJSON::kill(GJSON::DENIED);
+		foreach($ids as $k => $id){
+			$mongoIds[$k] = new MongoId($id);
 		}
 
-		$responses = new VideoResponse();
-		$responses->Db()->remove(array('$or' => array(
-			array('vid' => $video->_id), array('xtn_vid' => $video->_id)
-		)), array('safe' => true));
-		glue::db()->videoresponse_likes->remove(array("video_id"=>$video->_id));
-		glue::db()->video_likes->remove(array('item' => $video->_id)); // Still unsure about this since it is touching user data
-
-		$video->deleted = 1;
-		$video->save();
-
-		glue::session()->user->total_uploads = glue::session()->user->total_uploads > 1 ? glue::session()->user->total_uploads-1 : 0;
-		glue::session()->user->save();
-
-		GJSON::kill('This video was deleted from your account', true);
-	}
-
-	function action_batch_delete(){
-		$this->pageTitle = 'Remove Videos - StageX';
-		if(!glue::http()->isAjax())
-			Glue::route("error/notfound");
-
-		$videos = isset($_POST['videos']) ? $_POST['videos'] : null;
-
-		if(count($videos) <= 0){
-			GJSON::kill('No videos were selected');
-		}
-
-		foreach($videos as $k => $id){
-			$video_ids[$k] = new MongoId($id);
-		}
-
-		$video_rows = Video::model()->find(array('_id' => array('$in' => $video_ids), 'user_id' => glue::session()->user->_id));
-		if(count($video_ids) != $video_rows->count()){
-			GJSON::kill(GJSON::UNKNOWN);
-		}
-
-		glue::mysql()->query('UPDATE documents SET deleted=1 WHERE uid = :user_id AND _id IN :id', array(
-			':user_id' => strval(glue::session()->user->_id),
-			':id' => $videos
-		));
-
+		$video_rows = Video::model()->find(array('_id' => array('$in' => $mongoIds), 'userId' => glue::user()->_id, 'deleted' => 0));
+		
+		$ids=array(); // We reset these to know which were actually picked from the DB
+		$mongoIds=array();
 		foreach($video_rows as $video){
-			VideoResponse::model()->Db()->remove(array('$or' => array(
-				array('vid' => $video->_id), array('xtn_vid' => $video->_id)
-			)), array('safe' => true));
-			$video->deleted = 1;
-			$video->save();
+			$ids[]=(string)$video->_id;
+			$mongoIds[]=$video->_id;
+			$video->author->saveCounters(array('totalUploads'=>-1));
+			
+			Queue::AddMessage($video->collectionName(),$video->_id,Queue::DELETE);
 		}
-		glue::db()->videoresponse_likes->remove(array("video_id"=>array('$in' => $video_ids)));
-		glue::db()->video_likes->remove(array('item' => array('$in' => $video_ids))); // Same reason as above
+		
+		//Video::model()->updateAll(array('_id' => array('$in' => $mongoIds), array('$set'=>array('deleted'=>1))));
+		glue::mysql()->query('UPDATE documents SET deleted=1 WHERE _id IN :id', array(':id' => $ids));
 
-		glue::session()->user->total_uploads = glue::session()->user->total_uploads > count($videos) ? glue::session()->user->total_uploads-count($videos) : 0;
-		glue::session()->user->save();
-
-		GJSON::kill('The videos you selected were deleted', true);
+		$this->json_success(array('messages'=>array('The videos you selected were deleted'),'updated'=>count($ids)));
 	}
 
 	function action_set_detail(){

@@ -24,7 +24,7 @@ class Validation extends \glue\Component{
 		
 		if(!$this->model)
 			throw new Exception("No model or map was provided to validate against");
-		if(!is_array($this->rules)||empty($this->rules))
+		if($this->rules===null)
 			throw new Exception("A valid set of rules must be applied");
 
 		$this->clearErrors();

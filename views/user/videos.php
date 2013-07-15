@@ -9,6 +9,8 @@ $this->JsFile('/js/playlist_dropdown.js');
 $this->js('videos.selectAll', "
 	$(function(){
 		//$.playlist_dropdown();
+		
+		$('.user_videos_body .alert').summarise();
 
 		$('.selectAll_input').click(function(){
 			if($(this).prop('checked')==true){
@@ -50,7 +52,25 @@ $this->js('videos.selectAll', "
 			$.post('/video/massEdit', params).done(function(data){
 
 			});
-		});		
+		});
+
+		$(document).on('click', '.grey_sticky_toolbar .btn_delete', function(){
+			params={'ids[]':[]};
+			$('.video_list .video .checkbox_col input:checked').each(function(i,item){
+				params['ids[]'][params['ids[]'].length]=$(item).val();
+			});
+
+			$.post('/video/delete', params, null, 'json').done(function(data){
+				if(data.success){
+					$('.user_videos_body .alert').summarise('set', 'success','The videos you selected were deleted');
+					$.each(params['ids[]'],function(i,item){
+						$('.video_list .video[data-id='+item+']').children().not('.deleted').css({display:'none'});
+					});
+				}else{
+		
+				}
+			}, 'json');			
+		});
 	});
 	");
 ?>
@@ -83,6 +103,8 @@ $this->js('videos.selectAll', "
     	</div>
     	<div class="clear"></div>
     </div>
+    
+    <div class='alert'></div>
     
     <div class="mass_edit_form">
     	<?php $form=Html::activeForm(); 
@@ -207,11 +229,10 @@ $this->js('videos.selectAll', "
 	<?php ob_start(); ?>
 		<div class='stickytoolbar-placeholder grey_sticky_toolbar'>
 			<div class='stickytoolbar-bar'>
-				<div class='block_summary'></div>
 				<div class='inner_bar'>
 					<div class='checkbox_button checkbox_input'><?php echo Html::checkbox('selectAll', 1, 0, array('class' => 'selectAll_input')) ?></div>
 					<button class='btn-grey selected_actions dropdown-anchor edit_videos_button'>Edit</button>
-					<button class='btn-grey selected_actions dropdown-anchor'>Delete</button>
+					<button class='btn-grey selected_actions dropdown-anchor btn_delete'>Delete</button>
 					<div class="btn-group dropdown-group playlist-drodown">
 						<button class='btn-grey add_to_playlist'>Add To <span class="caret">&#9660;</span></button>
 						<div class="dropdown-menu"></div>

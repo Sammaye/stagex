@@ -787,4 +787,16 @@ class Video extends \glue\Db\Document{
 		glue::db()->video_stats_day->update(array("day"=>new MongoDate(mktime(0, 0, 0, date("m"), date("d"), date("Y"))), "vid"=>$this->_id),
 			array('$inc' => array($field => 1)), array("upsert"=>true));
 	}
+	
+	function delete(){
+		foreach($video_rows as $video){
+			VideoResponse::model()->Db()->remove(array('$or' => array(
+			array('vid' => $video->_id), array('xtn_vid' => $video->_id)
+			)), array('safe' => true));
+			$video->deleted = 1;
+			$video->save();
+		}
+		glue::db()->videoresponse_likes->remove(array("video_id"=>array('$in' => $video_ids)));
+		glue::db()->video_likes->remove(array('item' => array('$in' => $video_ids))); // Same reason as above		
+	}
 }

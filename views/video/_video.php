@@ -1,4 +1,9 @@
 <div class='video' data-id='<?php echo strval($item->_id) ?>'>
+
+	<div class="deleted">
+		This video has been deleted <a href="/video/undoDelete">Undo</a>
+	</div>
+
 	<div class='checkbox_col'><div class="checkbox_input" style=''><?php echo html::checkbox('video_id[]', strval(isset($custid) ? $custid : $item->_id), 0) ?></div></div>
 	<div class='thumbnail' style='position:relative;float:left;'><a href="/video/watch?id=<?php echo strval($item->_id) ?>" >
 		<img alt='<?php echo Html::encode($item->title) ?>' src="<?php echo $item->getImage(138, 77) ?>"/></a>
