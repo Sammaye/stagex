@@ -490,6 +490,10 @@ class videoController extends glue\Controller{
 
 		$this->json_success(array('messages'=>array('The videos you selected were deleted'),'updated'=>count($ids)));
 	}
+	
+	function action_undoDelete(){
+
+	}
 
 	function action_set_detail(){
 		$this->pageTitle = 'Save Video - StageX';

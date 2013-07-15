@@ -49,8 +49,13 @@ $this->js('videos.selectAll', "
 			$('.video_list .video .checkbox_col input:checked').each(function(i,item){
 				params[0]['ids['+i+']']=$(item).val();
 			});
-			$.post('/video/massEdit', params).done(function(data){
-
+			$.post('/video/massEdit', params, null, 'json').done(function(data){
+				if(data.success){
+					$('.user_videos_body .alert').summarise('set', 'success','The videos you selected were saved');
+				}else{
+					$('.user_videos_body .alert').summarise('set', 'error',
+						{message:'The videos you selected could not be saved because:', list:data.errors});
+				}
 			});
 		});
 
@@ -65,11 +70,27 @@ $this->js('videos.selectAll', "
 					$('.user_videos_body .alert').summarise('set', 'success','The videos you selected were deleted');
 					$.each(params['ids[]'],function(i,item){
 						$('.video_list .video[data-id='+item+']').children().not('.deleted').css({display:'none'});
+						$('.video_list .video[data-id='+item+'] .deleted').css({display:'block'});
 					});
 				}else{
-		
+					$('.user_videos_body .alert').summarise('set', 'error','The videos you selected could not be deleted');
 				}
+				$('.user_videos_body .alert').summarise('focus');
 			}, 'json');			
+		});
+		
+		$(document).on('click', '.video .deleted .undo', function(e){
+			e.preventDefault();
+		
+			data=$(this).parents('.video').data();
+			$.post('/video/undoDelete',{id:data.id},null,'json').done(function(data){
+				if(data.success){
+					$('.video_list .video[data-id='+item+']').children().not('.deleted').css({display:'block'});
+					$('.video_list .video[data-id='+item+'] .deleted').css({display:'none'});					
+				}else{
+					$(this).parents('.deleted').html('This video could not be recovered. Most likely because they have been processed and are deleted.');
+				}
+			});
 		});
 	});
 	");

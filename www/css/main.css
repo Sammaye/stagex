@@ -1115,7 +1115,7 @@ textarea{
 }
 
 .video .deleted{
-	padding:10px; text-align:center;
+	padding:10px; text-align:center; display:none;
 }
 
 .user_videos_body .video{

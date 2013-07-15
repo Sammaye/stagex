@@ -1,7 +1,7 @@
 <div class='video' data-id='<?php echo strval($item->_id) ?>'>
 
 	<div class="deleted">
-		This video has been deleted <a href="/video/undoDelete">Undo</a>
+		This video has been deleted <a href="#" class="undo">Undo</a>
 	</div>
 
 	<div class='checkbox_col'><div class="checkbox_input" style=''><?php echo html::checkbox('video_id[]', strval(isset($custid) ? $custid : $item->_id), 0) ?></div></div>
