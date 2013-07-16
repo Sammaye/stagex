@@ -71,7 +71,7 @@ $(function(){
 					if(!$this.hasClass(settings.base_class)){
 						$this.addClass(settings.base_class);
 					}
-					$this.addClass('summarise-alert');
+					$this.addClass('summarise-alert').css({display:'none'});
 					
 					methods.type(type,$this);
 					methods.content(content,$this);

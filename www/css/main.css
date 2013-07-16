@@ -433,6 +433,10 @@ textarea{
 	font-size:14px;	line-height:20px; padding:10px; border-radius:3px;	
 }
 
+.block-alert{
+	border-radius:0px!important;
+}
+
 .alert .close{
 	display:block;
 	float:right;
@@ -516,11 +520,11 @@ textarea{
 }
 
 .grey_sticky_toolbar .inner_bar{
-	height:34px; padding:10px 10px 10px 10px; /*background:#f1f1f1;*/ border-bottom:1px solid #cccccc;
+	height:34px; padding:10px 10px 10px 10px; /*background:#f1f1f1;*/ 
 }
 
 .grey_sticky_toolbar .stickytoolbar-bar{
-	background:#ffffff;
+	background:#ffffff; border-bottom:1px solid #cccccc;
 }
 
 .grey_sticky_toolbar .button{
@@ -1145,6 +1149,10 @@ textarea{
 
 .user_videos_body .header .right .form-search{
 	float:left;
+}
+
+.user_videos_body .alert{
+
 }
 
 .user_videos_body .mass_edit_form{

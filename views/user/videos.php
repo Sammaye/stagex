@@ -10,7 +10,8 @@ $this->js('videos', "
 	$(function(){
 		//$('.playlist-dropdown').playlistDropdown();
 		
-		$('.user_videos_body .alert').summarise();
+		$('.mass_edit_form .alert').summarise();
+		$('.grey_sticky_toolbar .block-alert').summarise()
 
 		$('.selectAll_input').click(function(){
 			if($(this).prop('checked')==true){
@@ -52,10 +53,9 @@ $this->js('videos', "
 			});
 			$.post('/video/batchSave', params, null, 'json').done(function(data){
 				if(data.success){
-					$('.user_videos_body .alert').summarise('set', 'success','The videos you selected were saved');
+					$('.mass_edit_form .alert').summarise('set', 'success', data.updated + ' of ' + data.total + ' of the videos you selected were saved');
 				}else{
-					$('.user_videos_body .alert').summarise('set', 'error',
-						{message:'The videos you selected could not be saved because:', list:data.errors});
+					$('.mass_edit_form .alert').summarise('set', 'error', 'The videos you selected could not be saved');
 				}
 			});
 		});
@@ -68,15 +68,15 @@ $this->js('videos', "
 
 			$.post('/video/delete', params, null, 'json').done(function(data){
 				if(data.success){
-					$('.user_videos_body .alert').summarise('set', 'success','The videos you selected were deleted');
+					$('.grey_sticky_toolbar .block-alert').summarise('set', 'success','The videos you selected were deleted');
 					$.each(params['ids[]'],function(i,item){
 						$('.video_list .video[data-id='+item+']').children().not('.deleted').css({display:'none'});
 						$('.video_list .video[data-id='+item+'] .deleted').css({display:'block'});
 					});
+					reset_checkboxes();
 				}else{
-					$('.user_videos_body .alert').summarise('set', 'error','The videos you selected could not be deleted');
+					$('.grey_sticky_toolbar .block-alert').summarise('set', 'error','The videos you selected could not be deleted');
 				}
-				$('.user_videos_body .alert').summarise('focus');
 			}, 'json');			
 		});
 		
@@ -94,6 +94,10 @@ $this->js('videos', "
 			});
 		});
 	});
+		
+	function reset_checkboxes(){
+		$('.selectAll_input').prop('checked',true).trigger('click');
+	}
 ");
 ?>
 <div class="user_videos_body">
@@ -126,8 +130,6 @@ $this->js('videos', "
     	<div class="clear"></div>
     </div>
     
-    <div class='alert'></div>
-    
     <div class="mass_edit_form">
     	<?php $form=Html::activeForm(); 
     	
@@ -141,6 +143,8 @@ $this->js('videos', "
     		<input type="button" class="btn-grey cancel" value="Cancel"/>
     		<div class="clear"></div>
     	</div>    	
+    	
+    	<div class='alert'></div>
     	
     	<div class="mass_edit_block form-stacked">
     		<a href="#" class="edit">+ Edit Title</a>
@@ -260,6 +264,7 @@ $this->js('videos', "
 						<div class="dropdown-menu"></div>
 					</div>
 				</div>
+				<div class="alert block-alert"></div>
 			</div>
 		</div>
 		<?php $html = ob_get_contents();

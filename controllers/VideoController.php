@@ -313,8 +313,9 @@ class videoController extends glue\Controller{
 				if($video->validate()&&$video->save())
 					$updated++;
 			}
-			$this->json_success(array('updated'=>$updated,'failed'=>count($ids)-$updated));
+			$this->json_success(array('updated'=>$updated,'failed'=>count($ids)-$updated,'total'=>count($ids)));
 		}
+		$this->json_error(self::UNKNOWN);
 	}
 
 	function action_delete_responses(){
