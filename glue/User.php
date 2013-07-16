@@ -72,14 +72,14 @@ class User extends \glue\db\Document{
 				if($this->cookie_domain!==null)
 					ini_set("session.cookie_domain", $this->domain);
 				if($this->cookie_path!==null)
-					ini_set("session.cookie_path", $this->cookie_domain);
+					ini_set("session.cookie_path", $this->cookie_path);
 				
 				glue::session()->start();
-
 				// Are they logged in?
 				// I use the temp cookie here because it is like augmenting the PHPSESS cookie with 
 				// something relatively trustable
 				if(glue::session()->authed && isset($_COOKIE[$this->tempCookie])){
+
 					$this->validateSession();
 				}elseif($this->allowCookies && isset($_COOKIE[$this->permCookie])){
 					$this->restoreFromCookie();

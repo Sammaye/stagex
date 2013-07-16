@@ -224,7 +224,7 @@ return array(
 					}
 
 					if(glue::http()->isAjax()){
-						GJSON::kill(GJSON::LOGIN);
+						echo json_encode(array('success' => false, 'messages' => array('You must login to continue')));
 						exit();
 					}else{
 						\glue\Html::setErrorFlashMessage('You must be logged in to access this page');

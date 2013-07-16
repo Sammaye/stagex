@@ -286,7 +286,7 @@ class userController extends \glue\Controller{
 		$this->title = 'Your Videos - StageX';
 		$this->layout = 'user_section';
 		$this->tab = 'videos';
-
+		
 		$filter = isset($_GET['filter']) ? $_GET['filter'] : null;
 
 		$filter_obj = array();
@@ -308,6 +308,7 @@ class userController extends \glue\Controller{
 			->sort(array('created' => -1));
 
 		echo $this->render('videos', array('video_rows' => $video_rows, 'filter' => $filter));
+		
 	}
 
 	function action_playlists(){

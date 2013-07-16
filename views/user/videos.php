@@ -47,10 +47,13 @@ $this->js('videos', "
 			var params = $(this).parents('.mass_edit_form').find('\
 				.mass_edit_block.active input,.mass_edit_block.active textarea,.mass_edit_block.active select\
 			').serializeArray();
-			params[params.length]={name:'ids[]',value:[]};
+		
+			id_length=0;
 			$('.video_list .video .checkbox_col input:checked').each(function(i,item){
-				params[params.length-1].value[params[params.length-1].value.length]=$(item).val();
-			});
+				params[params.length]={name:['ids['+id_length+']'],value:$(item).val()};
+				id_length++;
+			});		
+		
 			$.post('/video/batchSave', params, null, 'json').done(function(data){
 				if(data.success){
 					$('.mass_edit_form .alert').summarise('set', 'success', data.updated + ' of ' + data.total + ' of the videos you selected were saved');
@@ -271,7 +274,7 @@ $this->js('videos', "
 	ob_end_clean();
 
 	app\widgets\stickytoolbar::widget(array(
-		"element" => '.grey_sticky_bar',
+		"element" => '.grey_sticky_toolbar',
 		"options" => array(
 			'onFixedClass' => 'grey_sticky_bar-fixed'
 		),

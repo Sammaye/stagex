@@ -304,7 +304,6 @@ class videoController extends glue\Controller{
 			glue::trigger('404');
 		if(isset($_POST['Video'])&&($ids=glue::http()->param('ids',null))!==null){
 			$updated=0;
-			
 			foreach($ids as $id){
 				$video = Video::model()->findOne(array('_id' => new MongoId($id)));
 				if(!glue::auth()->check(array('^' => $video)))
@@ -472,7 +471,7 @@ class videoController extends glue\Controller{
 			Queue::AddMessage($video->collectionName(),$video->_id,Queue::DELETE);
 		}
 		
-		//Video::model()->updateAll(array('_id' => array('$in' => $mongoIds), array('$set'=>array('deleted'=>1))));
+		Video::model()->updateAll(array('_id' => array('$in' => $mongoIds)), array('$set'=>array('deleted'=>1)));
 		glue::mysql()->query('UPDATE documents SET deleted=1 WHERE _id IN :id', array(':id' => $ids));
 
 		$this->json_success(array('messages'=>array('The videos you selected were deleted'),'updated'=>count($ids)));
@@ -491,10 +490,12 @@ class videoController extends glue\Controller{
 			$this->json_error(self::UNKNOWN);
 
 		$video->deleted=0;
-		$video->author->saveCounters(array('totalUploads'=>1));
-		glue::mysql()->query('UPDATE documents SET deleted=0 WHERE _id = :id', array(':id' => $id));
-		
-		$this->json_success('Video Undeleted');
+		if($video->save()){
+			$video->author->saveCounters(array('totalUploads'=>1));
+			glue::mysql()->query('UPDATE documents SET deleted=0 WHERE _id = :id', array(':id' => $id));
+			$this->json_success('Video Undeleted');
+		}
+		$this->json_error(self::UNKNOWN);
 	}
 
 	function action_set_detail(){

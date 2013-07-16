@@ -1025,7 +1025,7 @@ textarea{
 }
 
 .video{
-	margin:0 0 10px 0;
+	margin:0 0 0 0;
 }
 
 .video .checkbox_col{
@@ -1151,8 +1151,8 @@ textarea{
 	float:left;
 }
 
-.user_videos_body .alert{
-
+.mass_edit_form .alert{
+	margin:0 0 10px 0;
 }
 
 .user_videos_body .mass_edit_form{

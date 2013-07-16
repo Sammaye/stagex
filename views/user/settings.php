@@ -87,7 +87,7 @@ $this->js('autosharesettings', '
 <div class="account_settings_body">
 
 	<?php echo html::form_summary($model, array(
-		'errorHead' => '<h6>Could not save settings</h6>Your account settings could not be saved because:'
+		'errorHead' => '<h4>Could not save settings</h4>Your account settings could not be saved because:'
 	)) ?>
 
 	<div class="account_settings_part edit_email_address">

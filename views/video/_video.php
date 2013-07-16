@@ -30,11 +30,13 @@
 			<?php endif; ?>
 		</div>		
 	<?php else: ?>
+		<!-- 
 		<div class="statistics">
-			<div class="stacked_info"><?php echo $item->views ?> <span>Views</span></div>
-			<div class="stacked_info"><?php echo $item->likes ?> <span>Likes</span></div>
-			<div class="stacked_info"><?php echo $item->totalResponses ?> <span>Responses</span></div>
+			<div class="stacked_info"><?php //echo $item->views ?> <span>Views</span></div>
+			<div class="stacked_info"><?php //echo $item->likes ?> <span>Likes</span></div>
+			<div class="stacked_info"><?php //echo $item->totalResponses ?> <span>Responses</span></div>
 		</div>
+		-->
 		
 		<div class='infocons'>
 	
