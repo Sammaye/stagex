@@ -11,7 +11,7 @@ class videoController extends glue\Controller{
 		return array(
 			array("allow",
 				"actions"=>array( 'upload', 'addUpload', 'getUploadStatus', 'createUpload', 'saveUpload', 'save', 'set_detail',
-					'delete_responses', 'batch_delete', 'delete', 'report', 'like', 'dislike', 'statistics', 'get_more_statistics' ),
+					'delete_responses', 'batch_delete', 'delete', 'report', 'like', 'dislike', 'statistics', 'get_more_statistics', 'undoDelete', 'batchSave' ),
 				"users"=>array("@*")
 			),
 			array('allow', 'actions' => array('index', 'watch', 'process_encoding', 'embedded', 'tst_sqs')),
@@ -297,37 +297,23 @@ class videoController extends glue\Controller{
 		$this->render('videos/embedded', array('model' => $video));
 	}
 
-	function action_save(){
+	function action_batchSave(){
 
-		$this->pageTitle = 'Save Video - StageX';
+		$this->title = 'Save Video - StageX';
 		if(!glue::http()->isAjax())
-			glue::route('error/notfound');
-
-		if(isset($_POST['Video'])){
-			$video = Video::model()->findOne(array('_id' => new MongoId($_POST['Video']['id'])));
-
-			if(!glue::roles()->checkRoles(array('deletedView' => $video))){
-				GJSON::kill('That video was not found');
+			glue::trigger('404');
+		if(isset($_POST['Video'])&&($ids=glue::http()->param('ids',null))!==null){
+			$updated=0;
+			
+			foreach($ids as $id){
+				$video = Video::model()->findOne(array('_id' => new MongoId($id)));
+				if(!glue::auth()->check(array('^' => $video)))
+					continue;
+				$video->attributes=$_POST['Video'];
+				if($video->validate()&&$video->save())
+					$updated++;
 			}
-
-			if(!glue::roles()->checkRoles(array('^' => $video))){
-				GJSON::kill(GJSON::DENIED);
-			}
-			$video->_attributes($_POST['Video']);
-
-			if($video->validate()){
-				//var_dump($video->comments);
-				$video->save();
-				echo json_encode(array('success' => true, 'errors' => $video->getErrorMessages(), 'data' => array(
-					'title' => htmlspecialchars($video->title),
-					'description' => nl2br(htmlspecialchars($video->description)),
-					'tags' => $video->tags,
-					'licence' => $video->get_licence_text(),
-					'category' => $video->get_category_text()
-				)));
-			}else{
-				echo json_encode(array('success' => false, 'errors' => $video->getErrorMessages()));
-			}
+			$this->json_success(array('updated'=>$updated,'failed'=>count($ids)-$updated));
 		}
 	}
 
@@ -492,7 +478,22 @@ class videoController extends glue\Controller{
 	}
 	
 	function action_undoDelete(){
+		$this->title = 'Remove Videos - StageX';
+		if(!glue::http()->isAjax())
+			Glue::route("error/notfound");
+		
+		$id=glue::http()->param('id',null);
+		if(
+			$id===null||
+			($video=Video::model()->findOne(array('_id'=>new MongoId($id), 'userId'=>glue::user()->_id)))===null
+		)
+			$this->json_error(self::UNKNOWN);
 
+		$video->deleted=0;
+		$video->author->saveCounters(array('totalUploads'=>1));
+		glue::mysql()->query('UPDATE documents SET deleted=0 WHERE _id = :id', array(':id' => $id));
+		
+		$this->json_success('Video Undeleted');
 	}
 
 	function action_set_detail(){

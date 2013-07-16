@@ -6,9 +6,9 @@ $this->JsFile("/js/jquery.expander.js");
 $this->JsFile('/js/jdropdown.js');
 $this->JsFile('/js/playlist_dropdown.js');
 
-$this->js('videos.selectAll', "
+$this->js('videos', "
 	$(function(){
-		//$.playlist_dropdown();
+		//$('.playlist-dropdown').playlistDropdown();
 		
 		$('.user_videos_body .alert').summarise();
 
@@ -46,10 +46,11 @@ $this->js('videos.selectAll', "
 			var params = $(this).parents('.mass_edit_form').find('\
 				.mass_edit_block.active input,.mass_edit_block.active textarea,.mass_edit_block.active select\
 			').serializeArray();
+			params[params.length]={name:'ids[]',value:[]};
 			$('.video_list .video .checkbox_col input:checked').each(function(i,item){
-				params[0]['ids['+i+']']=$(item).val();
+				params[params.length-1].value[params[params.length-1].value.length]=$(item).val();
 			});
-			$.post('/video/massEdit', params, null, 'json').done(function(data){
+			$.post('/video/batchSave', params, null, 'json').done(function(data){
 				if(data.success){
 					$('.user_videos_body .alert').summarise('set', 'success','The videos you selected were saved');
 				}else{
@@ -82,18 +83,18 @@ $this->js('videos.selectAll', "
 		$(document).on('click', '.video .deleted .undo', function(e){
 			e.preventDefault();
 		
-			data=$(this).parents('.video').data();
-			$.post('/video/undoDelete',{id:data.id},null,'json').done(function(data){
+			elData=$(this).parents('.video').data();
+			$.post('/video/undoDelete',{id:elData.id},null,'json').done(function(data){
 				if(data.success){
-					$('.video_list .video[data-id='+item+']').children().not('.deleted').css({display:'block'});
-					$('.video_list .video[data-id='+item+'] .deleted').css({display:'none'});					
+					$('.video_list .video[data-id='+elData.id+']').children().not('.deleted').css({display:'block'});
+					$('.video_list .video[data-id='+elData.id+'] .deleted').css({display:'none'});					
 				}else{
-					$(this).parents('.deleted').html('This video could not be recovered. Most likely because they have been processed and are deleted.');
+					$(this).parents('.deleted').html('This video could not be recovered. Most likely because it has been processed and is deleted.');
 				}
 			});
 		});
 	});
-	");
+");
 ?>
 <div class="user_videos_body">
 
@@ -254,7 +255,7 @@ $this->js('videos.selectAll', "
 					<div class='checkbox_button checkbox_input'><?php echo Html::checkbox('selectAll', 1, 0, array('class' => 'selectAll_input')) ?></div>
 					<button class='btn-grey selected_actions dropdown-anchor edit_videos_button'>Edit</button>
 					<button class='btn-grey selected_actions dropdown-anchor btn_delete'>Delete</button>
-					<div class="btn-group dropdown-group playlist-drodown">
+					<div class="btn-group dropdown-group playlist-dropdown">
 						<button class='btn-grey add_to_playlist'>Add To <span class="caret">&#9660;</span></button>
 						<div class="dropdown-menu"></div>
 					</div>

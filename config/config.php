@@ -244,12 +244,12 @@ return array(
 				'Owns' => function($object){
 					if(is_array($object)){
 						foreach($object as $item){
-							if(strval(Glue::session()->user->_id) == strval($item->user_id)){
+							if(strval(Glue::user()->_id) == strval($item->userId)){
 								return true;
 							}
 						}
-					}elseif($object instanceof MongoDocument){
-						if(strval(Glue::session()->user->_id) == strval($object->user_id)){
+					}elseif($object instanceof \glue\db\Document){
+						if(strval(Glue::user()->_id) == strval($object->userId)){
 							return true;
 						}
 					}
