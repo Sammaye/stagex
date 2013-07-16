@@ -877,7 +877,7 @@ class Document extends \glue\Model{
 			// All terms must exist in the document but they can exist across any and all fields
 			$field_regexes = array();
 			foreach($fields as $k => $field){
-				$field_regexes[] = array($field => new MongoRegex('/'.$term.'/i'));
+				$field_regexes[] = array($field => new \MongoRegex('/'.$term.'/i'));
 			}
 			$sub_query[] = array('$or' => $field_regexes);
 		}

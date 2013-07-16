@@ -83,6 +83,17 @@ $this->js('videos', "
 			}, 'json');			
 		});
 		
+		$(document).on('click', '.video .encoding_failed .btn', function(e){
+			videoEl=$(this).parents('.video');
+			$.post('/video/delete', {'ids[]':[videoEl.data().id]}, null, 'json').done(function(data){
+				if(data.success){
+					videoEl.remove();
+				}else{
+					$('.grey_sticky_toolbar .block-alert').summarise('set', 'error','The video you selected could not be deleted');
+				}
+			}, 'json');	
+		});
+		
 		$(document).on('click', '.video .deleted .undo', function(e){
 			e.preventDefault();
 		
@@ -296,6 +307,6 @@ $this->js('videos', "
 			'pagerCssClass' => 'grid_list_pager'
 		));
 	}else{ ?>
-		<div class=''>No videos were found for you</div>
+		<div class='no_results_found'>No videos were found</div>
 	<?php } ?>
 </div>
