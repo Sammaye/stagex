@@ -24,7 +24,7 @@ class Help extends \glue\db\Document{
 	}
 
 	static function getRootItems(){
-		return self::model()->find(array("path"=>new MongoRegex("/^[^,]*$/")))->sort(array("seq"=>1));
+		return self::model()->find(array("path"=>new \MongoRegex("/^[^,]*$/")))->sort(array("seq"=>1));
 	}
 
 	function getBreadCrumb(){
@@ -33,7 +33,7 @@ class Help extends \glue\db\Document{
 
 		foreach($breadcrumb as $i => $item){
 			if($item != $this->t_normalised){
-				$itemModel = self::model()->findOne(array('t_normalised' => $item));
+				$itemModel = self::model()->findOne(array('normalisedTitle' => $item));
 				$final_breadcrumb[$i] = html::a(array('href' => glue::http()->createUrl('/help/view', array('title' => $item)), 'text' => $itemModel->title));
 			}
 		}
@@ -55,25 +55,22 @@ class Help extends \glue\db\Document{
 		//return substr_replace($truncated, "...", strlen($truncated)-3);
 	}
 
-	function findOne($query){
-		$doc = glue::db()->{$this->collectionName()}->findOne($query);
-
-		if(!$doc){
-			return null;
-		}
-
-		$o = null;
-		if($doc['type'] == 'topic'){
-			$o = new HelpTopic();
-		}elseif($doc['type'] == 'article'){
-			$o = new HelpArticle();
-		}
-
-		if(!$o->onBeforeFind()) return false;
-		$o->setIsNewRecord(false);
-		$o->setScenario('update');
-		$o->setAttributes($doc);
-		$o->onAfterFind();
-		return $o;
+	function findOne($criteria=array(),$fields=array()){
+		$this->trace(__FUNCTION__);
+		if((
+				$record=$this->getCollection()->findOne($this->mergeCriteria(isset($c['condition']) ? $c['condition'] : array(), $criteria),
+						$this->mergeCriteria(isset($c['project']) ? $c['project'] : array(), $fields))
+		)!==null){
+			$this->resetScope();
+			
+			$o = null;
+			if($record['type'] == 'topic'){
+				$o = new HelpTopic();
+			}elseif($record['type'] == 'article'){
+				$o = new HelpArticle();
+			}
+			return $o->populateRecord($record,true,$fields===array()?false:true);
+		}else
+			return null;		
 	}
 }

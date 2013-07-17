@@ -9,6 +9,8 @@ class Jqautocomplete extends \glue\Widget{
 	public $options = array();
 	public $renderItem;
 	public $value;
+	
+	public $placeholder;
 
 	function render(){
 		if(!$this->model){
@@ -42,7 +44,7 @@ class Jqautocomplete extends \glue\Widget{
 			$js .= "});";
 
 			glue::$controller->js('jqauto_complete_'.$this->attribute, $js);
-			echo \html::textfield($this->attribute, $this->value ? $this->value : null, array('class' => $this->attribute));
+			echo \html::textfield($this->attribute, $this->value ? $this->value : null, array('class' => $this->attribute, 'placeholder'=>$this->placeholder));
 		}
 	}
 }

@@ -1,4 +1,8 @@
 <?php
+namespace app\models;
+
+use glue;
+
 class HelpTopic extends Help{
 
 	public $userId;
@@ -28,11 +32,11 @@ class HelpTopic extends Help{
 
 	function getDescendants(){
 		/** $secondLevel = $this->Db()->find(array("path"=>new MongoRegex("/^".$path.",[^,]*,[^,]*$/")))->sort(array("seq"=>1)); // Second Level **/
-		return self::model()->find(array("path"=>new MongoRegex("/^".$this->path.",[^,]*$/")))->sort(array("seq"=>1)); // First Level
+		return self::model()->find(array("path"=>new \MongoRegex("/^".$this->path.",[^,]*$/")))->sort(array("seq"=>1)); // First Level
 	}
 
 	function getChildren(){
-		return self::model()->find(array("path"=>new MongoRegex("/^".$this->path.",/")))->sort(array("path"=>1));
+		return self::model()->find(array("path"=>new \MongoRegex("/^".$this->path.",/")))->sort(array("path"=>1));
 	}
 
 	function rules(){
@@ -49,10 +53,10 @@ class HelpTopic extends Help{
 
 		$this->userId = glue::user()->_id;
 
-		$this->normalisedTitle = strtolower(iconv('UTF-8', 'ASCII//TRANSLIT', trim(str_replace(' ', '-', strip_to_single(make_alpha_numeric($this->title))))));
+		$this->normalisedTitle = strtolower(iconv('UTF-8', 'ASCII//TRANSLIT', trim(str_replace(' ', '-', strip_to_single(preg_replace("/[^a-zA-Z0-9\s]/", "", $this->title))))));
 		$this->keywords = str_replace(" ", "-", $this->normalisedTitle);
 
-		$this->published = new MongoDate();
+		$this->published = new \MongoDate();
 
 		$oldPath = $this->path;
 		if(strlen($this->parent) <= 0 || !$this->parent){
@@ -63,10 +67,10 @@ class HelpTopic extends Help{
 
 		if($this->getScenario() == 'update' && $oldPath != $this->path){
 			// I do not use active record to keep this process as fast as possible
-			$helpItems = $this->Db()->find(array("path"=>new MongoRegex("/^".$oldPath.",/"))); // Comma in regex denotes children
+			$helpItems = $this->getCollection()->find(array("path"=>new \MongoRegex("/^".$oldPath.",/"))); // Comma in regex denotes children
 			foreach($helpItems as $_id => $item){
-				$this->Db()->update(array(
-					"_id"=>new MongoId($_id)),
+				$this->updateAll(array(
+					"_id"=>new \MongoId($_id)),
 					array("\$set"=>array("path"=>preg_replace("/".$oldPath."/i", $this->path, $item['path']))));
 			}
 		}
@@ -104,24 +108,24 @@ class HelpTopic extends Help{
 	function delete($method = 'concat'){
 
 		if($method == 'scrub'){
-			$helpItems = $this->Db()->find(array(
-				"path"=>new MongoRegex("/^".$this->path.",/"))
+			$helpItems = $this->getCollection()->find(array(
+				"path"=>new \MongoRegex("/^".$this->path.",/"))
 			); // Comma in regex denotes children
 
 			foreach($helpItems as $_id => $item){
-				$this->Db()->remove(array("_id"=>new MongoId($_id)));
+				$this->deleteAll(array("_id"=>new \MongoId($_id)));
 				glue::mysql()->query("UPDATE help_documents SET deleted=1 WHERE _id=:_id", array(
 					":_id" => $_id,
 				));
 			}
 		}elseif($method == 'concat'){
 			// Concatenate
-			$helpItems = $this->Db()->find(array("path"=>new MongoRegex("/^".$this->path.",/"))); // Comma in regex denotes children
+			$helpItems = $this->getCollection()->find(array("path"=>new \MongoRegex("/^".$this->path.",/"))); // Comma in regex denotes children
 			$path_pieces = explode(",", $this->path); // the last part of the explosion should be the string we are looking for
 
 			foreach($helpItems as $_id => $item){
 				$infopath = str_replace($this->normalisedTitle.",", '', $item['path']); // Lets just remove this topic form its children
-				$this->Db()->update(array("_id"=>new MongoId($_id)), array("\$set"=>array("path"=>$infopath)));
+				$this->updateAll(array("_id"=>new \MongoId($_id)), array("\$set"=>array("path"=>$infopath)));
 				glue::mysql()->query("UPDATE help_documents SET path=:path, deleted=1 WHERE _id=:_id", array(
 					":_id" => $_id,
 					":path" => $infopath

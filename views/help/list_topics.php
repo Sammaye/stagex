@@ -1,5 +1,5 @@
 <?php
-glue::clientScript()->addJsScript('addTopic', "
+$this->js('addTopic', "
 
 	var selectedTopic;
 
@@ -10,17 +10,10 @@ glue::clientScript()->addJsScript('addTopic', "
 
 			selectedTopic = $(this);
 
-			$.facebox(" . glue::clientScript()->encode("
+			$.facebox(" . js_encode("
 				<h2 class='diag_header'>Delete Help Topic</h2>
 
-				<div class='error_message' style='display:none; margin:10px 10px 0 10px;'>
-					<div class='tl'></div><div class='tr'></div><div class='bl'></div><div class='br'></div>
-					<div class='message_content'>
-						<h2>Could not create Help Topic</h2>
-						<p>This help topic could not be created because:</p>
-						<ul></ul>
-					</div>
-				</div>
+				<div class='alert'></div>
 
 				<form method='get' action='#' class='delete_topic_form'>
 					<div class='form'>
@@ -57,16 +50,16 @@ glue::clientScript()->addJsScript('addTopic', "
 	});
 ") ?>
 
-<div class="container_16 help_topic_admin_body">
+<div class="help_page">
 
 	<div class="grid_16 alpha omega">
 		<div class='help_topic_admin_bar'><h1 class='top_head'>Help Topics</h1>
-		<div class='right_bar'>
+		<div class='search-form'>
 			<div class='search_form'>
-				<form method='get' action='<?php echo glue::url()->create('SELF') ?>'><?php echo html::textfield('help_query', glue::http()->param('help_query', ''), array( 'class' => 'search_input' )) ?>
+				<form method='get' action='<?php echo $this->createUrl('SELF') ?>'><?php echo html::textfield('help_query', glue::http()->param('help_query', ''), array( 'class' => 'search_input' )) ?>
 				<?php echo html::submitbutton('Search', array( 'class' => 'invisible_submit' ))?></form>
 			</div>
-			<a href='<?php echo glue::url()->create('/help/add_topic') ?>' class='create_topic'>Add new topic</a>
+			<a href='<?php echo $this->createUrl('/help/add_topic') ?>' class='create_topic'>Add new topic</a>
 		</div>
 		<div class="clear"></div></div>
 	</div>
@@ -86,7 +79,7 @@ glue::clientScript()->addJsScript('addTopic', "
 			<?php foreach($items as $model){ ?>
 				<tr class='topic'>
 					<td><span class='_id' style='display:none;'><?php echo $model->_id ?></span>
-					<a href="<?php echo glue::url()->create('/help/edit_topic', array( 'id' => strval($model->_id) )) ?>"><?php echo $model->title ?></a></td>
+					<a href="<?php echo $this->createUrl('/help/editTopic', array( 'id' => strval($model->_id) )) ?>"><?php echo $model->title ?></a></td>
 					<td><?php echo $model->path ?></td>
 					<td><?php echo $model->seq ?></td>
 					<td><a href='' class='deleteTopic'>Delete</a></td>

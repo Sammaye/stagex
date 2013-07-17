@@ -1,14 +1,13 @@
 <?php
-class HelpController extends GController{
+
+use app\models\Help,
+	app\models\HelpTopic;
+
+class HelpController extends \glue\Controller{
 
 	public $selectedTab = '';
 
-	// A set of filters to be run before and after the controller action
-	public function filters(){
-		return array('rbam');
-	}
-
-	public function accessRules(){
+	public function authRules(){
 		return array(
 //			array("allow",
 //				"actions"=>array( 'view_topics', 'add_topic', 'edit_topic', 'remove_topics', 'view_articles', 'add_article', 'edit_article',
@@ -22,20 +21,20 @@ class HelpController extends GController{
 
 
 	function action_index(){
-		$this->pageTitle = 'StageX Help Center';
-		$this->render("help/index");
+		$this->title = 'StageX Help Center';
+		echo $this->render("help/index");
 	}
 
 	function action_view(){
-		$this->pageTitle = 'Help Content Not Found - StageX';
+		$this->title = 'Help Content Not Found - StageX';
 		$this->layout = "help_layout";
 
-		$item = Help::model()->findOne(array('t_normalised' => glue::http()->param('title')));
+		$item = Help::model()->findOne(array('normalisedTitle' => glue::http()->param('title')));
 
 		if(!$item){
-			$this->render('help/notfound');
+			echo $this->render('help/notfound');
 		}else{
-			$this->pageTitle = $item->title.' - StageX';
+			$this->title = $item->title.' - StageX';
 			if(count(explode(',', $item->path)) > 1){
 				$this->selectedTab = strstr($item->path, ',', true);
 			}else{
@@ -43,57 +42,53 @@ class HelpController extends GController{
 			}
 
 			if($item->type == 'topic'){
-				$this->render('help/view_topic', array('model' => $item));
+				echo $this->render('help/view_topic', array('model' => $item));
 			}elseif($item->type == 'article'){
-				$this->render('help/view_article', array('model' => $item));
+				echo $this->render('help/view_article', array('model' => $item));
 			}
 		}
 	}
 
 	function action_search(){
-		$this->pageTitle = 'Search StageX Help';
+		$this->title = 'Search StageX Help';
 
 		glue::sphinx()->query(array('select' => glue::http()->param('help_query', '')), "help");
-		$this->render("help/search", array( "sphinx" => glue::sphinx()->getSearcher() ));
+		echo $this->render("help/search", array( "sphinx" => glue::sphinx()->getSearcher() ));
 	}
 
 
-	function action_view_topics(){
-		$this->pageTitle = 'View Help Topics - StageX';
+	function action_viewTopics(){
+		$this->title = 'View Help Topics - StageX';
 
 		// Will list all help articles. But only for admins
-		$this->render('help/list_topics', array('items' => HelpTopic::model()->search(array('title', 'path'), glue::http()->param('help_query', ''), array('type' => 'topic'))) );
+		echo $this->render('help/list_topics', array('items' => app\models\HelpTopic::model()->fts(array('title', 'path'), glue::http()->param('query', ''), array('type' => 'topic'))) );
 	}
 
-	function action_add_topic(){
-		$this->pageTitle = 'Add Help Topic - StageX';
-		//var_dump($_POST);
+	function action_addTopic(){
+		$this->title = 'Add Help Topic - StageX';
 		$model = new HelpTopic();
 
 		if(isset($_POST['HelpTopic'])){
-			$model->_attributes($_POST['HelpTopic']);
+			$model->attributes=$_POST['HelpTopic'];
 			if($model->validate()){
 				$model->save();
-				glue::http()->redirect('/help/view_topics');
+				glue::http()->redirect('/help/viewTopics');
 			}
 		}
-		//echo "here";
-		$this->render('help/manage_topic', array( 'model' => $model ));
+		echo $this->render('help/manage_topic', array( 'model' => $model ));
 	}
 
-	function action_edit_topic(){
-		$this->pageTitle = 'Edit Help Topic - StageX';
+	function action_editTopic(){
+		$this->title = 'Edit Help Topic - StageX';
 		$model = HelpTopic::model()->findOne(array('_id' => new MongoId($_GET['id'])));
 
 		if(isset($_POST['HelpTopic'])){
-			$model->_attributes($_POST['HelpTopic']);
-			if($model->validate()){
-				$model->save();
-				glue::http()->redirect('/help/view_topics');
+			$model->attributes=$_POST['HelpTopic'];
+			if($model->validate()&&$model->save()){
+				glue::http()->redirect('/help/viewTopics');
 			}
 		}
-		//echo "here";
-		$this->render('help/manage_topic', array( 'model' => $model ));
+		echo $this->render('help/manage_topic', array( 'model' => $model ));
 	}
 
 	function action_remove_topics(){

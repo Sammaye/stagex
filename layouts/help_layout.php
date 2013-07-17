@@ -1,29 +1,30 @@
+<?php
+
+use \glue\Html;
+
+$this->beginPage() ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html xmlns:fb="http://www.facebook.com/2008/fbml">
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<meta http-equiv="content-language" content="en"/>
 
-		<meta name="description" content="<?php echo $this->pageDescription ?>" />
-		<meta name="keywords" content="<?php echo $this->pageKeywords ?>" />
-
 		<link rel="shortcut icon" href="/images/favicon.ico" />
 
-		<title><?php echo $this->pageTitle ?></title>
+		<title><?php echo Html::encode($this->title) ?></title>
 
 		<?php
-			glue::clientScript()->addCoreJsFile('jqueryui', '/js/jquery-ui.js');
-			glue::clientScript()->addCoreJsFile('jquery', '/js/jquery.js');
+			echo Html::jsFile('/js/jquery.js')."\n";
+			echo Html::jsFile('/js/jquery-ui.js')."\n";
 
-			glue::clientScript()->addJsFile('facebox', "/js/facebox.js");
-			glue::clientScript()->addJsFile("common", '/js/common.js');
+			echo Html::jsFile("/js/facebox.js")."\n";
+			echo Html::jsFile('/js/common.js')."\n";
 
-			glue::clientScript()->addCoreCSSFile('reset', "/css/reset.css");
-			glue::clientScript()->addCoreCSSFile('960', "/css/960.css");
-			glue::clientScript()->addCoreCSSFile('main', "/css/main.css");
-			glue::clientScript()->addCoreCSSFile('springhare', "/css/springhare.css");
+			echo Html::cssFile("/css/reset.css")."\n";
+			echo Html::cssFile("/css/960.css")."\n";
+			echo Html::cssFile("/css/main.css")."\n";
 
-			glue::clientScript()->addJsScript('ga_script', "var _gaq = _gaq || [];
+			$this->js('ga_script', "var _gaq = _gaq || [];
 			  _gaq.push(['_setAccount', 'UA-31049834-1']);
 			  _gaq.push(['_trackPageview']);
 
@@ -31,57 +32,65 @@
 			    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
 			    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
 			    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-		  	})();", GClientScript::HEAD);
+		  	})();", self::HEAD);
+
+			$this->js('gplus_one', "(function() {
+		    	var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+		    	po.src = 'https://apis.google.com/js/plusone.js';
+		    	var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+		  	})();");
+
+			$this->head();
 		?>
-
 	</head>
-
+	
 	<body>
-		<?php $this->widget('application/widgets/presenceBar.php') ?>
-
-		<div class='help_head_outer'>
-			<div class='help_head'>StageX Help</div>
-			<div class='help_search'>
-				<?php $form = html::form(array('action' => '/help/search', 'method' => 'get')) ?>
-					<?php //echo html::textfield('help_query', htmlspecialchars($_GET['help_query']), array()) ?>
-
-					<?php $this->widget('application/widgets/Jqautocomplete.php', array(
-						'attribute' => 'help_query',
-						'value' => htmlspecialchars(glue::http()->param('help_query', '')),
-						'options' => array(
-							'appendTo' => '#help_search_results',
-							'source' => '/help/suggestions',
-							'minLength' => 2,
-						),
-						'renderItem' => "
-							return $( '<li></li>' )
-								.data( 'item.autocomplete', item )
-								.append( '<a class=\'content\'>' + item.label + '</a>' )
-								.appendTo( ul );
-							")) ?>
-
-					<button class='blue_css_button'>Search Help</button>
-				<?php $form->end() ?>
+		<?php $this->beginBody() ?>
+			<?php app\widgets\Menu::widget() ?>
+		<div class="help_page help_layout">
+		<div class='head'>
+			<div class="left">
+			<div><a href="/help">Support</a> / <?php echo isset($model) ? $model->getBreadCrumb() : '' ?></div>
+			<h1 class="hero"><?php if(isset($model)&&$model!==null): echo $model->title; else: echo "404 Not Found"; endif; ?></h1>
 			</div>
+    		<div class='search form-search'>
+			<?php $form = Html::form(array('method' => 'get', 'action' => '/help/search')); ?><div class="search_input">
+				<?php app\widgets\Jqautocomplete::widget(array(
+					'attribute' => 'query',
+					'value' => urldecode(htmlspecialchars(isset($_GET['query']) ? $_GET['query'] : '')),
+					'options' => array(
+						'appendTo' => '#help_search_results',
+						'source' => '/help/suggestions',
+						'minLength' => 2,
+					),
+					'renderItem' => "
+						return $( '<li></li>' )
+							.data( 'item.autocomplete', item )
+							.append( '<a class=\'content\'><span>' + item.label + '</span></div></a>' )
+							.appendTo( ul );
+				"))  ?></div><button class="submit_search"><span>&nbsp;</span></button>
+			<?php $form->end() ?>
+			<div class="clear"></div>
+			<p class='ask'><a href='https://getsatisfaction.com/stagex'>Ask a Question on the Forums</a></p>
+			</div>
+			<div class="clear"></div>
 		</div>
 
-		<div class='container_16 help_section_body'>
-			<div class='grid_5 alpha help_left_menu'>
-				<ul class='help_menu_ul help_menu_normal_ul'>
-					<li class='hm_item'><a href='<?php echo glue::url()->create('/help') ?>'>Go to Help Home</a></li>
-			        <?php foreach(Help::getRootItems() as $item){ ?>
-			        	<li><a class='<?php if($this->selectedTab == $item->t_normalised): echo "selected"; endif ?> ' href="<?php echo glue::url()->create('/help/view', array('title' => $item->t_normalised)) ?>"><?php echo $item->title ?></a></li>
+		<div class='article'>
+			<div class='left'>
+				<ul class='help_menu'>
+					<li><a href='<?php echo $this->createUrl('/help') ?>'>Go to Help Home</a></li>
+			        <?php foreach(app\models\Help::getRootItems() as $item){ ?>
+			        	<li><a class='<?php if($this->selectedTab == $item->normalisedTitle): echo "selected"; endif ?> ' href="<?php echo $this->createUrl('/help/view', array('title' => $item->normalisedTitle)) ?>"><?php echo $item->title ?></a></li>
 			        <?php } ?>
-			        <li class='qa_item'><a href='https://getsatisfaction.com/stagex'>Ask A Question</a></li>
+			        <li><a href='https://getsatisfaction.com/stagex'>Ask A Question</a></li>
 				</ul>
 			</div>
-			<div class='grid_12 omega'>
-				<div class='page_breadcrumb'><?php echo isset($model) ? $model->getBreadCrumb() : '' ?></div>
-		        <?php echo $page ?>
-	      	</div>
-	    	<div class='clearer'></div>
+			<div class='body'><?php echo $content ?></div>
+	    	<div class='clear'></div>
+	    </div>	
 	    </div>
-	    <div class="playlistBottomBar_outer" id="playlist-root"></div>
-		<div id="mainSearch_results"></div><div id='help_search_results'></div>
-	</body>
+		<div id="mainSearch_results"></div>
+		<?php $this->endBody() ?>
+	</body>	
 </html>
