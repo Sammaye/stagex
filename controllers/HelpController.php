@@ -1,7 +1,8 @@
 <?php
 
 use app\models\Help,
-	app\models\HelpTopic;
+	app\models\HelpTopic,
+	app\models\HelpArticle;
 
 class HelpController extends \glue\Controller{
 
@@ -109,7 +110,7 @@ class HelpController extends \glue\Controller{
 		GJSON::kill('The topics you selected were removed', true);
 	}
 
-	function action_view_articles(){
+	function action_viewArticles(){
 		$this->pageTitle = 'View Help Articles - StageX';
 
 		// Will list all help articles. But only for admins

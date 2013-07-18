@@ -46,7 +46,7 @@ $this->beginPage() ?>
 	
 	<body>
 		<?php $this->beginBody() ?>
-			<?php app\widgets\Menu::widget() ?>
+			<?php app\widgets\Menu::widget(); ?>
 		<div class="help_page help_layout">
 		<div class='head'>
 			<div class="left">

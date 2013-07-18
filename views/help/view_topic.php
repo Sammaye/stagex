@@ -1,5 +1,4 @@
 <div class='view_helparticle_body view_helptopic_body'>
-	<h1 class='title'><?php echo $model->title ?></h1>
 	<div class='content'>
 		<?php $children = $model->getDescendants()->sort(array('type' => 1, 'seq' => 1)) ?>
 

@@ -59,7 +59,7 @@ $this->js('addTopic', "
 				<form method='get' action='<?php echo $this->createUrl('SELF') ?>'><?php echo html::textfield('help_query', glue::http()->param('help_query', ''), array( 'class' => 'search_input' )) ?>
 				<?php echo html::submitbutton('Search', array( 'class' => 'invisible_submit' ))?></form>
 			</div>
-			<a href='<?php echo $this->createUrl('/help/add_topic') ?>' class='create_topic'>Add new topic</a>
+			<a href='<?php echo $this->createUrl('/help/addTopic') ?>' class='create_topic'>Add new topic</a>
 		</div>
 		<div class="clear"></div></div>
 	</div>
