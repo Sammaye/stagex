@@ -50,7 +50,7 @@ $this->beginPage() ?>
 		<div class="help_page help_layout">
 		<div class='head'>
 			<div class="left">
-			<div><a href="/help">Support</a> / <?php echo isset($model) ? $model->getBreadCrumb() : '' ?></div>
+			<div><a href="/help">Support</a> &rsaquo; <?php echo isset($model) ? $model->getBreadCrumb() : '' ?></div>
 			<h1 class="hero"><?php if(isset($model)&&$model!==null): echo $model->title; else: echo "404 Not Found"; endif; ?></h1>
 			</div>
     		<div class='search form-search'>

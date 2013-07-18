@@ -64,28 +64,33 @@ abstract class Widget extends \glue\Component{
 			if(($pos=strpos($attribute,'['))!==false)
 			{
 				if($pos!==0){  // e.g. name[a][b]
-					$id = str_replace(']', '_', strtr(get_class($model).'['.substr($attribute,0,$pos).']'.substr($attribute,$pos),array(']['=>']','['=>']')));
-					return array(get_class($model).'['.substr($attribute,0,$pos).']'.substr($attribute,$pos), $id);
+					$id = str_replace(']', '_', strtr($this->getModelClass($model).'['.substr($attribute,0,$pos).']'.substr($attribute,$pos),array(']['=>']','['=>']')));
+					return array($this->getModelClass($model).'['.substr($attribute,0,$pos).']'.substr($attribute,$pos), $id);
 				}
 				if(($pos=strrpos($attribute,']'))!==false && $pos!==strlen($attribute)-1)  // e.g. [a][b]name
 				{
 					$sub=substr($attribute,0,$pos+1);
 					$attribute=substr($attribute,$pos+1);
-					$id = str_replace(']', '_', trim(strtr(get_class($model).$sub.'['.$attribute.']',array(']['=>']','['=>']'))));
-					return array(get_class($model).$sub.'['.$attribute.']', $id);
+					$id = str_replace(']', '_', trim(strtr($this->getModelClass($model).$sub.'['.$attribute.']',array(']['=>']','['=>']'))));
+					return array($this->getModelClass($model).$sub.'['.$attribute.']', $id);
 				}
 				if(preg_match('/\](\w+\[.*)$/',$attribute,$matches))
 				{
-					$id = str_replace('[', '_', get_class($model).'['.str_replace(']','_',trim(strtr($attribute,array(']['=>']','['=>']')),']')));
-					$name=get_class($model).'['.str_replace(']','][',trim(strtr($attribute,array(']['=>']','['=>']')),']')).']';
+					$id = str_replace('[', '_', $this->getModelClass($model).'['.str_replace(']','_',trim(strtr($attribute,array(']['=>']','['=>']')),']')));
+					$name=$this->getModelClass($model).'['.str_replace(']','][',trim(strtr($attribute,array(']['=>']','['=>']')),']')).']';
 					$attribute=$matches[1];
 
 					return array($name, $id);
 				}
 			}
 			else
-				return array(get_class($model).'['.$attribute.']', str_replace('[', '_', trim(get_class($model).'['.$attribute.']', ']')));
+				return array($this->getModelClass($model).'['.$attribute.']', str_replace('[', '_', trim($this->getModelClass($model).'['.$attribute.']', ']')));
 		}
+	}
+	
+	function getModelClass($model){
+		$parts=explode('\\',$model instanceof \glue\Model ? get_class($model) : $model);
+		return end($parts);
 	}
 
 	function getId($autoGenerate = true){

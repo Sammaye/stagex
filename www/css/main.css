@@ -1344,7 +1344,7 @@ textarea{
 }
 
 .help_layout .article .body{
-	float:left;
+	float:left; width:760px;
 }
 
 .help_layout .head{
@@ -1365,4 +1365,12 @@ textarea{
 
 .help_layout .article .body .content{
 	font-size:14px; line-height:20px;
+}
+
+.help_page_view .no_results_found{
+	text-align:left;
+}
+
+.help_page_view .topic h2{
+	margin-top:30px;
 }

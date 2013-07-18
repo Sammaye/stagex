@@ -1,5 +1,10 @@
 <?php
-class CKEditor extends GWidget{
+
+namespace app\widgets;
+
+use glue;
+
+class CKEditor extends \glue\Widget{
 
 	public $config;
 
@@ -10,15 +15,15 @@ class CKEditor extends GWidget{
 	function render(){
 		list($name, $id) = $this->getAttributeNameId();
 
-		glue::clientScript()->addJsFile('ckeditor', '/js/CKEditor/ckeditor.js');
-		glue::clientScript()->addJsScript('ckeditor_'.$id, "
+		glue::$controller->jsFile('ckeditor', '/js/CKEditor/ckeditor.js');
+		glue::$controller->js('ckeditor_'.$id, "
 			$(function(){
 				CKEDITOR.replace('{$id}',
-				".GClientScript::encode($this->formOptions())."
+				".js_encode($this->formOptions())."
 				);
 			});
 		");
 
-		echo html::activeTextarea($this->model, $this->attribute, array('id' => $id));
+		echo \html::activeTextarea($this->model, $this->attribute, array('id' => $id));
 	}
 }

@@ -80,7 +80,7 @@ class Controller {
 		$content = $this->renderFile($viewFile, $params);
 		$layoutFile = $this->getLayoutPath($this->layout);
 		if ($layoutFile !== false) {
-			return $this->renderFile($layoutFile, array('content'=>$content));
+			return $this->renderFile($layoutFile, array_merge($params,array('content'=>$content)));
 		} else {
 			return $content;
 		}

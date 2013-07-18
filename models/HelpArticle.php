@@ -65,10 +65,10 @@ class HelpArticle extends \app\models\Help{
 			unset($this->tags);
 		}
 
-		$this->normalisedTitle = strtolower(iconv('UTF-8', 'ASCII//TRANSLIT', trim(str_replace(' ', '-', strip_to_single(make_alpha_numeric($this->title))))));
+		$this->normalisedTitle = strtolower(iconv('UTF-8', 'ASCII//TRANSLIT', trim(str_replace(' ', '-', strip_to_single(preg_replace("/[^a-zA-Z0-9\s]/", "", $this->title))))));
 		$this->keywords = str_replace(" ", "-", $this->normalisedTitle);
 
-		$this->published = new MongoDate();
+		$this->published = new \MongoDate();
 
 		$oldPath = $this->path;
 		if(strlen($this->parent) <= 0 || !$this->parent){

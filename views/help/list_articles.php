@@ -1,6 +1,6 @@
 <?php
 
-glue::clientScript()->addJsScript('deleteArticle', "
+$this->js('deleteArticle', "
 	$(function(){
 		$('.delete_article').click(function(event){
 			event.preventDefault();
@@ -35,10 +35,10 @@ glue::clientScript()->addJsScript('deleteArticle', "
 			<h1 class='head'>Help Articles</h1>
 			<div class='right_bar'>
 				<div class='search_form'>
-					<form method='get' action='<?php echo glue::url()->create('SELF') ?>'><?php echo html::textfield('help_query', glue::http()->param('help_query', ''), array( 'class' => 'search_input' )) ?>
+					<form method='get' action='<?php echo $this->createUrl('SELF') ?>'><?php echo html::textfield('help_query', glue::http()->param('query', ''), array( 'class' => 'search_input' )) ?>
 					<?php echo html::submitbutton('Search', array( 'class' => 'invisible_submit' ))?></form>
 				</div>
-				<a href='<?php echo glue::url()->create('/help/add_article') ?>' class='create_article'>Create New Help Article</a>
+				<a href='<?php echo $this->createUrl('/help/addArticle') ?>' class='create_article'>Create New Help Article</a>
 			</div>
 			<div class='clearer'></div>
 		</div>
@@ -52,12 +52,12 @@ glue::clientScript()->addJsScript('deleteArticle', "
 
 				foreach($items as $article){ ?>
 					<div class='article <?php if($i == 0): echo "no_border"; endif ?>' data-id='<?php echo $article->_id ?>'>
-						<a class='title' href='<?php echo glue::url()->create('/help/edit_article', array( 'id' => strval($article->_id) )) ?>'><?php echo $article->title ?></a>
+						<a class='title' href='<?php echo $this->createUrl('/help/editArticle', array( 'id' => strval($article->_id) )) ?>'><?php echo $article->title ?></a>
 						<div class='content'><?php echo $article->content ?></div>
 						<div class='path'><?php echo $article->path ?></div>
 						<div class='tags'>
 							<?php foreach($article->tags as $tag){ ?>
-								<a href='<?php echo glue::url()->create('/help/list_articles', array( 'help_query' => $tag )) ?>'><?php echo $tag ?></a>
+								<a href='<?php echo $this->createUrl('/help/viewArticles', array( 'query' => $tag )) ?>'><?php echo $tag ?></a>
 							<?php } ?>
 						</div>
 
