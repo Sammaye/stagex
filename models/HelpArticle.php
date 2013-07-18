@@ -102,7 +102,7 @@ class HelpArticle extends \app\models\Help{
 				":content" => $this->content,
 				":tags" => $this->tagString,
 				":path" => $this->path,
-				":type" => "topic",
+				":type" => "article",
 			));
 		}
 		return true;
