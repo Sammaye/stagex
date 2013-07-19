@@ -6,12 +6,9 @@ $this->js('deleteArticle', "
 			event.preventDefault();
 
 			var el = $(this);
-			//console.log('form', $('.delete_topic_form').serialize());
-			$.getJSON('/help/remove_articles', {'id': $(this).parents('.article').data().id}, function(data){
+			$.getJSON('/help/deleteArticle', {'id': $(this).parents('.article').data().id}, function(data){
 				if(!data.success){
-					//console.log('length', data.errors.length);
-					forms.summary($('.help_article_admin_body .block_summary'), false,
-						'The help article you selected could not be deleted.', data.errors);
+					$('.alert').summarise({},'error','Could not delete');
 				}else{
 					el.parents('.article').fadeOut('slow', function(){
 						$(this).remove();
@@ -22,13 +19,9 @@ $this->js('deleteArticle', "
 	});
 ") ?>
 
-<div class='container_16 help_article_admin_body'>
+<div class='container_16 manage_articles_body'>
 
-	<div class='block_summary' style='display:none;'>
-		<div class='tl'></div><div class='tr'></div><div class='bl'></div><div class='br'></div>
-		<div class='close'><a href='#'><?php echo utf8_decode('&#215;') ?></a></div>
-		<div class='message_content'></div>
-	</div>
+	<div class='alert' style='display:none;'></div>
 
 	<div class="grid_16 alpha omega">
 		<div class='top_bar'>

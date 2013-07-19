@@ -1,4 +1,7 @@
 <?php
+
+$this->jsFile('/js/modal.js');
+
 $this->js('addTopic', "
 
 	var selectedTopic;
@@ -9,43 +12,38 @@ $this->js('addTopic', "
 			event.preventDefault();
 
 			selectedTopic = $(this);
-
-			$.facebox(" . js_encode("
-				<h2 class='diag_header'>Delete Help Topic</h2>
+			$.modal({
+			html: " . js_encode("
+				<h2>Delete Help Topic</h2>
+				<div class='clear'></div>
 
 				<div class='alert'></div>
 
 				<form method='get' action='#' class='delete_topic_form'>
-					<div class='form'>
+					<div class='form form-vertical'>
 						<input type='hidden' class='id' name='id'/>
 						<div class='row'>" . html::label('Deletion Method', 'method').html::selectbox('method', array('concat' => 'Concat children to this ones parent (including articles)', 'scrub' => 'Scrub all Children (including articles)')) . "</div>
-						<div class='submitrow'><a href='#' class='_deleteTopic_submit'>Delete Topic</a></div>
+						<div class='submit_row'>".html::submitButton('Delete', array('class'=>'btn-success'))."</div>					
 					</div>
 				</form>
-			") . ", 'add_help_topic_diag');
+			") . ", wrapperCssClass: 'help_modal'});
 
-			$('.add_help_topic_diag .delete_topic_form .id').val($(this).parents('.topic').find('._id').text());
+			$('.help_modal .delete_topic_form .id').val($(this).parents('.topic').find('._id').text());
 		});
 
-		$(document).on('click', '._deleteTopic_submit', function(event){
+		$(document).on('click', '.delete_topic_form .btn-success', function(event){
 			event.preventDefault();
-			//console.log('form', $('.delete_topic_form').serialize());
-			$.post('/help/remove_topics', $('.delete_topic_form').serialize(), function(data){
+			$.post('/help/deleteTopic', $('.delete_topic_form').serialize(), function(data){
 				if(!data.success){
-					//console.log('length', data.errors.length);
-					for(var i=0;i<data.errors.length;i++){
-						$('.add_help_topic_diag .error_message ul').append($('<li>').html(data.errors[i]));
-					}
-					$('.add_help_topic_diag .error_message').addClass('error_message_curved');
-					$('.add_help_topic_diag .error_message').css({ 'display': 'block' });
+					$('.help_modal .alert').summarise({},'error','Poop!');
 				}else{
-					jQuery(document).trigger('close.facebox');
+					$.modal('close');
 					selectedTopic.parents('.topic').fadeOut('slow', function(){
 						$(this).remove();
 					});
 				}
+				$('.help_modal .alert').summarise('reset');
 			}, 'json');
-			$.facebox.close();
 		});
 	});
 ") ?>
@@ -64,9 +62,9 @@ $this->js('addTopic', "
 		<div class="clear"></div></div>
 	</div>
 
-	<div class="grid_16 alpha omega">
+	<div class="">
 		<?php if($items->count() > 0){ ?>
-		<table class="help_item_list">
+		<table class="table" width="100%">
 			<thead>
 				<tr>
 					<th>Title</th>

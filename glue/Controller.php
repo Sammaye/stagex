@@ -34,6 +34,12 @@ class Controller {
 
 	public $cssFiles;
 	public $css;
+	
+	function getName(){
+		$class=get_class($this);
+		$parts=explode('\\',$class);
+		return end($parts);
+	}
 
 	function authRules(){ return array(); }
 

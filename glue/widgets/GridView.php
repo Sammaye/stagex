@@ -1,6 +1,8 @@
 <?php
 
-namespace \glue\widgets;
+namespace glue\widgets;
+
+use glue;
 
 /**
  * GListView Widget
@@ -10,7 +12,7 @@ namespace \glue\widgets;
  *
  * @author Sam Millman
  */
-class GridView extends Widget{
+class GridView extends \glue\Widget{
 
 	public $id; // The id of the widget, mostly used for AJAX and JQuery stuff
 
@@ -43,7 +45,7 @@ class GridView extends Widget{
 	public $pageSize = 20;
 	public $maxPage; // Max number of available pages
 
-	public $tableCssClass = 'grid-view';
+	public $tableCssClass = 'table';
 	public $rowCssClassExpression;
 	public $sorterCssClass;
 	public $pagerCssClass;
@@ -64,7 +66,7 @@ class GridView extends Widget{
 
 	function render(){
 
-		if(!$this->cursor instanceof GMongoCursor)
+		if(!$this->cursor instanceof \glue\db\Cursor)
 			trigger_error("You must supply a GMongoCursor for the cursor param of the GListView widget");
 
 		$this->itemCount = $this->cursor->count();
@@ -88,8 +90,8 @@ class GridView extends Widget{
 			$this->cursor->skip(($this->page-1)*$this->pageSize)->limit($this->pageSize);
 
 			$pager = $this->__renderPager();
-			$html = preg_replace("/{pager}/", $pager, $this->template);
 		}
+		$html = preg_replace("/{pager}/", isset($pager)?$pager:'', $this->template);
 
 		ob_start();
 			$this->renderTable();
@@ -108,7 +110,7 @@ class GridView extends Widget{
 		$end = $this->page + 5 <= $this->maxPage ? $this->page + 5 : $this->maxPage;
 		$ret = "";
 
-		$ret .= "<div class='GListView_Pager {$this->pagerCssClass}'>";
+		$ret .= "<div class='GridView_Pager {$this->pagerCssClass}'>";
 
 	    if($this->page != 1 && $this->maxPage > 1) {
 	    	if($this->enableAjaxPagination){
@@ -164,7 +166,7 @@ class GridView extends Widget{
 				}elseif(is_numeric($k)){
 					$label = ucwords(str_replace('_', ' ', $v));
 				}
-				echo html::openTag('th', array('class' => null)) . $label . html::closeTag('th');
+				echo \html::openTag('th', array('class' => null)) . $label . \html::closeTag('th');
 			}
 		echo "</tr>";
 
@@ -205,7 +207,7 @@ class GridView extends Widget{
 	}
 
 	function getUrl($morph = array()){
-		return glue::url()->create(array_merge($this->data, array_merge(
+		return glue::http()->createUrl(array_merge($this->data, array_merge(
 			array(
 				//"mode"=>urlencode($this->mode),
 				"pagesize"=>$this->pageSize,
@@ -218,7 +220,7 @@ class GridView extends Widget{
 
 	public function getColumnValue($doc, $k, $v){
 		if(is_string($v) || (is_numeric($k) && !is_array($v))){
-			$value = $doc->getAttribute(is_numeric($k) ? $v : $k);
+			$value = $doc->{is_numeric($k) ? $v : $k};
 		}else{ // This column is a lot of complex
 			if(isset($v['type'])){
 				switch($v['type']){
@@ -254,15 +256,19 @@ class GridView extends Widget{
 				'update' => array(
 					'label' => 'Update',
 					'image' => null,
-					'url' => 'glue::url()->create("/".str_replace("Controller", "",
-								isset(glue::$action["controller"]) ? glue::$action["controller"] : "siteController")."/update", array("id" => $doc->_id))',
+					'url' => function() use ($doc){
+						return glue::http()->createUrl("/".str_replace("Controller", "",
+							glue::$controller->getName()."/update"), array("id" => $doc->_id));
+					},
 					'visible' => null
 				),
 				'delete' => array(
 					'label' => 'Delete',
 					'image' => null,
-					'url' => 'glue::url()->create("/".str_replace("Controller", "",
-								isset(glue::$action["controller"]) ? glue::$action["controller"] : "siteController")."/delete", array("id" => $doc->_id))',
+					'url' => function() use ($doc){
+						return glue::http()->createUrl("/".str_replace("Controller", "",
+							glue::$controller->getName()."/delete"), array("id" => $doc->_id));
+					},
 					'visible' => null
 				)
 			)

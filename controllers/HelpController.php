@@ -92,22 +92,22 @@ class HelpController extends \glue\Controller{
 		echo $this->render('help/manage_topic', array( 'model' => $model ));
 	}
 
-	function action_remove_topics(){
-		$this->pageTitle = 'Remove Help Topics - StageX';
+	function action_deleteTopic(){
+		$this->title = 'Remove Help Topics - StageX';
 		if(!glue::http()->isAjax())
-			glue::route(glue::config('404', 'errorPages'));
+			glue::trigger('404');
 
-		$method = isset($_POST['method']) ? $_POST['method'] : null;
-		$model = HelpTopic::model()->findOne(array('_id' => new MongoId($_POST['id'])));
+		$method = glue::http()->param('method',null);
+		$model = HelpTopic::model()->findOne(array('_id' => new MongoId(glue::http()->param('id',null))));
 
 		if(!$model)
-			GJSON::kill("That topic could no longer be found");
+			$this->json_error('That topic could no longer be found');
 
 		if($method != 'concat' && $method != 'scrub')
-			GJSON::kill('You supplied an invalid mode. Please specify one.');
+			$this->json_error('You supplied an invalid mode. Please specify one.');
 
 		$model->delete($method);
-		GJSON::kill('The topics you selected were removed', true);
+		$this->json_success('The topic you selected was removed');
 	}
 
 	function action_viewArticles(){
