@@ -19,6 +19,9 @@ class videoController extends glue\Controller{
 		);
 	}
 
+	/**
+	 * @filters @,ajax,post
+	 */
 	public function action_index(){
 		$this->pageTitle = 'Browse All Videos - StageX';
 
@@ -194,11 +197,8 @@ class videoController extends glue\Controller{
 	}
 
 	function action_saveUpload(){
-		
-		if(!glue::http()->isAjax()){
+		if(!glue::auth()->check('ajax','post'))
 			glue::trigger('404');
-			return;	
-		}
 
 		$video = Video::model()->findOne(array('userId' => glue::user()->_id, 'uploadId' => $_POST['uploadId']));
 		$exists = true;
@@ -300,7 +300,7 @@ class videoController extends glue\Controller{
 	function action_batchSave(){
 
 		$this->title = 'Save Video - StageX';
-		if(!glue::http()->isAjax())
+		if(!glue::auth()->check('ajax','post'))
 			glue::trigger('404');
 		if(isset($_POST['Video'])&&($ids=glue::http()->param('ids',null))!==null){
 			$updated=0;
@@ -317,59 +317,45 @@ class videoController extends glue\Controller{
 		$this->json_error(self::UNKNOWN);
 	}
 
-	function action_delete_responses(){
+	function action_deleteResponses(){
 		$this->pageTitle = 'Delete Video Responses - StageX';
 
-		if(!glue::http()->isAjax()){
-			glue::route('error/notfound');
-		}
+		if(!glue::auth()->check('ajax','post'))
+			glue::trigger('404');
 
 		$video = Video::model()->findOne(array("_id"=>new MongoId($_GET['id'])));
 		if($video){
-			if(!glue::roles()->checkRoles(array('^' => $video, '^@'))){
-				GJSON::kill(GJSON::DENIED);
-			}
+			if(!glue::auth()->check(array('^' => $video)))
+				$this->json_error(self::DENIED);
 
 			switch($_GET['type']){
 				case "video":
-					$count = glue::db()->videoresponse->find(array('vid' => $video->_id, 'type' => 'video'))->count();
-					glue::db()->videoresponse->remove(array('vid' => $video->_id, 'type' => 'video'), array('safe' => true));
-
-					$video->total_responses = $video->total_responses-$count;
-					$video->vid_responses = $video->vid_responses-$count;
-					$video->save();
-
-					GJSON::kill('All video responses were deleted.', true);
+					$video->removeVideoResponses();
+					$this->json_success('All video responses were deleted');
 					break;
 				case "text":
-					$count = glue::db()->videoresponse->find(array('vid' => $video->_id, 'type' => 'text'))->count();
-					glue::db()->videoresponse->remove(array('vid' => $video->_id, 'type' => 'text'), array('safe' => true));
-
-					$video->total_responses = $video->total_responses-$count;
-					$video->txt_responses = $video->txt_responses-$count;
-					$video->save();
-
-					GJSON::kill('All text responses were deleted.', true);
+					$video->removeTextResponses();
+					$this->json_success('All text responses were deleted');
 					break;
 				default:
-					echo json_encode(array('success' => false));
+					$this->json_error(self::UNKNOWN);
 					break;
 			}
 		}else{
-			GJSON::kill('Video could not be found');
+			$this->json_error('Video could not be found');
 		}
 	}
 
 	function action_report(){
-		$this->pageTitle = 'Report Video - StageX';
-		if(!glue::http()->isAjax())
+		$this->title = 'Report Video - StageX';
+		if(!glue::auth()->check('ajax','post'))
 			Glue::route("error/notfound");
 
 		if(isset($_GET['reason']) && isset($_GET['id'])){
 			$video = Video::model()->findOne(array('_id' => new MongoId($_GET['id'])));
 
-			if(!glue::roles()->checkRoles(array('deletedView' => $video))){
-				GJSON::kill('That video was not found');
+			if(!glue::auth()->check(array('deleted' => $video))){
+				$this->json_error('That video was not found');
 			}
 
 			$video->report($_GET['reason']);
@@ -594,3 +580,11 @@ class videoController extends glue\Controller{
 		GJSON::kill($model->getStatistics_dateRange($fromTs, $toTs), true);
 	}
 }
+
+videoController::post('batchSave', function(){
+	
+	if(!Auth::check(array('ajax','post')))
+		glue::trigger('404');
+	
+	
+});

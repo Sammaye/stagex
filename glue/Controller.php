@@ -255,7 +255,7 @@ class Controller {
 
 		$json='';
 		if(is_string($params)){
-			$json= json_encode(array('success' => true, 'messages' => array($params)));
+			$json= json_encode(array('success' => true, 'message' => array($params)));
 		}else{
 			$json= json_encode(array_merge(array('success' => true), $params));
 		}
@@ -271,17 +271,17 @@ class Controller {
 		$json='';
 		switch(true){
 			case $params == self::DENIED:
-				$json= json_encode(array('success' => false, 'messages' => array('Action not Permitted')));
+				$json= json_encode(array('success' => false, 'message' => 'Action not Permitted'));
 				break;
 			case $params == self::LOGIN:
-				$json= json_encode(array('success' => false, 'messages' => array('You must login to continue')));
+				$json= json_encode(array('success' => false, 'message' => 'You must login to continue'));
 				break;
 			case $params == self::UNKNOWN:
-				$json= json_encode(array('success' => false, 'messages' => array('An unknown error was encountered')));
+				$json= json_encode(array('success' => false, 'message' => 'An unknown error was encountered'));
 				break;
 			default:
 				if(is_string($params)){
-					$json= json_encode(array('success' => false, 'messages' => array($params)));
+					$json= json_encode(array('success' => false, 'message' => $params));
 				}else{
 					$json= json_encode(array_merge(array('success' => false), $params));
 				}

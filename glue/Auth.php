@@ -9,6 +9,7 @@ class Auth extends \glue\Component{
 
 	public $shortcuts;
 	public $filters;
+	public $responses;
 
 	private $controller;
 
@@ -89,7 +90,7 @@ class Auth extends \glue\Component{
 	}
 
 	// This is used as a means to else where
-	public function check($roles, $all = false){
+	public function check($roles, $all = true){
 		$matched = true;
 
 		if(is_string($roles)) $roles=array($roles);

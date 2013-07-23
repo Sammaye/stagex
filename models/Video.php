@@ -799,4 +799,22 @@ class Video extends \glue\Db\Document{
 		glue::db()->videoresponse_likes->remove(array("video_id"=>array('$in' => $video_ids)));
 		glue::db()->video_likes->remove(array('item' => array('$in' => $video_ids))); // Same reason as above		
 	}
+	
+	function removeVideoResponses(){
+		$count = glue::db()->videoresponse->find(array('vid' => $video->_id, 'type' => 'video'))->count();
+		glue::db()->videoresponse->remove(array('vid' => $video->_id, 'type' => 'video'), array('safe' => true));
+		
+		$video->total_responses = $video->total_responses-$count;
+		$video->vid_responses = $video->vid_responses-$count;
+		$video->save();		
+	}
+	
+	function removeTextResponses(){
+		$count = glue::db()->videoresponse->find(array('vid' => $video->_id, 'type' => 'text'))->count();
+		glue::db()->videoresponse->remove(array('vid' => $video->_id, 'type' => 'text'), array('safe' => true));
+		
+		$video->total_responses = $video->total_responses-$count;
+		$video->txt_responses = $video->txt_responses-$count;
+		$video->save();		
+	}
 }

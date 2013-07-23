@@ -151,10 +151,10 @@ return array(
 			 * These are shortcuts used to make short hand notation to certain commonly used filters
 			 */
 			'shortcuts' => array(
-				'@' 	=> 'roleLogged',
-				'@*' 	=> "loginRequired",
-				'^@' 	=> "roleAdmin",
-				'*' 	=> "roleUser",
+				'@' 	=> 'authed',
+				'@*' 	=> "authRequired",
+				'^@' 	=> "admin",
+				'*' 	=> "user",
 				'^' 	=> "Owns"
 			),
 
@@ -162,12 +162,29 @@ return array(
 			 * These are the filters used to determine if they are authorised to actually access what they wanna
 			 */
 			'filters' => array(
-				'roleUser' => function(){
+				'user' => function(){
 					return true;
 				},
-
-				'roleLogged' => function(){
-					if(glue::session()->authed){
+				'authed' => function(){
+					if(glue::session()->authed)
+						return true;
+					return false;
+				},
+				'authRequired' => function(){
+					if(!glue::session()->authed){
+						if(glue::http()->isAjax()){
+							echo json_encode(array('success' => false, 'messages' => array('You must login to continue')));
+							exit();
+						}else{
+							\glue\Html::setErrorFlashMessage('You must be logged in to access this page');
+							header('Location: /user/login?nxt='.Glue::http()->createUrl('SELF', array(), null));
+							exit();
+						}
+					}
+					return true;			
+				},
+				'admin' => function(){
+					if(Glue::user()->group == 10 || Glue::user()->group == 9){
 						return true;
 					}
 					return false;
@@ -218,30 +235,11 @@ return array(
 					}
 					return true;
 				},
-				'loginRequired' => function(){
-					if(glue::session()->authed){
-						return true;
-					}
 
-					if(glue::http()->isAjax()){
-						echo json_encode(array('success' => false, 'messages' => array('You must login to continue')));
-						exit();
-					}else{
-						\glue\Html::setErrorFlashMessage('You must be logged in to access this page');
-						header('Location: /user/login?nxt='.Glue::http()->createUrl('SELF', array(), null));
-						exit();
-					}
-					return false;
-				},
-
-				'roleAdmin' => function(){
-				  	if(Glue::session()->user->group == 10 || Glue::session()->user->group == 9){
-				  		return true;
-				  	}
-				  	return false;
-				},
 
 				'Owns' => function($object){
+					if(glue::auth()->check('^@'))
+						return true;
 					if(is_array($object)){
 						foreach($object as $item){
 							if(strval(Glue::user()->_id) == strval($item->userId)){
@@ -255,14 +253,44 @@ return array(
 					}
 					return false;
 				},
-
-				/**
-				 * Ajax is class as an auth item, note this in case you do not use the inbuilt auth
-				 */
 				'ajax' => function(){
+					
+					glue::auth()->response=function($authed){
+						if(!$authed){
+							glue::trigger('404');
+							exit();
+						}
+					};					
+					
 					if(glue::http()->isAjax()){
 						return true;
 					}
+					return false;
+				},
+				'post' => function(){
+					
+					glue::auth()->response=function($authed){
+						if(!$authed){
+							glue::trigger('404');
+							exit();
+						}
+					};
+					
+					if(glue::http()->isPost())
+						return true;
+					return false;
+				},
+				'get' => function(){
+					
+					glue::auth()->response=function($authed){
+						if(!$authed){
+							glue::trigger('404');
+							exit();
+						}
+					};
+					
+					if(glue::http()->isGet())
+						return true;
 					return false;
 				}
 			)
