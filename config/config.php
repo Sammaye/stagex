@@ -189,6 +189,12 @@ return array(
 					}
 					return false;
 				},
+				'cli' => function(){
+					if(php_sapi_name() == 'cli')
+						return true;
+					else
+						return false;
+				},
 				'canView' => function($item){
 					if(!$item){
 						return false;

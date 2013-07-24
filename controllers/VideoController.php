@@ -14,7 +14,8 @@ class videoController extends glue\Controller{
 					'delete_responses', 'batch_delete', 'delete', 'report', 'like', 'dislike', 'statistics', 'get_more_statistics', 'undoDelete', 'batchSave' ),
 				"users"=>array("@*")
 			),
-			array('allow', 'actions' => array('index', 'watch', 'process_encoding', 'embedded', 'tst_sqs')),
+			array('allow', 'actions'=>array('process_encoding'),'users'=>array('cli')),
+			array('allow', 'actions' => array('index', 'watch', 'embedded')),
 			array("deny", "users"=>array("*")),
 		);
 	}
