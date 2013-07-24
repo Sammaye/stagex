@@ -240,9 +240,13 @@ class Http{
 	}
 
 	/**
-	 * Only gets the major versions of browsers, all others respond as u
+	 * Only gets the major name (i.e. "IE","Firefox","Chrome") of main stream browsers, all others respond as "u"
+	 * This is mostly used for statistical reasons and allows us to log the most important data while showing 
+	 * the rest without bogging the user down to their knees in grade d muff.
+	 * 
+	 * If you want a more accurate version please use `get_browser()`.
 	 */
-	function getBrowserBrand(){
+	function getMajorBrowserName(){
 		$u_agent = $_SERVER['HTTP_USER_AGENT'];
 		$u_brows_key = 'u';
 		if(preg_match('/MSIE/i',$u_agent)){
@@ -268,15 +272,11 @@ class Http{
 			$referer = 'Direct Entry';
 		}
 
-		if($referer === false){
+		if($referer === false)
 			return null;
-		}
-
-		if(strlen($referer) > 0){
+		if(strlen($referer) > 0)
 			return $referer;
-		}else{
-			return null;
-		}
+		return null;
 	}
 
 	function is_search_bot($bot_string){
