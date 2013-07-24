@@ -87,7 +87,7 @@ class HelpTopic extends Help{
 				":type" => 'topic',
 			));
 
-			glue::sitemap()->addUrl(glue::http()->createUrl('/help/view', array('title' => $this->normalisedTitle)), 'hourly', '0.5');
+			glue::sitemap()->addUrl(glue::http()->getUrl('/help/view', array('title' => $this->normalisedTitle)), 'hourly', '0.5');
 		}else{
 			glue::mysql()->query("UPDATE help_documents SET _id=:_id, title=:title, path=:path, type=:type WHERE _id=:_id", array(
 				":_id" => strval($this->_id),

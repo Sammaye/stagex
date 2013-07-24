@@ -173,52 +173,7 @@ class Http{
 		}
 	}
 
-	public function getParam($params = null){
-		$ar = array();
-		if(empty($params)){
-			$params = $_GET;
-			unset($_GET['url']);
-		}
-
-		foreach($params as $field => $value){
-			$ar[] = $field.'='.$value;
-		}
-		return implode('&amp;', $ar);
-	}
-
-	public static function _get($attributes, $default_val = null){
-		if(is_array($attributes)){
-			$get = array();
-			foreach($attributes as $k => $v){
-				if(!is_numeric($k)){
-					$get[$k] = isset($_GET[$k]) ? $_GET[$k] : $v;
-				}else{
-					$get[$k] = isset($_GET[$k]) ? $_GET[$k] : null;
-				}
-			}
-			return $get;
-		}else{
-			return isset($_GET[$attributes]) ? $_GET[$attributes] : $default_val;
-		}
-	}
-
-	public static function _post($attributes, $default_val = null){
-		if(is_array($attributes)){
-			$get = array();
-			foreach($attributes as $k => $v){
-				if(!is_numeric($k)){
-					$get[$k] = isset($_POST[$k]) ? $_POST[$k] : $v;
-				}else{
-					$get[$k] = isset($_POST[$k]) ? $_POST[$k] : null;
-				}
-			}
-			return $get;
-		}else{
-			return isset($_POST[$attributes]) ? $_POST[$attributes] : $default_val;
-		}
-	}
-
-	function createUrl($path = '/', $params = array(), $host = '/', $scheme = 'http'){
+	function getUrl($path = '/', $params = array(), $host = '/', $scheme = 'http'){
 
 		if($host === null){
 			$host=$this->baseUrl();
@@ -255,20 +210,12 @@ class Http{
 		}
 		return $host.$path.(count($params) > 0 ? '?'.$this->getParams($params) : '').($fragment ? '#'.$fragment : '');
 	}
-
-	public function getUrl($returnObj = false){
-		if($returnObj){
-			return array();
-		}else{
-			return $this->createUrl('SELF');
-		}
-	}
 	
 	public function getParams($params = null){
 		$ar = array();
 		if(empty($params)){
 			$params = $_GET;
-			unset($_GET['url']);
+			unset($params['url']);
 		}
 	
 		foreach($params as $field => $value){
@@ -292,7 +239,7 @@ class Http{
 	/**
 	 * Only gets the major versions of browsers, all others respond as u
 	 */
-	function get_major_ua_browser(){
+	function getBrowserBrand(){
 		$u_agent = $_SERVER['HTTP_USER_AGENT'];
 		$u_brows_key = 'u';
 		if(preg_match('/MSIE/i',$u_agent)){

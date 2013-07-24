@@ -349,85 +349,78 @@ class videoController extends glue\Controller{
 	function action_report(){
 		$this->title = 'Report Video - StageX';
 		if(!glue::auth()->check('ajax','post'))
-			Glue::route("error/notfound");
+			glue::trigger('404');
+		
+		$id=glue::http()->param('id',null);
+		$reason=glue::http()->param('reason',null);
 
-		if(isset($_GET['reason']) && isset($_GET['id'])){
-			$video = Video::model()->findOne(array('_id' => new MongoId($_GET['id'])));
+		if($id!==null&&$reason!==null){
+			$video = Video::model()->findOne(array('_id' => new MongoId($id)));
 
-			if(!glue::auth()->check(array('deleted' => $video))){
+			if(!glue::auth()->check(array('deleted' => $video)))
 				$this->json_error('That video was not found');
-			}
-
 			$video->report($_GET['reason']);
-			echo json_encode(array("success"=>true));
+			$this->json_success('The video was reported');
 		}else{
-			echo json_encode(array("success"=>false));
+			$this->json_error(self::UNKNOWN);
 		}
 	}
 
 	function action_like(){
-		$this->pageTitle = 'Like Video - StageX';
-		if(!glue::http()->isAjax())
-			Glue::route("error/notfound");
+		$this->title = 'Like Video - StageX';
+		if(!glue::auth()->check('ajax','post'))
+			glue::trigger('404');
 
-		$video = Video::model()->findOne(array('_id' => new MongoId($_GET['id'])));
-		if($video){
+		$id=glue::http()->param('id',null);
+		if($video = Video::model()->findOne(array('_id' => new MongoId($id)))){
 			if(!(bool)$video->voteable)
-				GJSON::kill('Voting has been disabled on this video');
+				$this->json_error('Voting has been disabled on this video');
 
 			$video->like();
 
-			if($video->listing == 1){
-				Stream::videoLike($video->_id, glue::session()->user->_id);
-			}
+			if($video->isPublic())
+				app\models\Stream::videoLike($video->_id, glue::user()->_id);
+			if(glue::user()->autoshareLikes)
+				AutoPublishStream::add_to_qeue(AutoPublishStream::LK_V, glue::user()->_id, $video->_id);	
 
 			$total = $video->likes + $video->dislikes;
-
-			if(glue::session()->user->should_autoshare('lk_dl')){
-				AutoPublishStream::add_to_qeue(AutoPublishStream::LK_V, glue::session()->user->_id, $video->_id);
-			}
-
-			GJSON::kill(array(
+			$this->json_success(array(
 				'likes' => $video->likes,
 				'dislikes' => $video->dislikes,
 				"like_percent" => ($video->likes/$total)*100,
 				'dislike_percent' => ($video->dislikes/$total)*100
-			), true);
+			));
 		}else{
-			GJSON::kill('Video could not be found');
+			$this->json_error('Video could not be found');
 		}
 	}
 
 	function action_dislike(){
-		$this->pageTitle = 'Dislike Video - StageX';
-		if(!glue::http()->isAjax())
-			Glue::route("error/notfound");
+		$this->title = 'Dislike Video - StageX';
+		if(!glue::auth()->check('ajax','post'))
+			glue::trigger('404');
 
-		$video = Video::model()->findOne(array('_id' => new MongoId($_GET['id'])));
-		if($video){
+		$id=glue::http()->param('id',null);
+		if($video = Video::model()->findOne(array('_id' => new MongoId($id)))){
 			if(!(bool)$video->voteable)
-				GJSON::kill('Voting has been disabled on this video');
+				$this->json_error('Voting has been disabled on this video');
 
 			$video->dislike();
 
-			if($video->listing == 1){
-				Stream::videoDislike($video->_id, glue::session()->user->_id);
-			}
+			if($video->isPublic())
+				Stream::videoDislike($video->_id, glue::user()->_id);
+			if(glue::user()->autoshareLikes)
+				AutoPublishStream::add_to_qeue(AutoPublishStream::DL_V, glue::user()->_id, $video->_id);
 
 			$total = $video->likes + $video->dislikes;
-
-			if(glue::session()->user->should_autoshare('lk_dl')){
-				AutoPublishStream::add_to_qeue(AutoPublishStream::DL_V, glue::session()->user->_id, $video->_id);
-			}
-
-			GJSON::kill(array(
+			$this->json_success(array(
 				'likes' => $video->likes,
 				'dislikes' => $video->dislikes,
 				"like_percent" => ($video->likes/$total)*100,
 				'dislike_percent' => ($video->dislikes/$total)*100
-			), true);
+			));
 		}else{
-			GJSON::kill('Video could not be found');
+			$this->json_error('Video could not be found');
 		}
 	}
 
@@ -484,53 +477,6 @@ class videoController extends glue\Controller{
 		$this->json_error(self::UNKNOWN);
 	}
 
-	function action_set_detail(){
-		$this->pageTitle = 'Save Video - StageX';
-		if(!glue::http()->isAjax())
-			Glue::route("error/notfound");
-
-		$field = null;
-		if(isset($_POST['field'])){
-			$field = $_POST['field'] == 'listing' || $_POST['field'] == 'licence' ? $_POST['field'] : null;
-		}
-
-		$value = isset($_POST['value']) ? $_POST['value'] : null;
-		$videos = isset($_POST['videos']) ? $_POST['videos'] : array();
-		$video_ids = array();
-
-		if(count($videos) <= 0){
-			GJSON::kill('No videos were selected');
-		}
-
-		if(!$field){
-			GJSON::kill('No field was specified for change. Please refresh the page and try again');
-		}
-
-		foreach($videos as $k => $id){
-			$video_ids[$k] = new MongoId($id);
-		}
-
-		$video_rows = Video::model()->find(array('_id' => array('$in' => $video_ids), 'user_id' => glue::session()->user->_id));
-		if(count($video_ids) != $video_rows->count()){
-			GJSON::kill(GJSON::UNKNOWN);
-		}
-
-		$validated_videos = array();
-		foreach($video_rows as $k => $video){
-			$video->$field = $value;
-			if($video->validate(array($field))){
-				$validated_videos[] = $video;
-			}else{
-				GJSON::kill(array('messages'=>$video->getErrorMessages()));
-			}
-		}
-
-		foreach($validated_videos as $k => $video){
-			$video->save();
-		}
-		GJSON::kill('The videos you selected were saved', true);
-	}
-
 	function action_statistics(){
 		$video = Video::model()->findOne(array("_id" => new MongoId($_GET['id'])));
 		if(!$video || !glue::roles()->checkRoles(array('^' => $video))){ // Only the owner of the video can see this
@@ -580,11 +526,3 @@ class videoController extends glue\Controller{
 		GJSON::kill($model->getStatistics_dateRange($fromTs, $toTs), true);
 	}
 }
-
-videoController::post('batchSave', function(){
-	
-	if(!Auth::check(array('ajax','post')))
-		glue::trigger('404');
-	
-	
-});

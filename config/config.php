@@ -177,7 +177,7 @@ return array(
 							exit();
 						}else{
 							\glue\Html::setErrorFlashMessage('You must be logged in to access this page');
-							header('Location: /user/login?nxt='.Glue::http()->createUrl('SELF', array(), null));
+							header('Location: /user/login?nxt='.Glue::http()->getUrl('SELF', array(), null));
 							exit();
 						}
 					}

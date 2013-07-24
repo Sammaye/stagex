@@ -207,7 +207,7 @@ class GridView extends \glue\Widget{
 	}
 
 	function getUrl($morph = array()){
-		return glue::http()->createUrl(array_merge($this->data, array_merge(
+		return glue::http()->getUrl(array_merge($this->data, array_merge(
 			array(
 				//"mode"=>urlencode($this->mode),
 				"pagesize"=>$this->pageSize,
@@ -257,7 +257,7 @@ class GridView extends \glue\Widget{
 					'label' => 'Update',
 					'image' => null,
 					'url' => function() use ($doc){
-						return glue::http()->createUrl("/".str_replace("Controller", "",
+						return glue::http()->getUrl("/".str_replace("Controller", "",
 							glue::$controller->getName()."/update"), array("id" => $doc->_id));
 					},
 					'visible' => null
@@ -266,7 +266,7 @@ class GridView extends \glue\Widget{
 					'label' => 'Delete',
 					'image' => null,
 					'url' => function() use ($doc){
-						return glue::http()->createUrl("/".str_replace("Controller", "",
+						return glue::http()->getUrl("/".str_replace("Controller", "",
 							glue::$controller->getName()."/delete"), array("id" => $doc->_id));
 					},
 					'visible' => null

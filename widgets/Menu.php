@@ -11,7 +11,7 @@ class Menu extends \glue\Widget{
 		<div class='menu' style=''>
 			<div class="menu_left">
 				<ul>
-					<li class='logo'><a href='<?php echo glue::http()->createUrl('/') ?>'><img src='/images/main_logo.png' alt='StageX'/></a></li>
+					<li class='logo'><a href='<?php echo glue::http()->getUrl('/') ?>'><img src='/images/main_logo.png' alt='StageX'/></a></li>
 					<li class="search">
 						<form action="/search" method="get"><div class="search_input">
 							<?php
@@ -45,7 +45,7 @@ class Menu extends \glue\Widget{
 								)) ?></div><button class="submit_search"><span>&nbsp;</span></button>
 						</form>
 					</li>
-					<li class='link'><a href="<?php echo Glue::http()->createUrl("/video") ?>">Browse</a></li>
+					<li class='link'><a href="<?php echo Glue::http()->getUrl("/video") ?>">Browse</a></li>
 				</ul>
 			</div>
 			<?php if(isset($_SESSION)){ ?>
@@ -65,13 +65,13 @@ class Menu extends \glue\Widget{
 								</a>
 							</li>
 							<li><img alt='thumbnail' class='user_image' src='<?php echo glue::user()->getAvatar(30,30) ?>'/></li>
-							<li><a href="<?php echo Glue::http()->createUrl("/user/videos", array('id' => glue::user()->_id)) ?>"><?php echo glue::user()->getUsername() ?></a></li>
-							<li><a href="<?php echo Glue::http()->createUrl("/help") ?>">Help</a></li>
+							<li><a href="<?php echo Glue::http()->getUrl("/user/videos", array('id' => glue::user()->_id)) ?>"><?php echo glue::user()->getUsername() ?></a></li>
+							<li><a href="<?php echo Glue::http()->getUrl("/help") ?>">Help</a></li>
 							<li><a target='_blank' href="https://getsatisfaction.com/stagex">Report Bug</a></li>
 						<?php }else{ ?>
-							<li><a href="<?php echo Glue::http()->createUrl("/user/create") ?>">Create Account</a></li>
-							<li><a href="<?php echo Glue::http()->createUrl("/user/login") ?>">Sign In</a></li>
-							<li><a href="<?php echo Glue::http()->createUrl("/help") ?>">Help</a></li>
+							<li><a href="<?php echo Glue::http()->getUrl("/user/create") ?>">Create Account</a></li>
+							<li><a href="<?php echo Glue::http()->getUrl("/user/login") ?>">Sign In</a></li>
+							<li><a href="<?php echo Glue::http()->getUrl("/help") ?>">Help</a></li>
 							<li><a target='_blank' href="https://getsatisfaction.com/stagex">Report Bug</a></li>
 						<?php } ?>
 					</ul>

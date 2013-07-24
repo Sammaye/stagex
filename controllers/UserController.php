@@ -551,11 +551,11 @@ class userController extends \glue\Controller{
 				Glue::user()->logout(false);
 
 				html::setSuccessFlashMessage("Email Changed! All devices have been signed out. You must login again.");
-				header("Location: ".Glue::http()->createUrl("/user/login"));
+				header("Location: ".Glue::http()->getUrl("/user/login"));
 				exit();
 			}else{
 				html::setErrorFlashMessage("You must be logged in to change your email address");
-				header("Location: ".Glue::http()->createUrl("/user/login", array("next"=>$user->accessToken['url'])));
+				header("Location: ".Glue::http()->getUrl("/user/login", array("next"=>$user->accessToken['url'])));
 				exit();
 			}
 		}else{
@@ -645,7 +645,7 @@ class userController extends \glue\Controller{
 		$user = User::model()->findOne(array("_id"=>glue::user()->_id));
 		if(!$user){
 			Html::setErrorFlashMessage("You must be logged in to access this area.");
-			glue::http()->redirect('/user/login', array('nxt' => glue::http()->createUrl('SELF')));
+			glue::http()->redirect('/user/login', array('nxt' => glue::http()->getUrl('SELF')));
 		}
 		return $user;
 	}

@@ -118,7 +118,7 @@ $this->js('videos', "
 
 	<div class="header">
 		<div class="left">
-    	    <a class="btn-success" href="<?php echo glue::http()->createUrl('/video/upload', array(), glue::$params['uploadBase']) ?>">Add New Upload</a>
+    	    <a class="btn-success" href="<?php echo glue::http()->getUrl('/video/upload', array(), glue::$params['uploadBase']) ?>">Add New Upload</a>
     	</div>
     	<div class="right">   
     		<span class='light small amount_found'><?php echo $video_rows->count() ?> found</span>

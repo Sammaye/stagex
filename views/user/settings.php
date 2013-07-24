@@ -210,5 +210,5 @@ $this->js('autosharesettings', '
 		<div class="footer_submit"><?php echo html::submitbutton("Save Account Settings", array('class' => 'btn-success')) ?></div>
 
 	<?php $form->end() ?>
-	<a class="deactivate" href="<?php echo glue::http()->createUrl("/user/deactivate") ?>">Deactivate Account</a>
+	<a class="deactivate" href="<?php echo glue::http()->getUrl("/user/deactivate") ?>">Deactivate Account</a>
 </div>

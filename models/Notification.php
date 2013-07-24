@@ -205,11 +205,11 @@ class Notification extends \glue\db\Document{
 
 			$user = User::model()->findOne(array('_id' => $this->fromUsers[$i]));
 			if($users_count > 1 && $i == $users_count-1){
-				$caption .=  " and <a href='".glue::http()->createUrl('/user/view', array('id' => strval($user->_id)))."'>@{$user->getUsername()}</a>";
+				$caption .=  " and <a href='".glue::http()->getUrl('/user/view', array('id' => strval($user->_id)))."'>@{$user->getUsername()}</a>";
 			}elseif($users_count > 1 && $i != 0){
-				$caption .=  ", <a href='".glue::http()->createUrl('/user/view', array('id' => strval($user->_id)))."'>@{$user->getUsername()}</a>";
+				$caption .=  ", <a href='".glue::http()->getUrl('/user/view', array('id' => strval($user->_id)))."'>@{$user->getUsername()}</a>";
 			}else{
-				$caption .=  "<a href='".glue::http()->createUrl('/user/view', array('id' => strval($user->_id)))."'>@{$user->getUsername()}</a>";
+				$caption .=  "<a href='".glue::http()->getUrl('/user/view', array('id' => strval($user->_id)))."'>@{$user->getUsername()}</a>";
 			}
 
 			if($i == 2 || $getOnlyFirst)

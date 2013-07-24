@@ -213,7 +213,7 @@ class Video extends \glue\Db\Document{
 		if(isset(glue::$params['thumbnailBase'])){
 			return 'http://'.glue::$params['thumbnailBase'].strval($this->_id).'_w_'.$width.'_h_'.$height.'.png';
 		}else{
-			return Glue::http()->createUrl("/image/video", array(
+			return Glue::http()->getUrl("/image/video", array(
 				'file' => strval($this->_id),
 				"w"=>$width,
 				"h"=>$height
