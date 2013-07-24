@@ -27,13 +27,6 @@ class Bootstrap extends \glue\Component{
 			));
 		}
 		return $this->aws->get($obj);
-//     	if(!isset($this->aws[$obj])){ // This if will cache the aws response
-// 			$this->aws[$obj] = $obj::factory(array(
-// 				'key' => $this->key,
-// 				'secret' => $this->secret
-// 			));
-//     	}
-// 		return $this->aws[$obj];
 	}
 
 	function S3Upload($filename,$opt = array()){

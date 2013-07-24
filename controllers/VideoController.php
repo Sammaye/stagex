@@ -454,7 +454,7 @@ class videoController extends glue\Controller{
 		Video::model()->updateAll(array('_id' => array('$in' => $mongoIds)), array('$set'=>array('deleted'=>1)));
 		glue::mysql()->query('UPDATE documents SET deleted=1 WHERE _id IN :id', array(':id' => $ids));
 
-		$this->json_success(array('messages'=>array('The videos you selected were deleted'),'updated'=>count($ids)));
+		$this->json_success(array('message'=>'The videos you selected were deleted','updated'=>count($ids)));
 	}
 	
 	function action_undoDelete(){

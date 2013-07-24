@@ -66,6 +66,7 @@ class Video extends \glue\Db\Document{
 	 * @var $state
 	 */
 	public $state;
+	public $stateReason;
 
 	public $original;
 	public $mp4;
@@ -208,6 +209,22 @@ class Video extends \glue\Db\Document{
 		foreach($defaults as $k => $v)
 			$this->$k=$v;
 	}
+	
+	function setImage($bytes){
+		$ref=\MongoDBRef::create('video',$this->_id);
+		if(
+				$bytes &&
+				Image::saveAsSize($ref, $bytes, 800, 600, true) &&
+				Image::saveAsSize($ref, $bytes, 33, 18) &&
+				Image::saveAsSize($ref, $bytes, 44, 26) &&
+				Image::saveAsSize($ref, $bytes, 124, 69) &&
+				Image::saveAsSize($ref, $bytes, 138, 77) &&
+				Image::saveAsSize($ref, $bytes, 234, 130)
+		){
+			return true;
+		}
+		return false;
+	}	
 
 	function getImage($width, $height){
 		if(isset(glue::$params['thumbnailBase'])){
@@ -308,8 +325,14 @@ class Video extends \glue\Db\Document{
 				}
 
 				$this->updateAll(array('_id' => $this->_id), array('$set' => array('state' => $state, 'jobId' => $job['jobId'])));
-				glue::db()->encoding_jobs->insert(array_merge($job, array('file_name' => $file_name, 'img_submit' => $img_submit, 'mp4_submit' => $mp4_submit,
-					'ogv_submit' => $ogv_submit, 'state' => $state)));
+				glue::db()->encoding_jobs->insert(array_merge(
+					$job, 
+					array('file_name' => $file_name, 'img_submit' => $img_submit, 'mp4_submit' => $mp4_submit,
+					'ogv_submit' => $ogv_submit, 'state' => $state, 'ts'=>new \MongoDate())
+				));
+				
+				// technically the video is now there so lets inc the total uploads.
+				glue::user()->saveCounters(array('totalUploads'=>1));
 			}else{
 				
 				// FAIL
@@ -335,12 +358,9 @@ class Video extends \glue\Db\Document{
 
 	function afterSave(){
 
-		if($this->state == 'finished' && $this->getScenario() != 'process_encoding'){ // Only put it into the search index if it's done
+		if($this->state == 'finished'){ // Only put it into the search index if it's done
 
 			if($this->getIsNewRecord()){
-
-				$this->author->saveCounters(array('totalUploads'=>1));
-
 				$query = "INSERT INTO documents (_id,uid,deleted,listing,title,description,category,tags,author_name,duration,views,rating,type,adult,date_uploaded)
 							VALUES(:_id,:uid,:deleted,:listing,:title,:description,:cat,:tags,:author_name,:duration,:views,:rating,:type,:adult,now())";
 			}else{
