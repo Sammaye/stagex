@@ -6,15 +6,14 @@ use glue;
 
 class Http{
 
-	private $script_url;
-	private $baseUrl;
-	private $_pathInfo;
-	private $_params;
-	private $argv = array();
-
 	public $csrf_token_name = 'GCSRF_TOKEN';
 	public $enableCsrfValidation = true;
 	public $csrf_error = false;
+	
+	private $scriptUrl;
+	private $baseUrl;
+	private $pathInfo;
+	private $argv = array();	
 
 	function userAgent(){
 		return isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : null;
@@ -79,7 +78,7 @@ class Http{
 
 	public function path()
 	{
-	    if($this->_pathInfo===null)
+	    if($this->pathInfo===null)
 	    {
 	        $pathInfo=$this->requestUri();
 
@@ -96,9 +95,9 @@ class Http{
 	        else if(strpos($_SERVER['PHP_SELF'],$scriptUrl)===0)
 	            $pathInfo=substr($_SERVER['PHP_SELF'],strlen($scriptUrl));
 
-	        $this->_pathInfo=trim($pathInfo,'/');
+	        $this->pathInfo=trim($pathInfo,'/');
 	    }
-	    return $this->_pathInfo;
+	    return $this->pathInfo;
 	}
 
 	function isAjax(){
@@ -123,21 +122,21 @@ class Http{
 	}
 
 	function scriptUrl(){
-	    if($this->script_url===null)
+	    if($this->scriptUrl===null)
 	    {
 	        $scriptName = basename($_SERVER['SCRIPT_FILENAME']);
 	        if(basename($_SERVER['SCRIPT_NAME']) === $scriptName)
-	            $this->script_url = $_SERVER['SCRIPT_NAME'];
+	            $this->scriptUrl = $_SERVER['SCRIPT_NAME'];
 	        else if(basename($_SERVER['PHP_SELF']) === $scriptName)
-	            $this->script_url = $_SERVER['PHP_SELF'];
+	            $this->scriptUrl = $_SERVER['PHP_SELF'];
 	        else if(isset($_SERVER['ORIG_SCRIPT_NAME']) && basename($_SERVER['ORIG_SCRIPT_NAME']) === $scriptName)
-	            $this->script_url = $_SERVER['ORIG_SCRIPT_NAME'];
+	            $this->scriptUrl = $_SERVER['ORIG_SCRIPT_NAME'];
 	        else if(($pos=strpos($_SERVER['PHP_SELF'],'/'.$scriptName)) !== false)
-	            $this->script_url = substr($_SERVER['SCRIPT_NAME'],0,$pos).'/'.$scriptName;
+	            $this->scriptUrl = substr($_SERVER['SCRIPT_NAME'],0,$pos).'/'.$scriptName;
 	        else if(isset($_SERVER['DOCUMENT_ROOT']) && strpos($_SERVER['SCRIPT_FILENAME'],$_SERVER['DOCUMENT_ROOT']) === 0)
-	            $this->script_url = str_replace('\\','/',str_replace($_SERVER['DOCUMENT_ROOT'],'',$_SERVER['SCRIPT_FILENAME']));
+	            $this->scriptUrl = str_replace('\\','/',str_replace($_SERVER['DOCUMENT_ROOT'],'',$_SERVER['SCRIPT_FILENAME']));
 	    }
-	    return $this->script_url;
+	    return $this->scriptUrl;
 	}
 
 	public function param($attributes, $default_val = null){
@@ -194,7 +193,7 @@ class Http{
 			unset($params['url']);
 
 			$path = $this->path();
-			return $host.'/'.$path.(count($params) > 0 ? '?'.$this->getParams($params) : '').($fragment ? '#'.$fragment : '');
+			return $host.'/'.$path.(count($params) > 0 ? '?'.$this->serialise($params) : '').($fragment ? '#'.$fragment : '');
 		}
 
 		if(is_array($path)){
@@ -208,10 +207,10 @@ class Http{
 			$params = array_merge($getParams, $path);
 			$path = '/'.$this->path();
 		}
-		return $host.$path.(count($params) > 0 ? '?'.$this->getParams($params) : '').($fragment ? '#'.$fragment : '');
+		return $host.$path.(count($params) > 0 ? '?'.$this->serialise($params) : '').($fragment ? '#'.$fragment : '');
 	}
 	
-	public function getParams($params = null){
+	public function serialise($params = null,$array=false){
 		$ar = array();
 		if(empty($params)){
 			$params = $_GET;
@@ -219,13 +218,17 @@ class Http{
 		}
 	
 		foreach($params as $field => $value){
-			$ar[] = $field.'='.$value;
+			if(is_array($value)){
+				foreach($value as $f=>$v)
+					$ar[] = $field.'[]='.$value;
+			}else
+				$ar[] = $field.'='.$value;
 		}
-		return implode('&amp;', $ar);
+		return $array?$ar:implode('&amp;', $ar);
 	}	
 
 	function redirect($url, $attr = array(), $host='/'){
-		header("Location: ".$this->createUrl($url, $attr, $host));
+		header("Location: ".$this->url($url, $attr, $host));
 		exit();
 	}
 
