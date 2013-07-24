@@ -280,7 +280,7 @@ class User extends \glue\User{
 				"hash" => $hash,
 				"email" => $this->newEmail,
 				"y" => "E_CHANGE",
-				"url" => glue::http()->getUrl("/user/confirminbox", array('e' => $this->newEmail, 'h' => $hash, 'uid' => strval($this->_id)))
+				"url" => glue::http()->url("/user/confirminbox", array('e' => $this->newEmail, 'h' => $hash, 'uid' => strval($this->_id)))
 			);
 		}
 		return true;
@@ -309,7 +309,7 @@ class User extends \glue\User{
 				":type" => "user",
 			));
 
-			glue::sitemap()->addUrl(glue::http()->getUrl('/user/view', array('id' => $this->_id)), 'hourly', '1.0');
+			glue::sitemap()->addUrl(glue::http()->url('/user/view', array('id' => $this->_id)), 'hourly', '1.0');
 		}else{
 			glue::mysql()->query("UPDATE documents SET _id=:_id, deleted=:deleted, listing=:listing, title=:title, type=:type WHERE _id=:_id", array(
 				":_id" => strval($this->_id),
@@ -366,7 +366,7 @@ class User extends \glue\User{
 		if(isset(glue::$params['imagesUrl'])){
 			return 'http://images.stagex.co.uk/user/'.strval($this->_id).'_w_'.$width.'_h_'.$height.'.png';
 		}else{
-			return Glue::http()->getUrl("/image/user", array('file' => strval($this->_id), "w"=>$width, "h"=>$height));
+			return Glue::http()->url("/image/user", array('file' => strval($this->_id), "w"=>$width, "h"=>$height));
 		}
 	}
 

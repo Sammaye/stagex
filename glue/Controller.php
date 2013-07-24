@@ -304,6 +304,6 @@ class Controller {
 	}
 	
 	function createUrl($path = '/', $params = array(), $host = '/', $scheme = 'http'){
-		return glue::http()->getUrl($path, $params, $host, $scheme);
+		return glue::http()->url($path, $params, $host, $scheme);
 	}
 }

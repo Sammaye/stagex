@@ -542,7 +542,7 @@ class Html{
 		$html = html::openTag('div', array('class' => 'flash '.$class));
 		$html .= html::openTag('div', array('class' => 'message')).$message.html::closeTag('div');
 
-		$html .= html::a(array('href' => glue::http()->getUrl('SELF'), 'text' => utf8_decode('&#215;'), 'class' => 'close'));
+		$html .= html::a(array('href' => glue::http()->url('SELF'), 'text' => utf8_decode('&#215;'), 'class' => 'close'));
 		$html .= html::open_closeTag('div', array('class' => 'clear'));
 
 		$html .= html::closeTag('div');
@@ -679,7 +679,7 @@ class form_base{
 	public function init(){
 
 		//$this->name = $name;
-		if(!$this->action) $this->action = Glue::http()->getUrl('SELF');
+		if(!$this->action) $this->action = Glue::http()->url('SELF');
 		if(!$this->method) $this->method = "post";
 
 		$options = array();

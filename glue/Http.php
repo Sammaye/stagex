@@ -173,7 +173,7 @@ class Http{
 		}
 	}
 
-	function getUrl($path = '/', $params = array(), $host = '/', $scheme = 'http'){
+	function url($path = '/', $params = array(), $host = '/', $scheme = 'http'){
 
 		if($host === null){
 			$host=$this->baseUrl();

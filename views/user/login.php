@@ -39,7 +39,7 @@
 			</div>
 		</div>
 		<div class='footer'>
-			<p class="light small">Cannot get into your account? <a href='<?php echo Glue::http()->getUrl("/user/recover") ?>'>Recover your account details here</a></p>
+			<p class="light small">Cannot get into your account? <a href='<?php echo Glue::http()->url("/user/recover") ?>'>Recover your account details here</a></p>
 		</div>
 	<?php $form->end() ?>
 

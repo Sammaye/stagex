@@ -207,7 +207,7 @@ class ListView extends \glue\Widget{
 	}
 
 	function getUrl($morph = array()){
-		return glue::http()->getUrl(array_merge($this->data, array_merge(
+		return glue::http()->url(array_merge($this->data, array_merge(
 			array(
 				//"mode"=>urlencode($this->mode),
 				"pagesize"=>$this->pageSize,

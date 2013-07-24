@@ -177,7 +177,7 @@ class ErrorHandler extends \glue\Component{
 	    				<p>'.nl2br($errMsg).'</p>
 	    				<p>Trace: '.nl2br($trace).'</p>
 	    				<p>Back Trace:</p><p>'.$backtracel.'</p>
-	    				<p>On: '.(php_sapi_name() != 'cli' ? Glue::http()->getUrl('SELF') : $_SERVER['PHP_SELF']).'</p>';
+	    				<p>On: '.(php_sapi_name() != 'cli' ? Glue::http()->url('SELF') : $_SERVER['PHP_SELF']).'</p>';
 
 	    if($errstr == "(SQL)"){
 	    	$errorText .= '<h2>SQL Trace</h2>

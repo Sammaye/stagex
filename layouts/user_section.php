@@ -49,28 +49,28 @@ $this->beginPage() ?>
 			<div class='userbody'>
 				<div class='side_menu' style='float:left;'>
 					<ul>
-						<li><a href='<?php echo glue::http()->getUrl('/stream/news') ?>' <?php echo $this->tab == "news_feed" ? "class='selected'" : "" ?>>News Feed</a></li>
-						<li class='wl_item'><a href='<?php echo glue::http()->getUrl('/user/watch_later') ?>' <?php echo $this->tab == "watch_later" ? "class='selected'" : "" ?>>Watch Later</a></li>
-						<li><a href='<?php echo glue::http()->getUrl('/user/videos') ?>' <?php echo $this->tab == "videos" ? "class='selected'" : "" ?>>Videos</a></li>
-						<li><a href='<?php echo glue::http()->getUrl('/user/playlists') ?>' <?php echo $this->tab == "playlists" ? "class='selected'" : "" ?>>Playlists</a></li>
-						<li><a href='<?php echo glue::http()->getUrl('/history/watched') ?>' <?php echo $this->tab == "watched" ? "class='selected'" : "" ?>>Watched</a></li>
-						<li><a href='<?php echo glue::http()->getUrl('/history/rated_videos') ?>' <?php echo $this->tab == "likes" ? "class='selected'" : "" ?>>Likes</a></li>
+						<li><a href='<?php echo glue::http()->url('/stream/news') ?>' <?php echo $this->tab == "news_feed" ? "class='selected'" : "" ?>>News Feed</a></li>
+						<li class='wl_item'><a href='<?php echo glue::http()->url('/user/watch_later') ?>' <?php echo $this->tab == "watch_later" ? "class='selected'" : "" ?>>Watch Later</a></li>
+						<li><a href='<?php echo glue::http()->url('/user/videos') ?>' <?php echo $this->tab == "videos" ? "class='selected'" : "" ?>>Videos</a></li>
+						<li><a href='<?php echo glue::http()->url('/user/playlists') ?>' <?php echo $this->tab == "playlists" ? "class='selected'" : "" ?>>Playlists</a></li>
+						<li><a href='<?php echo glue::http()->url('/history/watched') ?>' <?php echo $this->tab == "watched" ? "class='selected'" : "" ?>>Watched</a></li>
+						<li><a href='<?php echo glue::http()->url('/history/rated_videos') ?>' <?php echo $this->tab == "likes" ? "class='selected'" : "" ?>>Likes</a></li>
 						<?php if($this->tab == "likes"){ ?>
-							<li class='indented_row'><a href='<?php echo glue::http()->getUrl('/history/rated_videos') ?>' <?php echo $this->subtab == "liked_videos" ? "class='selected'" : "" ?>>Videos</a></li>
-							<li class='indented_row'><a href='<?php echo glue::http()->getUrl('/history/rated_playlists') ?>' <?php echo $this->subtab == "liked_playlists" ? "class='selected'" : "" ?>>Playlists</a></li>
+							<li class='indented_row'><a href='<?php echo glue::http()->url('/history/rated_videos') ?>' <?php echo $this->subtab == "liked_videos" ? "class='selected'" : "" ?>>Videos</a></li>
+							<li class='indented_row'><a href='<?php echo glue::http()->url('/history/rated_playlists') ?>' <?php echo $this->subtab == "liked_playlists" ? "class='selected'" : "" ?>>Playlists</a></li>
 						<?php } ?>
-						<li><a href='<?php echo glue::http()->getUrl('/user/subscriptions') ?>' <?php echo $this->tab == "subscriptions" ? "class='selected'" : "" ?>>Subscriptions</a></li>
-						<li><a href='<?php echo glue::http()->getUrl('/stream') ?>' <?php echo $this->tab == "stream" ? "class='selected'" : "" ?>>Stream</a></li>
-						<li><a href='<?php echo glue::http()->getUrl('/stream/notifications') ?>' <?php echo $this->tab == "notifications" ? "class='selected'" : "" ?>>Notifications</a></li>
+						<li><a href='<?php echo glue::http()->url('/user/subscriptions') ?>' <?php echo $this->tab == "subscriptions" ? "class='selected'" : "" ?>>Subscriptions</a></li>
+						<li><a href='<?php echo glue::http()->url('/stream') ?>' <?php echo $this->tab == "stream" ? "class='selected'" : "" ?>>Stream</a></li>
+						<li><a href='<?php echo glue::http()->url('/stream/notifications') ?>' <?php echo $this->tab == "notifications" ? "class='selected'" : "" ?>>Notifications</a></li>
 					</ul>
 					<h3 class='head_divider'>Settings</h3>
 					<ul>
-						<li><a href='<?php echo glue::http()->getUrl('/user/settings') ?>' <?php echo $this->tab == "settings" ? "class='selected'" : "" ?>>Account Settings</a></li>
-						<li><a href='<?php echo glue::http()->getUrl('/user/profile') ?>' <?php echo $this->tab == "profile" ? "class='selected'" : "" ?>>Profile Settings</a></li>
-						<li><a href='<?php echo glue::http()->getUrl('/user/activity') ?>' <?php echo $this->tab == "activity" ? "class='selected'" : "" ?>>Account Activity</a></li>
+						<li><a href='<?php echo glue::http()->url('/user/settings') ?>' <?php echo $this->tab == "settings" ? "class='selected'" : "" ?>>Account Settings</a></li>
+						<li><a href='<?php echo glue::http()->url('/user/profile') ?>' <?php echo $this->tab == "profile" ? "class='selected'" : "" ?>>Profile Settings</a></li>
+						<li><a href='<?php echo glue::http()->url('/user/activity') ?>' <?php echo $this->tab == "activity" ? "class='selected'" : "" ?>>Account Activity</a></li>
 					</ul>
 					<ul class='end_list'>
-						<li><a href='<?php echo glue::http()->getUrl('/user/logout') ?>'>Logout</a></li>
+						<li><a href='<?php echo glue::http()->url('/user/logout') ?>'>Logout</a></li>
 					</ul>
 				</div>
 				<div class='grid_block alpha omega user_section_main_content' style='float:left; width:820px;'>

@@ -34,7 +34,7 @@ class Help extends \glue\db\Document{
 		foreach($breadcrumb as $i => $item){
 			if($item != $this->normalisedTitle){
 				$itemModel = self::model()->findOne(array('normalisedTitle' => $item));
-				$final_breadcrumb[$i] = \html::a(array('href' => glue::http()->getUrl('/help/view', array('title' => $item)), 'text' => $itemModel->title));
+				$final_breadcrumb[$i] = \html::a(array('href' => glue::http()->url('/help/view', array('title' => $item)), 'text' => $itemModel->title));
 			}
 		}
 		return implode(' '.utf8_decode('&rsaquo;').' ', $final_breadcrumb);
@@ -47,7 +47,7 @@ class Help extends \glue\db\Document{
 	}
 
 	function getPermaLink(){
-		return glue::http()->getUrl('/help/view', array('title' => $this->normalisedTitle));
+		return glue::http()->url('/help/view', array('title' => $this->normalisedTitle));
 	}
 
 	function getAbstract($amount = 100){

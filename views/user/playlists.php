@@ -16,10 +16,10 @@ ob_end_clean();
 
 ob_start(); ?>
 	<div class='white_shaded_dropdown filters_menu'>
-		<div class='item' data-caption='Showing All Playlists' data-url='<?php echo glue::http()->getUrl('/user/playlists') ?>'>All Playlists</div>
-		<div class='item' data-caption='Showing Listed Playlists' data-url='<?php echo glue::http()->getUrl(array('filter' => 'listed')) ?>'>Listed Playlists</div>
-		<div class='item' data-caption='Showing Unlisted Playlists' data-url='<?php echo glue::http()->getUrl(array('filter' => 'unlisted')) ?>'>Unlisted Playlists</div>
-		<div class='item' data-caption='Showing Private Playlists' data-url='<?php echo glue::http()->getUrl(array('filter' => 'private')) ?>'>Private Playlists</div>
+		<div class='item' data-caption='Showing All Playlists' data-url='<?php echo glue::http()->url('/user/playlists') ?>'>All Playlists</div>
+		<div class='item' data-caption='Showing Listed Playlists' data-url='<?php echo glue::http()->url(array('filter' => 'listed')) ?>'>Listed Playlists</div>
+		<div class='item' data-caption='Showing Unlisted Playlists' data-url='<?php echo glue::http()->url(array('filter' => 'unlisted')) ?>'>Unlisted Playlists</div>
+		<div class='item' data-caption='Showing Private Playlists' data-url='<?php echo glue::http()->url(array('filter' => 'private')) ?>'>Private Playlists</div>
 	</div><?php
 	$filter_html = ob_get_contents();
 ob_end_clean();
