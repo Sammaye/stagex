@@ -86,7 +86,10 @@ class Sphinx extends \glue\Component{
 		$this->resultsPerPage=$num;	
 	}
 
-	public function setGroupBy(){}
+	public function setGroupBy($attribute,$func,$groupsort="@group desc"){
+		$this->sphinx->SetGroupBy($attribute,$func,$groupsort);
+		return $this;
+	}
 	
 	public function resetMatch(){
 		$this->condition=null;
