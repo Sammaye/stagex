@@ -11,6 +11,15 @@ use glue,
 
 class User extends \glue\User{
 
+	/* ATM these are not being used
+	const AUTOPUBLISH_UPLOAD=1;
+	const AUTOPUBLISH_VRESPONSE=2;
+	const AUTOPUBLISH_LKVIDEO=4;
+	const AUTOPUBLISH_DLVIDEO=8;
+	const AUTOPUBLISH_LKPLAYLIST=16;
+	const AUTOPUBLISH_PLVADDED=32;
+	*/
+	
 	/** @virtual */
 	public $newEmail;
 	/** @virtual */
@@ -427,5 +436,17 @@ class User extends \glue\User{
 		$this->save();
 		//$this->getCollection()->save(array('_id' => $this->_id, 'date_deleted' => new \MongoDate(), 'deleted' => 1, 'username' => '[User Deleted]')); // Empty the document
 		glue::db()->qeue->insert(array('id' => $this->_id, 'type' => 'user', 'ts' => new \MongoDate()));		
+	}
+	
+	function autoPublishStreamItem(){
+		if(!glue::db()->auto_publish_queue->findOne(array('type'=>$type,'userId'=>$user_id,'videoId'=>$video_id,'playlistId'=>$playlist_id,'text'=>$text))){
+			glue::db()->auto_publish_queue->insert(array(
+				'type' => $type,
+				'userId' => $user_id,
+				'videoId' => $video_id,
+				'playlistId' => $playlist_id,
+				'text' => $text
+			));
+		}		
 	}
 }

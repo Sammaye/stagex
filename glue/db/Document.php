@@ -594,6 +594,13 @@ class Document extends \glue\Model{
 		$this->trace(__FUNCTION__);
 		return $this->findBy_id($pk,$fields);
 	}
+	
+	/**
+	 * Finds without active record
+	 */
+	public function findAll($criteria=array()){
+		return $this->getCollection()->find($criteria);
+	}
 
 	/**
 	 * Delete record by pk
