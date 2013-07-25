@@ -391,25 +391,16 @@ class Video extends \glue\Db\Document{
 	function search($keyword=''){
 		
 		$sphinx=glue::sphinx()
-				->matchMode()
-				->match(array('title','description','tags','author_name'),glue::http()->param('q',$keyword))
-				->match('title','cheese')
-				->filter(array('adult', array(1,2,3), true))
-				->resetFilters()
-				->filter('adult', array(1,2,3), true)
-				->sort()
-				->limit();
+				->match(array('title', 'content', 'tags', 'path'),glue::http()->param('q',$keyword))
+				->filter('deleted', array(1), true);
 		
-		$cursor=$sphinx->query();
-		$cursor->setCurrentCallback(function($doc){
+		$cursor=$sphinx->query('help');
+		$cursor->setIteratorCallback(function($doc){
 			if($doc['type']=='article')
-				$o=new app\models\HelpArticle();
+				return app\models\HelpArticle::model()->findOne(array('_id'=>new \MongoId($doc['_id'])));
 			elseif($doc['type']=='topic')
-				$o=new app\models\HelpTopic();
-			return isset($o)?$o->populateRecord($doc):null;
+				return app\models\HelpTopic::model()->findOne(array('_id'=>new \MongoId($doc['_id'])));
 		});
-		$sphinx->reset();
-		
 	}
 
 	/**

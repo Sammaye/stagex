@@ -4,37 +4,31 @@ namespace glue\components\Sphinx;
 
 require_once ( "sphinxapi.php" );
 
-class Sphinx extends \glue\Component implements ArrayAccess, Iterator, Countable{
+class Sphinx extends \glue\Component{
 
 	public $host;
 	public $port;
 	public $indexes = array();
-
-	public $matches;
-	public $total_found = 0;
-	public $max_page;
-	public $page = 1;
-	public $limit;
-
-	public $maxLimit = 10000; // 10K Is the full search limit
-
+	
+	public $resultsPerPage=20;
+	public $maxMatches = 10000; // 10K Is the full search limit
 	public $cutoff = 1000000; // Million row cutoff
-
-	public $term;
-
+	
 	private $condition;
-	
-	private $iteratorCallback;
-	
+	private $maxPage;
+	private $page = 1;
+	private $limit;	
 	private $sphinx;
 
-	function init(){
+	public function init(){
 		$this->sphinx = new SphinxClient();
 		$this->sphinx->SetServer ( $this->host, $this->port );
+		
+		// Lets set our defaults
 		$this->sphinx->SetConnectTimeout ( 1 );
 		$this->sphinx->SetArrayResult ( true );
 		$this->sphinx->SetFilter('deleted', array(1), true);
-
+		$this->sphinx->SetMatchMode(SPH_MATCH_EXTENDED2);
 		return $this;
 	}
 	
@@ -44,326 +38,150 @@ class Sphinx extends \glue\Component implements ArrayAccess, Iterator, Countable
 		}
 	}
 	
-	function setIteratorCallback($func){
+	public function setIteratorCallback($func){
 		$this->iteratorCallback=$func;
 		return $this;
 	}
 	
-	function select($select){
+	public function select($select){
 		$this->sphinx->SetSelect($select);
 	}
 	
-	function match(){
-		
+	public function match($field,$keywords){
+		if(strlen($query) > 0)
+			$this->condition .= (is_array($field)?'@('.implode(',',$field).')':'@'.$field) . 
+				(is_array($keywords)?explode(' ',$keywords):$keywords);
 	}
 	
-	function filter($attribute, $values = array(), $exclude = false){
+	public function filter($attribute, $values = array(), $exclude = false){
 		$this->sphinx->SetFilter($attribute, $values, $exclude);
 	}
 	
-	function filterRange ( $attribute, $min, $max ) {
+	public function filterRange ( $attribute, $min, $max ) {
 		$this->sphinx->SetFilterRange($attribute, $min, $max);
 	}	
 
-	function matchMode($mode = SPH_MATCH_ALL){
+	public function matchMode($mode = SPH_MATCH_ALL){
 		$this->sphinx->SetMatchMode($mode);
 	}	
 	
-	function sort($mode = SPH_SORT_RELEVANCE, $sortby = ''){
+	public function sort($mode = SPH_SORT_RELEVANCE, $sortby = ''){
 		$this->sphinx->SetSortMode($mode, $sortby);
 	}
 
-	function rank($mode = SPH_RANK_PROXIMITY_BM25){
+	public function rank($mode = SPH_RANK_PROXIMITY_BM25){
 		$this->sphinx->SetRankingMode($mode);
 	}
-
-	function UpdateAttributes($index, $attrs, $values){
-		return $this->sphinx->UpdateAttributes($index, $attrs, $values);
+	
+	public function limit($limit,$offset=0){
+		$this->limit=array($offset,$limit);
+		$this->sphinx->setLimits($offset,$limit,$this->maxMatches,$this->cutoff);
 	}
 	
-	function resetMatch(){
-		
+	public function page($num){
+		$this->page=$num;
 	}
 	
-	function resetFilters(){
-		
-	}
-	
-	function setGroupBy(){
-		
+	public function resultsPerPage($num){
+		$this->resultsPerPage=$num;	
 	}
 
-	function resetLimit(){
-		unset($this->limit);
+	public function setGroupBy(){}
+	
+	public function resetMatch(){
+		$this->condition=null;
+		return $this;
 	}
 	
-	function resetOverrides(){
+	public function resetFilters(){
+		$this->sphinx->ResetFilters();
+		return $this;
+	}	
+
+	public function resetLimit(){
+		$this->limit=null;
+		return $this;
+	}
+	
+	public function resetPage(){
+		$this->page=1;
+		return $this;
+	}
+	
+	public function resetResultsPerPage(){
+		$this->resultsPerPage=20;
+		return $this;
+	}
+	
+	public function resetGroupBy(){
+		$this->sphinx->ResetGroupBy();
+		return $this;
+	}
+	
+	public function resetOverrides(){
 		$this->sphinx->ResetOverrides();
 		return $this;
 	}
 
-	function resetAll(){
-		$this->page = 1;
-		unset($this->limit);
-		$this->sphinx->ResetFilters();
-		$this->sphinx->ResetGroupBy();
-		$this->sphinx->ResetOverrides();
+	public function resetAll(){
+		$this->resetMatch();
+		$this->resetFilters();
+		$this->resetLimit();
+		$this->resetPage();
+		$this->resetResultsPerPage();
+		$this->resetGroupBy();
+		$this->resetOverrides();
 	}
 
-	function formFields($query, $index = 'main'){
-		if($query && strlen($query) > 0){
-			$index_attr = $this->indexes[$index];
-			$query_array = array();
-			foreach($index_attr['query_fields'] as $field){
-				$query_array[] = $field;
-			}
-			$query_string .= '@('.implode(',', $query_array).') '.$query;
-			return $query_string;
-		}else{
-			return '';
-		}
-	}
-
-	/**
-	 * The main query function.
-	 *
-	 * @example query(array('select' => $_GET['q'], 'where' => array('uid' => array(strval($this->_id))), [ 'query' => '@title "the"' ]), 'media');
-	 *
-	 * @param $query
-	 * @param $index
-	 */
-	function query($query = array(), $index = ''){
-
-		$query_string = '';
-		$this->sphinx->SetMatchMode(SPH_MATCH_EXTENDED2);
+	public function query($index,$className=''){
 
 		// Lets get the indexes information
 		$index_attr = $this->indexes[$index];
 
-		// If that index is to be passed into a cursor
-		if(isset($index_attr['cursor'])){
-			glue::import('glue/plugins/sphinx/'.$index_attr['cursor'].'.php');
-			$cursor = $index_attr['cursor']; // Cos PHP is still a bit weird when trying to set a class name from a element array we use the predefined variable
-		}
+		// Does it have a delta?
+		$indexName = $index.(isset($index_attr['type'])&&$index_attr['type']=='delta'?$index_attr['delta']:'');
 
-		// **
-		// Does this index have a Delta?
-		// **
-		$type = isset($index_attr['type']) ? $index_attr['type'] : '';
-		if($type == 'delta'){ // If index has delta lets handle that
-			$index_string = $index.' '.$index_attr['delta']; //$index.' '.
+		// If no limit is set we assume to use paging
+		// currently you MUST put a limit in if you do not wish to use paging,
+		// this MAY change		
+		
+		if($this->limit!==null){
+			$result = $this->sphinx->Query($this->condition, $indexName);
+			$this->resetAll();
+			if($error = $this->sphinx->GetLastError())
+				throw new \Exception($error); // Throwing an exception should exit
+			return new Cursor($result,$className);	
+		}
+		
+		// Just like in SQL I need to do two queries to figure out ouor paging properly
+		$this->sphinx->setLimits(0,$this->resultsPerPage,$this->maxMatches,$this->cutoff);
+		$firstPage = $this->sphinx->Query($this->condition, $indexName);
+		
+		if($error = $this->sphinx->GetLastError())
+			throw new \Exception($error);
+		
+		if($firstPage['total_found'] > 0){
+			$this->maxPage = $first_page['total_found'] < $this->maxMatches ? ceil($first_page['total_found']/20) : ceil($this->maxMatches/20);
+			if($this->maxPage <= 0) $this->maxPage = 1;
+			if($this->page > $this->maxPage) $this->page = $this->maxPage;
+			if($this->page <= 0) $this->page = 1;
+		}			
+			
+		if($this->page===1){
+			$c = new Cursor($firstPage,$className);
 		}else{
-			$index_string = $index;
-		}
-
-		// **
-		// Lets form the query, if it is a raw query just place that in else go through
-		// fields assigning the value
-		// **
-		if(isset($query['query']) && strlen($query['query']) > 0){
-			$query_string .= $query['query'];
-		}elseif(isset($query['select']) && strlen($query['select']) > 0){
-
-			$query_array = array();
-			foreach($index_attr['query_fields'] as $field){
-				$query_array[] = $field;
-			}
-			$query_string .= '@('.implode(',', $query_array).') '.$query['select'];
-		}
-
-		//**
-		// Now lets for the where up
-		//**
-		if(isset($query['where'])){ // then build the filter clause
-			$query_array = array();
-			foreach($query['where'] as $field => $values){
-
-				$values_array = array();
-				foreach($values as $value){
-					$values_array[] = '"' . $value . '"';
-				}
-				$query_array[] = '@'.$field.' '.implode(' ', $values_array);
-			}
-			$query_string .= ' '.implode(' ', $query_array);
-		}
-
-		//**
-		// Judge which path to take. If limit is installed then do that else do paging by default
-		//**
-		if(isset($query['limit']) || isset($this->limit)){
-			$this->sphinx->SetLimits(0, isset($query['limit']) ? $query['limit'] : $this->limit, $this->maxLimit, $this->maxLimit); // Always get first page first.
+			$this->sphinx->SetLimits((int)(($this->page-1)*$this->resultsPerPage),$this->resultsPerPage,$this->maxLimit,$this->cutoff);
 			$result = $this->sphinx->Query($query_string, $index_string);
-
-			$error = $this->sphinx->GetLastError();
-//var_dump($result);
-//exit();
-			if(!$error){
-				if($index_attr['cursor']){
-					$this->matches = new $cursor(!empty($result['matches']) ? $result['matches'] : array());
-				}else{
-					$this->matches = $result['matches'];
-				}
-			}else{
-				trigger_error($error);
-			}
-		}else{ // Lets just assume paging
-
-			if(isset($query['results_per_page'])){
-				$this->sphinx->SetLimits(0, $query['results_per_page'], $this->maxLimit, $this->cutoff); // Always get first page first.
-			}else{
-				$this->sphinx->SetLimits(0, 20, $this->maxLimit, $this->cutoff); // Always get first page first.
-			}
-			$first_page = $this->sphinx->Query($query_string, $index_string);
-//var_dump($query_string); exit();
-			$error = $this->sphinx->GetLastError();
-
-			if(!$error){
-
-				if(isset($first_page['matches']) && $first_page['total_found'] > 0){
-					$this->total_found = $first_page['total_found'];
-					$this->max_page = $this->total_found < $this->maxLimit ? ceil($this->total_found/20) : ceil($this->maxLimit/20);
-
-					if($this->max_page <= 0) $this->max_page = 1;
-					if($this->page > $this->max_page) $this->page = $this->max_page;
-					if($this->page <= 0) $this->page = 1;
-
-					if($this->page == 1){ // Then just respond with the original query.
-						if($index_attr['cursor']){
-							$this->matches = new $cursor(is_array($first_page['matches']) ? $first_page['matches'] : array());
-						}else{
-							$this->matches = $first_page['matches'];
-						}
-					}else{
-						if(isset($query['results_per_page'])){
-							$this->sphinx->SetLimits((int)(($this->page-1)*$query['results_per_page']), $query['results_per_page'], $this->maxLimit, $this->cutoff); // Testing first page
-						}else{
-							//var_dump(($this->page-1)*20); exit();
-							$this->sphinx->SetLimits((int)(($this->page-1)*20), 20, $this->maxLimit, $this->cutoff); // Testing first page
-						}
-						$res = $this->sphinx->Query($query_string, $index_string);
-
-						if($res){
-							if($index_attr['cursor']){
-								$this->matches = new $cursor(is_array($res['matches']) ? $res['matches'] : array());
-							}else{
-								$this->matches = $res['matches'];
-							}
-						}else{
-							trigger_error($this->sphinx->GetLastError());
-							return $this->sphinx->GetLastError();
-						}
-					}
-				}
-			}else{
-				trigger_error($error);
-				return $error;
-			}
+			
+			if($error = $this->sphinx->GetLastError())
+				throw new \Exception($error);
+			$c=new Cursor($result,$className);	
 		}
+		$c->maxPage=$this->maxPage;
+		return $c;
 	}
 	
-	public function __construct($matches) {
-		$this->_container = $matches;
-		//$this->_container->reset();
-		reset($this->_container);
-	}
-	
-	function set($matches){
-		$this->_container = $matches;
-	}
-	
-	function get(){
-		return $this->_container;
-	}
-	
-	function count(){
-		return count($this->_container);
-	}
-	
-	public function offsetSet($offset, $value) {
-		if (is_null($offset)) {
-			$this->_container[] = $value;
-		} else {
-			$this->_container[$offset] = $value;
-		}
-	}
-	
-	public function offsetExists($offset) {
-		return isset($this->_container[$offset]);
-	}
-	
-	public function offsetUnset($offset) {
-		unset($this->_container[$offset]);
-	}
-	
-	public function offsetGet($offset) {
-		//var_dump(__METHOD__);
-		if(isset($this->_container[$offset])){
-	
-			$c = $this->_container[$offset]['attrs'];
-	
-			if($c['type']){
-				switch($c['type']){
-					case "video":
-						$o = Video::model()->findOne(array('_id' => new MongoId($c['_id'])));
-						break;
-					case "user":
-						$o = User::model()->findOne(array('_id' => new MongoId($c['_id'])));
-						break;
-					case "playlist":
-						$o = Playlist::model()->findOne(array('_id' => new MongoId($c['_id'])));
-						break;
-				}
-			}else{
-				$o = (Object)$c;
-			}
-			$o->sphinxdocId = $c['id'];
-			return $o;
-		}
-	
-		return null; //Else lets just return normal
-	}
-	
-	function rewind() {
-		reset($this->_container);
-	}
-	
-	function current() {
-	
-		if(current($this->_container) !== false){
-			$c = current($this->_container);
-			//var_dump($c);
-			if($c['attrs']['type']){
-				switch($c['attrs']['type']){
-					case "video":
-						$o = Video::model()->findOne(array('_id' => new MongoId($c['attrs']['_id'])));
-						break;
-					case "user":
-						$o = User::model()->findOne(array('_id' => new MongoId($c['attrs']['_id'])));
-						break;
-					case "playlist":
-						//var_dump($c);
-						$o = Playlist::model()->findOne(array('_id' => new MongoId($c['attrs']['_id'])));
-						break;
-				}
-			}else{
-				$o = (Object)$c['attrs'];
-			}
-			//$o->sphinxdocId = $c['id'];
-			return $o;
-		}else{
-			return  false;
-		}
-	}
-	
-	public function key() {
-		return key($this->_container);
-	}
-	
-	public function next() {
-		return next($this->_container);
-	}
-	
-	public function valid() {
-		return $this->current() !== false;
+	public function UpdateAttributes($index, $attrs, $values){
+		return $this->sphinx->UpdateAttributes($index, $attrs, $values);
 	}	
 }

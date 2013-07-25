@@ -1,6 +1,6 @@
 <?php
 
-namespace glue\db;
+namespace Sphinx;
 
 use \glue\Exception;
 
