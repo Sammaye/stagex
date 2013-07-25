@@ -101,8 +101,8 @@ class User extends \glue\User{
 	public $googleUid;
 	public $clickyUid;
 
-	public $totalSubscribers = 0;
-	public $totalSubscriptions = 0;
+	public $totalFollowers = 0;
+	public $totalFollowing = 0;
 	public $totalPlaylists = 0;
 	public $totalUploads = 0;
 
@@ -148,8 +148,8 @@ class User extends \glue\User{
 
 	function relations(){
 		return array(
-			"subscriptions" => array('many', 'Subscription', "from_id"),
-			"subscribers" => array('many', 'Subscription', "to_id"),
+			"following" => array('many', 'Follower', "from_id"),
+			"followers" => array('many', 'Follower', "to_id"),
 			"videos" => array('many', 'Video', "user_id"),
 			"playlists" => array('many', 'Playlist', "user_id"),
 			'notifications' => array('many', 'Notification', 'user_id'),

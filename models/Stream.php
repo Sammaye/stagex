@@ -142,7 +142,7 @@ class Stream extends \glue\db\Document{
 	}
 
 	static function subscribedTo($user_id, $subscribed_user){
-		$status = Stream::model()->findOne(array('user_id' => $user_id, 'subscribed_user_id' => $subscribed_user, 'type' => Stream::SUBSCRIBED_TO));
+		$status = Stream::model()->findOne(array('userId' => $user_id, 'subscribed_user_id' => $subscribed_user, 'type' => Stream::SUBSCRIBED_TO));
 
 		if($status){
 			$status->save();

@@ -3,6 +3,7 @@
 use glue\Html,
 	app\models\loginForm,
 	app\models\User,
+	app\models\Follower,
 	app\models\Video,
 	app\models\Playlist;
 
@@ -455,49 +456,46 @@ class userController extends \glue\Controller{
 		echo $this->render('user/profile_settings', array('model' => $model, 'success_message' => ''));
 	}
 
-	function action_subscribe(){
-		$this->pageTitle = 'Subscribe To User - StageX';
+	function action_follow(){
+		$this->title = 'Subscribe To User - StageX';
 
-		if(glue::http()->isAjax()){
-			$user = User::model()->findOne(array("_id"=>new MongoId($_GET['id'])));
+		if(glue::auth()->check('ajax','post')){
+			
+			if(
+				($id=glue::http()->param('id',null))===null ||
+				($user=User::model()->findOne(array("_id"=>new MongoId($id))))===null
+			)
+				$this->json_error('User not found');
 
-			if($user){
-				if(!Subscription::model()->findOne(array('from_id' => glue::session()->user->_id, 'to_id' => $user->_id))){
-					$subscription = new Subscription();
-					$subscription->from_id=  glue::session()->user->_id;
-					$subscription->to_id = $user->_id;
-					$subscription->save();
+			if(!Follower::model()->findOne(array('fromId' => glue::user()->_id, 'toId' => $user->_id))){
+				$follower = new Follower();
+				$follower->fromId=  glue::user()->_id;
+				$follower->toId = $user->_id;
+				$follower->save();
 
-					Stream::subscribedTo(glue::session()->user->_id, $user->_id);
-					echo json_encode(array("success"=>true));
-				}else{
-					echo json_encode(array("success"=>false));
-				}
-			}else{
-				echo json_encode(array("success"=>false));
-			}
-		}else{
-			Glue::getController("error/notfound");
-		}
+				app\models\Stream::subscribedTo(glue::user()->_id, $user->_id);
+				$this->json_success('You are now following this user');
+			} // Be silent about the relationship already existing
+		}else
+			glue::trigger('404');
 	}
 
-	function action_unsubscribe(){
-		$this->pageTitle = 'Unsubscribe From User - StageX';
+	function action_unfollow(){
+		$this->title = 'Unsubscribe From User - StageX';
 
-		if(glue::http()->isAjax()){
-			$user = User::model()->findOne(array('_id' => new MongoId($_GET['id'])));
-			$subscription = Subscription::model()->findOne(array('from_id' => glue::session()->user->_id, 'to_id' => new MongoId($_GET['id'])));
+		if(glue::auth()->check('ajax','post')){
+			if(($id=glue::http()->param('id',null))===null)
+				$this->json_error('User not found');
+			
+			$user = User::model()->findOne(array('_id' => new MongoId($id)));
+			$follow = Follower::model()->findOne(array('fromId' => glue::user()->_id, 'toId' => new MongoId($id)));
 
-			if($subscription && $user){
-				$subscription->delete();
-
-				echo json_encode(array("success"=>true));
-			}else{
-				echo json_encode(array("success"=>false));
-			}
-		}else{
-			Glue::getController("error/notfound");
-		}
+			if($follow && $user && $subscription->delete())
+				$this->json_success('You have unfollowed this user');
+			else
+				$this->json_error(self::UNKNOWN);
+		}else
+			glue::trigger('404');
 	}
 
 	function action_logout(){
