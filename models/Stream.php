@@ -15,17 +15,17 @@ class Stream extends \glue\db\Document{
 	const SUBSCRIBED_TO = 8;
 	const WALL_POST = 10;
 
-	public $user_id;
+	public $userId;
 	public $from_users = array();
 	public $items = array();
 	public $type;
 
-	public $posted_by_id;
+	public $postedById;
 	public $message;
-	public $subscribed_user_id;
-	public $video_id;
-	public $item_id;
-	public $item_type;
+	public $subscribedUserId;
+	public $videoId;
+	public $itemId;
+	public $itemType;
 	public $like;
 
 	function collectionName(){
@@ -170,9 +170,9 @@ class Stream extends \glue\db\Document{
 	}
 
 	static function videoUpload($user_id, $video_id){
-		$status = new Stream();
-		$status->user_id = $user_id;
-		$status->video_id = $video_id;
+		$status = new static;
+		$status->userId = $user_id;
+		$status->videoId = $video_id;
 		$status->type = Stream::VIDEO_UPLOAD;
 		$status->save();
 	}

@@ -23,7 +23,7 @@ class UserController extends \glue\Controller{
 		//print count($stream_cursor); // DEBUG
 		
 		// Now lets iterate through the documents finding out what kind of action needs auto publishing to networks
-		// The list of possible values can be found in AutoPublishStream model
+		// The list of possible values can be found in AutoPublishQueue model
 		foreach($stream_cursor as $k => $v){
 		
 			// I have used different fields for each entity to be able to

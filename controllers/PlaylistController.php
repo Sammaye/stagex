@@ -271,7 +271,7 @@ class PlaylistController extends GController{
 					Stream::add_video_2_playlist(glue::session()->user->_id, $playlist->_id, $video->_id);
 
 					if(glue::session()->user->should_autoshare('video_2_pl')){
-						AutoPublishStream::add_to_qeue(AutoPublishStream::PL_V_ADDED, glue::session()->user->_id, $video->_id, $playlist->_id);
+						AutoPublishQueue::add_to_qeue(AutoPublishQueue::PL_V_ADDED, glue::session()->user->_id, $video->_id, $playlist->_id);
 					}
 				}
 
@@ -406,7 +406,7 @@ class PlaylistController extends GController{
 				Stream::like_playlist(glue::session()->user->_id, $playlist->_id);
 
 				if(glue::session()->user->should_autoshare('lk_dl')){
-					AutoPublishStream::add_to_qeue(AutoPublishStream::LK_PL, glue::session()->user->_id, null, $playlist->_id);
+					AutoPublishQueue::add_to_qeue(AutoPublishQueue::LK_PL, glue::session()->user->_id, null, $playlist->_id);
 				}
 			}
 		}

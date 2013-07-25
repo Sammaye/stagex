@@ -134,7 +134,7 @@ class videoresponseController extends \glue\Controller{
 				ob_end_clean();
 
 				if(glue::session()->user->should_autoshare('c_video')){
-					AutoPublishStream::add_to_qeue(AutoPublishStream::V_RES, glue::session()->user->_id, $video->_id, null, $comment->content);
+					AutoPublishQueue::add_to_qeue(AutoPublishQueue::V_RES, glue::session()->user->_id, $video->_id, null, $comment->content);
 				}
 
 				//var_dump($comment->in_reply);

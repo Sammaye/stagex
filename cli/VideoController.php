@@ -157,23 +157,21 @@ class VideoController extends \glue\Controller{
 					$videos = app\models\Video::model()->find(array('jobId' => $message->id));
 					foreach($videos as $k => $video){
 		
-						$video->setScenario('process_encoding');
-		
 						$video->duration = $job['duration'];
 						$video->ogg = $job['ogg_url'];
 						$video->mp4 = $job['mp4_url'];
 						$video->image = $job['image'];
 						$video->state = 'finished';
-						$video->image_src = $job['image_src'];
+						//$video->imageSrc = $job['image_src']; // technically I should not need this but I will leave it commented out atm
 						$video->setImage($job['image_src']->bin);
 						$video->save();
 
 						// Send it all over the internet!!
-						Stream::videoUpload($video->author->_id, $video->_id);
+						app\models\Stream::videoUpload($video->author->_id, $video->_id);
 						if($user->autoshareUploads)
-							AutoPublishStream::add_to_qeue(AutoPublishStream::UPLOAD, $user->_id, $video->_id);					
+							app\models\AutoPublishQueue::add_to_qeue(app\models\AutoPublishQueue::UPLOAD, $video->author->_id, $video->_id);					
 						if($video->isPublic())
-							glue::sitemap()->addUrl(glue::url()->create('/video/watch', array('id' => $video->_id)), 'hourly', '1.0');						
+							glue::sitemap()->addUrl(glue::http()->url('/video/watch', array('id' => $video->_id)), 'hourly', '1.0');						
 						if($video->author->emailEncodingResult)
 							glue::mailer()->mail($video->author->email, array('no-reply@stagex.co.uk', 'StageX'), 'Your video has finished encoding and is ready for viewing!',
 							"videos/finished_encoding.php", array( "username"=>$video->author->username, "video"=>$video ));
