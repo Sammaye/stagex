@@ -4,7 +4,7 @@ namespace glue\components\Sphinx;
 
 require_once ( "sphinxapi.php" );
 
-class Sphinx extends \glue\Component{
+class Sphinx extends \glue\Component implements ArrayAccess, Iterator, Countable{
 
 	public $host;
 	public $port;
@@ -22,6 +22,10 @@ class Sphinx extends \glue\Component{
 
 	public $term;
 
+	private $condition;
+	
+	private $iteratorCallback;
+	
 	private $sphinx;
 
 	function init(){
@@ -34,52 +38,68 @@ class Sphinx extends \glue\Component{
 		return $this;
 	}
 	
-	function find(){
-		return new \SphinxCursor($matches);
+	public function __call($method,$params){
+		if(method_exists($this->sphinx,$method)){
+			return call_user_func_array(array($this->sphinx, $name), $parameters);
+		}
 	}
-
-	public function getSearcher(){
+	
+	function setIteratorCallback($func){
+		$this->iteratorCallback=$func;
 		return $this;
 	}
-
-	public function model(){
-		return $this->sphinx;
+	
+	function select($select){
+		$this->sphinx->SetSelect($select);
 	}
+	
+	function match(){
+		
+	}
+	
+	function filter($attribute, $values = array(), $exclude = false){
+		$this->sphinx->SetFilter($attribute, $values, $exclude);
+	}
+	
+	function filterRange ( $attribute, $min, $max ) {
+		$this->sphinx->SetFilterRange($attribute, $min, $max);
+	}	
 
-	function setSortMode($mode = SPH_SORT_RELEVANCE, $sortby = ''){
+	function matchMode($mode = SPH_MATCH_ALL){
+		$this->sphinx->SetMatchMode($mode);
+	}	
+	
+	function sort($mode = SPH_SORT_RELEVANCE, $sortby = ''){
 		$this->sphinx->SetSortMode($mode, $sortby);
 	}
 
-	function setRankingMode($mode = SPH_RANK_PROXIMITY_BM25){
+	function rank($mode = SPH_RANK_PROXIMITY_BM25){
 		$this->sphinx->SetRankingMode($mode);
-	}
-
-	function setMatchMode($mode = SPH_MATCH_ALL){
-		$this->sphinx->SetMatchMode($mode);
-	}
-
-	function setSelect($select){
-		$this->sphinx->SetSelect($select);
-	}
-
-	function setFilter($attribute, $values = array(), $exclude = false){
-		$this->sphinx->SetFilter($attribute, $values, $exclude);
-	}
-
-	function setFilterRange ( $attribute, $min, $max ) {
-		$this->sphinx->SetFilterRange($attribute, $min, $max);
 	}
 
 	function UpdateAttributes($index, $attrs, $values){
 		return $this->sphinx->UpdateAttributes($index, $attrs, $values);
 	}
-
-	function resetPage(){
-		$this->page = 1;
+	
+	function resetMatch(){
+		
+	}
+	
+	function resetFilters(){
+		
+	}
+	
+	function setGroupBy(){
+		
 	}
 
 	function resetLimit(){
 		unset($this->limit);
+	}
+	
+	function resetOverrides(){
+		$this->sphinx->ResetOverrides();
+		return $this;
 	}
 
 	function resetAll(){
@@ -240,43 +260,110 @@ class Sphinx extends \glue\Component{
 			}
 		}
 	}
-
- 	function renderPager($class = ''){
-
- 		//$this->max_page = 10;
-
-		$start = $this->page - 5 > 0 ? $this->page - 5 : 1;
-		$end = $this->page + 5 <= $this->max_page ? $this->page + 5 : $this->max_page;
-		$ret = "";
-
-		//$url = glue::url()->get(true);
-
-		$ret .= "<div class='GListView_Pager {$class}'>";
-
-	    if($this->page != 1 && $this->max_page > 1) {
-	        $ret .= '<div class="control"><a href="'.
-	        	glue::url()->create(array('page' => $this->page-1)).'">Previous</a></div>';
-	    }
-
-	    if($this->max_page > 1){
-	    	$ret .= '<ul>';
-		    for ($i = $start; $i <= $end && $i <= $this->max_page; $i++){
-
-		        if($i==$this->page) {
-		        	$ret .= '<li><div class="active" style="margin-right:6px;"><span>'.$i.'</span></div></li>';
-		        } else {
-		            $ret .= '<li><a style="margin-right:6px;" href="'.glue::url()->create(array('page' => $i)).'"><span>'.$i.'</span></a></li>';
-		        }
-		    }
-		    $ret .= '</ul>';
-	    }
-
-	    if($this->page < $this->max_page) {
-	        $ret .= '<div class="control"><a href="'.glue::url()->create(array('page' => $this->page+1)).'">Next</a></div>';
-	    }
-
-	    $ret .= "</div>";
-
-	    return $ret;
+	
+	public function __construct($matches) {
+		$this->_container = $matches;
+		//$this->_container->reset();
+		reset($this->_container);
 	}
+	
+	function set($matches){
+		$this->_container = $matches;
+	}
+	
+	function get(){
+		return $this->_container;
+	}
+	
+	function count(){
+		return count($this->_container);
+	}
+	
+	public function offsetSet($offset, $value) {
+		if (is_null($offset)) {
+			$this->_container[] = $value;
+		} else {
+			$this->_container[$offset] = $value;
+		}
+	}
+	
+	public function offsetExists($offset) {
+		return isset($this->_container[$offset]);
+	}
+	
+	public function offsetUnset($offset) {
+		unset($this->_container[$offset]);
+	}
+	
+	public function offsetGet($offset) {
+		//var_dump(__METHOD__);
+		if(isset($this->_container[$offset])){
+	
+			$c = $this->_container[$offset]['attrs'];
+	
+			if($c['type']){
+				switch($c['type']){
+					case "video":
+						$o = Video::model()->findOne(array('_id' => new MongoId($c['_id'])));
+						break;
+					case "user":
+						$o = User::model()->findOne(array('_id' => new MongoId($c['_id'])));
+						break;
+					case "playlist":
+						$o = Playlist::model()->findOne(array('_id' => new MongoId($c['_id'])));
+						break;
+				}
+			}else{
+				$o = (Object)$c;
+			}
+			$o->sphinxdocId = $c['id'];
+			return $o;
+		}
+	
+		return null; //Else lets just return normal
+	}
+	
+	function rewind() {
+		reset($this->_container);
+	}
+	
+	function current() {
+	
+		if(current($this->_container) !== false){
+			$c = current($this->_container);
+			//var_dump($c);
+			if($c['attrs']['type']){
+				switch($c['attrs']['type']){
+					case "video":
+						$o = Video::model()->findOne(array('_id' => new MongoId($c['attrs']['_id'])));
+						break;
+					case "user":
+						$o = User::model()->findOne(array('_id' => new MongoId($c['attrs']['_id'])));
+						break;
+					case "playlist":
+						//var_dump($c);
+						$o = Playlist::model()->findOne(array('_id' => new MongoId($c['attrs']['_id'])));
+						break;
+				}
+			}else{
+				$o = (Object)$c['attrs'];
+			}
+			//$o->sphinxdocId = $c['id'];
+			return $o;
+		}else{
+			return  false;
+		}
+	}
+	
+	public function key() {
+		return key($this->_container);
+	}
+	
+	public function next() {
+		return next($this->_container);
+	}
+	
+	public function valid() {
+		return $this->current() !== false;
+	}	
 }

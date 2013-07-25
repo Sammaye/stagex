@@ -387,6 +387,30 @@ class Video extends \glue\Db\Document{
 		}
 		return true;
 	}
+	
+	function search($keyword=''){
+		
+		$sphinx=glue::sphinx()
+				->matchMode()
+				->match(array('title','description','tags','author_name'),glue::http()->param('q',$keyword))
+				->match('title','cheese')
+				->filter(array('adult', array(1,2,3), true))
+				->resetFilters()
+				->filter('adult', array(1,2,3), true)
+				->sort()
+				->limit();
+		
+		$cursor=$sphinx->query();
+		$cursor->setCurrentCallback(function($doc){
+			if($doc['type']=='article')
+				$o=new app\models\HelpArticle();
+			elseif($doc['type']=='topic')
+				$o=new app\models\HelpTopic();
+			return isset($o)?$o->populateRecord($doc):null;
+		});
+		$sphinx->reset();
+		
+	}
 
 	/**
 	 * Document structure:

@@ -338,11 +338,10 @@ return array(
 				'indexes' => array(
 					'main' => array(
 						'delta' => 'main_delta',
-						'fields' => array( 'title', 'description', 'tags', 'author_name' ),
+						//'fields' => array( 'title', 'description', 'tags', 'author_name' ),
 					),
 					'help' => array(
-						'cursor' => 'HelpSearch_SphinxCursor',
-						'fields' => array( 'title', 'content', 'tags', 'path' ),
+						//'fields' => array( 'title', 'content', 'tags', 'path' ),
 					)
 				)
 		),
