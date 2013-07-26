@@ -1,5 +1,5 @@
 <?php
-namespace \glue\components\Sphinx;
+namespace glue\components\Sphinx;
 
 class Cursor implements \Iterator, \Countable{
 	
@@ -34,11 +34,9 @@ class Cursor implements \Iterator, \Countable{
 	
 	function current() {
 		if(($c=current($this->matches)) !== false){
-			if(
-				(is_string($this->iteratorCallback) && function_exists($this->iteratorCallback)) || 
-				(is_object($this->iteratorCallback) && $this->iteratorCallback instanceof \Closure)
-			)
-				return $this->iteratorCallback($c['attrs'],$this->className);
+			$fn=$this->iteratorCallback;
+			if((is_string($fn) && function_exists($fn)) || (is_object($fn) && $fn instanceof \Closure))
+				return $fn($c['attrs'],$this->className);
 			elseif($this->className)
 				$className::model()->findOne(array('_id' => new \MongoId($c['attrs']['_id'])));
 			else 

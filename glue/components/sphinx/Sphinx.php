@@ -24,7 +24,7 @@ class Sphinx extends \glue\Component{
 	private $iteratorCallback;
 	
 	public function init(){
-		$this->sphinx = new SphinxClient();
+		$this->sphinx = new \SphinxClient();
 		$this->sphinx->SetServer ( $this->host, $this->port );
 		
 		// Lets set our defaults
@@ -55,7 +55,7 @@ class Sphinx extends \glue\Component{
 	}
 	
 	public function match($field,$keywords){
-		if(strlen($query) > 0)
+		if(strlen($keywords) > 0)
 			$this->condition .= (is_array($field)?'@('.implode(',',$field).')':'@'.$field) . 
 				(is_array($keywords)?explode(' ',$keywords):$keywords);
 		return $this;
@@ -192,7 +192,7 @@ class Sphinx extends \glue\Component{
 			throw new \Exception($error);
 		
 		if($firstPage['total_found'] > 0){
-			$this->maxPage = $first_page['total_found'] < $this->maxMatches ? ceil($first_page['total_found']/20) : ceil($this->maxMatches/20);
+			$this->maxPage = $firstPage['total_found'] < $this->maxMatches ? ceil($firstPage['total_found']/20) : ceil($this->maxMatches/20);
 			if($this->maxPage <= 0) $this->maxPage = 1;
 			if($this->page > $this->maxPage) $this->page = $this->maxPage;
 			if($this->page <= 0) $this->page = 1;

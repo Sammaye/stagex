@@ -1427,6 +1427,7 @@ textarea{
 	font-size:14px; line-height:20px;
 }
 
+.help_page .no_results_found,
 .help_page_view .no_results_found{
 	text-align:left;
 }
@@ -1441,4 +1442,28 @@ textarea{
 
 .help_modal h2{
 	float:left;
+}
+
+.help_page .search_list .result{
+	margin:0 0 20px 0;'
+}
+
+.help_page .search_list .result h2{
+	margin:0; line-height:24px;
+}
+
+.help_page .search_list .result .breadcrumb{
+	font-size:12px; margin-bottom:10px;
+}
+
+.help_page .search_list .result .breadcrumb a{
+	color:#999999;
+}
+
+.help_page .search_head{
+	margin:50px 0;
+}
+
+.help_page .search_head .head_breadcrumb{
+	font-size:14px; line-height:22px;
 }
