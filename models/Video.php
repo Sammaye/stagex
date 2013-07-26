@@ -388,19 +388,26 @@ class Video extends \glue\Db\Document{
 		return true;
 	}
 	
-	function search($keyword=''){
+	function search($keyword='',$query=false){
 		
 		$sphinx=glue::sphinx()
-				->match(array('title', 'content', 'tags', 'path'),glue::http()->param('q',$keyword))
-				->filter('deleted', array(1), true);
+				->index('main')
+				->match(array('title', 'description', 'tags', 'author_name'),glue::http()->param('q',$keyword))
+				->match('type','video')
+				->filter(array(
+						array('deleted', array(1), true), 
+						array('listing', array('2', '3'), true),
+				));
 		
-		$cursor=$sphinx->query('help');
-		$cursor->setIteratorCallback(function($doc){
-			if($doc['type']=='article')
-				return app\models\HelpArticle::model()->findOne(array('_id'=>new \MongoId($doc['_id'])));
-			elseif($doc['type']=='topic')
-				return app\models\HelpTopic::model()->findOne(array('_id'=>new \MongoId($doc['_id'])));
-		});
+		// Since this will be used for public sorting I think this always applies		
+		if(glue::user()->safeSearch || !glue::session()->authed){
+			$sphinx->filter('adult', array('1'), true);
+		}				
+				
+		if($query)
+			return $cursor=$sphinx->query();
+		else
+			return $sphinx;
 	}
 
 	/**

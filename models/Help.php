@@ -73,4 +73,19 @@ class Help extends \glue\db\Document{
 		}else
 			return null;		
 	}
+	
+	public function search($keywords){
+		$sphinx=glue::sphinx()
+		->match(array('title', 'content', 'tags', 'path'),glue::http()->param('q',$keywords))
+		->filter('deleted', array(1), true);
+		
+		$cursor=$sphinx->query('help');
+		$cursor->setIteratorCallback(function($doc){
+			if($doc['type']=='article')
+				return app\models\HelpArticle::model()->findOne(array('_id'=>new \MongoId($doc['_id'])));
+			elseif($doc['type']=='topic')
+				return app\models\HelpTopic::model()->findOne(array('_id'=>new \MongoId($doc['_id'])));
+		});
+		return $cursor;		
+	}
 }

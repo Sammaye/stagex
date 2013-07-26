@@ -14,12 +14,15 @@ class Sphinx extends \glue\Component{
 	public $maxMatches = 10000; // 10K Is the full search limit
 	public $cutoff = 1000000; // Million row cutoff
 	
+	private $index;
 	private $condition;
 	private $maxPage;
 	private $page = 1;
 	private $limit;	
 	private $sphinx;
 
+	private $iteratorCallback;
+	
 	public function init(){
 		$this->sphinx = new SphinxClient();
 		$this->sphinx->SetServer ( $this->host, $this->port );
@@ -27,7 +30,6 @@ class Sphinx extends \glue\Component{
 		// Lets set our defaults
 		$this->sphinx->SetConnectTimeout ( 1 );
 		$this->sphinx->SetArrayResult ( true );
-		$this->sphinx->SetFilter('deleted', array(1), true);
 		$this->sphinx->SetMatchMode(SPH_MATCH_EXTENDED2);
 		return $this;
 	}
@@ -43,52 +45,74 @@ class Sphinx extends \glue\Component{
 		return $this;
 	}
 	
+	public function index($name){
+		$this->index=$name;
+	}
+	
 	public function select($select){
 		$this->sphinx->SetSelect($select);
+		return $this;
 	}
 	
 	public function match($field,$keywords){
 		if(strlen($query) > 0)
 			$this->condition .= (is_array($field)?'@('.implode(',',$field).')':'@'.$field) . 
 				(is_array($keywords)?explode(' ',$keywords):$keywords);
+		return $this;
 	}
 	
 	public function filter($attribute, $values = array(), $exclude = false){
-		$this->sphinx->SetFilter($attribute, $values, $exclude);
+		if(is_array($attribute)){
+			foreach($attribute as $v)
+				$this->sphinx->SetFilter($v[0], $v[1], $v[2]);
+		}else
+			$this->sphinx->SetFilter($attribute, $values, $exclude);
+		return $this;
 	}
 	
 	public function filterRange ( $attribute, $min, $max ) {
 		$this->sphinx->SetFilterRange($attribute, $min, $max);
+		return $this;
 	}	
 
 	public function matchMode($mode = SPH_MATCH_ALL){
 		$this->sphinx->SetMatchMode($mode);
+		return $this;
 	}	
 	
 	public function sort($mode = SPH_SORT_RELEVANCE, $sortby = ''){
 		$this->sphinx->SetSortMode($mode, $sortby);
+		return $this;
 	}
 
 	public function rank($mode = SPH_RANK_PROXIMITY_BM25){
 		$this->sphinx->SetRankingMode($mode);
+		return $this;
 	}
 	
 	public function limit($limit,$offset=0){
 		$this->limit=array($offset,$limit);
 		$this->sphinx->setLimits($offset,$limit,$this->maxMatches,$this->cutoff);
+		return $this;
 	}
 	
 	public function page($num){
 		$this->page=$num;
+		return $this;
 	}
 	
 	public function resultsPerPage($num){
 		$this->resultsPerPage=$num;	
+		return $this;
 	}
 
 	public function setGroupBy($attribute,$func,$groupsort="@group desc"){
 		$this->sphinx->SetGroupBy($attribute,$func,$groupsort);
 		return $this;
+	}
+	
+	public function resetIndex(){
+		$this->index=null;
 	}
 	
 	public function resetMatch(){
@@ -127,6 +151,7 @@ class Sphinx extends \glue\Component{
 	}
 
 	public function resetAll(){
+		$this->resetIndex();
 		$this->resetMatch();
 		$this->resetFilters();
 		$this->resetLimit();
@@ -134,15 +159,16 @@ class Sphinx extends \glue\Component{
 		$this->resetResultsPerPage();
 		$this->resetGroupBy();
 		$this->resetOverrides();
+		return $this;
 	}
 
-	public function query($index,$className=''){
+	public function query($index=null,$className=''){
 
 		// Lets get the indexes information
-		$index_attr = $this->indexes[$index];
+		$index_attr = $this->indexes[($index?:$this->index)];
 
 		// Does it have a delta?
-		$indexName = $index.(isset($index_attr['type'])&&$index_attr['type']=='delta'?$index_attr['delta']:'');
+		$indexName = ($index?:$this->index).(isset($index_attr['type'])&&$index_attr['type']=='delta'?' '.$index_attr['delta']:'');
 
 		// If no limit is set we assume to use paging
 		// currently you MUST put a limit in if you do not wish to use paging,
@@ -153,7 +179,9 @@ class Sphinx extends \glue\Component{
 			$this->resetAll();
 			if($error = $this->sphinx->GetLastError())
 				throw new \Exception($error); // Throwing an exception should exit
-			return new Cursor($result,$className);	
+			$c=new Cursor($result,$className);
+			$c->setIteratorCallback($this->iteratorCallback);
+			return $c;
 		}
 		
 		// Just like in SQL I need to do two queries to figure out ouor paging properly
@@ -181,6 +209,9 @@ class Sphinx extends \glue\Component{
 			$c=new Cursor($result,$className);	
 		}
 		$c->maxPage=$this->maxPage;
+		$c->setIteratorCallback($this->iteratorCallback);
+		
+		$this->resetAll();
 		return $c;
 	}
 	

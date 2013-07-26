@@ -4,8 +4,6 @@ use app\models\Video,
 	app\models\Queue;
 
 class videoController extends glue\Controller{
-
-	public $tab='';
 	
 	public function authRules(){
 		return array(
@@ -14,82 +12,48 @@ class videoController extends glue\Controller{
 					'delete_responses', 'batch_delete', 'delete', 'report', 'like', 'dislike', 'statistics', 'get_more_statistics', 'undoDelete', 'batchSave' ),
 				"users"=>array("@*")
 			),
-			array('allow', 'actions'=>array('process_encoding'),'users'=>array('cli')),
 			array('allow', 'actions' => array('index', 'watch', 'embedded')),
 			array("deny", "users"=>array("*")),
 		);
 	}
 
-	/**
-	 * @filters @,ajax,post
-	 */
 	public function action_index(){
-		$this->pageTitle = 'Browse All Videos - StageX';
+		$this->title = 'Browse All Videos - StageX';
+		
+		extract(glue::http()->param(array(
+			'sort', 'time', 'duration', 'cat', 'page'=>1
+		),null));
+		$sphinx = Video::model()->search()->page($page);
 
-		$sort = isset($_GET['sort']) ? $_GET['sort'] : null;
-		$time_show = isset($_GET['time']) ? $_GET['time'] : null;
-		$duration = isset($_GET['duration']) ? $_GET['duration'] : null;
-		$cat = isset($_GET['cat']) ? $_GET['cat'] : null;
-
-		$sphinx = glue::sphinx()->getSearcher();
-		$sphinx->page = isset($_GET['page']) ? $_GET['page'] : 1;
-
-		$video =  new Video();
-		$categories = $video->categories();
+		$categories = Video::model()->categories();
 		if(isset($categories[$cat])){
 			$row = $categories[$cat];
-			$sphinx->setFilter('category', array($row[1]));
-			$this->pageTitle = 'Browse '.$row[0].' videos - StageX';
-		}else{
+			
+			$sphinx->filter('category', array($row[1]));
+			$this->title = 'Browse '.$row[0].' videos - StageX';
+		}else
 			$cat = null;
-		}
-		$sphinx->setFilter('listing', array('2', '3'), true);
 
-		if(glue::session()->user->safe_srch == "S" || !glue::session()->authed){
-			$sphinx->setFilter('adult', array('1'), true);
-		}
+		if($time=='today')
+			$sphinx->filterRange('date_uploaded', time()-24*60*60, time());
+			//mktime(0, 0, 0, date('n'), date('j'), date('Y'))
+		elseif($time=='week')
+			$sphinx->filterRange('date_uploaded', strtotime('7 days ago'), time());
+		elseif($time=='month')
+			$sphinx->filterRange('date_uploaded', mktime(0, 0, 0, date('n'), 1, date('Y')), time());
 
-		switch($time_show){
-			case "today":
-				$sphinx->setFilterRange('date_uploaded', time()-24*60*60, time());
-				//mktime(0, 0, 0, date('n'), date('j'), date('Y'))
-				break;
-			case "week":
-				//var_dump(strtotime('7 days ago'));
-				$sphinx->setFilterRange('date_uploaded', strtotime('7 days ago'), time());
-				break;
-			case "month":
-				$sphinx->setFilterRange('date_uploaded', mktime(0, 0, 0, date('n'), 1, date('Y')), time());
-				break;
-		}
+		if($sort=='views')
+			$sphinx->sort(SPH_SORT_ATTR_DESC, "views");
+		elseif($sort=='rating')
+			$sphinx->sort(SPH_SORT_ATTR_DESC, "rating");
+		else
+			$sphinx->sort(SPH_SORT_ATTR_DESC, "date_uploaded");
 
-		switch($sort){
-			case "views":
-				$sphinx->setSortMode(SPH_SORT_ATTR_DESC, "views");
-				$filter = "videos";
-				break;
-			case "rating":
-				$sphinx->setSortMode(SPH_SORT_ATTR_DESC, "rating");
-				$filter = "videos";
-				break;
-			default:
-				$filter = "videos";
-				$sphinx->setSortMode(SPH_SORT_ATTR_DESC, "date_uploaded");
-				break;
-		}
-//var_dump(glue::url()->_GET('sort', 'time'));
-		switch($duration){
-			case "ltthree":
-				$sphinx->setFilterRange('duration', 1, 240000);
-				break;
-			case "gtthree":
-				$sphinx->setFilterRange('duration', 240000, 23456789911122000000);
-				break;
-		}
-		$sphinx->query(array('select' => isset($_GET['mainSearch']) ? $_GET['mainSearch'] : null, 'where' => array('type' => array('video')), 'results_per_page' => 20), 'main');
-
-		$this->render('videos/browse', array('sphinx' => $sphinx, 'filter' => $filter, 'sort' => $sort, 'time_show' => $time_show, 'duration' => $duration, 'cat' => $cat));
-
+		if($duration=='ltthree')
+			$sphinx->filterRange('duration', 1, 240000);
+		elseif($duration=='gtthree')
+			$sphinx->filterRange('duration', 240000, 23456789911122000000);
+		$this->render('videos/browse', array('sphinx' => $sphinx, 'filter' => $filter, 'sort' => $sort, 'time' => $time, 'duration' => $duration, 'cat' => $cat));
 	}
 
 	function action_upload(){
