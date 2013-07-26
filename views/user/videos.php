@@ -271,11 +271,21 @@ $this->js('videos', "
 			<div class='stickytoolbar-bar'>
 				<div class='inner_bar'>
 					<div class='checkbox_button checkbox_input'><?php echo Html::checkbox('selectAll', 1, 0, array('class' => 'selectAll_input')) ?></div>
-					<button class='btn-grey selected_actions dropdown-anchor edit_videos_button'>Edit</button>
-					<button class='btn-grey selected_actions dropdown-anchor btn_delete'>Delete</button>
+					<button class='btn-grey selected_actions edit_videos_button'>Edit</button>
+					<button class='btn-grey selected_actions btn_delete'>Delete</button>
 					<div class="btn-group dropdown-group playlist-dropdown">
-						<button class='btn-grey add_to_playlist'>Add To <span class="caret">&#9660;</span></button>
-						<div class="dropdown-menu"></div>
+						<button class='btn-grey add_to_playlist dropdown-anchor'>Add To <span class="caret">&#9660;</span></button>
+						<div class="dropdown-menu">
+							<div class="head_ribbon">
+								<a href="#" class='watch_later'>Watch Later</a>
+								<input type="text" placeholder="Search for Playlists" class="search_input"/>
+							</div>
+							<div class="playlist_results">
+							<div class='item'>
+								Search for playlists above
+							</div>
+							</div>
+						</div>
 					</div>
 				</div>
 				<div class="alert block-alert"></div>

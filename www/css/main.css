@@ -394,8 +394,8 @@ textarea{
 }
 
 .dropdown-menu{
-	width:250px; padding-bottom: 6px;
-    padding-top: 6px; z-index: 10;
+	width:250px; /*padding-bottom: 6px; padding-top: 6px;*/ 
+    z-index: 10;
 	display:none;
 	-moz-transition: opacity 0.218s ease 0s;
     background: none repeat scroll 0 0 #FFFFFF;
@@ -405,7 +405,7 @@ textarea{
     font-size: 13px;
     margin: 0;
     outline: medium none;
-    padding: 6px 0; z-index:1000; overflow:hidden;
+    z-index:1000; overflow:hidden;
 }
 
 .dropdown-menu .divider{
@@ -1466,4 +1466,20 @@ textarea{
 
 .help_page .search_head .head_breadcrumb{
 	font-size:14px; line-height:22px;
+}
+
+.playlist-dropdown .head_ribbon{
+	background:#f8f8f8; border-bottom:1px solid #e5e5e5;
+}
+
+.playlist-dropdown .head_ribbon .watch_later{
+	display:block; padding:12px 0 12px 12px; font-weight:14px;
+}
+
+.playlist-dropdown .head_ribbon .search_input{
+	width:85%; border-radius:3px; margin:0 0 8px 3px;
+}
+
+.playlist-dropdown .playlist_results .item{
+	padding:12px 4px 12px 12px;
 }

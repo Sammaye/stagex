@@ -74,6 +74,7 @@
 		destroy: function(){}
 	},
 	open = function(event){
+		console.log('here');
 		event.preventDefault();
 
 		var anchor = $(this).parents('.jdropdown-anchor'),
