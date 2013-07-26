@@ -349,11 +349,11 @@ class userController extends \glue\Controller{
 
 		$this->layout = 'user_section';
 		$this->tab = 'watch_later';
-		$watch_later = Playlist::model()->findOne(array('title' => 'Watch Later', 'user_id' => glue::user()->_id));
+		$watch_later = Playlist::model()->findOne(array('title' => 'Watch Later', 'userId' => glue::user()->_id));
 		echo $this->render('user/watch_later', array('model' => $watch_later));
 	}
 
-	function action_subscriptions(){
+	function action_following(){
 		$this->pageTitle = 'Your Subscriptions - StageX';
 
 		$this->layout = 'user_section';
@@ -611,26 +611,6 @@ class userController extends \glue\Controller{
 		}
 	}
 
-	public function action_video_search_suggestions(){
-		$this->pageTitle = 'Video Search - StageX';
-		if(!glue::http()->isAjax()){
-			glue::route('error/notfound');
-		}
-
-		$ret = array();
-
-		$sphinx = glue::sphinx()->getSearcher();
-		$sphinx->limit = 5;
-		$sphinx->query(array('select' => glue::http()->param('term', ''), 'where' => array('type' => array('video'), 'uid' => array(strval(glue::session()->user->_id)))), 'main');
-
-		if($sphinx->matches){
-			foreach($sphinx->matches as $item){
-					$ret[] = array('label' => $item->title);
-			}
-		}
-		echo json_encode($ret);
-	}
-	
 	function action_manage(){
 		$this->render('manage');
 	}	

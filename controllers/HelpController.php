@@ -52,11 +52,8 @@ class HelpController extends \glue\Controller{
 
 	function action_search(){
 		$this->title = 'Search StageX Help';
-
-		glue::sphinx()->query(array('select' => glue::http()->param('help_query', '')), "help");
-		echo $this->render("help/search", array( "sphinx" => glue::sphinx()->getSearcher() ));
+		echo $this->render("help/search", array( "sphinx" => Help::model()->search() ));
 	}
-
 
 	function action_viewTopics(){
 		$this->title = 'View Help Topics - StageX';

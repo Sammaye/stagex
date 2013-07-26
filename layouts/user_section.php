@@ -59,7 +59,7 @@ $this->beginPage() ?>
 							<li class='indented_row'><a href='<?php echo glue::http()->url('/history/rated_videos') ?>' <?php echo $this->subtab == "liked_videos" ? "class='selected'" : "" ?>>Videos</a></li>
 							<li class='indented_row'><a href='<?php echo glue::http()->url('/history/rated_playlists') ?>' <?php echo $this->subtab == "liked_playlists" ? "class='selected'" : "" ?>>Playlists</a></li>
 						<?php } ?>
-						<li><a href='<?php echo glue::http()->url('/user/subscriptions') ?>' <?php echo $this->tab == "subscriptions" ? "class='selected'" : "" ?>>Subscriptions</a></li>
+						<li><a href='<?php echo glue::http()->url('/user/follwoing') ?>' <?php echo $this->tab == "subscriptions" ? "class='selected'" : "" ?>>Following</a></li>
 						<li><a href='<?php echo glue::http()->url('/stream') ?>' <?php echo $this->tab == "stream" ? "class='selected'" : "" ?>>Stream</a></li>
 						<li><a href='<?php echo glue::http()->url('/stream/notifications') ?>' <?php echo $this->tab == "notifications" ? "class='selected'" : "" ?>>Notifications</a></li>
 					</ul>

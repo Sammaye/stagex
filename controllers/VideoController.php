@@ -490,4 +490,19 @@ class videoController extends glue\Controller{
 
 		GJSON::kill($model->getStatistics_dateRange($fromTs, $toTs), true);
 	}
+	
+	public function action_searchSuggestions(){
+		$this->title = 'Video Search - StageX';
+		if(!glue::http()->isAjax())
+			glue::trigger('404');
+	
+		$ret = array();
+		$sphinx=Video::model()->search(glue::http()->param('term', ''));
+		$sphinx->match('uid', strval(glue::user()->_id));// I do this in case this needs changing later
+		$cursor=$sphinx->limit(5)->query();
+	
+		foreach($cursor as $item)
+			$ret[] = array('label' => $item->title);
+		echo json_encode($ret);
+	}	
 }
