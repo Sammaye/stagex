@@ -1432,8 +1432,8 @@ textarea{
 	text-align:left;
 }
 
-.help_page_view .topic h2{
-	margin-top:30px;
+.help_page_view .article{
+	margin-bottom:30px;
 }
 
 .help_modal .form-vertical{
