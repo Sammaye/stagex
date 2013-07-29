@@ -1,6 +1,7 @@
 <?php
 
-use app\models\Subscription;
+use app\models\Follower,
+	app\models\Stream;
 
 class StreamController extends glue\Controller{
 
@@ -26,7 +27,7 @@ class StreamController extends glue\Controller{
 		$this->pageTitle = 'Recent News - StageX';
 
 		$this->tab = 'news_feed';
-		$subscription_model = new Subscription();
+		$subscription_model = new Follower();
 
 		$subscriptions = $subscription_model->getAll_ids();
 		$stream = Stream::model()->find(array('user_id' => array('$in' => $subscriptions),
@@ -35,7 +36,7 @@ class StreamController extends glue\Controller{
 				array('comment_user' => array('$in' => $subscriptions))
 			)
 		))->sort(array('ts' => -1))->limit(20);
-		$this->render('stream/news_feed', array('model' => $stream, 'subscriptions' => $subscriptions));
+		echo $this->render('stream/news_feed', array('model' => $stream, 'subscriptions' => $subscriptions));
 	}
 
 	public function action_notifications(){
@@ -214,7 +215,7 @@ class StreamController extends glue\Controller{
 
 		$_ts_sec = array();
 		if($_ts)
-			$_ts_sec = array('ts' => array('$lt' => new MongoDate($_ts)));
+			$_ts_sec = array('created' => array('$lt' => new MongoDate($_ts)));
 
 		$_filter_a = array();
 		if($filter){
@@ -235,8 +236,8 @@ class StreamController extends glue\Controller{
 		}
 
 		return Stream::model()->find(array_merge(array(
-			'user_id' => $user ? $user->_id : glue::session()->user->_id
-		), $_ts_sec, $_filter_a))->sort(array('ts' => -1))->limit(20);
+			'user_id' => $user ? $user->_id : glue::user()->_id
+		), $_ts_sec, $_filter_a))->sort(array('created' => -1))->limit(20);
 	}
 
 	function load_news_stream($_ts = null, $_id = null){

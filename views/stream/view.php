@@ -1,45 +1,14 @@
 <?php
 
-glue::clientScript()->addJsFile('jquery-expander', "/js/jquery-expander.js");
-glue::clientScript()->addJsFile('j-dropdown', '/js/jdropdown.js');
+$this->jsFile('jquery-expander', "/js/jquery-expander.js");
+$this->jsFile('j-dropdown', '/js/jdropdown.js');
 
-ob_start();
-	?>
-		<div class='filters_menu'>
-			<div class='item' data-caption='Showing All Activity' data-filter='all'>All Activity</div>
-			<div class='item' data-caption='Showing Actions Activity' data-filter='actions'>Actions Only</div>
-			<div class='item' data-caption='Showing Comment Activity' data-filter='comments'>Comments Only</div>
-		</div>
-	<?php
-	$menu_html = ob_get_contents();
-ob_end_clean();
-
-ob_start(); ?>
-	<h2 class='diag_header'>Reply</h2>
-		<div class='form reply_form'>
-			<div class='row'><?php echo html::hiddenfield('user_id').html::textarea('message', null) ?></div>
-			<a href='#' class='green_css_button add_reply float_left'>Reply</a> <a href='#' class='grey_css_button cancel'>Cancel</a>
-		</div><?php
-	$reply_diag_html = ob_get_contents();
-ob_end_clean();
-
-glue::clientScript()->addJsScript('streampage.base', "
+$this->js('streampage.base', "
 	$(function(){
 
-		var hash_action = getActionHash();
-		if(hash_action[0] == 'wall_post_reply'){
-			$.facebox(".GClientScript::encode($reply_diag_html).", 'add_wall_post_diag');
-			$('.add_wall_post_diag input[name=user_id]').val(hash_action[1]);
-			window.location.hash = '';
-		}
-
+		$('.dropdown-group').jdropdown();
+		
 		$('.expandable').expander({slicePoint: 200});
-
-		$(document).on('click', '.stream_comment_reply a', function(event){
-			event.preventDefault();
-			$.facebox(".GClientScript::encode($reply_diag_html).", 'add_wall_post_diag');
-			$('.add_wall_post_diag input[name=user_id]').val($(this).parents('.streamitem').data('target_user'));
-		});
 
 		$(document).on('click', '.add_wall_post_diag .cancel', function(e){
 			e.preventDefault();
@@ -100,13 +69,6 @@ glue::clientScript()->addJsScript('streampage.base', "
 			});
 		});
 
-		$('body').append($(".GClientScript::encode($menu_html)."));
-		$('.selected_filter').jdropdown({
-			'orientation': 'over',
-			'menu_div': '.filters_menu',
-			'item': '.filters_menu .item'
-		});
-
 	    $(document).on('jdropdown.selectItem', '.filters_menu .item', function(e, event){
 	        //event.preventDefault();
 			$('.selected_filter').html($(this).data('caption'));
@@ -129,10 +91,26 @@ glue::clientScript()->addJsScript('streampage.base', "
 
 ?>
 
-<div class='grid_5 alpha omega boxed_page_layout_outer float_left' style='width:574px;'>
-	<div class='head_outer' style=''><div class='page_head'>Stream</div>
+<div>
+
+	<div class="tabs-nav">
+		<ul>
+			<li><a href="/stream/news" id="news_tab">News</a></li>
+			<li><a href="/stream" class="selected">Activity</a></li>
+		</ul>
+	</div>
+
+	<div class='' style='padding:20px;'>
 		<!-- <div class='clear_all grey_css_button float_right button'><span>Clear All Stream</span></div> -->
-		<div class='grey_css_button selected_filter float_right button_margined'>Showing All Activity</div>
+		
+		<div class="btn-group dropdown-group">
+			<button class='btn-grey dropdown-anchor'>All Activity <span class="caret">&#9660;</span></button>
+			<div class="dropdown-menu">
+				<a href="">All Activity</a>
+				<a href="">Actions Only</a>
+				<a href="">Comments Only</a>
+			</div>		
+		</div>
 	</div>
 	<div class='list' style=''>
 		<?php
@@ -140,10 +118,10 @@ glue::clientScript()->addJsScript('streampage.base', "
 		if($model->count() > 0){
 			foreach($model as $k => $item){
 				//var_dump($k);
-				$this->partialRender('stream/streamitem', array('item' => $item));
+				echo $this->renderPartial('stream/streamitem', array('item' => $item));
 			}
 		}else{ ?>
-			<div class='not_found_head'>No stream has yet been recorded for your user</div>
+			<div class='no_results_found'>No stream has yet been recorded for your user</div>
 		<?php } ?>
 	</div>
 	<?php if($model->count() > 20){ ?>
@@ -151,8 +129,8 @@ glue::clientScript()->addJsScript('streampage.base', "
 	<?php } ?>
 </div>
 <div style='float:left; width:160px; margin-left:25px;'>
-	<?php $this->widget("application/widgets/Advertising/Ad_box.php", array( "configuration"=>'300_box' )); ?>
+	<?php //$this->widget("application/widgets/Advertising/Ad_box.php", array( "configuration"=>'300_box' )); ?>
 	<div style='margin-top:25px;'>
-		<?php $this->widget("application/widgets/Advertising/Ad_box.php", array( "configuration"=>'300_box' )); ?>
+		<?php //$this->widget("application/widgets/Advertising/Ad_box.php", array( "configuration"=>'300_box' )); ?>
 	</div>
 </div>
