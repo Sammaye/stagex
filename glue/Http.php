@@ -156,17 +156,19 @@ class Http{
 			foreach($attributes as $k => $v){
 				if(!is_numeric($k)){
 					$val = $v;
+					$key = $k;
 				}else{
 					$val = $default_val;
+					$key=$v;
 				}
 
-				if(isset($_POST[$k]))
-				$val = $_POST[$k];
+				if(isset($_POST[$key]))
+					$val = $_POST[$key];
 
-				if(isset($_GET[$k]))
-				$val = $_GET[$k];
+				if(isset($_GET[$key]))
+					$val = $_GET[$key];
 
-				$ar[$k] = $val;
+				$ar[$key] = $val;
 			}
 			return $ar;
 		}

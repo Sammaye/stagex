@@ -1,7 +1,7 @@
 <?php
 
-$this->jsFile('jquery-expander', "/js/jquery-expander.js");
-$this->jsFile('j-dropdown', '/js/jdropdown.js');
+$this->jsFile("/js/jquery.expander.js");
+$this->jsFile('/js/jdropdown.js');
 
 $this->js('streampage.base', "
 	$(function(){
@@ -54,39 +54,36 @@ $this->js('streampage.base', "
 			});
 		});
 
-		$(document).on('click', '.load_more', function(event){
-			event.preventDefault();
-			var last_ts = $('.list .streamitem').last().data('ts'),
-				filter = $('.list').data('sort');
-			$.getJSON('/stream/get_stream', {ts: last_ts, filter: filter }, function(data){
-				if(data.success){
-					$('.list').append(data.html);
-				}else{
-					if(data.noneleft){
-						$('.load_more').html(data.messages[0]);
-					}
-				}
-			});
-		});
 
-	    $(document).on('jdropdown.selectItem', '.filters_menu .item', function(e, event){
-	        //event.preventDefault();
-			$('.selected_filter').html($(this).data('caption'));
-			$('.list').data('sort', $(this).data('filter'));
-
-			$.getJSON('/stream/get_stream', { filter: $(this).data('filter') }, function(data){
-				if(data.success){
-					$('.list').html(data.html);
-					$('.load_more').html('Load more stream');
-				}else{
-					if(data.noneleft){
-						$('.list').html('<div style=\'font-size:16px; font-weight:normal; padding:21px;\'>'+data.initMessage+'</div>');
-						$('.load_more').html(data.messages[0]);
-					}
-				}
-			});
-	    });
 	});
+		
+	$(document).on('click', '.load_more', function(event){
+		event.preventDefault();
+		var last_ts = $('.list .streamitem').last().data('ts'),
+			filter = $('.list').data('sort');
+		$.getJSON('/stream/getStream', {ts: last_ts, filter: filter }, function(data){
+			if(data.success)
+				$('.list').append(data.html);
+			else if(data.noneleft)
+				$('.load_more').html(data.message);
+		});
+	});
+
+	$(document).on('click', '.simple-nav a', function(event){
+	    event.preventDefault();
+		$('.simple-nav a').not($(this)).removeClass('selected');
+		$(this).addClass('selected');
+
+		$.getJSON('/stream/getStream', { filter: $(this).data('filter') }, function(data){
+			if(data.success){
+				$('.list').html(data.html);
+				$('.load_more').html('Load more stream');
+			}else if(data.remaining<=0){
+				$('.list').html($('<div/>').addClass('no_results_found').text(data.initMessage));
+				$('.load_more').html(data.message);
+			}
+		});
+	});		
 ");
 
 ?>
@@ -99,32 +96,24 @@ $this->js('streampage.base', "
 			<li><a href="/stream" class="selected">Activity</a></li>
 		</ul>
 	</div>
-
-	<div class='' style='padding:20px;'>
-		<!-- <div class='clear_all grey_css_button float_right button'><span>Clear All Stream</span></div> -->
-		
-		<div class="btn-group dropdown-group">
-			<button class='btn-grey dropdown-anchor'>All Activity <span class="caret">&#9660;</span></button>
-			<div class="dropdown-menu">
-				<a href="">All Activity</a>
-				<a href="">Actions Only</a>
-				<a href="">Comments Only</a>
-			</div>		
-		</div>
+	<div class="simple-nav" style='background:#f5f5f5;'>
+		<a href="#" class="selected" data-filter="all">All</a>
+		<a href="#" data-filter="posts">Posts</a>
+		<a href="#" data-filter="comments">Comments</a>
+		<a href="#" data-filter="liked">Likes</a>
+		<a href="#" data-filter="watched">Watched</a>
 	</div>
 	<div class='list' style=''>
 		<?php
-		//var_dump($model->count());
-		if($model->count() > 0){
-			foreach($model as $k => $item){
-				//var_dump($k);
+		if($cursor->count() > 0){
+			foreach($cursor as $k => $item){
 				echo $this->renderPartial('stream/streamitem', array('item' => $item));
 			}
 		}else{ ?>
 			<div class='no_results_found'>No stream has yet been recorded for your user</div>
 		<?php } ?>
 	</div>
-	<?php if($model->count() > 20){ ?>
+	<?php if($cursor->count() > 20){ ?>
 		<a class='load_more' href='#'>Load more stream</a>
 	<?php } ?>
 </div>

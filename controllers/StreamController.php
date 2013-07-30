@@ -17,10 +17,10 @@ class StreamController extends glue\Controller{
 	}
 
 	public function action_index(){
-		$this->pageTitle = 'Your Stream - StageX';
+		$this->title = 'Your Stream - StageX';
 
 		$this->tab = 'stream';
-		echo $this->render('stream/view', array('model' => $this->load_single_stream()));
+		echo $this->render('stream/view', array('cursor' => $this->load_single_stream()));
 	}
 
 	public function action_news(){
@@ -171,44 +171,36 @@ class StreamController extends glue\Controller{
 		}
 	}
 
-	function action_get_stream(){
-		$this->pageTitle = 'Get Stream - StageX';
+	function action_getStream(){
+		$this->title = 'Get Stream - StageX';
 
 		if(!glue::http()->isAjax())
-			glue::route(glue::config('404', 'errorPages'));
+			glue::trigger('404');
 
-		$get_news = isset($_GET['news']) ? $_GET['news'] : null;
-		$_last_ts = isset($_GET['ts']) ? $_GET['ts'] : null;
-		$_hide_del = isset($_GET['hide_del']) ? true : false;
-		$_user_id = isset($_GET['uid']) ? User::model()->findOne(array('_id' => new MongoId($_GET['uid']))) : null;
-		$_filter = isset($_GET['filter']) ? $_GET['filter'] : null;
+		extract(glue::http()->param(array(
+			'news', 'ts', 'hide_del', 'user', 'filter'
+		),null));
+		
+		if($user)
+			$user = User::model()->findOne(array('_id' => new MongoId($user)));
+		elseif(!$user && !glue::session()->authed)
+			$this->json_error(self::UNKNOWN);
+			
+		if($ts && !preg_match( '/^[1-9][0-9]*$/', $ts ))
+			$this->json_error('No last stream item could be found');
 
-		if($_last_ts && !( 1 === preg_match( '/^[1-9][0-9]*$/', $_last_ts ))){
-			GJSON::kill(array('No last stream item could be found'));
-		}
-
-		if(!$_user_id && !glue::session()->authed)
-			GJSON::kill(GJSON::UNKNOWN);
-
-		if(!$get_news){
-			$stream = $this->load_single_stream($_last_ts, $_user_id, $_filter);
-		}else{
-			$stream = $this->load_news_stream($_last_ts, $_filter);
-		}
+		if(!$news)
+			$stream = $this->load_single_stream($ts, $user, $filter);
+		else
+			$stream = $this->load_news_stream($ts, $filter);
 
 		$html = '';
 		if($stream->count() > 0){
-			foreach($stream as $k => $item){
-				ob_start();
-					$this->partialRender('stream/streamitem', array('item' => $item, 'hideDelete' => $_hide_del));
-					$partial_html = ob_get_contents();
-				ob_end_clean();
-				$html .= $partial_html;
-			}
-			GJSON::kill(array('html' => $html), true);
-		}else{
-			GJSON::kill(array('noneleft' => true, 'messages' => array('There are no more stream items to load'), 'initMessage' => 'No stream could be found'));
-		}
+			foreach($stream as $k => $item)
+				$html.=$this->renderPartial('stream/streamitem', array('item' => $item, 'hideDelete' => $_hide_del));
+			$this->json_success(array('html'=>$html));
+		}else
+			$this->json_error(array('remaining'=>0,'initMessage'=>'No stream could be found','message'=>'There are no more stream items to load'));
 	}
 
 	function load_single_stream($_ts = null, $user = null, $filter = null){
@@ -226,7 +218,7 @@ class StreamController extends glue\Controller{
 				case "liked":
 					$_filter_a = array('type' => Stream::VIDEO_RATE, 'like' => 1);
 					break;
-				case "actions":
+				case "posts":
 					$_filter_a = array('type' => array('$nin' => array(Stream::WALL_POST)));
 					break;
 				case "comments":
