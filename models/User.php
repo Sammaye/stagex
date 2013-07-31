@@ -33,6 +33,8 @@ class User extends \glue\User{
 	/** @virtual */
 	public $avatar;
 	/** @virtual */
+	public $watchLater;
+	/** @virtual */
 	public $hash;
 
 	public $username;
@@ -448,5 +450,16 @@ class User extends \glue\User{
 				'text' => $text
 			));
 		}		
+	}
+	
+	function watchLaterPlaylist(){
+		if(
+			$this->watchLater===null && 
+			($playlist=Playlist::model()->findOne(array('title' => 'Watch Later', 'userId' => glue::user()->_id)))!==null
+		)
+			$this->watchLater=$playlist;
+		elseif($this->watchLater===null)
+			$this->watchLater=new Playlist();
+		return $this->watchLater;
 	}
 }

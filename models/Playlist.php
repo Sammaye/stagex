@@ -43,6 +43,12 @@ class Playlist extends \glue\db\Document{
 			"author" => array('one', 'app\\models\\User', "_id", 'on' => 'userId'),
 		);
 	}
+	
+	function defaultScope(){
+		return array(
+			'condition' => array('deleted'=>array('$in'=>0,null))		
+		);
+	}
 
 	public static function model($class = __CLASS__){
 		return parent::model($class);
@@ -90,19 +96,20 @@ class Playlist extends \glue\db\Document{
 		return $pics;
 	}
 
-	function add_video($_id){
+	function addVideo($_id){
 		foreach($this->videos as $k=>$v){
 			if($v['_id'] == $_id)
 				return; // Bail if the video exists
 		}
 		$this->videos[] = array('_id' => $_id, 'pos' => count($this->videos));
+		$this->totalVideos++;
 	}
 
 	function add_video_at_pos($_id, $pos = 0){
 		$this->videos[] = array('_id' => $_id, 'pos' => $pos);
 	}
 
-	function video_already_added($_id){
+	function videoAlreadyAdded($_id){
 		foreach($this->videos as $k=>$v){
 			if($v['_id'] == $_id)
 				return true; // Bail if the video exists

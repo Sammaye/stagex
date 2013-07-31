@@ -1,15 +1,17 @@
 <?php
-class PlaylistController extends GController{
 
-	// A set of filters to be run before and after the controller action
-	public function filters(){
-		return array('rbam');
-	}
+use app\models\AutoPublishQueue;
 
-	public function accessRules(){
+use app\models\Video;
+
+use app\models\Playlist;
+
+class PlaylistController extends glue\Controller{
+
+	public function authRules(){
 		return array(
 			array("allow",
-				"actions"=>array('add', 'edit', 'save_playlist', 'delete', 'batch_delete', 'add_video', 'add_many_videos', 'get_menu', 'set_detail', 'like', 'unlike', 'clear_all_videos',
+				"actions"=>array('add', 'edit', 'save_playlist', 'delete', 'batch_delete', 'addVideo', 'add_many_videos', 'get_menu', 'set_detail', 'like', 'unlike', 'clear_all_videos',
 					'delete_many_videos'),
 				"users"=>array("@*")
 			),
@@ -243,48 +245,38 @@ class PlaylistController extends GController{
 		GJSON::kill('The playlists you selected were saved', true);
 	}
 
-	public function action_add_video(){
-		$this->pageTitle = 'Add Video To Playlist - StageX';
+	public function action_addVideo(){
+		$this->title = 'Add Video To Playlist - StageX';
 		if(!glue::http()->isAjax())
-			Glue::route("error/notfound");
+			glue::trigger('404');
+		extract(glue::http()->param(array('playlist_id', 'video_ids' => array())));
 
-		$video = Video::model()->findOne(array('_id' => new MongoId($_POST['id'])));
-		if($video){
-			$playlist = Playlist::model()->findOne(array('_id' => new MongoId($_POST['p_id']), 'user_id' => glue::session()->user->_id, 'deleted' => array('$ne' => 1)));
-			if($playlist){
-				if((count($playlist->videos)+1) > 200){
-					echo json_encode(array('success' => false, 'html' =>
-						$this->get_menu_summary('This video would exceed the 200 slots you have on this playlist')));
-					exit();
-				}
-
-				if($playlist->video_already_added($video->_id)){
-					echo json_encode(array('success' => false, 'html' =>
-						$this->get_menu_summary('This video has already been added to '.$playlist->title)));
-					exit();
-				}
-
-				$playlist->add_video($video->_id);
-				$playlist->save();
-
-				if(!($playlist->listing == 'u' && $playlist->listing =='n')){ // If this playlist is not private
-					Stream::add_video_2_playlist(glue::session()->user->_id, $playlist->_id, $video->_id);
-
-					if(glue::session()->user->should_autoshare('video_2_pl')){
-						AutoPublishQueue::add_to_qeue(AutoPublishQueue::PL_V_ADDED, glue::session()->user->_id, $video->_id, $playlist->_id);
-					}
-				}
-
-				echo json_encode(array('success' => true, 'html' =>
-					$this->get_menu_summary('The video you selected was added to '.$playlist->title)));
-			}else{
+		if($playlist=Playlist::model()->findOne(array('_id'=>new MongoId($playlist_id), 'userId' => glue::user()->_id))){
+			
+			$mongoIds=array();
+			foreach($video_ids as $id)
+				$mongoIds[]=new MongoId($id);
+			$videos=Video::model()->find(array('_id'=>array('$in'=>$mongoIds)));
+			/*if((count($playlist->videos)+1) > 200){ // Commented out for the mo
 				echo json_encode(array('success' => false, 'html' =>
-					$this->get_menu_summary('The video you selected was not added because of an unknown error.')));
+						$this->get_menu_summary('This video would exceed the 200 slots you have on this playlist')));
+				exit();
+			}*/
+			$existingIds=array();
+			foreach($videos as $video){
+				if(!$playlist->videoAlreadyAdded($video->_id))
+					$playlist->addVideo($video->_id);
 			}
-		}else{
-			echo json_encode(array('success' => false, 'html' =>
-				$this->get_menu_summary('The video you selected was not added because there was an error getting this video.')));
-		}
+			if(!$playlist->save())
+				$this->json_error('The video you selected was not added because of an unknown error.');
+			if($playlist->listing === 0 || $playlist->listing === 1){ // If this playlist is not private
+				Stream::PlaylistAddVideo(glue::user()->_id, $playlist->_id, $video->_id);
+				if(glue::user()->autoshareAddToPlaylist)
+					AutoPublishQueue::add_to_qeue(AutoPublishQueue::PL_V_ADDED, glue::user()->_id, $video->_id, $playlist->_id);
+			}
+			$this->json_success('The video you selected was added to '.$playlist->title);			
+		}else
+			$this->json_error('The video you selected was not added because of an unknown error.');
 	}
 
 	public function action_add_many_videos(){

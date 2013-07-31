@@ -172,7 +172,7 @@ class Stream extends \glue\db\Document{
 	static function videoUpload($user_id, $video_id){
 		$status = new static;
 		$status->userId = $user_id;
-		$status->videoId = $video_id;
+		$status->itemId = $video_id;
 		$status->type = Stream::VIDEO_UPLOAD;
 		$status->save();
 	}
@@ -242,16 +242,16 @@ class Stream extends \glue\db\Document{
 		}
 	}
 
-	public static function add_video_2_playlist($user_id, $playlist_id, $video_id){
-		$status = Stream::model()->findOne(array('user_id' => $user_id, 'playlist_id' => $playlist_id, 'type' => Stream::ADD_TO_PL));
+	public static function PlaylistAddVideo($user_id, $playlist_id, $video_id){
+		$status = Stream::model()->findOne(array('userId' => $user_id, 'itemId' => $playlist_id, 'type' => Stream::ADD_TO_PL));
 
 		if($status){
 			$status->addItemBy_id($video_id);
 			$status->save();
 		}else{
 			$status = new Stream();
-			$status->user_id = $user_id;
-			$status->playlist_id = $playlist_id;
+			$status->userId = $user_id;
+			$status->itemId = $playlist_id;
 			$status->type = Stream::ADD_TO_PL;
 			$status->addItemBy_id($video_id);
 			$status->save();

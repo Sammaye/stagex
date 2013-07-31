@@ -6,6 +6,26 @@ $this->JsFile("/js/jquery.expander.js");
 $this->JsFile('/js/jdropdown.js');
 $this->JsFile('/js/playlist_dropdown.js');
 
+$this->js('playlists', "
+	$(document).on('click', '.playlist-dropdown .playlist_link', function(e){
+		e.preventDefault();
+		var params = [{name:'playlist_id',value:$(this).data().id}];
+		
+		id_length=0;
+		$('.video_list .video .checkbox_col input:checked').each(function(i,item){
+			params[params.length]={name:['video_ids['+id_length+']'],value:$(item).val()};
+			id_length++;
+		});	
+		console.log(params);
+		$.post('/playlist/addVideo', params, null, 'json').done(function(data){
+			if(data.success){
+				alert('worked');
+			}else{
+			}
+		});
+	});
+");
+
 $this->js('videos', "
 	$(function(){
 		//$('.playlist-dropdown').playlistDropdown();
@@ -277,7 +297,7 @@ $this->js('videos', "
 						<button class='btn-grey add_to_playlist dropdown-anchor'>Add To <span class="caret">&#9660;</span></button>
 						<div class="dropdown-menu">
 							<div class="head_ribbon">
-								<a href="#" class='watch_later'>Watch Later</a>
+								<a href="#" data-id="<?php echo glue::user()->watchLaterPlaylist()->_id ?>" class='watch_later playlist_link'>Watch Later</a>
 								<input type="text" placeholder="Search for Playlists" class="search_input"/>
 							</div>
 							<div class="playlist_results">
