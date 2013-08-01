@@ -717,7 +717,7 @@ class Video extends \glue\Db\Document{
 	}
 
 	function userHasWatched(){
-		$r = glue::db()->watched_history->findOne(array('user_id' => glue::session()->user->_id, 'item' => $this->_id));
+		$r = glue::db()->watched_history->findOne(array('user_id' => glue::user()->_id, 'item' => $this->_id));
 		if($r) return true;
 		return false;
 	}

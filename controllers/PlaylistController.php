@@ -11,8 +11,8 @@ class PlaylistController extends glue\Controller{
 	public function authRules(){
 		return array(
 			array("allow",
-				"actions"=>array('add', 'edit', 'save_playlist', 'delete', 'batch_delete', 'addVideo', 'add_many_videos', 'get_menu', 'set_detail', 'like', 'unlike', 'clear_all_videos',
-					'delete_many_videos'),
+				"actions"=>array('add', 'edit', 'save_playlist', 'delete', 'batch_delete', 'addVideo', 'add_many_videos', 'get_menu', 'set_detail', 'like', 'unlike', 'clear',
+					'deleteVideo'),
 				"users"=>array("@*")
 			),
 			array('allow', 'actions' => array('index', 'view', 'get_playlist_bar')),
@@ -279,107 +279,52 @@ class PlaylistController extends glue\Controller{
 			$this->json_error('The video you selected was not added because of an unknown error.');
 	}
 
-	public function action_add_many_videos(){
-		$this->pageTitle = 'Add Videos To Playlist - StageX';
+	function action_deleteVideo(){
+		$this->title = 'Remove Videos From Playlist - StageX';
 		if(!glue::http()->isAjax())
-			Glue::route("error/notfound");
+			glue::trigger('404');
 
-		if(is_array($_POST['id'])){
-			$vars_array = array();
+		extract(glue::http()->param(array('ids','playlist_id')));
+		$playlist = Playlist::model()->findOne(array('_id' => new MongoId($playlist_id), 'userId' => glue::user()->_id));
+		if(!$playlist)
+			$this->json_error('This playlist no longer exists');
+		if(count($ids) <= 0)
+			$this->json_error('You selected no videos to delete');
 
-			foreach($_POST['id'] as $k => $v){
-				$vars_array[] = new MongoId($v);
-			}
-			$videos = Video::model()->find(array('_id' => array('$in' => $vars_array)));
-			$playlist = Playlist::model()->findOne(array('_id' => new MongoId($_POST['p_id']), 'user_id' => glue::session()->user->_id, 'deleted' => array('$ne' => 1)));
-
-			if($videos->count() == count($_POST['id']) && $playlist){
-				if((count($playlist->videos)+$videos->count()) > 200){
-					echo json_encode(array('success' => false, 'html' =>
-						$this->get_menu_summary('You selected '.count($_POST['id']).' videos but only have '.(200-count($playlist->videos)).' free slots on this playlist')));
-					exit();
-				}
-
-				foreach($videos as $k => $v){
-					$playlist->add_video($v->_id);
-				}
-
-				$playlist->save();
-				echo json_encode(array('success' => true, 'html' =>
-					$this->get_menu_summary('The video(s) you selected were added to '.$playlist->title)));
-			}else{
-				switch(true){
-					case !$playlist:
-						echo json_encode(array('success' => false, 'html' =>
-							$this->get_menu_summary('The video(s) you selected were not added to a playlist because no playlist was selected.')));
-						break;
-					default:
-						echo json_encode(array('success' => false, 'html' =>
-							$this->get_menu_summary('The video(s) you selected were not added because of an unknown error.')));
-						break;
-				}
-			}
-		}else{
-			echo json_encode(array('success' => false, 'html' =>
-				$this->get_menu_summary('You selected no video(s) to add to a playlist.')));
-		}
-	}
-
-	function action_delete_many_videos(){
-		$this->pageTitle = 'Remove Videos From Playlist - StageX';
-		if(!glue::http()->isAjax())
-			Glue::route("error/notfound");
-
-		$_ids = isset($_POST['items']) ? $_POST['items'] : array();
-		$playlist = Playlist::model()->findOne(array('_id' => new MongoId($_POST['id']), 'user_id' => glue::session()->user->_id));
-
-		if(count($_ids) <= 0)
-			GJSON::kill('You selected no videos to delete');
-
-		if(!$playlist || (bool)$playlist->deleted){
-			GJSON::kill('This playlist no longer exists');
-		}
-
-		$vars_array = array();
-		foreach($_ids as $k => $v){
-			$vars_array[] = new MongoId($v);
-		}
-
-		for($i=0,$size = count($playlist->videos); $i < $size; $i++){ // Unset the videos
-			if($playlist->videos[$i]['_id'] == $vars_array[$i]){
-				unset($playlist->videos[$i]);
-			}
-		}
-
-		//reindex the array
-		for($i=0,$size = count($playlist->videos); $i < $size; $i++){
-			$playlist->videos[$i]['pos'] = $i;
+		$mongoIds=array();
+		foreach($ids as $k => $v)
+			$mongoIds[] = new MongoId($v);
+		
+		$playlistVideos=$playlist->videos;
+		array_walk($playlistVideos, function(&$n) {
+			$n = (string)$n['_id'];
+		});		
+		foreach(Video::model()->find(array('_id'=>array('$in'=>$mongoIds))) as $_id => $video){
+			if(($k=array_search($_id,$playlistVideos))!==false)
+				unset($playlist->videos[$k]);
 		}
 		$playlist->save();
-		GJSON::kill('Videos were deleted', true);
+		$this->json_success('Videos removed');
 	}
 
-	function action_clear_all_videos(){
-		$this->pageTitle = 'Clear All Videos From Playlist - StageX';
+	function action_clear(){
+		$this->title = 'Clear Playlist - StageX';
 		if(!glue::http()->isAjax())
-			Glue::route("error/notfound");
-
-		$playlist = Playlist::model()->findOne(array('_id' => new MongoId($_GET['id']), 'user_id' => glue::session()->user->_id));
-
-		if(!$playlist || (bool)$playlist->deleted){
-			GJSON::kill('This playlist no longer exists');
-		}
-
+			glue::trigger('404');
+	
+		$playlist = Playlist::model()->findOne(array('_id' => new MongoId(glue::http()->param('id')), 'userId' => glue::user()->_id));
+		if(!$playlist)
+			$this->json_error('This playlist no longer exists');
 		$playlist->videos = array();
+		$playlist->totalVideos=0;
 		$playlist->save();
 
 		ob_start(); ?>
-			<div class='padded_list_not_found'>No videos were found</div>
+			<div class='no_results_found'>No videos were found</div>
 			<?php
 			$html = ob_get_contents();
 		ob_end_clean();
-
-		GJSON::kill(array('html' => $html, 'messages' => array('All videos were removed')), true);
+		$this->json_success(array('html' => $html, 'message' => 'All videos were removed'));
 	}
 
 	function action_like(){

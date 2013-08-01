@@ -1,70 +1,84 @@
 <?php
-
 	if(!$model) $model = new app\models\Playlist;
-
-	$this->jsFile('jquery-expander', "/js/jquery-expander.js");
-	$this->jsFile('playlist_dropdown', '/js/playlist_dropdown.js');
+	$this->jsFile("/js/jquery.expander.js");
+	$this->JsFile('/js/jdropdown.js');
+	$this->jsFile('/js/playlist_dropdown.js');
 
 	$this->js('watch_later', "
-		$(function(){
-			$.playlist_dropdown();
-			$('div.expandable').expander({slicePoint: 60});
+		$('div.expandable').expander({slicePoint: 60});	
+		$('.grey_sticky_toolbar .block-alert').summarise();
 
-			$(document).on('click', '.selectAll_input', function(event){
-				if($(this).attr('checked')){
-					$('.video_list input:checkbox').attr('checked', true);
+		$('.dropdown-group').jdropdown();			
+
+		$('.selectAll_input').click(function(){
+			if($(this).prop('checked')==true){
+				$('.video_list input:checkbox').prop('checked', false).trigger('click');
+			}else{
+				$('.video_list input:checkbox').prop('checked', true).trigger('click');
+			}
+		});
+			
+		function reset_checkboxes(){
+			$('.selectAll_input').prop('checked',true).trigger('click');
+		}			
+			
+		$(document).on('click', '.grey_sticky_toolbar .btn_delete', function(){
+			params={'ids[]':[]};
+			$('.video_list .video .checkbox_col input:checked').each(function(i,item){
+				params['ids[]'][params['ids[]'].length]=$(item).val();
+			});
+			params['playlist_id']='".$model->_id."';
+
+			$.post('/playlist/deleteVideo', params, null, 'json').done(function(data){
+				if(data.success){
+					$('.grey_sticky_toolbar .block-alert').summarise('set', 'success','The videos you selected were deleted');
+					$.each(params['ids[]'],function(i,item){
+						$('.video_list .video[data-id='+item+']').remove();
+					});
+					reset_checkboxes();
 				}else{
-					$('.video_list input:checkbox').attr('checked', false);
+					$('.grey_sticky_toolbar .block-alert').summarise('set', 'error','The videos you selected could not be deleted');
 				}
-			});
+			}, 'json');			
+		});			
 
-			$(document).on('click', '.delete', function(event){
-				event.preventDefault();
-				//console.log('d', {videos: $('.video_list input:checked').serializeArray()});
-
-				var ar = $('.video_list input:checked').serializeArray(),
-					ret = [];
-
-				for(var i =0; i < ar.length; i++){
-					ret[ret.length] = ar[i].name;
-				}
-
-				$.post('/playlist/delete_many_videos', {items: ret, id: '".$model->_id."'}, function(data){
-					if(data.success){
-						$('.video_list input:checked').parents('.video_item').remove();
-					}else{
-						forms.summary($('.grey_sticky_bar .block_summary'), false, data.messages[0]);
-					}
-				}, 'json');
-			});
-
-			$(document).on('click', '.clear_all', function(event){
-				event.preventDefault();
-				$.getJSON('/playlist/clear_all_videos', {id: '".$model->_id."'}, function(data){
-					if(data.success){
-						$('.video_list').html(data.html);
-					}
-				});
+		$(document).on('click', '.grey_sticky_toolbar .btn_delete_all', function(event){
+			event.preventDefault();
+			$.getJSON('/playlist/clear', {id: '".$model->_id."'}, function(data){
+				if(data.success)
+					$('.video_list').html(data.html);
 			});
 		});
 	");
 ?>
 <div class="boxed_page_layout_outer">
 
-	<div class='borderless_head'><div class='head'>Videos Queued for Later</div></div>
 	<?php ob_start(); ?>
-		<div class='stickytoolbar-placeholder grey_sticky_bar'>
+	
+		<div class='stickytoolbar-placeholder grey_sticky_toolbar'>
 			<div class='stickytoolbar-bar'>
-				<div class='block_summary'></div>
-
 				<div class='inner_bar'>
-					<div class='checkbox_input'><?php echo html::checkbox('selectAll', 1, 0, array('class' => 'selectAll_input')) ?></div>
-					<div class='grey_css_button add_to_playlist left_button'>Add To</div>
-					<div class='grey_css_button delete float_left'>Remove</div>
-					<div class='grey_css_button clear_all float_right'>Clear Queue</div>
+					<div class='checkbox_button checkbox_input'><?php echo html::checkbox('selectAll', 1, 0, array('class' => 'selectAll_input')) ?></div>
+					<div class="btn-group dropdown-group playlist-dropdown">
+						<button class='btn-grey add_to_playlist dropdown-anchor'>Add To <span class="caret">&#9660;</span></button>
+						<div class="dropdown-menu">
+							<div class="head_ribbon">
+								<a href="#" data-id="<?php echo glue::user()->watchLaterPlaylist()->_id ?>" class='watch_later playlist_link'>Watch Later</a>
+								<input type="text" placeholder="Search for Playlists" class="search_input"/>
+							</div>
+							<div class="playlist_results">
+							<div class='item'>
+								Search for playlists above
+							</div>
+							</div>
+						</div>
+					</div>
+					<button class='btn-grey selected_actions btn_delete'>Remove</button>
+					<button class='btn-grey selected_actions btn_delete_all'>Clear Queue</button>					
 				</div>
+				<div class="alert block-alert"></div>
 			</div>
-		</div>
+		</div>	
 	<?php $html = ob_get_contents();
 	ob_end_clean();
 	app\widgets\stickytoolbar::widget(array(
@@ -87,11 +101,11 @@
 
 			foreach($videos as $k => $item){
 				if($item instanceof app\models\Video){
-					echo $this->renderPartial('videos/_video_ext', array('model' => $item, 'show_checkbox' => true, 'show_watched_status' => true));
+					echo $this->renderPartial('video/_video_ext', array('model' => $item, 'show_checkbox' => true, 'show_watched_status' => true));
 				}
 			}
 		}else{ ?>
-			<div class='padded_list_not_found'>No videos have been queued for later</div>
+			<div class='no_results_found'>No videos have been queued for later</div>
 		<?php } ?>
 	</div>
 </div>

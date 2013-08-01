@@ -344,7 +344,7 @@ class userController extends \glue\Controller{
 		echo $this->render('playlists', array('playlist_rows' => $playlist_rows, 'filter' => $filter));
 	}
 
-	function action_watch_later(){
+	function action_watchLater(){
 		$this->title = 'Watch Later - StageX';
 
 		$this->layout = 'user_section';

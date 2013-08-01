@@ -1264,12 +1264,18 @@ textarea{
 .video .info .description{
 	font-size:13px;
 	line-height:20px;
+	color:#555555;
 }
 
 .video .info .detail{
 	color:#999999;
 	font-size:11px;
 	line-height:18px;
+}
+
+.video .info .uploader{
+	font-size:12px;
+	color:#555555;
 }
 
 .video .infocons{
@@ -1575,4 +1581,9 @@ textarea{
 
 .activity_dropdown{
 	width:150px;
+}
+
+.video_list .video{
+	padding:10px;
+	border-bottom:1px solid #eeeeee;
 }
