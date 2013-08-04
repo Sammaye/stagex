@@ -45,7 +45,7 @@ $this->beginPage() ?>
 	</head>
 	<body>
 		<?php $this->beginBody() ?>
-			<?php app\widgets\Menu::widget() ?>
+			<?php app\widgets\Menu::widget(); ?>
 			<div class='userbody'>
 				<div class='side_menu' style='float:left;'>
 					<ul>

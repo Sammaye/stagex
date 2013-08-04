@@ -410,7 +410,7 @@ class videoController extends glue\Controller{
 		foreach($video_rows as $video){
 			$ids[]=(string)$video->_id;
 			$mongoIds[]=$video->_id;
-			$video->author->saveCounters(array('totalUploads'=>-1));
+			$video->author->saveCounters(array('totalUploads'=>-1),0);
 			
 			Queue::AddMessage($video->collectionName(),$video->_id,Queue::DELETE);
 		}

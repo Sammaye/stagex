@@ -655,15 +655,21 @@ class Document extends \glue\Model{
 	 * (non-PHPdoc)
 	 * @see http://www.yiiframework.com/doc/api/1.1/CActiveRecord#saveCounters-detail
 	 */
-	public function saveCounters(array $counters) {
+	public function saveCounters(array $counters,$lower=null) {
 		$this->trace(__FUNCTION__);
 
 		if ($this->getIsNewRecord())
 			throw new Exception('The active record cannot be updated because it is new.');
 
 		if(sizeof($counters)>0){
-			foreach($counters as $k => $v) $this->$k=$this->$k+$v;
-			return $this->updateByPk($this->{$this->primaryKey()}, array('$inc' => $counters));
+			foreach($counters as $k => $v){
+				if($lower!==null&&(($this->$k-$v)>$lower)){
+					$this->$k=$this->$k+$v;
+				}else
+					unset($counters[$k]);		
+			}	
+			if(count($counters)>0)
+				return $this->updateByPk($this->{$this->primaryKey()}, array('$inc' => $counters));
 		}
 		return true; // Assume true since the action did run it just had nothing to update...
 	}
