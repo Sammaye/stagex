@@ -195,50 +195,22 @@ return array(
 					else
 						return false;
 				},
-				'canView' => function($item){
-					if(!$item){
+				'viewable' => function($item){
+					if(!$item||glue::auth()->check(array('deleted'=>$item,'denied'=>$item)))
 						return false;
-					}
-
-					if($item->deleted){
-						return false;
-					}
-
-					if($item->author instanceof User){
-						if((bool)$item->author->deleted){
-							return false;
-						}
-					}
-
-					if($item->listing){
-						if($item->listing == 3 && (strval(glue::session()->user->_id) != strval($item->author->_id)))
-							return false;
-					}
 					return true;
 				},
-				'deletedView' => function($item){
-					if(!$item){
+				'deleted' => function($item){
+					if(!$item
+						||$item->deleted
+						||($item->author instanceof User&&$item->author->deleted)
+						||!$item instanceof User)
 						return false;
-					}
-
-					if($item->deleted){
-						return false;
-					}
-
-					if($item->author instanceof User){
-						if((bool)$item->author->deleted){
-							return false;
-						}
-					}elseif(!$item instanceof User){
-						return false;
-					}
 					return true;
 				},
-				'deniedView' => function($item){
-					if($item->listing){
-						if($item->listing == 3 && strval(glue::session()->user->_id) != strval($item->author->_id))
-							return false;
-					}
+				'denied' => function($item){
+					if($item->listing&&$item->listing == 2 && strval(glue::user()->_id) != strval($item->author->_id))
+						return false;
 					return true;
 				},
 

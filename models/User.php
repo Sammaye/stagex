@@ -224,9 +224,9 @@ class User extends \glue\User{
 
 	function validateBirthday($field, $params = array()){
 		$filled_size = count(array_filter(array(
-			\glue\Validation::isEmpty($this->birth_day) ? null : $this->birth_day,
-			\glue\Validation::isEmpty($this->birth_month) ? null : $this->birth_month,
-			\glue\Validation::isEmpty($this->birth_year) ? null : $this->birth_year,
+			\glue\Validation::isEmpty($this->birthDay) ? null : $this->birthDay,
+			\glue\Validation::isEmpty($this->birthMonth) ? null : $this->birthMonth,
+			\glue\Validation::isEmpty($this->birthYear) ? null : $this->birthYear,
 		)));
 
 		if($filled_size != 3 && $filled_size > 0){
@@ -395,6 +395,12 @@ class User extends \glue\User{
 	function getAbout(){
 		return nl2br(html::encode($this->about));
 	}
+	
+	function getBirthdayTime(){
+		if(isset($this->birthDay,$this->birthMonth,$this->birthYear))
+			return mktime(0, 0, 0, $user->birth_month, $user->birth_day, $user->birth_year);
+		return 0;
+	}
 
 	function get_allowed_bandwidth(){
 		return $this->allowedBandwidth > 0 ? $this->allowedBandwidth : glue::$params['defaultAllowedBandwidth'];
@@ -461,5 +467,10 @@ class User extends \glue\User{
 		elseif($this->watchLater===null)
 			$this->watchLater=new Playlist();
 		return $this->watchLater;
+	}
+	
+	function recordWatched($video){
+		glue::db()->watched_history->update(array(
+			'userId' => $this->_id, 'item' => $video->_id), array('$set' => array('ts' => new \MongoDate())), array('upsert' => true));
 	}
 }

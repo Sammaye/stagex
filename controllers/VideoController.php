@@ -202,53 +202,44 @@ class videoController extends glue\Controller{
 		$_SESSION['last_comment_pull'] = serialize($now);
 
 		$video = Video::model()->findOne(array("_id"=>new MongoId(glue::http()->param('id'))));
-
-		if(!glue::roles()->checkRoles(array('deletedView' => $video))){
-			$this->pageTitle = 'Video Not Found - StageX';
-			$this->render('videos/deleted', array('video'=>$video));
-			exit();
+		if(!glue::auth()->check(array('viewable' => $video))){
+			$this->title = 'Video Not Found - StageX';
+			$this->render('deleted', array('video'=>$video));
+			glue::end();
 		}
 
-		$this->pageTitle = $video->title.' - StageX';
-		if(strlen($video->desc) > 0){
-			$this->pageDescription = $video->desc;
-		}
-		$this->pageKeywords = is_array($video->tags) ? implode(",", $video->tags) : "";
+		$this->title = $video->title.' - StageX';
+		if(strlen($video->description) > 0)
+			$this->description = $video->description;
+		$this->keywords = is_array($video->tags) ? implode(",", $video->tags) : "";
 
-		if(!glue::roles()->checkRoles(array('deniedView' => $video))){
-			glue::route(glue::config('404', 'errorPages'));
-		}
-
-		if(isset($_SESSION['age_confirmed']) && glue::http()->param('av', '1') == "1") // This allows us to stop malicious people from sending mature links to kids without having to use two pages
+		// This allows us to stop malicious people from sending mature links to kids without having to use two pages
+		if(isset($_SESSION['age_confirmed']) && glue::http()->param('av', '1') == "1")
 			$_SESSION['age_confirmed'] = $video->_id;
-
 		$age_confirm = isset($_SESSION['age_confirmed']) ? $_SESSION['age_confirmed'] : 0;
-		$safe_search = glue::session()->authed ? glue::session()->user->safe_srch : "S";
-
-		if((bool)$video->adult_content && $age_confirm != strval($video->_id)){
-
+		//$safe_search = glue::session()->authed ? glue::user()->safeSearch : "S";		
+		if(
+			!glue::auth()->check(array("^"=>$video)) && glue::user()->safeSearch && 
+			$video->mature && $age_confirm != strval($video->_id) 
+		){
 			$_SESSION['age_confirmed'] = 0;
-			if((!Glue::roles()->checkRoles(array("^@", "^"=>$video))) && $safe_search == "S"){
-				$this->render('videos/age_verification', array('video'=>$video));
-				exit();
-			}
+			$this->render('videos/age_verification', array('video'=>$video));
+			glue::end();
 		}
 
 		// ELSE play the video
 		$video->recordHit();
 		if(glue::session()->authed){
-			if(strval(glue::session()->user->_id) != strval($video->user_id) && $video->listing != 'u' && $video->listing != 'n'){
-				Stream::videoWatch(glue::session()->user->_id, $video->_id);
-			}
-			glue::db()->watched_history->update(array('user_id' => glue::session()->user->_id, 'item' => $video->_id), array('$set' => array('ts' => new MongoDate())), array('upsert' => true));
+			if(strval(glue::user()->_id) != strval($video->userId) && $video->listing != 1 && $video->listing != 2)
+				app\models\Stream::videoWatch(glue::user()->_id, $video->_id);
+			glue::user()->recordWatched($video);
 		}
 
-		$playlist_id = isset($_GET['plid']) ? $_GET['plid'] : null;
-		$playlist = $playlist_id ? Playlist::model()->findOne(array('_id' => new MongoId($playlist_id))) : null;
-//var_dump($video->getAttributes());
+		if($playlist_id=glue::http()->param('playlist_id',null))
+			$playlist = apps\models\Playlist::model()->findOne(array('_id' => new MongoId($playlist_id)));
 		$this->layout = 'watch_video_layout';
-		$this->render('videos/watch', array( "model"=>$video, 'playlist' => $playlist,
-			'comments' => Glue::roles()->checkRoles(array("^"=>$video)) ? VideoResponse::findAllComments($video, array('$lte' => $now)) : VideoResponse::findPublicComments($video, array('$lte' => $now))
+		$this->render('watch', array("model"=>$video, 'playlist' => isset($playlist)?$playlist:null, 'LastCommentPull' => $now
+			//'comments' => glue::auth()->check(array("^"=>$video)) ? VideoResponse::findAllComments($video, array('$lte' => $now)) : VideoResponse::findPublicComments($video, array('$lte' => $now))
 		));
 	}
 

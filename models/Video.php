@@ -415,24 +415,26 @@ class Video extends \glue\Db\Document{
 	 *
 	 * {
 	 *   _id: {},
+	 *   sid: {},
+	 *   vid: {},
 	 *   hits: 0,
 	 *   u_hits: 0,
-	 *   hours: {
-	 *   	1: {v: 5, u: 0},
-	 *   	2: {v: 3, u: 9},
-	 *   },
+	 *   hours: [
+	 *   	0:{v:5,u:9},
+	 *   	1:{v:3,u:0},
+	 *   ],
 	 *   browser: {
 	 *   	chrome: 1,
 	 *   	ie: 2
 	 *   },
 	 *   age: {
-	 *   	13_16: 0,
-	 *   	17_25: 0
+	 *   	13_16: 1,
+	 *   	17_25: 2
 	 *   },
-	 *   video_comments: 0,
-	 *   text_comments: 0,
-	 *   video_likes: 0,
-	 *   video_dislikes: 0,
+	 *   v_comments: 0,
+	 *   t_comments: 0,
+	 *   likes: 0,
+	 *   dislikes: 0,
 	 *   age_total: 0,
 	 *   browser_total: 0,
 	 *   male: 0,
@@ -445,82 +447,62 @@ class Video extends \glue\Db\Document{
 		if(!glue::http()->is_search_bot($_SERVER['HTTP_USER_AGENT'])){ // Is the user a search bot? is so we don't want to add them
 
 			$user = glue::session()->user;
-			$u_brows_key = glue::http()->get_major_ua_browser();
+			$bname=glue::http()->getMajorBrowserName();
 
-	        $u_age_key = 'u';
+	        $age_key = 'u';
 	        if(glue::session()->authed){
 		        ///Other, 13-16, 17-25, 26-35, 36-50, 50+
-		        //var_dump($user->birth_month); exit();
-		        $u_age = !empty($user->birth_day) && !empty($user->birth_month) && !empty($user->birth_year) ?
-		        	mktime(0, 0, 0, $user->birth_month, $user->birth_day, $user->birth_year) : 0;
-				$u_age_diff = (time() - $u_age)/(60*60*24*365);
-
-				switch(true){
-					case $u_age_diff > 12 && $u_age_diff < 17:
-						$u_age_key = '13_16';
-						break;
-					case $u_age_diff > 17 && $u_age_diff < 26:
-						$u_age_key = '17_25';
-						break;
-					case $u_age_diff > 25 && $u_age_diff < 36:
-						$u_age_key = '26_35';
-						break;
-					case $u_age_diff > 35 && $u_age_diff < 51:
-						$u_age_key = '36_50';
-						break;
-					case $u_age_diff > 50:
-						$u_age_key = '50_plus';
-						break;
-				}
+				$age_diff = (time() - glue::user()->getBirthdayTime())/(60*60*24*365);
+				if($age_diff > 12 && $age_diff < 17)
+					$age_key = '13_16';
+				if($age_diff > 17 && $age_diff < 26)
+					$age_key = '17_25';
+				if($age_diff > 25 && $age_diff < 36)
+					$age_key = '26_35';
+				if($age_diff > 35 && $age_diff < 51)
+					$age_key = '36_50';
+				if($age_diff > 50)
+					$age_key = '50_plus';
 	        }
 
-			$is_unique = glue::db()->video_stats_all->find(array(
-				"sid" => glue::session()->user->_id instanceof MongoId ? glue::session()->user->_id : session_id(),
+			$resp = !glue::db()->video_statistics->update(array(
+				"sid" => glue::user()->_id instanceof \MongoId ? glue::user()->_id : session_id(),
 				"vid" => $this->_id
-			))->count() <= 0;
+			), array('$setOnInsert'=>array('ts'=>new \MongoDate())), array('upsert'=>true));
+			$is_unique=!$resp['updatedExisting'];
 
 			$update_doc = array( '$inc' => array( 'hits' => 1 ) );
 			if($is_unique){
 				$update_doc['$inc']['u_hits'] = 1;
-				$update_doc['$inc']['age.'.$u_age_key] = 1;
-				$update_doc['$inc']['browser.'.$u_brows_key] = 1;
+				$update_doc['$inc']['age.'.$age_key] = 1;
+				$update_doc['$inc']['browser.'.$bname] = 1;
 
 				// These are used to make my life a little easier
 				$update_doc['$inc']['age_total'] = 1;
 				$update_doc['$inc']['browser_total'] = 1;
 
-				if(glue::session()->user->gender == 'm'){
+				if(glue::user()->gender == 'm'){
 					$update_doc['$inc']['male'] = 1;
-				}elseif(glue::session()->user->gender == 'f'){
+				}elseif(glue::user()->gender == 'f'){
 					$update_doc['$inc']['female'] = 1;
 				}
 			}
 
-			$day_update_doc = $update_doc;
-			$day_update_doc['$inc']['hours.'.date('G').'.v'] = 1;
-			if($is_unique): $day_update_doc['$inc']['hours.'.date('G').'.u'] = 1; endif;
+			$update_doc['$inc']['hours.'.date('G').'.v'] = 1;
+			if($is_unique) $update_doc['$inc']['hours.'.date('G').'.u'] = 1;
 
-			glue::db()->video_stats_day->update(array("day"=>new MongoDate(mktime(0, 0, 0, date("m"), date("d"), date("Y"))), "vid"=>$this->_id), $day_update_doc, array("upsert"=>true));
-			//glue::db()->{video_stats_year}->update(array("year"=>new MongoDate(mktime(0, 0, 0, 1, 1, date("Y"))), "vid"=>$this->_id), $update_doc, array("upsert"=>true));
+			glue::db()->video_statistics_day->update(array("day"=>new\ MongoDate(mktime(0, 0, 0, date("m"), date("d"), date("Y"))), "vid"=>$this->_id), 
+				$update_doc, array("upsert"=>true));
 
-			if($is_unique){
-				$this->unique_views = $this->unique_views+1;
-
-				glue::db()->video_stats_all->insert(array(
-					'sid' => glue::session()->user->_id instanceof MongoId ? glue::session()->user->_id : session_id(),
-					'vid' => $this->_id,
-					'ts' => new MongoDate()
-				));
-			}
+			if($is_unique) $this->uniqueViews = $this->uniqueViews+1;
 			$this->views = $this->views+1;
 			$this->save();
 
 			// Now lets do some referers
 			$referer = glue::http()->getNormalisedReferer();
-			if($referer){
+			if($referer)
 				glue::db()->video_referers->update(array('video_id' => $this->_id, 'referer' => $referer), array('$inc' => array('c' => 1),
-					'$set' => array('ts' => new MongoDate())), array('upsert' => true));
-			}
+					'$setOnInsert' => array('ts' => new \MongoDate())), array('upsert' => true));
 		}
 	}
 
