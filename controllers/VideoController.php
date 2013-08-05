@@ -209,8 +209,7 @@ class videoController extends glue\Controller{
 		}
 
 		$this->title = $video->title.' - StageX';
-		if(strlen($video->description) > 0)
-			$this->description = $video->description;
+		if(strlen($video->description) > 0) $this->description = $video->description;
 		$this->keywords = is_array($video->tags) ? implode(",", $video->tags) : "";
 
 		// This allows us to stop malicious people from sending mature links to kids without having to use two pages
