@@ -663,7 +663,7 @@ class Document extends \glue\Model{
 
 		if(sizeof($counters)>0){
 			foreach($counters as $k => $v){
-				if($lower!==null&&(($this->$k-$v)>$lower)){
+				if($lower!==null&&(($this->$k+$v)>$lower)){
 					$this->$k=$this->$k+$v;
 				}else
 					unset($counters[$k]);		
