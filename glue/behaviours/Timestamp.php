@@ -22,6 +22,9 @@ class Timestamp extends \glue\Behaviour{
 	{
 		// Defaults and assume if 0 is passed in that
 		// its an error rather than the epoch
+		
+		if($datefrom instanceof \MongoDate) $datefrom=$datefrom->sec;
+		if($dateto instanceof \MongoDate) $dateto=$dateto->sec;
 
 		if($datefrom==0) { return "A long time ago"; }
 		if($dateto==-1) { $dateto = time(); }

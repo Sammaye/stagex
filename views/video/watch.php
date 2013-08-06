@@ -1,151 +1,121 @@
 <?php
 
-glue::clientScript()->addJsFile('playlist_bar', '/js/playlist_bar.js');
-glue::clientScript()->addJsFile('playlist_dropdown', '/js/playlist_dropdown.js');
+$this->jsFile('/js/views/playlist_bar.js');
 // This include of a script is temp to just get this working.
-glue::clientScript()->addJsFile('jdropdown', '/js/jdropdown.js');
+$this->jsFile('/js/jdropdown.js');
+$this->jsFile('/js/views/subscribeButton.js');
 
-	glue::clientScript()->addJsScript('video_tabs', "
-		$(function(){
-			$.playlist_dropdown({ 'video_page': true, 'video_id': '".strval($model->_id)."' });
-			$.playlist_bar();
+$this->js('video_tabs', "
+		
+	$.playlist_bar();
+	var video_id = '". $model->_id ."';
 
-			var video_id = '". $model->_id ."'
+	$('.video_action_tabs .tab').click(function(event){
+		event.preventDefault();
+		//Lets get the content name
+		var target_el = $('.tab_content_container').find('.'+$(this).data('tab'));
 
-			$('.video_action_tabs .tab').click(function(event){
-				event.preventDefault();
-
-				//Lets get the content name
-				var target_el = $('.tab_content_container').find('.'+$(this).data('tab'));
-
-				if(target_el.css('display') == 'none'){
-					target_el.css({ 'display': 'block' });
-					$('.tab_content_container').children().not(target_el).css({ 'display': 'none' });
-				}else{
-					target_el.css({ 'display': 'none' });
-				}
-			});
-
-			$(document).on('click', '.subscribe', function(event){
-				event.preventDefault();
-
-				var el = $(this);
-				$.getJSON('/user/subscribe', {id: '".strval($model->author->_id)."'}, function(data){
-					if(data.success){
-						el.removeClass('green_css_button subscribe').addClass('grey_css_button unsubscribe').find('div').html('Unsubscribe');
-					}else{}
-				});
-			});
-
-			$(document).on('click', '.unsubscribe', function(event){
-				event.preventDefault();
-
-				var el = $(this);
-				$.getJSON('/user/unsubscribe', {id: '".strval($model->author->_id)."'}, function(data){
-					if(data.success){
-						el.removeClass('grey_css_button unsubscribe').addClass('green_css_button subscribe').find('div').html('Subscribe');
-					}
-				});
-			});
-
-			$('.report_video_submit').click(function(event){
-				event.preventDefault();
-				$.getJSON('/video/report', {id: '".strval($model->_id)."', reason: $('#report_reason').val()}, function(data){
-					if(data.success){
-						forms.summary($('.video_actions .block_summary'), true, 'Thank you for helping make the StageX community safer for everyone.');
-					}else{
-						forms.summary($('.video_actions .block_summary'), false, 'We could not report this video. We are unsure why but please be sure some one is looking into it right now.');
-					}
-				});
-			});
-
-			$('.tab_like').click(function(event){
-				event.preventDefault();
-				var el = $(this);
-				$.getJSON('/video/like', {id: '".strval($model->_id)."'}, function(data){
-					if(data.success){
-						$('.tab_content_container').children().not($('.action_like')).css({ 'display': 'none' });
-						$('.action_like').css({ 'display': 'block' });
-						$('.tab_dislike').removeClass('active');
-						el.addClass('active');
-					}
-				});
-			});
-
-			$('.tab_dislike').click(function(event){
-				event.preventDefault();
-				$.getJSON('/video/dislike', {id: '".strval($model->_id)."'}, function(data){
-					if(data.success){
-						$('.tab_content_container').children().not($('.tab_content_container .action_dislike')).css({ 'display': 'none' });
-						$('.tab_content_container .action_dislike').css({ 'display': 'block' });
-						$('.tab_dislike').addClass('active');
-						$('.tab_like').removeClass('active');
-						$('.action_dislike .likes_amount').text(data.likes);
-						$('.action_dislike .dislikes_amount').text(data.dislikes);
-					}
-				});
-			});
-
-			$('.share_status_text').on('click focus', function(event){
-				if($(this).hasClass('share_status_text_unchanged')){
-					$(this).val('').removeClass('share_status_text_unchanged');
-				}
-			});
-
-			$('.share_video_as_status').on('click', function(event){
-				event.preventDefault();
-				var text = '', textarea = $(this).parents('.share_item_with_subs').find('.share_status_text');
-
-				if(!textarea.hasClass('share_status_text_unchanged') && textarea.val().length > 0){
-					text = textarea.val();
-				}
-
-				$.getJSON('/stream/share', {'type': 'video', 'id': '".strval($model->_id)."', text: text}, function(data){
-					if(data.success){
-						forms.summary($('.video_actions .block_summary'), true, data.message);
-						$('.share_status_text').val('');
-					}else{
-						forms.summary($('.video_actions .block_summary'), false, data.message);
-					}
-				});
-			});
-
-			$('.video_action_dialog .close').click(function(event){
-				event.preventDefault();
-				$('.tab_content_container').children().css({ 'display': 'none' });
-			});
-
-			add_expandable_details_link();
-		});
-
-		function add_expandable_details_link(){
-			if($('#details').find('.collapsable').height() > 94){
-				// Add the expand link. It is already bound.
-				$('.watch_video_body #details .expand_info').unbind('click');
-
-				$('#details').find('.collapsable').addClass('collapsed').css({ 'height': '94px' });
-				$('#details .collapsable .expand_info').text('Show More Information').css({ 'display': 'block' });
-
-				$('#details .collapsable .expand_info').click(function(event){
-					event.preventDefault();
-					if($(this).parents('#details').find('.collapsable').hasClass('collapsed')){
-						$(this).parents('#details').find('.collapsable').addClass('collapsed').css({ 'height':
-							($(this).parents('#details').find('.collapsable').find('.inner_div').height()+43)+'px' });
-
-						$(this).parents('#details').find('.collapsable').removeClass('collapsed');
-						$('#details .collapsable .expand_info').text('Show Less Information');
-					}else{
-						$(this).parents('#details').find('.collapsable').addClass('collapsed').css({ 'height': '94px' });
-						$('#details .collapsable .expand_info').text('Show More Information');
-					}
-				});
-			}else{
-				$('#details .collapsable .expand_info').hide();
-			}
+		if(target_el.css('display') == 'none'){
+			target_el.css({ 'display': 'block' });
+			$('.tab_content_container').children().not(target_el).css({ 'display': 'none' });
+		}else{
+			target_el.css({ 'display': 'none' });
 		}
-	");
+	});
 
-glue::clientScript()->addJsScript('watch.edit_video', "
+	$('.report_video_submit').click(function(event){
+		event.preventDefault();
+		$.getJSON('/video/report', {id: '".strval($model->_id)."', reason: $('#report_reason').val()}, function(data){
+			if(data.success){
+				forms.summary($('.video_actions .block_summary'), true, 'Thank you for helping make the StageX community safer for everyone.');
+			}else{
+				forms.summary($('.video_actions .block_summary'), false, 'We could not report this video. We are unsure why but please be sure some one is looking into it right now.');
+			}
+		});
+	});
+
+	$('.tab_like').click(function(event){
+		event.preventDefault();
+		var el = $(this);
+		$.getJSON('/video/like', {id: '".strval($model->_id)."'}, function(data){
+			if(data.success){
+				$('.tab_content_container').children().not($('.action_like')).css({ 'display': 'none' });
+				$('.action_like').css({ 'display': 'block' });
+				$('.tab_dislike').removeClass('active');
+				el.addClass('active');
+			}
+		});
+	});
+
+	$('.tab_dislike').click(function(event){
+		event.preventDefault();
+		$.getJSON('/video/dislike', {id: '".strval($model->_id)."'}, function(data){
+			if(data.success){
+				$('.tab_content_container').children().not($('.tab_content_container .action_dislike')).css({ 'display': 'none' });
+				$('.tab_content_container .action_dislike').css({ 'display': 'block' });
+				$('.tab_dislike').addClass('active');
+				$('.tab_like').removeClass('active');
+				$('.action_dislike .likes_amount').text(data.likes);
+				$('.action_dislike .dislikes_amount').text(data.dislikes);
+			}
+		});
+	});
+
+	$('.share_status_text').on('click focus', function(event){
+		if($(this).hasClass('share_status_text_unchanged')){
+			$(this).val('').removeClass('share_status_text_unchanged');
+		}
+	});
+
+	$('.share_video_as_status').on('click', function(event){
+		event.preventDefault();
+		var text = '', textarea = $(this).parents('.share_item_with_subs').find('.share_status_text');
+
+		if(!textarea.hasClass('share_status_text_unchanged') && textarea.val().length > 0){
+			text = textarea.val();
+		}
+
+		$.getJSON('/stream/share', {'type': 'video', 'id': '".strval($model->_id)."', text: text}, function(data){
+			if(data.success){
+				forms.summary($('.video_actions .block_summary'), true, data.message);
+				$('.share_status_text').val('');
+			}else{
+				forms.summary($('.video_actions .block_summary'), false, data.message);
+			}
+		});
+	});
+		
+	$(function(){
+		add_expandable_details_link();
+	});
+
+	function add_expandable_details_link(){
+		if($('#details').find('.collapsable').height() > 94){
+			// Add the expand link. It is already bound.
+			$('.watch_video_body #details .expand_info').unbind('click');
+			$('#details').find('.collapsable').addClass('collapsed').css({ 'height': '94px' });
+			$('#details .collapsable .expand_info').text('Show More Information').css({ 'display': 'block' });
+
+			$('#details .collapsable .expand_info').click(function(event){
+				event.preventDefault();
+				if($(this).parents('#details').find('.collapsable').hasClass('collapsed')){
+					$(this).parents('#details').find('.collapsable').addClass('collapsed').css({ 'height':
+						($(this).parents('#details').find('.collapsable').find('.inner_div').height()+43)+'px' });
+		
+					$(this).parents('#details').find('.collapsable').removeClass('collapsed');
+					$('#details .collapsable .expand_info').text('Show Less Information');
+				}else{
+					$(this).parents('#details').find('.collapsable').addClass('collapsed').css({ 'height': '94px' });
+					$('#details .collapsable .expand_info').text('Show More Information');
+				}
+			});
+		}else{
+			$('#details .collapsable .expand_info').hide();
+		}
+	}
+");
+
+$this->js('watch.edit_video', "
 	$(function(){
 
 		$('.video_edit_panes .video_edit_pane').css({ 'display': 'none' });
@@ -246,19 +216,21 @@ glue::clientScript()->addJsScript('watch.edit_video', "
 <div class="watch_video_body">
 	<div class="top_head_bar" id='video_author_bar'>
 
-		<?php if($model->author->_id != glue::session()->user->_id){ ?>
+		<?php if(glue::user()->equals($model->author)){ ?>
 			<div class='video_watch_author_box'>
 				<div class="user_image"><img alt='thumbnail' src="<?php echo $model->author->getAvatar(30, 30); ?>"/></div>
 				<h1 class='username_outer'>
-					<a href='<?php echo glue::url()->create('/user/view', array('id' => $model->author->_id)) ?>'><?php echo $model->author->getUsername() ?></a> <span class='uploaded'><?php echo ago($model->created->sec) ?></span>
-				</h1>
+					<a href='<?php echo glue::http()->url('/user/view', array('id' => $model->author->_id)) ?>'><?php echo $model->author->getUsername() ?></a>
+				</h1><span class='uploaded'><?php echo $model->ago($model->created) ?></span>
 				<?php if(glue::session()->authed){ ?>
 					<div class='right'>
-						<?php if(Subscription::isSubscribed($model->author->_id)){ ?>
-							<div class='unsubscribe grey_css_button float_right'><div>Unsubscribe</div></div>
+						<div class="subscribe_widget">
+						<?php if(app\models\Follower::isSubscribed($model->author->_id)){ ?>
+							<input type="button" class='unsubscribe btn button' value="Unsubscribe"/>
 						<?php }else{ ?>
-							<div class='subscribe green_css_button float_right'><div>Subscribe</div></div>
+							<input type="button" class='subscribe btn-success button' value="Subscribe"/>
 						<?php } ?>
+						</div>
 					</div>
 				<?php } ?>
 				<div class="clear"></div>
@@ -270,7 +242,7 @@ glue::clientScript()->addJsScript('watch.edit_video', "
 				<div class='edit_menu video_edit_tabs'>
 					<div class='blue_css_button button save_video_edits'>Save Changes</div>
 					<div class='grey_button_left video_edit_tab upload_details'>Settings</div><div class='grey_button_right video_edit_tab advanced_settings'>Details</div>
-					<a href='<?php echo glue::url()->create('/video/remove', array('id' => $model->_id)) ?>' class='delete_video link_right_button'>Delete</a>
+					<a href='<?php echo glue::http()->url('/video/remove', array('id' => $model->_id)) ?>' class='delete_video link_right_button'>Delete</a>
 				</div>
 				<div class="video_edit_panes">
 					<?php $form = html::activeForm(array('action' => '')) ?>
@@ -357,7 +329,9 @@ glue::clientScript()->addJsScript('watch.edit_video', "
 			}elseif($model->state == 'pending' || $model->state == 'submitting' || $model->state == 'transcoding'){
 				?><div class='video_processor_holder'><span>Hold on to your butts we're processing...</span></div><?php
 			}else{
-				$this->widget('application/widgets/videoPlayer.php', array( "mp4"=>$model->mp4, "ogg"=>$model->ogg, "width"=>970, "height"=>444 ));
+				app\widgets\videoPlayer::widget(array(
+					"mp4"=>$model->mp4, "ogg"=>$model->ogg, "width"=>970, "height"=>444
+				));
 			} ?>
 		</div>
 
@@ -365,7 +339,7 @@ glue::clientScript()->addJsScript('watch.edit_video', "
 			<div class="video_actions">
 				<?php if($model->state == 'finished'): ?>
 				<div class='video_action_tabs'>
-					<?php if(glue::roles()->checkRoles(array('@'))){
+					<?php if(glue::auth()->check(array('@'))){
 						if($model->voteable){ ?>
 							<div class='grey_button_left button tab_like <?php if($model->currentUserLikes()): echo "active"; endif ?>'><img alt='like' src='/images/thumbs_up_dark.png'/>Applaud</div>
 							<div class='grey_button_right button tab_dislike <?php if($model->currentUserDislikes()): echo "active"; endif ?>'>Boo</div>
@@ -373,8 +347,8 @@ glue::clientScript()->addJsScript('watch.edit_video', "
 						<div class='add_to_playlist button grey_css_button'>Add to Playlist</div>
 					<?php } ?>
 					<div class='tab button grey_css_button' data-tab='video_action_share'>Share</div>
-					<?php if(glue::roles()->checkRoles(array('@'))): ?><div class='tab button grey_css_button report' data-tab='video_action_report'><img alt='report' src='/images/flag_up.png'/></div><?php endif ?>
-					<?php if(!$model->private_stats){ ?><div class='tab button_right grey_css_button stats' data-tab='video_action_stats'><img alt='stats' src='/images/stats_dark_small.png'/></div><?php } ?>
+					<?php if(glue::auth()->check(array('@'))): ?><div class='tab button grey_css_button report' data-tab='video_action_report'><img alt='report' src='/images/flag_up.png'/></div><?php endif ?>
+					<?php if(!$model->privateStatistics){ ?><div class='tab button_right grey_css_button stats' data-tab='video_action_stats'><img alt='stats' src='/images/stats_dark_small.png'/></div><?php } ?>
 				</div>
 
 				<div class='block_summary' style='display:none;'></div>
@@ -394,11 +368,11 @@ glue::clientScript()->addJsScript('watch.edit_video', "
 							<div class='margin_top_10'>
 								<ul class="video_watch_broadcast_share">
 									<li class="caption">Share with other networks:</li>
-									<li><a rel='new_window' href="http://www.facebook.com/sharer.php?u=<?php echo urlencode(Glue::url()->create("/video/watch", array("id"=>$model->_id))) ?>"><img alt='fb' src="/images/fb_large.png"/></a></li>
-									<li><a rel='new_window' href="http://twitter.com/share?url=<?php echo urlencode(Glue::url()->create("/video/watch", array("id"=>$model->_id))) ?>"><img alt='twt' src="/images/twt_large.png"/></a></li>
-									<li><a rel='new_window' href="http://www.plurk.com/?status=<?php echo urlencode(Glue::url()->create("/video/watch", array("id"=>$model->_id))) ?>"><img alt='plurk' src="/images/plurk_large.png"/></a></li>
+									<li><a rel='new_window' href="http://www.facebook.com/sharer.php?u=<?php echo urlencode(glue::http()->url("/video/watch", array("id"=>$model->_id))) ?>"><img alt='fb' src="/images/fb_large.png"/></a></li>
+									<li><a rel='new_window' href="http://twitter.com/share?url=<?php echo urlencode(glue::http()->url("/video/watch", array("id"=>$model->_id))) ?>"><img alt='twt' src="/images/twt_large.png"/></a></li>
+									<li><a rel='new_window' href="http://www.plurk.com/?status=<?php echo urlencode(glue::http()->url("/video/watch", array("id"=>$model->_id))) ?>"><img alt='plurk' src="/images/plurk_large.png"/></a></li>
 									<li>
-										<g:plusone size="medium" annotation="inline" href="<?php echo glue::url()->create('/video/watch', array('id' => $model->_id)) ?>"></g:plusone>
+										<g:plusone size="medium" annotation="inline" href="<?php echo glue::http()->url('/video/watch', array('id' => $model->_id)) ?>"></g:plusone>
 									</li>
 								</ul>
 								<div class="clear"></div>
@@ -433,21 +407,21 @@ glue::clientScript()->addJsScript('watch.edit_video', "
 
 						<div class='margin_top_10 link_to_video'>
 							<div>Link to this video:</div>
-							<input type="text" class="select_all_onfoc" value="<?php echo Glue::url()->create("/video/watch", array("id"=>$model->_id)) ?>" />
+							<input type="text" class="select_all_onfoc" value="<?php echo glue::http()->url("/video/watch", array("id"=>$model->_id)) ?>" />
 						</div>
 						<?php if($model->embeddable){ ?>
 							<div class='embed_video'>
 								<div>Embedded Player:</div>
-								<textarea rows="" cols="" class="select_all_onfoc"><iframe style="width:560px; height:315px; border:0;" frameborder="0" src="<?php echo Glue::url()->create("/video/embedded", array("id"=>$model->_id)) ?>"></iframe></textarea>
+								<textarea rows="" cols="" class="select_all_onfoc"><iframe style="width:560px; height:315px; border:0;" frameborder="0" src="<?php echo glue::http()->url("/video/embedded", array("id"=>$model->_id)) ?>"></iframe></textarea>
 							</div>
 						<?php } ?>
 						<div class='margin_top_10'>
 							<ul class="video_watch_broadcast_share">
 								<li class="caption"><span>Broadcast:</span></li>
-								<li><a rel='new_window' href="http://www.facebook.com/sharer.php?u=<?php echo urlencode(Glue::url()->create("/video/watch", array("id"=>$model->_id))) ?>"><img alt='fb' src="/images/fb_large.png"/></a></li>
-								<li><a rel='new_window' href="http://twitter.com/share?url=<?php echo urlencode(Glue::url()->create("/video/watch", array("id"=>$model->_id))) ?>"><img alt='twt' src="/images/twt_large.png"/></a></li>
-								<li><a rel='new_window' href="http://www.plurk.com/?status=<?php echo urlencode(Glue::url()->create("/video/watch", array("id"=>$model->_id))) ?>"><img alt='plurk' src="/images/plurk_large.png"/></a></li>
-								<li><g:plusone size="medium" annotation="inline" href="<?php echo glue::url()->create('/video/watch', array('id' => $model->_id)) ?>"></g:plusone></li>
+								<li><a rel='new_window' href="http://www.facebook.com/sharer.php?u=<?php echo urlencode(glue::http()->url("/video/watch", array("id"=>$model->_id))) ?>"><img alt='fb' src="/images/fb_large.png"/></a></li>
+								<li><a rel='new_window' href="http://twitter.com/share?url=<?php echo urlencode(glue::http()->url("/video/watch", array("id"=>$model->_id))) ?>"><img alt='twt' src="/images/twt_large.png"/></a></li>
+								<li><a rel='new_window' href="http://www.plurk.com/?status=<?php echo urlencode(glue::http()->url("/video/watch", array("id"=>$model->_id))) ?>"><img alt='plurk' src="/images/plurk_large.png"/></a></li>
+								<li><g:plusone size="medium" annotation="inline" href="<?php echo glue::http()->url('/video/watch', array('id' => $model->_id)) ?>"></g:plusone></li>
 							</ul>
 							<div class="clear"></div>
 						</div>
@@ -459,7 +433,8 @@ glue::clientScript()->addJsScript('watch.edit_video', "
 								<div class="close"><a href="#"><?php echo utf8_decode('&#215;') ?></a></div>
 							</div>
 
-							<?php $this->widget('application/widgets/JqselectBox.php', array(
+							<?php /* 
+							$this->widget('application/widgets/JqselectBox.php', array(
 								'attribute' => 'report_reason',
 								'id' => 'report_reason',
 								'class' => 'report_reason_select',
@@ -473,7 +448,7 @@ glue::clientScript()->addJsScript('watch.edit_video', "
 									'religious' => 'Hate Preaching/Religious Reasons',
 									'dirty' => 'Just Plain Dirty'
 								)
-							)) ?>
+							)) */ ?>
 							<a href='#' class='grey_css_button report_video_submit float_right'>Report Video</a>
 							<div class="clear"></div>
 					</div>
@@ -487,18 +462,17 @@ glue::clientScript()->addJsScript('watch.edit_video', "
 
 							<div class='views_status'>
 								<div class='float_left'><span><?php echo $model->views ?></span> views</div>
-								<div class='float_right'><span><?php echo $model->unique_views ?></span> unique views</div>
+								<div class='float_right'><span><?php echo $model->uniqueViews ?></span> unique views</div>
 							</div>
 							<!-- <h2 style='font-size:13px; margin-top:12px;'>Video Statistics for the last week</h2> -->
 							<div id="chartdiv" style="height:200px;width:600px; position:relative;"></div>
 
 							<?php
 							$video_stats = $model->getStatistics_dateRange(mktime(0, 0, 0, date("m"), date("d")-7, date("Y")), mktime(0, 0, 0, date("m"), date("d"), date("Y")));
-
-							$this->widget('application/widgets/highcharts.php', array(
-								'chartName' => 'video_views_plot',
-								'appendTo' => 'chartdiv',
-								'series' => $video_stats['hits']
+							app\models\highCharts::widget(array(
+							'chartName' => 'video_views_plot',
+							'appendTo' => 'chartdiv',
+							'series' => $video_stats['hits']							
 							)) ?>
 
 							<div class='demo_block_outer'>
@@ -539,7 +513,7 @@ glue::clientScript()->addJsScript('watch.edit_video', "
 								<?php if(strlen($model->description) > 0): ?><p id="video_description" class="description"><?php echo nl2br(htmlspecialchars($model->description)) ?></p><?php endif ?>
 								<?php if(count($model->tags) > 0){ ?>
 									<div class='tags' id='video_tags'><?php foreach($model->tags as $tag){
-											?><a href="<?php echo Glue::url()->create("/search", array("mainSearch"=>$tag)) ?>"><span><?php echo $tag ?></span></a><?php
+											?><a href="<?php echo glue::http()->url("/search", array("mainSearch"=>$tag)) ?>"><span><?php echo $tag ?></span></a><?php
 										} ?></div>
 								<?php } ?>
 
@@ -578,17 +552,11 @@ glue::clientScript()->addJsScript('watch.edit_video', "
 			</div>
 			<?php if($model->state == 'finished'): ?>
 			<div class='grey_bordered_head'>
-				<span><?php echo $model->total_responses ?> responses</span>
-				<a class='float_right' href="<?php echo glue::url()->create("/videoresponse/view_all", array("id"=>$model->_id)) ?>">View All Responses</a>
+				<span><?php echo $model->totalResponses ?> responses</span>
+				<a class='float_right' href="<?php echo glue::http()->url("/videoresponse/view_all", array("id"=>$model->_id)) ?>">View All Responses</a>
 			</div>
-			<?php $this->partialRender('responses/list', array('model' => $model, 'comments' => $comments, 'comment_per_page' => 10)) ?>
+			<?php //$this->renderPartial('responses/list', array('model' => $model, 'comments' => $comments, 'comment_per_page' => 10)) ?>
 			<?php endif; ?>
-		</div>
-		<div style='float:left; width:300px; margin-left:10px;'>
-			<?php $this->widget("application/widgets/Advertising/Ad_box.php", array( "configuration"=>'300_box' )); ?>
-			<div style='margin-top:25px;'>
-				<?php $this->widget("application/widgets/Advertising/Ad_box.php", array( "configuration"=>'300_box' )); ?>
-			</div>
 		</div>
 	</div>
 </div>
@@ -596,11 +564,11 @@ glue::clientScript()->addJsScript('watch.edit_video', "
 <div id='video_response_options' style='width:200px;'></div>
 <div id='videoResponse_results' class=''></div>
 
-<?php if(glue::roles()->checkRoles(array('canView' => $playlist))){ ?>
+<?php if(glue::auth()->check(array('viewable' => $playlist))){ ?>
 <div class="playlist_bar_outer" data-id='<?php echo $playlist->_id ?>'>
 	<div class='playlist_bar_head'>
-		<div class='float_left head_left'>Playlist: <a href='<?php echo glue::url()->create('/playlist/view', array('id' => $playlist->_id)) ?>'><?php echo html::encode($playlist->title) ?></a> (<?php echo count($playlist->videos) ?> Videos)
-		- By <b><a href='<?php echo glue::url()->create('/user/view', array('id' => $playlist->user_id)) ?>'><?php echo $playlist->author->getUsername(); ?></a></b></div>
+		<div class='float_left head_left'>Playlist: <a href='<?php echo glue::http()->url('/playlist/view', array('id' => $playlist->_id)) ?>'><?php echo html::encode($playlist->title) ?></a> (<?php echo count($playlist->videos) ?> Videos)
+		- By <b><a href='<?php echo glue::http()->url('/user/view', array('id' => $playlist->userId)) ?>'><?php echo $playlist->author->getUsername(); ?></a></b></div>
 		<button class='float_right view_all_videos'>View All Videos</button>
 	</div>
 	<div class='playlist_content'>

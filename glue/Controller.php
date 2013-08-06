@@ -52,6 +52,9 @@ class Controller {
 	}
 
 	function cssFile($map, $path, $media = null){
+		if($path===null)
+		$this->cssFiles[basename($map,'.css')] = Html::cssFile($path,$media);
+		else
 		$this->cssFiles[$map] = Html::cssFile($path, $media);
 	}
 

@@ -471,28 +471,28 @@ class Video extends \glue\Db\Document{
 			), array('$setOnInsert'=>array('ts'=>new \MongoDate())), array('upsert'=>true));
 			$is_unique=!$resp['updatedExisting'];
 
-			$update_doc = array( '$inc' => array( 'hits' => 1 ) );
+			$doc = array( '$inc' => array( 'hits' => 1 ) );
 			if($is_unique){
-				$update_doc['$inc']['u_hits'] = 1;
-				$update_doc['$inc']['age.'.$age_key] = 1;
-				$update_doc['$inc']['browser.'.$bname] = 1;
+				$doc['$inc']['u_hits'] = 1;
+				$doc['$inc']['age.'.$age_key] = 1;
+				$doc['$inc']['browser.'.$bname] = 1;
 
 				// These are used to make my life a little easier
-				$update_doc['$inc']['age_total'] = 1;
-				$update_doc['$inc']['browser_total'] = 1;
+				$doc['$inc']['age_total'] = 1;
+				$doc['$inc']['browser_total'] = 1;
 
 				if(glue::user()->gender == 'm'){
-					$update_doc['$inc']['male'] = 1;
+					$doc['$inc']['male'] = 1;
 				}elseif(glue::user()->gender == 'f'){
-					$update_doc['$inc']['female'] = 1;
+					$doc['$inc']['female'] = 1;
 				}
 			}
 
-			$update_doc['$inc']['hours.'.date('G').'.v'] = 1;
-			if($is_unique) $update_doc['$inc']['hours.'.date('G').'.u'] = 1;
+			$doc['$inc']['hours.'.date('G').'.v'] = 1;
+			if($is_unique) $doc['$inc']['hours.'.date('G').'.u'] = 1;
 
-			glue::db()->video_statistics_day->update(array("day"=>new\ MongoDate(mktime(0, 0, 0, date("m"), date("d"), date("Y"))), "vid"=>$this->_id), 
-				$update_doc, array("upsert"=>true));
+			glue::db()->video_statistics_day->update(array("day"=>new \MongoDate(mktime(0, 0, 0, date("m"), date("d"), date("Y"))), "vid"=>$this->_id), 
+				$doc, array("upsert"=>true));
 
 			if($is_unique) $this->uniqueViews = $this->uniqueViews+1;
 			$this->views = $this->views+1;

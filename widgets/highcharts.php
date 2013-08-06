@@ -1,5 +1,8 @@
 <?php
-class highcharts extends GWidget{
+
+namespace app\widgets;
+
+class highcharts extends \glue\Widget{
 
 	public $chartName;
 
@@ -26,14 +29,14 @@ class highcharts extends GWidget{
 	 */
 	public $events = array();
 
-	function init(){}
-
 	function render(){
-
-		glue::clientScript()->addJsFile('glue.highcharts.script', '/js/highplot/js/highcharts.js');
-		glue::clientScript()->addJsScript('glue.highcharts', "
+		
+		list($name,$id)=$this->getAttributeNameId();
+		
+		glue::$controller->jsFile('/js/highplot/js/highcharts.js');
+		glue::$controller->js('highcharts.'.$id, "
 		var ".$this->chartName.";
-		$(document).ready(function(){
+		$(function(){
 			".$this->chartName."= new Highcharts.Chart({
 				chart: {
 					renderTo: '".$this->appendTo."',
@@ -41,7 +44,7 @@ class highcharts extends GWidget{
 					marginRight: 130,
 					marginBottom: 25,
 					marginTop: 20,
-					events: ".GClientScript::encode($this->events)."
+					events: ".js_encode($this->events)."
 				},
 				title: {
 					text: null
@@ -63,8 +66,8 @@ class highcharts extends GWidget{
 				},
 				tooltip: {
 					formatter: function() {
-			                return '<b>'+ this.series.name +'</b><br/>'+
-							this.y +' Views';
+			            return '<b>'+ this.series.name +'</b><br/>'+
+						this.y +' Views';
 					}
 				},
 				legend: {
@@ -75,10 +78,8 @@ class highcharts extends GWidget{
 					y: 100,
 					borderWidth: 0
 				},
-				series: ".GClientScript::encode($this->series)."
+				series: ".js_encode($this->series)."
 			});
 		});");
-
 	}
-
 }

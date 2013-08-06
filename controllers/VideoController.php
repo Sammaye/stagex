@@ -222,7 +222,7 @@ class videoController extends glue\Controller{
 			$video->mature && $age_confirm != strval($video->_id) 
 		){
 			$_SESSION['age_confirmed'] = 0;
-			$this->render('videos/age_verification', array('video'=>$video));
+			$this->render('age_verification', array('video'=>$video));
 			glue::end();
 		}
 
@@ -237,7 +237,7 @@ class videoController extends glue\Controller{
 		if($playlist_id=glue::http()->param('playlist_id',null))
 			$playlist = apps\models\Playlist::model()->findOne(array('_id' => new MongoId($playlist_id)));
 		$this->layout = 'watch_video_layout';
-		$this->render('watch', array("model"=>$video, 'playlist' => isset($playlist)?$playlist:null, 'LastCommentPull' => $now
+		echo $this->render('watch', array("model"=>$video, 'playlist' => isset($playlist)?$playlist:null, 'LastCommentPull' => $now
 			//'comments' => glue::auth()->check(array("^"=>$video)) ? VideoResponse::findAllComments($video, array('$lte' => $now)) : VideoResponse::findPublicComments($video, array('$lte' => $now))
 		));
 	}
@@ -246,10 +246,19 @@ class videoController extends glue\Controller{
 		$this->layout = 'black_blank_page';
 
 		$video = Video::model()->findOne(array("_id"=>new MongoId($_GET['id'])));
-		$this->pageTitle = $video ? $video->title : 'Not found';
+		if(!glue::auth()->check(array('viewable' => $video))){
+			$this->title = 'Video Not Found - StageX';
+			$this->render('deleted', array('video'=>$video));
+			glue::end();
+		}		
 
 		$video->recordHit();
-		$this->render('videos/embedded', array('model' => $video));
+		if(glue::session()->authed){
+			if(strval(glue::user()->_id) != strval($video->userId) && $video->listing != 1 && $video->listing != 2)
+				app\models\Stream::videoWatch(glue::user()->_id, $video->_id);
+			glue::user()->recordWatched($video);
+		}		
+		$this->render('embedded', array('model' => $video));
 	}
 
 	function action_batchSave(){
