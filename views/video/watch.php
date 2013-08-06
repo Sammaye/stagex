@@ -213,36 +213,35 @@ $this->js('watch.edit_video', "
 	});
 "); ?>
 
-<div class="watch_video_body">
-	<div class="top_head_bar" id='video_author_bar'>
+<div class="watch_page">
 
-		<?php if(glue::user()->equals($model->author)){ ?>
-			<div class='video_watch_author_box'>
-				<div class="user_image"><img alt='thumbnail' src="<?php echo $model->author->getAvatar(30, 30); ?>"/></div>
-				<h1 class='username_outer'>
-					<a href='<?php echo glue::http()->url('/user/view', array('id' => $model->author->_id)) ?>'><?php echo $model->author->getUsername() ?></a>
-				</h1><span class='uploaded'><?php echo $model->ago($model->created) ?></span>
-				<?php if(glue::session()->authed){ ?>
-					<div class='right'>
-						<div class="subscribe_widget">
-						<?php if(app\models\Follower::isSubscribed($model->author->_id)){ ?>
-							<input type="button" class='unsubscribe btn button' value="Unsubscribe"/>
-						<?php }else{ ?>
-							<input type="button" class='subscribe btn-success button' value="Subscribe"/>
-						<?php } ?>
-						</div>
-					</div>
+	<?php if(!glue::user()->equals($model->author)){ ?>
+	<div style='background:#4b4b4b; height:30px; padding:15px 20px; color:#fff;'>
+		<img alt='thumbnail' style='border-radius:50px; float:left;' src="<?php echo $model->author->getAvatar(30, 30); ?>"/>
+		<a style='color:#fff;font-size:20px; font-weight:normal; display:inline-block; margin:5px 10px 0 10px; line-height:22px;' href='<?php echo glue::http()->url('/user/view', array('id' => $model->author->_id)) ?>'><?php echo $model->author->getUsername() ?></a>
+		<span style='display:inline-block; font-size:12px;' class='uploaded'><?php echo $model->ago($model->created) ?></span>
+		<?php if(glue::session()->authed){ ?>
+			<div class='right' style='float:right;'>
+			<div class="subscribe_widget">
+				<span class="follower_count">1,000,000 Followers</span>
+				<?php if(app\models\Follower::isSubscribed($model->author->_id)){ ?>
+				<input type="button" class='unsubscribe btn button' value="Unsubscribe"/>
+				<?php }else{ ?>
+				<input type="button" class='subscribe btn-success button' value="Subscribe"/>
 				<?php } ?>
-				<div class="clear"></div>
 			</div>
-		<?php }else{ ?>
-			<div class='video_details_edit edit_video_settings_form'>
-				<div class='block_summary' style='display:none;'></div>
+			</div>
+		<?php } ?>
+		<div class="clear"></div>
+	</div>
+	<?php }else{ ?>
+			<div class='' style='background:#f1f1f1;'>
+				<div class='alert' style='display:none;'></div>
 
-				<div class='edit_menu video_edit_tabs'>
-					<div class='blue_css_button button save_video_edits'>Save Changes</div>
-					<div class='grey_button_left video_edit_tab upload_details'>Settings</div><div class='grey_button_right video_edit_tab advanced_settings'>Details</div>
-					<a href='<?php echo glue::http()->url('/video/remove', array('id' => $model->_id)) ?>' class='delete_video link_right_button'>Delete</a>
+				<div class='menu'>
+					<input type="button" class="btn-info save_video" value="Save Changes"/>
+					<input type="button" class="btn-inline left" value="Settings"/><input type="button" class="btn-inline right" value="Details"/>
+					<a href='<?php echo glue::http()->url('/video/delete', array('id' => $model->_id)) ?>' class='delete_video link_right_button'>Delete</a>
 				</div>
 				<div class="video_edit_panes">
 					<?php $form = html::activeForm(array('action' => '')) ?>
@@ -317,17 +316,15 @@ $this->js('watch.edit_video', "
 				</div>
 			</div>
 		<?php } ?>
-		<div class="clear"></div>
-	</div>
 
-	<div class="container_16">
-		<h1 class='video_title' id='video_title'><?php echo $model->title ?></h1>
-		<div class='video_object'>
+	<div class="" style='margin:40px 0 0 0;'>
+		<h1><?php echo $model->title ?></h1>
+		<div class='video_element' style='width:970px; height:444px; border-radius:4px; background:#000; color:#fff; text-align:center; font-size:30px;'>
 			<?php
 			if($model->state == 'failed'){
-				?><div class='video_processor_holder'><span>KaBoom! We could not complete this video, sorry! &lt;/3</span></div><?php
+				?><div class='progress'>KaBoom! We could not complete this video, sorry! &lt;/3</div><?php
 			}elseif($model->state == 'pending' || $model->state == 'submitting' || $model->state == 'transcoding'){
-				?><div class='video_processor_holder'><span>Hold on to your butts we're processing...</span></div><?php
+				?><div class='progress'>Hold on, we're processing...</div><?php
 			}else{
 				app\widgets\videoPlayer::widget(array(
 					"mp4"=>$model->mp4, "ogg"=>$model->ogg, "width"=>970, "height"=>444
