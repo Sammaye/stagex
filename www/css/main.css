@@ -379,6 +379,61 @@ textarea{
 	border:1px solid #c6c6c6;
 }
 
+.btn-dark{
+	background-color: #474949;
+	background-image:none;
+    border-color: #474949;
+    font-size: 14px;
+    font-weight: normal;
+    color:#fff;
+    line-height: 1.42857;
+    margin-bottom: 0;
+    padding: 6px 12px;
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;    
+}
+
+.btn-dark.active,
+.btn-dark:hover{
+	background:#3a3c3c;
+	border-color:#2e2f2f;
+	box-shadow:none;
+	color:#fff;
+}
+
+.btn-primary{
+	background-color: #428BCA;
+    border-color: #428BCA;
+	background-image:none;
+    font-size: 14px;
+    font-weight: normal;
+    color:#fff;
+    line-height: 1.42857;
+    margin-bottom: 0;
+    padding: 6px 12px;
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;      
+}
+
+.btn-primary:hover{
+	background:#357EBD;
+	box-shadow:none;
+	border-color:#3071A9;
+	color:#fff;
+}
+
+.btn-inline.right{
+	border-left:1px solid #2e2f2f;
+	border-radius:0 2px 2px 0;
+}
+
+.btn-inline.left{
+	border-radius:2px 0 0 2px;
+	border-right:0;
+}
+
 .btn-group{
 	position:relative;
 	display:inline-block;
@@ -1586,4 +1641,37 @@ textarea{
 .video_list .video{
 	padding:10px;
 	border-bottom:1px solid #eeeeee;
+}
+
+.watch_page .edit_settings input[type="text"],
+.watch_page .edit_settings textarea{
+	width:480px;
+}
+
+.watch_page .edit_settings textarea{
+	height:190px;
+}
+
+.watch_page .edit_panes .pane{
+	display:none; margin:0 0 10px 20px;
+}
+
+.watch_page .edit_menu .btn-primary{
+	margin-right:60px;
+}
+
+.watch_page .edit_menu .delete_video{
+	margin:0 0 0 30px; display:inline-block;
+}
+
+.watch_page .video_element{
+	width:970px; height:444px; border-radius:4px; background:#000; border:1px solid #000; color:#fff; text-align:center; font-size:30px;
+}
+
+.watch_page .video_element .progress{
+	margin-top:190px;
+}
+
+.watch_page .main_body{
+	margin:40px 0 0 20px; width:980px;
 }

@@ -1,6 +1,8 @@
 <?php
 
-namespace app\models; 
+namespace app\widgets; 
+
+use glue;
 
 class videoPlayer extends \glue\Widget{
 

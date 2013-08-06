@@ -291,7 +291,7 @@ $this->js('videos', "
 			<div class='stickytoolbar-bar'>
 				<div class='inner_bar'>
 					<div class='checkbox_button checkbox_input'><?php echo Html::checkbox('selectAll', 1, 0, array('class' => 'selectAll_input')) ?></div>
-					<button class='btn-grey selected_actions edit_videos_button'>Edit</button>
+					<button class='btn btn-dark selected_actions edit_videos_button'>Edit</button>
 					<button class='btn-grey selected_actions btn_delete'>Delete</button>
 					<div class="btn-group dropdown-group playlist-dropdown">
 						<button class='btn-grey add_to_playlist dropdown-anchor'>Add To <span class="caret">&#9660;</span></button>

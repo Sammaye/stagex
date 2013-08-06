@@ -51,7 +51,7 @@ class Controller {
 			$this->metaTag('keywords', glue::$keywords);
 	}
 
-	function cssFile($map, $path, $media = null){
+	function cssFile($map, $path=null, $media = null){
 		if($path===null)
 		$this->cssFiles[basename($map,'.css')] = Html::cssFile($path,$media);
 		else

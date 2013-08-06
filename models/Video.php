@@ -205,9 +205,11 @@ class Video extends \glue\Db\Document{
 	}
 	
 	public function populateDefaults(){
-		$defaults=glue::user()->defaultVideoSettings;
-		foreach($defaults as $k => $v)
-			$this->$k=$v;
+		if(glue::session()->authed){
+			$defaults=glue::user()->defaultVideoSettings;
+			foreach($defaults as $k => $v)
+				$this->$k=$v;
+		}
 	}
 	
 	function setImage($bytes){

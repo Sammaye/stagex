@@ -116,27 +116,24 @@ $this->js('video_tabs', "
 ");
 
 $this->js('watch.edit_video', "
-	$(function(){
 
-		$('.video_edit_panes .video_edit_pane').css({ 'display': 'none' });
-
-		$(document).on('click', '.edit_video_settings_form .video_edit_tab', function(event){
-			if($(this).hasClass('upload_details')){
-				var pane = $('.video_edit_panes .upload_details_pane');
-			}else{
-				var pane = $('.video_edit_panes .advanced_settings_pane');
-			}
-
+	$(document).on('click', '.edit_menu .btn-tab', function(event){
+		
+		tabClass=$(this).attr('id').replace(/_tab/,'_content');
+		pane=$('.edit_panes #'+tabClass);
+		
+		if(pane.length>0){
 			if(pane.css('display') == 'none'){
-				$('.video_edit_panes .video_edit_pane').not(pane).css({ 'display': 'none' });
-				$('.video_edit_tabs .video_edit_tab').not($(this)).removeClass('active');
+				$('.edit_panes .pane').not(pane).css({ 'display': 'none' });
+				$('.edit_menu .btn-tab').not($(this)).removeClass('active');
 				pane.css({ 'display': 'block' });
 				$(this).addClass('active');
 			}else{
 				pane.css({ 'display': 'none' });
-				$('.video_edit_tabs .video_edit_tab').removeClass('active');
+				$('.edit_menu .btn-tab').removeClass('active');
 			}
-		});
+		}
+	});
 
 
 		$('.save_video_edits').click(function(event){
@@ -210,7 +207,6 @@ $this->js('watch.edit_video', "
 				refresh_video_response_list();
 			});
 		});
-	});
 "); ?>
 
 <div class="watch_page">
@@ -235,95 +231,78 @@ $this->js('watch.edit_video', "
 		<div class="clear"></div>
 	</div>
 	<?php }else{ ?>
-			<div class='' style='background:#f1f1f1;'>
-				<div class='alert' style='display:none;'></div>
-
-				<div class='menu'>
-					<input type="button" class="btn-info save_video" value="Save Changes"/>
-					<input type="button" class="btn-inline left" value="Settings"/><input type="button" class="btn-inline right" value="Details"/>
-					<a href='<?php echo glue::http()->url('/video/delete', array('id' => $model->_id)) ?>' class='delete_video link_right_button'>Delete</a>
+			<div class='' style='background:#e5e5e5;'>
+				<div class='edit_menu' style='height:30px; padding:10px 20px;'>
+					<div class='alert' style='display:none;'></div>
+					<input type="button" class="btn btn-primary save_video" value="Save Changes"/>
+					<input type="button" id="settings_tab" class="btn btn-dark btn-inline left btn-tab" value="Settings"/><input type="button" id="details_tab" class="btn btn-dark btn-tab btn-inline right" value="Details"/>
+					<a href='<?php echo glue::http()->url('/video/delete', array('id' => $model->_id)) ?>' class='delete_video'>Delete</a>
 				</div>
-				<div class="video_edit_panes">
+				<div class="edit_panes" style='width:980px;'>
 					<?php $form = html::activeForm(array('action' => '')) ?>
-						<div class='upload_details video_edit_pane upload_details_pane' style='display:none;'>
-							<div class='form'><div class='left_edit'>
-								<div class="form_row"><div class='caption'><?php echo html::label('Title', 'title') ?></div><?php echo html::activeTextField($model, 'title', array('id' => 'video_title_input')) ?></div>
-								<div class="form_row"><div class='caption'><?php echo html::label('Description', 'description')?></div><?php echo html::activeTextarea($model, 'description') ?></div>
-								<div class="form_row last"><div class='caption'><?php echo html::label('Tags', 'string_tags') ?></div><?php echo html::activeTextField($model, 'string_tags') ?></div>
-							</div>
-							<div class='right_edit'>
-								<div class='options_box'>
-									<h2>Category</h2><?php echo html::activeSelectbox($model, 'category', $model->categories('selectBox')) ?>
-								</div>
-								<div class="options_box">
-									<h2>Adult Content</h2>
-									<div class="label_options"><label><?php echo $form->checkbox($model, 'adult_content', 1) ?><span>This video is not suitable for family viewing</span></label></div>
-								</div>
-								<div class="options_box">
-									<h2>Listing</h2>
-									<?php $grp = html::activeRadio_group($model, 'listing') ?>
-									<div class="label_options">
-										<label><?php echo $grp->add(1) ?><span>Listed</span></label>
-										<div class='light_caption'><p>Your video is public to all users of StageX</p></div>
-										<label><?php echo $grp->add(2) ?><span>Unlisted</span></label>
-										<div class='light_caption'><p>Your video is hidden from listings but can still be accessed directly using the video URL</p></div>
-										<label><?php echo $grp->add(3) ?><span>Private</span></label>
-										<div class='light_caption'><p>No one but you can access this video</p></div>
-									</div>
-								</div>
-								<div class="options_box licence_options">
-									<h2>Licence (<a href='#'>Learn More</a>)</h2>
-									<?php $grp = html::activeRadio_group($model, 'licence') ?>
-									<div class="label_options">
-										<label class='first'><?php echo $grp->add('1') ?><span>Standard StageX Licence</span></label>
-										<label><?php echo $grp->add('2') ?><span>Creative Commons Licence</span></label>
-									</div>
-								</div>
-							</div><div class='clearer'></div></div>
+						<div class='edit_settings pane' id="settings_content">
+						<div class="form-stacked left" style='float:left;'>
+							<div class="form_row"><?php echo html::label('Title', 'title') ?><?php echo html::activeTextField($model, 'title') ?></div>
+							<div class="form_row"><?php echo html::label('Description', 'description')?><?php echo html::activeTextarea($model, 'description') ?></div>
+							<div class="form_row last"><?php echo html::label('Tags', 'stringTags') ?><?php echo html::activeTextField($model, 'string_tags') ?></div>			
 						</div>
+						<div class='right' style='float:right;width:450px;'>
+							<h4>Category</h4><?php echo html::activeSelectbox($model, 'category', $model->categories('selectBox')) ?>
+							<h4>Adult Content</h4>
+							<label class="checkbox"><?php echo $form->checkbox($model, 'mature', 1) ?>This video is not suitable for family viewing</label>
+							<h4>Listing</h4>
+							<?php $grp = html::activeRadio_group($model, 'listing') ?>
+							<div class="label_options">
+								<label class="radio"><?php echo $grp->add(0) ?>Listed</label>
+								<p class='light'>Your video is public to all users of StageX</p>
+								<label class="radio"><?php echo $grp->add(1) ?>Unlisted</label>
+								<p class='light'>Your video is hidden from listings but can still be accessed directly using the video URL</p>
+								<label class="radio"><?php echo $grp->add(2) ?>Private</label>
+								<p class='light'>No one but you can access this video</p>
+							</div>
+							<h4>Licence (<a href='#'>Learn More</a>)</h4>
+							<?php $grp = html::activeRadio_group($model, 'licence') ?>
+							<div class="label_options">
+								<label class="radio"><?php echo $grp->add('1') ?>Standard StageX Licence</label>
+								<label class="radio"><?php echo $grp->add('2') ?>Creative Commons Licence</label>
+							</div>
+						</div>						
+						</div>
+						<div class="clear"></div>
 
-						<div class='video_edit_pane advanced_settings advanced_settings_pane' style='display:none;'>
-							<div class="content_outer_left">
-								<div class="video_watch_listing_optional">
-									<label class='block_label' style='margin-bottom:7px;'><?php echo $form->checkbox($model, "voteable", 1) ?><span>Allow users to vote on this video</span></label>
-									<label class='block_label'><?php echo $form->checkbox($model, "embeddable", 1) ?><span>Allow embedding of my video</span></label>
-								</div>
-								<h2 class='statistics_head'>Statistics</h2>
-								<div class="video_watch_statistics_edit">
-									<label class='block_label'><?php echo $form->checkbox($model, "private_stats", 1) ?><span>Make all statistics private</span></label>
-								</div>
-							</div>
-							<div class='content_outer_right'>
-								<h2>Responses</h2>
-								<?php $group = $form->radio_group($model, "mod_comments") ?>
-								<div class="video_watch_edit_reponses">
-									<label class='block_label block' style='margin-bottom:7px;'><?php echo $group->add(0) ?><span>Automatically post all comments</span></label>
-									<label class='block_label'><?php echo $group->add(1) ?><span>Make all moderated</span></label>
-								</div>
-								<div class="video_watch_listing_optional video_watch_edit_responses_options">
-									<label class='block_label'><?php echo $form->checkbox($model, "voteable_comments", 1) ?><span>Allow users to vote on responses</span></label>
-									<label class='block_label'><?php echo $form->checkbox($model, "vid_coms_allowed", 1) ?><span>Allow video responses</span></label>
-									<label class='block_label'><?php echo $form->checkbox($model, "txt_coms_allowed", 1) ?><span>Allow text responses</span></label>
-								</div>
-							</div>
-							<div class='content_outer_right'>
-								<div class='grey_css_button delete_all_responses' data-type='video' style='margin-bottom:15px;'>Delete all video responses</div>
-								<div class='grey_css_button delete_all_responses' data-type='text'>Delete all text responses</div>
-							</div>
-							<div class='clearer'></div>
+						<div class='pane' id="details_content">
+						<div class="left" style='float:left; margin-right:40px;'>
+							<label class='checkbox'><?php echo $form->checkbox($model, "voteable", 1) ?>Allow users to vote on this video</label>
+							<label class='checkbox'><?php echo $form->checkbox($model, "embeddable", 1) ?>Allow embedding of my video</label>
+							<label class='checkbox'><?php echo $form->checkbox($model, "private_stats", 1) ?>Make all statistics private</label>
 						</div>
+						<div class='left' style='float:left; margin-right:40px;'>
+							<h4>Responses</h4>
+							<?php $group = $form->radio_group($model, "mod_comments") ?>
+							<label class='checkbox'><?php echo $group->add(0) ?><span>Automatically post all comments</span></label>
+							<label class='checkbox'><?php echo $group->add(1) ?><span>Make all moderated</span></label>
+							<label class='checkbox'><?php echo $form->checkbox($model, "voteable_comments", 1) ?><span>Allow users to vote on responses</span></label>
+							<label class='checkbox'><?php echo $form->checkbox($model, "vid_coms_allowed", 1) ?><span>Allow video responses</span></label>
+							<label class='checkbox'><?php echo $form->checkbox($model, "txt_coms_allowed", 1) ?><span>Allow text responses</span></label>
+						</div>
+						<div class='right' style='float:left;'>
+							<div class='btn delete_all_responses' data-type='video' style='margin-bottom:15px; display:block;'>Delete all video responses</div>
+							<div class='btn delete_all_responses' data-type='text'>Delete all text responses</div>
+						</div>
+						</div>
+						<div class="clear"></div>
 					<?php $form->end(); ?>
 				</div>
 			</div>
 		<?php } ?>
 
-	<div class="" style='margin:40px 0 0 0;'>
+	<div class="main_body">
 		<h1><?php echo $model->title ?></h1>
-		<div class='video_element' style='width:970px; height:444px; border-radius:4px; background:#000; color:#fff; text-align:center; font-size:30px;'>
+		<div class='video_element'>
 			<?php
 			if($model->state == 'failed'){
 				?><div class='progress'>KaBoom! We could not complete this video, sorry! &lt;/3</div><?php
-			}elseif($model->state == 'pending' || $model->state == 'submitting' || $model->state == 'transcoding'){
+			}elseif($model->state == 'uploading' || $model->isProcessing()){
 				?><div class='progress'>Hold on, we're processing...</div><?php
 			}else{
 				app\widgets\videoPlayer::widget(array(
