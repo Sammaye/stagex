@@ -4,11 +4,14 @@ $this->jsFile('/js/views/playlist_bar.js');
 // This include of a script is temp to just get this working.
 $this->jsFile('/js/jdropdown.js');
 $this->jsFile('/js/views/subscribeButton.js');
+$this->JsFile("/js/jquery.expander.js");
 
 $this->js('video_tabs', "
 		
 	$.playlist_bar();
 	var video_id = '". $model->_id ."';
+		
+	$('.expandable').expander();
 
 	$('.video_action_tabs .tab').click(function(event){
 		event.preventDefault();
@@ -211,7 +214,7 @@ $this->js('watch.edit_video', "
 
 <div class="watch_page">
 
-	<?php if(!glue::auth()->check(array('^'=>$model))){ ?>
+	<?php if(glue::auth()->check(array('^'=>$model))){ ?>
 	<div style='background:#4b4b4b; height:30px; padding:15px 20px; color:#fff;'>
 		<img alt='thumbnail' style='border-radius:50px; float:left;' src="<?php echo $model->author->getAvatar(30, 30); ?>"/>
 		<a style='color:#fff;font-size:20px; font-weight:normal; display:inline-block; margin:5px 10px 0 10px; line-height:22px;' href='<?php echo glue::http()->url('/user/view', array('id' => $model->author->_id)) ?>'><?php echo $model->author->getUsername() ?></a>
@@ -219,7 +222,7 @@ $this->js('watch.edit_video', "
 		<?php if(glue::session()->authed){ ?>
 			<div class='right' style='float:right;'>
 			<div class="subscribe_widget">
-				<span class="follower_count">1,000,000 Followers</span>
+				<span class="follower_count">1,000,000 Subscribers</span>
 				<?php if(app\models\Follower::isSubscribed($model->author->_id)){ ?>
 				<input type="button" class='unsubscribe btn button' value="Unsubscribe"/>
 				<?php }else{ ?>
@@ -297,7 +300,8 @@ $this->js('watch.edit_video', "
 		<?php } ?>
 
 	<div class="main_body">
-		<h1><?php echo $model->title ?></h1>
+		<div style='font-size:12px;'><a href=""><?php echo $model->get_category_text()?></a></div>
+		<h1 style='margin-top:4px;'><?php echo $model->title ?></h1>
 		<div class='video_element'>
 			<?php
 			if($model->state == 'failed'){
@@ -311,9 +315,32 @@ $this->js('watch.edit_video', "
 			} ?>
 		</div>
 		
-		<div class="btn-toolbar">
-
+		<div class="collapsable" style='padding:20px 15px;'>
+			<div class='left' style='float:left; width:70%; margin-right:10px;'>
+				<?php if(strlen($model->description) > 0): ?><div class="expandable" style='font-size:14px; line-height:17px; margin-bottom:10px;'><?php echo nl2br(htmlspecialchars($model->description)) ?></div><?php endif ?>
+				<?php if(count($model->tags) > 0 && is_array($model->tags)): ?>
+				<div style='margin-bottom:10px;'>
+					<?php foreach($model->tags as $tag){
+						?><a style='margin-right:10px;' href="<?php echo glue::http()->url("/search", array("query"=>$tag)) ?>">#<?php echo $tag ?></a><?php
+					} ?>
+				</div>
+				<?php endif; ?>
+				<div style='font-size:12px; color:#666666;'>
+				<b>License:</b><span id='video_licence'><?php echo $model->get_licence_text() ? $model->get_licence_text() : "StageX Licence" ?></span>
+				</div>
+			</div>
+			<div class='right' style='float:left; width:20%; text-align:right;'>
+				<div class="views"><?php echo !$model->privateStatistics ? '<strong>'.$model->views.'</strong> views' : '' ?></div>
+				<?php if($model->voteable && ($model->likes+$model->dislikes > 0)){ ?>
+				<div class="rating">
+					<?php echo $model->likes-$model->dislikes; ?>
+					<div><?php echo $model->likes ?> likes / <?php echo $model->dislikes ?> dislikes</div>
+				</div>
+				<?php } ?>
+			</div>			
+			<div class="clear"></div>
 		</div>
+
 		<div>
 		<div class="simple-nav left">
 		
@@ -323,12 +350,10 @@ $this->js('watch.edit_video', "
 				<input type="button" class="btn <?php if($model->currentUserDislikes()): echo "active"; endif ?>" value="-1"/>
 			</div>
 			<?php endif; ?>		
-		
-			<a href="#" class="selected" data-filter="all">Details</a>
-			<?php if(!$model->privateStatistics): ?><a href="#" data-filter="posts">Statistics</a><?php endif; ?>
-			<?php if(glue::auth()->check(array('@'))): ?><a href="#" data-filter="comments">Add to Playlist</a><?php endif; ?>
-			<a href="#" data-filter="liked">Share</a>
-			<?php if(glue::auth()->check(array('@'))): ?><a href="#" data-filter="watched">Report</a><?php endif; ?>
+			<?php if(!$model->privateStatistics): ?><a href="#">Statistics</a><?php endif; ?>
+			<?php if(glue::auth()->check(array('@'))): ?><a href="#">Add to Playlist</a><?php endif; ?>
+			<a href="#">Share</a>
+			<?php if(glue::auth()->check(array('@'))): ?><a href="#">Report</a><?php endif; ?>
 		</div>
 		
 		<?php if($model->voteable){ ?>
@@ -479,49 +504,7 @@ $this->js('watch.edit_video', "
 							</div>
 						</div>
 					<?php } ?>					
-						<div id="details">
-					<div class="collapsable">
-						<div class='inner_div'>
-							<div class='left'>
-								<?php if(strlen($model->description) > 0): ?><p id="video_description" class="description"><?php echo nl2br(htmlspecialchars($model->description)) ?></p><?php endif ?>
-								<?php if(count($model->tags) > 0){ ?>
-									<div class='tags' id='video_tags'><?php foreach($model->tags as $tag){
-											?><a href="<?php echo glue::http()->url("/search", array("mainSearch"=>$tag)) ?>"><span><?php echo $tag ?></span></a><?php
-										} ?></div>
-								<?php } ?>
 
-								<?php if(strlen($model->description) <= 0 && count($model->tags) <= 0): ?><div style='margin-top:15px;'><?php endif ?>
-								<p class='licence'><b>Licensed under:</b> <span id='video_licence'><?php echo $model->get_licence_text() ? $model->get_licence_text() : "StageX Licence" ?></span></p>
-								<p class='category'><b>Category:</b> <span id='video_category'><?php echo $model->get_category_text() ?></span></p>
-								<?php if(strlen($model->description) <= 0 && count($model->tags) <= 0): ?></div><?php endif ?>
-							</div>
-							<div class='right'>
-								<div class="views"><?php echo !$model->private_stats ? '<strong>'.$model->views.'</strong> views' : '' ?></div>
-								<?php if($model->voteable && ($model->likes+$model->dislikes > 0)){
-									$like_percent = $model->likes > 0 ? 163*($model->likes/($model->dislikes+$model->likes)) : 0;
-									$dislike_percent = $model->dislikes > 0 ? 163*($model->dislikes/($model->likes+$model->dislikes)) : 0;
-
-									$like_width = $like_percent > 0 ? $like_percent-1 : 0;
-									$dislike_width = $dislike_percent > 0 ? $dislike_percent-1 : 0;
-
-									$like_border_css = $like_width > 0 && $dislike_width > 0 ? 'border-right:1px solid #ffffff;' : '';
-									$dislike_border_css = $like_width > 0 && $dislike_width > 0 ? 'border-left:1px solid #ffffff;' : '';
-//var_dump($like_percent);
-//var_dump($dislike_percent);
-									?>
-									<div class="like_bar">
-										<div class='bordered_outer'>
-											<div class='likes' style='width:<?php echo $like_width."px" ?>; <?php echo $like_border_css ?>'>&nbsp;</div>
-											<div class='dislikes' style='width:<?php echo $dislike_width."px" ?>; <?php echo $dislike_border_css ?>'>&nbsp;</div>
-										</div><strong class='caption'><?php echo $model->likes > 0 ? $model->likes : "None" ?> liked this, <?php echo $model->dislikes > 0 ? $model->dislikes : "None" ?> Did not</strong>
-									</div>
-								<?php } ?>
-							</div>
-							<div class="clear"></div>
-							<a href="#" class='expand_info expand_video_details_info'>Show Less Information</a>
-						</div>
-					</div>
-				</div>
 		
 		</div>
 
