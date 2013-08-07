@@ -1,7 +1,7 @@
 <?php
-glue::clientScript()->addJsFile('autoresize', "/js/autoresizetextarea.js");
+glue::$controller->jsFile("/js/autoresizetextarea.js");
 
-glue::clientScript()->addJsScript('response_selector', "
+glue::$controller->js('response_selector', "
 	$(document).on('click', '.video_response_selector .response_tab', function(event){
 		event.preventDefault();
 		var stub = $(this).children('.stub'),
@@ -51,8 +51,7 @@ glue::clientScript()->addJsScript('response_selector', "
 	});
 ");
 
-
-glue::clientScript()->addJsScript('watch.response_list', "
+glue::$controller->js('watch.response_list', "
 	var live_comments_timeout;
 
 	$(function(){
@@ -214,16 +213,16 @@ glue::clientScript()->addJsScript('watch.response_list', "
 
 <div class='video_response_selector'>
 	<div class='block_summary main_block_summary' style='display:none;'></div>
-	<?php if(($model->txt_coms_allowed || $model->vid_coms_allowed) && glue::roles()->checkRoles(array('@'))){ ?>
+	<?php if(($model->allowTextComments || $model->allowVideoComments) && glue::auth()->check(array('@'))){ ?>
 		<ul class="response_tabs">
 			<li>Respond with:</li>
-			<?php if($model->txt_coms_allowed): ?><li><a href="#text_response_pane" class="response_tab text_response_tab">Comment<i class="stub" style='left:130px;'></i></a></li><?php endif ?>
-			<?php if($model->vid_coms_allowed): ?><li><a href="#video_response_pane" class="response_tab video_response_tab">Video<i class="stub" style='<?php if($model->txt_coms_allowed){ echo "display:none;"; } ?> left:205px;'></i></a></li><?php endif ?>
+			<?php if($model->allowTextComments): ?><li><a href="#text_response_pane" class="response_tab text_response_tab">Comment<i class="stub" style='left:130px;'></i></a></li><?php endif ?>
+			<?php if($model->allowVideoComments): ?><li><a href="#video_response_pane" class="response_tab video_response_tab">Video<i class="stub" style='<?php if($model->allowTextComments){ echo "display:none;"; } ?> left:205px;'></i></a></li><?php endif ?>
 		</ul>
 		<div class="response_panes">
-			<?php if($model->txt_coms_allowed){ ?>
+			<?php if($model->allowTextComments){ ?>
 				<div class='response_pane text_response_pane'>
-					<?php $this->widget('application/widgets/autoresizetextarea.php', array(
+					<?php app\widgets\autoresizetextarea::widget(array(
 						'attribute' => 'text_comment_content',
 						'class' => 'text_comment_content'
 					)) ?>
@@ -231,11 +230,11 @@ glue::clientScript()->addJsScript('watch.response_list', "
 				</div>
 			<?php } ?>
 
-			<?php if($model->vid_coms_allowed){ ?>
+			<?php if($model->allowVideoComments){ ?>
 				<div class='response_pane video_response_pane' style='display:none;'>
 					<div class='inner'>
 						<h2 class='select_head'>Search for and select one of your videos to add it as a response:</h2>
-						<?php $this->widget('application/widgets/Jqautocomplete.php', array(
+						<?php app\widgets\Jqautocomplete::widget(array(
 								'attribute' => 'videoResponseSearch',
 								'value' => '',
 								'options' => array(
@@ -268,7 +267,7 @@ glue::clientScript()->addJsScript('watch.response_list', "
 	<?php } ?>
 </div>
 <div class="video_response_list" data-sort='<?php echo isset($sort) ? $sort : '' ?>' data-mode='<?php echo isset($mode) ? $mode : '' ?>'
-	data-responses_per_page='<?php echo isset($comment_per_page) ? $comment_per_page : '' ?>' data-video_id='<?php echo $model->_id ?>'>
+	data-responses_per_page='<?php echo isset($pageSize) ? $pageSize : '' ?>' data-video_id='<?php echo $model->_id ?>'>
 	<div class="new_comments_notifier"><a href="#"></a></div>
 	<?php
 		ob_start();
@@ -276,13 +275,13 @@ glue::clientScript()->addJsScript('watch.response_list', "
 		$template = ob_get_contents();
 		ob_end_clean();
 		
-		$this->widget('glue/widgets/GListView.php', array(
-				'pageSize'	 => $comment_per_page,
+		glue\widgets\ListView::widget(array(
+				'pageSize'	 => $pageSize,
 				"cursor"	 => $comments,
 				'template' 	 => $template,
 				'data' 		 => array('mode' => isset($mode) ? $mode : ''),
 				'enableAjaxPagination' => true,				
-				'itemView' => 'responses/_response.php',
+				'itemView' => 'response/_response.php',
 				'pagerCssClass' => 'grid_list_pager'
 		));	 ?>
 </div>

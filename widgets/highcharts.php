@@ -2,6 +2,8 @@
 
 namespace app\widgets;
 
+use glue;
+
 class highcharts extends \glue\Widget{
 
 	public $chartName;

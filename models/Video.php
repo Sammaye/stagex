@@ -548,7 +548,7 @@ class Video extends \glue\Db\Document{
 
 			foreach(glue::db()->video_stats_day->find(array(
 				"vid"=>$this->_id,
-				"day"=> array("\$gte" => new MongoDate($fromTs), "\$lte" => new MongoDate($toTs) ),
+				"day"=> array("\$gte" => new \MongoDate($fromTs), "\$lte" => new \MongoDate($toTs) ),
 			)) as $day){
 				//var_dump($day);
 				$non_unique_views_range[$day['day']->sec] = !empty($day['hits']) ? $day['hits'] : 0;
@@ -581,7 +581,7 @@ class Video extends \glue\Db\Document{
 //var_dump($toTs);
 			foreach(glue::db()->video_stats_day->find(array(
 				"vid"=>$this->_id,
-				"day"=> array("\$gte" => new MongoDate($fromTs), "\$lte" => new MongoDate($toTs) ),
+				"day"=> array("\$gte" => new zMongoDate($fromTs), "\$lte" => new MongoDate($toTs) ),
 			)) as $day){
 				//var_dump($day);
 				foreach($day['hours'] as $k => $v){
@@ -707,13 +707,13 @@ class Video extends \glue\Db\Document{
 	}
 
 	function currentUserLikes(){
-		$r = glue::db()->video_likes->findOne(array('user_id' => glue::session()->user->_id, 'item' => $this->_id, 'like' => 1));
+		$r = glue::db()->video_likes->findOne(array('user_id' => glue::user()->_id, 'item' => $this->_id, 'like' => 1));
 		if($r) return true;
 		return false;
 	}
 
 	function currentUserDislikes(){
-		$r = glue::db()->video_likes->findOne(array('user_id' => glue::session()->user->_id, 'item' => $this->_id, 'like' => 0));
+		$r = glue::db()->video_likes->findOne(array('user_id' => glue::user()->_id, 'item' => $this->_id, 'like' => 0));
 		if($r) return true;
 		return false;
 	}

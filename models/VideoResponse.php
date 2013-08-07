@@ -46,7 +46,7 @@ class VideoResponse extends \glue\db\Document{
 			'public' => array(
 				'condition' => array('$or' => array(
 					array('approved' => true),
-					array('user_id' => glue::user()->_id)
+					array('userId' => glue::user()->_id)
 				))
 			),
 			'moderated' => array(
@@ -76,7 +76,7 @@ class VideoResponse extends \glue\db\Document{
 		if($showOnlyModerated){
 			return self::model()->moderated()->find(array('videoId' => $video->_id));
 		}else{
-			return self::model()->public()->find(array('videoId' => $video->id, 'created' => $ts_query));
+			return self::model()->public()->find(array('videoId' => $video->_id, 'created' => $ts_query));
 		}
 	}
 
