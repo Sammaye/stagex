@@ -87,35 +87,6 @@ $this->js('video_tabs', "
 			}
 		});
 	});
-		
-	$(function(){
-		add_expandable_details_link();
-	});
-
-	function add_expandable_details_link(){
-		if($('#details').find('.collapsable').height() > 94){
-			// Add the expand link. It is already bound.
-			$('.watch_video_body #details .expand_info').unbind('click');
-			$('#details').find('.collapsable').addClass('collapsed').css({ 'height': '94px' });
-			$('#details .collapsable .expand_info').text('Show More Information').css({ 'display': 'block' });
-
-			$('#details .collapsable .expand_info').click(function(event){
-				event.preventDefault();
-				if($(this).parents('#details').find('.collapsable').hasClass('collapsed')){
-					$(this).parents('#details').find('.collapsable').addClass('collapsed').css({ 'height':
-						($(this).parents('#details').find('.collapsable').find('.inner_div').height()+43)+'px' });
-		
-					$(this).parents('#details').find('.collapsable').removeClass('collapsed');
-					$('#details .collapsable .expand_info').text('Show Less Information');
-				}else{
-					$(this).parents('#details').find('.collapsable').addClass('collapsed').css({ 'height': '94px' });
-					$('#details .collapsable .expand_info').text('Show More Information');
-				}
-			});
-		}else{
-			$('#details .collapsable .expand_info').hide();
-		}
-	}
 ");
 
 $this->js('watch.edit_video', "
@@ -299,7 +270,10 @@ $this->js('watch.edit_video', "
 			</div>
 		<?php } ?>
 
-	<div class="main_body">
+	<div class="main_body" style='margin-left:45px;'>
+	<div style='float:left; width:145px;'>f
+	</div>
+	<div style='float:left; width:835px;'>
 		<div style='font-size:12px;'><a href=""><?php echo $model->get_category_text()?></a></div>
 		<h1 style='margin-top:4px;'><?php echo $model->title ?></h1>
 		<div class='video_element'>
@@ -326,134 +300,77 @@ $this->js('watch.edit_video', "
 				</div>
 				<?php endif; ?>
 				<div style='font-size:12px; color:#666666;'>
-				<b>License:</b><span id='video_licence'><?php echo $model->get_licence_text() ? $model->get_licence_text() : "StageX Licence" ?></span>
+				<b>License: </b><span id='video_licence'><?php echo $model->get_licence_text() ? $model->get_licence_text() : "StageX Licence" ?></span>
 				</div>
 			</div>
 			<div class='right' style='float:left; width:20%; text-align:right;'>
-				<div class="views"><?php echo !$model->privateStatistics ? '<strong>'.$model->views.'</strong> views' : '' ?></div>
-				<?php if($model->voteable && ($model->likes+$model->dislikes > 0)){ ?>
-				<div class="rating">
-					<?php echo $model->likes-$model->dislikes; ?>
-					<div><?php echo $model->likes ?> likes / <?php echo $model->dislikes ?> dislikes</div>
-				</div>
-				<?php } ?>
+				<div class="views" style='color: #999999; font-size: 16px; font-weight: bold;'><?php echo !$model->privateStatistics ? '<strong>'.$model->views.'</strong> views' : '' ?></div>
 			</div>			
 			<div class="clear"></div>
 		</div>
 
 		<div>
-		<div class="simple-nav left">
+		<div class="simple-nav left" style='border-bottom:1px solid #cccccc;'>
 		
 			<?php if($model->voteable && glue::auth()->check(array('@'))): ?>
-			<div class="btn-group">
-				<input type="button" class="btn <?php if($model->currentUserLikes()): echo "active"; endif ?>" value="+1"/>
-				<input type="button" class="btn <?php if($model->currentUserDislikes()): echo "active"; endif ?>" value="-1"/>
+			<div class="btn-group" style='margin:8px 0 0 0;'>
+				<input type="button" class="btn <?php if($model->currentUserLikes()): echo "active"; endif ?> btn-white btn-like" value="+<?php echo $model->likes>0?$model->likes:1 ?>"/>
+				<input type="button" class="btn <?php if($model->currentUserDislikes()): echo "active"; endif ?> btn-white" value="-<?php echo $model->dislikes>0?$model->dislikes:1 ?>"/>
 			</div>
+			<div style='float:right;'>
 			<?php endif; ?>		
-			<?php if(!$model->privateStatistics): ?><a href="#">Statistics</a><?php endif; ?>
+			<?php if(!$model->privateStatistics): ?><a href="#" class="selected">Statistics</a><?php endif; ?>
 			<?php if(glue::auth()->check(array('@'))): ?><a href="#">Add to Playlist</a><?php endif; ?>
 			<a href="#">Share</a>
 			<?php if(glue::auth()->check(array('@'))): ?><a href="#">Report</a><?php endif; ?>
+			</div>
+			<div class="clear"></div>
 		</div>
 		
-		<?php if($model->voteable){ ?>
-		<div class="curved_white_filled_box video_action_dialog action_like">
-			<div class='header_outer'>
-				<div class="box_head">You applauded this video. Why not share the love around?</div>
-				<div class="close"><a href="#"><?php echo utf8_decode('&#215;') ?></a></div>
+		<div class="share_content like_content video_details_pane">
+		<div class="" style='margin:10px 0 15px 0; font-weight:bold; color:#444444; font-size:16px;'>You liked this video, why not spread the love?</div>
+		<?php if(glue::session()->authed){ ?>
+			<div class='share_item_with_subs' style='float:left; margin-right:45px;'>
+			<h4>Share with your subscribers</h4>
+			<?php echo html::textarea('share_status_text', 'Add some text here if you wish to describe why you shared this video or just click the share button to continue', array('class' => 'share_status_text share_status_text_unchanged')) ?>
+			<div><input type="button" class="btn-success" value="Share"/></div>
 			</div>
-			<div class='share_item_with_subs'>
-				<?php echo html::textarea('share_status_text', 'Add some text here if you wish to describe why you shared this video or just click the share button to continue', array('class' => 'share_status_text share_status_text_unchanged')) ?>
-				<div class='green_css_button share_video_as_status'>Share</div>
-			</div>
-			<div class='clearer'></div>
-			<div class='margin_top_10'>
-				<ul class="video_watch_broadcast_share">
-					<li class="caption">Share with other networks:</li>
-					<li><a rel='new_window' href="http://www.facebook.com/sharer.php?u=<?php echo urlencode(glue::http()->url("/video/watch", array("id"=>$model->_id))) ?>"><img alt='fb' src="/images/fb_large.png"/></a></li>
-					<li><a rel='new_window' href="http://twitter.com/share?url=<?php echo urlencode(glue::http()->url("/video/watch", array("id"=>$model->_id))) ?>"><img alt='twt' src="/images/twt_large.png"/></a></li>
-					<li><a rel='new_window' href="http://www.plurk.com/?status=<?php echo urlencode(glue::http()->url("/video/watch", array("id"=>$model->_id))) ?>"><img alt='plurk' src="/images/plurk_large.png"/></a></li>
-				<li>
-				<g:plusone size="medium" annotation="inline" href="<?php echo glue::http()->url('/video/watch', array('id' => $model->_id)) ?>"></g:plusone>
-				</li>
-				</ul>
-				<div class="clear"></div>
-			</div>
+		<?php } ?>
+		<div style='float:left;'>
+			<h4>Share Elsewhere</h4>
+			<ul class="network_bc">
+				<li><a rel='new_window' href="http://www.facebook.com/sharer.php?u=<?php echo urlencode(glue::http()->url("/video/watch", array("id"=>$model->_id))) ?>"><img alt='fb' src="/images/fb_large.png"/></a></li>
+				<li><a rel='new_window' href="http://twitter.com/share?url=<?php echo urlencode(glue::http()->url("/video/watch", array("id"=>$model->_id))) ?>"><img alt='twt' src="/images/twt_large.png"/></a></li>
+				<li><a rel='new_window' href="http://www.plurk.com/?status=<?php echo urlencode(glue::http()->url("/video/watch", array("id"=>$model->_id))) ?>"><img alt='plurk' src="/images/plurk_large.png"/></a></li>
+				<li><g:plusone size="medium" annotation="inline" href="<?php echo glue::http()->url('/video/watch', array('id' => $model->_id)) ?>"></g:plusone></li>
+			</ul>		
+			<div class="clear"></div>
+			<input type="text" style='width:330px; margin-top:10px;' class="select_all_onfoc" value="<?php echo glue::http()->url("/video/watch", array("id"=>$model->_id)) ?>" />
+			<div class="clear"></div>	
+			<?php if($model->embeddable){ ?>
+			<h4>Embedd:</h4>
+			<textarea rows="" cols="" style='width:330px; height:50px;' class="select_all_onfoc"><iframe style="width:560px; height:315px; border:0;" frameborder="0" src="<?php echo glue::http()->url("/video/embedded", array("id"=>$model->_id)) ?>"></iframe></textarea>
+			<?php } ?>
 		</div>
-
-		<div class="curved_white_filled_box video_action_dialog action_dislike">
-			<div class='header_outer'>
-				<div class="box_head">You booed! Obviously this wasn't to your taste.</div>
-				<div class="close"><a href="#"><?php echo utf8_decode('&#215;') ?></a></div>
-			</div>
-			<div class='video_ratings'>
-				<div class='caption' style=''>The score currently stands at:</div>
-				<img alt='like' src='/images/thumb_up_active.png'/><span class='likes_amount'><?php echo $model->likes ?></span>
-				<img alt='dislike' src='/images/thumb_down_active.png'/><span class='dislikes_amount'><?php echo $model->dislikes ?></span>
-			</div>
+		<div class="clear"></div>
 		</div>
-		<?php } ?>	
-		
-								<div class="curved_white_filled_box video_action_dialog video_action_share" id='broadcast_video'>
-						<div class='header_outer'>
-							<div class="box_head">Spread this Video</div>
-							<div class="close"><a href="#"><?php echo utf8_decode('&#215;') ?></a></div>
-						</div>
-						<?php if(glue::session()->authed){ ?>
-							<div class='share_item_with_subs'>
-								<?php echo html::textarea('share_status_text', 'Add some text here if you wish to describe why you shared this video or just click the share button to continue', array('class' => 'share_status_text share_status_text_unchanged')) ?>
-								<div class='green_css_button share_video_as_status'>Share</div>
-							</div>
-						<?php } ?>
-						<div class='clearer'></div>
-
-						<div class='margin_top_10 link_to_video'>
-							<div>Link to this video:</div>
-							<input type="text" class="select_all_onfoc" value="<?php echo glue::http()->url("/video/watch", array("id"=>$model->_id)) ?>" />
-						</div>
-						<?php if($model->embeddable){ ?>
-							<div class='embed_video'>
-								<div>Embedded Player:</div>
-								<textarea rows="" cols="" class="select_all_onfoc"><iframe style="width:560px; height:315px; border:0;" frameborder="0" src="<?php echo glue::http()->url("/video/embedded", array("id"=>$model->_id)) ?>"></iframe></textarea>
-							</div>
-						<?php } ?>
-						<div class='margin_top_10'>
-							<ul class="video_watch_broadcast_share">
-								<li class="caption"><span>Broadcast:</span></li>
-								<li><a rel='new_window' href="http://www.facebook.com/sharer.php?u=<?php echo urlencode(glue::http()->url("/video/watch", array("id"=>$model->_id))) ?>"><img alt='fb' src="/images/fb_large.png"/></a></li>
-								<li><a rel='new_window' href="http://twitter.com/share?url=<?php echo urlencode(glue::http()->url("/video/watch", array("id"=>$model->_id))) ?>"><img alt='twt' src="/images/twt_large.png"/></a></li>
-								<li><a rel='new_window' href="http://www.plurk.com/?status=<?php echo urlencode(glue::http()->url("/video/watch", array("id"=>$model->_id))) ?>"><img alt='plurk' src="/images/plurk_large.png"/></a></li>
-								<li><g:plusone size="medium" annotation="inline" href="<?php echo glue::http()->url('/video/watch', array('id' => $model->_id)) ?>"></g:plusone></li>
-							</ul>
-							<div class="clear"></div>
-						</div>
-					</div>
 					
-					<div class="curved_white_filled_box video_action_dialog video_action_report">
-							<div class='header_outer'>
-								<div class="box_head">Report Video</div>
-								<div class="close"><a href="#"><?php echo utf8_decode('&#215;') ?></a></div>
-							</div>
-
-							<?php /* 
-							$this->widget('application/widgets/JqselectBox.php', array(
-								'attribute' => 'report_reason',
-								'id' => 'report_reason',
-								'class' => 'report_reason_select',
-								"items" => array(
-									'extreme_v' => 'Extreme Voilence',
-									'sex' => 'Sexual Content',
-									'harmful_act' => 'Harmful/Dangerous Acts',
-									'child_abuse' => 'Child Abuse',
-									'spam' => 'Spam',
-									'rights_voil' => 'Rights Voilation',
-									'religious' => 'Hate Preaching/Religious Reasons',
-									'dirty' => 'Just Plain Dirty'
-								)
-							)) */ ?>
-							<a href='#' class='grey_css_button report_video_submit float_right'>Report Video</a>
-							<div class="clear"></div>
-					</div>
+		<div class="report_content video_details_pane">
+			<div class="" style='margin:10px 0 15px 0; font-weight:bold; color:#444444; font-size:16px;'>Report</div>
+			<p>Pick a reason out of the list below and then click "report":</p>
+			<?php $grp=html::radio_group('report_reason'); ?>
+			<div style='float:left;'>
+			<label class="radio"><?php echo $grp->add('sex'); ?>Sexual Content</label>
+			<label class="radio"><?php echo $grp->add('abuse'); ?>Harmful/Voilent Acts &amp; (Child) Abuse</label>
+			<label class="radio"><?php echo $grp->add('spam'); ?>Spam</label>
+			<label class="radio"><?php echo $grp->add('religious'); ?>Hate Preaching/Religious</label>
+			<label class="radio"><?php echo $grp->add('dirty'); ?>Just plain dirty</label>
+			</div>
+			<div style='float:left; margin:40px 0 0 95px;'>
+			<input type="button" class="btn-success" value="Report Video"/>
+			<p class="light" style='margin-top:5px; font-size:12px;'>Abuse of this function may result in account deletion</p>
+			</div><div class="clear"></div>
+		</div>
 
 					<?php if(!$model->private_stats){ ?>
 						<div class="curved_white_filled_box video_action_dialog video_action_stats">
@@ -521,6 +438,7 @@ $this->js('watch.edit_video', "
 		</div>
 	</div>
 	<div class="clear"></div>
+</div>
 </div>
 
 <div id='video_response_options' style='width:200px;'></div>
