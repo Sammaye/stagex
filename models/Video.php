@@ -546,7 +546,7 @@ class Video extends \glue\Db\Document{
 			//$unique_views_range[mktime(0,0,0, date('m', $newts), date('d', $newts)+1, date('Y', $newts))] = 0;
 			//$non_unique_views_range[mktime(0,0,0, date('m', $newts), date('d', $newts)+1, date('Y', $newts))] = 0;
 
-			foreach(glue::db()->video_stats_day->find(array(
+			foreach(glue::db()->video_statistics_day->find(array(
 				"vid"=>$this->_id,
 				"day"=> array("\$gte" => new \MongoDate($fromTs), "\$lte" => new \MongoDate($toTs) ),
 			)) as $day){
@@ -554,8 +554,8 @@ class Video extends \glue\Db\Document{
 				$non_unique_views_range[$day['day']->sec] = !empty($day['hits']) ? $day['hits'] : 0;
 				$unique_views_range[$day['day']->sec] = !empty($day['u_hits']) ? $day['u_hits'] : 0;
 
-				$sum_browser = summarise_array_row(isset($day['browser']) ? $day['browser'] : array(), $sum_browser);
-				$sum_ages = summarise_array_row(isset($day['age']) ? $day['age'] : array(), $sum_ages);
+				$sum_browser = \Collection::aggregate(isset($day['browser']) ? $day['browser'] : array(), $sum_browser);
+				$sum_ages = \Collection::aggregate(isset($day['age']) ? $day['age'] : array(), $sum_ages);
 
 				$total_browsers += isset($day['browser_total']) ? (int)$day['browser_total'] : 0;
 				$total_ages += isset($day['age_total']) ? (int)$day['age_total'] : 0;
@@ -579,9 +579,9 @@ class Video extends \glue\Db\Document{
 			}
 			//var_dump($unique_views_range);
 //var_dump($toTs);
-			foreach(glue::db()->video_stats_day->find(array(
+			foreach(glue::db()->video_statistics_day->find(array(
 				"vid"=>$this->_id,
-				"day"=> array("\$gte" => new zMongoDate($fromTs), "\$lte" => new MongoDate($toTs) ),
+				"day"=> array("\$gte" => new \MongoDate($fromTs), "\$lte" => new MongoDate($toTs) ),
 			)) as $day){
 				//var_dump($day);
 				foreach($day['hours'] as $k => $v){
@@ -590,8 +590,8 @@ class Video extends \glue\Db\Document{
 					$unique_views_range[mktime($k, 0, 0, date('m', $day['day']->sec), date('d', $day['day']->sec), date('Y', $day['day']->sec))] = !empty($v['u']) ? $v['u'] : 0;
 				}
 
-				$sum_browser = summarise_array_row(isset($day['browser']) ? $day['browser'] : array(), $sum_browser);
-				$sum_ages = summarise_array_row(isset($day['age']) ? $day['age'] : array(), $sum_ages);
+				$sum_browser = \Collection::aggregate(isset($day['browser']) ? $day['browser'] : array(), $sum_browser);
+				$sum_ages = \Collection::aggregate(isset($day['age']) ? $day['age'] : array(), $sum_ages);
 
 				$total_browsers += isset($day['browser_total']) ? (int)$day['browser_total'] : 0;
 				$total_ages += isset($day['age_total']) ? (int)$day['age_total'] : 0;

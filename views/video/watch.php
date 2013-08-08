@@ -52,10 +52,7 @@ $this->js('video_tabs', "
 		var el = $(this);
 		$.getJSON('/video/like', {id: '".strval($model->_id)."'}, function(data){
 			if(data.success){
-				pane=$('.video_action_tabs .like_content');
-				$('.video_action_tabs .simple-nav .tab').removeClass('selected');
-				$('.video_action_tabs .video_details_pane').not(pane).css({ 'display': 'none' });
-				pane.css({ 'display': 'block' });
+				$('#share_tab').trigger('click');
 				$('.btn-like').addClass('active');
 				$('.btn-dislike').removeClass('active');
 			}
@@ -346,8 +343,10 @@ $this->js('watch.edit_video', "
 		
 			<?php if($model->voteable && glue::auth()->check(array('@'))): ?>
 			<div class="btn-group" style='margin:8px 0 0 0;'>
-				<input type="button" class="btn <?php if($model->currentUserLikes()): echo "active"; endif ?> btn-white btn-like" value="+<?php echo $model->likes>0?$model->likes:1 ?>"/>
-				<input type="button" class="btn <?php if($model->currentUserDislikes()): echo "active"; endif ?> btn-white btn-dislike" value="-<?php echo $model->dislikes>0?$model->dislikes:1 ?>"/>
+				<input type="button" class="btn <?php if($model->currentUserLikes()): echo "active"; endif ?> btn-white btn-like" value="+1"/>
+				<input type="button" class="btn <?php if($model->currentUserDislikes()): echo "active"; endif ?> btn-white btn-dislike" value="-1"/>
+				
+				<span style='color: #666666;font-size: 16px;font-weight: bold; margin-left:10px;'><span style='color:green;'><?php echo '+'.$model->likes ?></span> / <span style='color:red;'><?php echo '-'.$model->dislikes ?></span></span>
 			</div>
 			<?php endif; ?>
 			<div style='float:right;'>		
@@ -362,7 +361,7 @@ $this->js('watch.edit_video', "
 		<div class="alert" style='display:none; margin-top:10px;'></div>
 		
 		<div class="share_content like_content video_details_pane">
-		<div class="" style='margin:10px 0 15px 0; font-weight:bold; color:#444444; font-size:16px;'>You liked this video, why not spread the love?</div>
+		<div class="" style='margin:10px 0 15px 0; font-weight:bold; color:#444444; font-size:16px;'>Why not spread the love?</div>
 		<?php if(glue::session()->authed){ ?>
 			<div class='share_item_with_subs' style='float:left; margin-right:45px;'>
 			<h4>Share with your subscribers</h4>
