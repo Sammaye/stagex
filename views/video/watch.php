@@ -185,7 +185,7 @@ $this->js('watch.edit_video', "
 
 <div class="watch_page">
 
-	<?php if(glue::auth()->check(array('^'=>$model))){ ?>
+	<?php if(!glue::auth()->check(array('^'=>$model))){ ?>
 	<div style='background:#4b4b4b; height:30px; padding:15px 20px; color:#fff;'>
 		<img alt='thumbnail' style='border-radius:50px; float:left;' src="<?php echo $model->author->getAvatar(30, 30); ?>"/>
 		<a style='color:#fff;font-size:20px; font-weight:normal; display:inline-block; margin:5px 10px 0 10px; line-height:22px;' href='<?php echo glue::http()->url('/user/view', array('id' => $model->author->_id)) ?>'><?php echo $model->author->getUsername() ?></a>
@@ -272,9 +272,13 @@ $this->js('watch.edit_video', "
 
 	<div class="main_body" style='margin-left:45px;'>
 	<div style='float:left; width:145px;'>
-		<?php app\widgets\UserMenu::widget() ?>
+		<?php if(glue::auth()->check(array('@'))) 
+			app\widgets\UserMenu::widget(); 
+		else
+			echo '&nbsp;';
+		?>
 	</div>
-	<div style='float:left; width:835px;'>
+	<div style='float:left; width:825px; margin-left:10px;'>
 		<div style='font-size:12px;'><a href=""><?php echo $model->get_category_text()?></a></div>
 		<h1 style='margin-top:4px; font-size:24px; line-height:27px;'><?php echo $model->title ?></h1>
 		<div class='video_element'>
@@ -285,12 +289,12 @@ $this->js('watch.edit_video', "
 				?><div class='progress'>Hold on, we're processing...</div><?php
 			}else{
 				app\widgets\videoPlayer::widget(array(
-					"mp4"=>$model->mp4, "ogg"=>$model->ogg, "width"=>970, "height"=>444
+					"mp4"=>$model->mp4, "ogg"=>$model->ogg, "width"=>825, "height"=>464
 				));
 			} ?>
 		</div>
 		
-		<div class="collapsable" style='padding:20px 15px;'>
+		<div class="collapsable" style='padding:20px 15px 0 15px;'>
 			<div class='left' style='float:left; width:70%; margin-right:10px;'>
 				<?php if(strlen($model->description) > 0): ?><div class="expandable" style='font-size:14px; line-height:17px; margin-bottom:10px;'><?php echo nl2br(htmlspecialchars($model->description)) ?></div><?php endif ?>
 				<?php if(count($model->tags) > 0 && is_array($model->tags)): ?>
@@ -304,7 +308,7 @@ $this->js('watch.edit_video', "
 				<b>License: </b><span id='video_licence'><?php echo $model->get_licence_text() ? $model->get_licence_text() : "StageX Licence" ?></span>
 				</div>
 			</div>
-			<div class='right' style='float:left; width:20%; text-align:right; width:230px;'>
+			<div class='right' style='float:left; text-align:right; width:220px;'>
 				<div class="views" style='color: #999999; font-size: 16px; font-weight: bold; float:left;'><?php echo !$model->privateStatistics ? '<strong>'.$model->views.'</strong> views' : '' ?></div>
 				
 				<div class='infocons' style='float:right;'>
@@ -337,8 +341,8 @@ $this->js('watch.edit_video', "
 				<input type="button" class="btn <?php if($model->currentUserLikes()): echo "active"; endif ?> btn-white btn-like" value="+<?php echo $model->likes>0?$model->likes:1 ?>"/>
 				<input type="button" class="btn <?php if($model->currentUserDislikes()): echo "active"; endif ?> btn-white" value="-<?php echo $model->dislikes>0?$model->dislikes:1 ?>"/>
 			</div>
-			<div style='float:right;'>
-			<?php endif; ?>		
+			<?php endif; ?>
+			<div style='float:right;'>		
 			<?php if(!$model->privateStatistics): ?><a href="#" class="selected">Statistics</a><?php endif; ?>
 			<?php if(glue::auth()->check(array('@'))): ?><a href="#">Add to Playlist</a><?php endif; ?>
 			<a href="#">Share</a>
@@ -419,8 +423,8 @@ $this->js('watch.edit_video', "
 					'series' => $video_stats['hits']							
 				)) ?>
 			</div>
-		<?php } ?>					
-		</div>
+		<?php } ?>	
+		</div>		
 
 		<div>
 			<div style='font-size:16px; font-weight:bold; color:#444444; margin:20px 0 5px 0;'><?php echo $model->totalResponses ?> responses</div>
