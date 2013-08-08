@@ -196,15 +196,15 @@ return array(
 						return false;
 				},
 				'viewable' => function($item){
-					if(!$item||glue::auth()->check(array('deleted'=>$item,'denied'=>$item)))
+					if(!$item||!glue::auth()->check(array('deleted'=>$item,'denied'=>$item))){
 						return false;
+					}
 					return true;
 				},
 				'deleted' => function($item){
 					if(!$item
 						||$item->deleted
-						||($item->author instanceof User&&$item->author->deleted)
-						||!$item instanceof User)
+						||($item->author instanceof User&&$item->author->deleted))
 						return false;
 					return true;
 				},

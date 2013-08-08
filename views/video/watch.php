@@ -12,54 +12,62 @@ $this->js('video_tabs', "
 	var video_id = '". $model->_id ."';
 		
 	$('.expandable').expander();
+	$('.video_action_tabs .alert').summarise();
 
 	$('.video_action_tabs .tab').click(function(event){
 		event.preventDefault();
-		//Lets get the content name
-		var target_el = $('.tab_content_container').find('.'+$(this).data('tab'));
-
-		if(target_el.css('display') == 'none'){
-			target_el.css({ 'display': 'block' });
-			$('.tab_content_container').children().not(target_el).css({ 'display': 'none' });
-		}else{
-			target_el.css({ 'display': 'none' });
+		$('.video_action_tabs .alert').summarise('close');
+		tabClass=$(this).attr('id').replace(/_tab/,'_content');
+		pane=$('.video_action_tabs .'+tabClass);		
+		
+		if(pane.length>0){
+			if(pane.css('display') == 'none'){
+				$('.video_action_tabs .video_details_pane').not(pane).css({ 'display': 'none' });
+				$('.video_action_tabs .simple-nav .tab').not($(this)).removeClass('selected');
+				pane.css({ 'display': 'block' });
+				$(this).addClass('selected');
+			}else{
+				pane.css({ 'display': 'none' });
+				$('.video_action_tabs .simple-nav .tab').removeClass('selected');
+			}
 		}
 	});
-
-	$('.report_video_submit').click(function(event){
+		
+	$('.report_content .btn-success').click(function(event){
 		event.preventDefault();
-		$.getJSON('/video/report', {id: '".strval($model->_id)."', reason: $('#report_reason').val()}, function(data){
+		$.get('/video/report', {id: '".strval($model->_id)."', reason: 
+			$('#report_reason input,#report_reason select,#report_reason textarea').serialize()}, null, 'json'
+		).done(function(data){
 			if(data.success){
-				forms.summary($('.video_actions .block_summary'), true, 'Thank you for helping make the StageX community safer for everyone.');
+				$('.video_action_tabs .alert').summarise('set','success','Thank you for helping make the StageX community safer for everyone.');
 			}else{
-				forms.summary($('.video_actions .block_summary'), false, 'We could not report this video. We are unsure why but please be sure some one is looking into it right now.');
+				$('.video_action_tabs .alert').summarise('set','error', 
+					'We could not report this video. We are unsure why but someone is looking into it.');
 			}
 		});
 	});
 
-	$('.tab_like').click(function(event){
+	$(document).on('click', '.btn-like', function(event){
 		event.preventDefault();
 		var el = $(this);
 		$.getJSON('/video/like', {id: '".strval($model->_id)."'}, function(data){
 			if(data.success){
-				$('.tab_content_container').children().not($('.action_like')).css({ 'display': 'none' });
-				$('.action_like').css({ 'display': 'block' });
-				$('.tab_dislike').removeClass('active');
-				el.addClass('active');
+				pane=$('.video_action_tabs .like_content');
+				$('.video_action_tabs .simple-nav .tab').removeClass('selected');
+				$('.video_action_tabs .video_details_pane').not(pane).css({ 'display': 'none' });
+				pane.css({ 'display': 'block' });
+				$('.btn-like').addClass('active');
+				$('.btn-dislike').removeClass('active');
 			}
 		});
 	});
 
-	$('.tab_dislike').click(function(event){
+	$(document).on('click', '.btn-dislike', function(event){
 		event.preventDefault();
 		$.getJSON('/video/dislike', {id: '".strval($model->_id)."'}, function(data){
 			if(data.success){
-				$('.tab_content_container').children().not($('.tab_content_container .action_dislike')).css({ 'display': 'none' });
-				$('.tab_content_container .action_dislike').css({ 'display': 'block' });
-				$('.tab_dislike').addClass('active');
-				$('.tab_like').removeClass('active');
-				$('.action_dislike .likes_amount').text(data.likes);
-				$('.action_dislike .dislikes_amount').text(data.dislikes);
+				$('.btn-dislike').addClass('active');
+				$('.btn-like').removeClass('active');
 			}
 		});
 	});
@@ -206,13 +214,13 @@ $this->js('watch.edit_video', "
 	</div>
 	<?php }else{ ?>
 			<div class='' style='background:#e5e5e5;'>
-				<div class='edit_menu' style='height:30px; padding:10px 20px;'>
+				<div class='edit_menu' style='height:30px; padding:10px 0px 10px 45px;'>
 					<div class='alert' style='display:none;'></div>
 					<input type="button" class="btn btn-primary save_video" value="Save Changes"/>
 					<input type="button" id="settings_tab" class="btn btn-dark btn-inline left btn-tab" value="Settings"/><input type="button" id="details_tab" class="btn btn-dark btn-tab btn-inline right" value="Details"/>
 					<a href='<?php echo glue::http()->url('/video/delete', array('id' => $model->_id)) ?>' class='delete_video'>Delete</a>
 				</div>
-				<div class="edit_panes" style='width:980px;'>
+				<div class="edit_panes" style='width:980px; margin-left:25px;'>
 					<?php $form = html::activeForm(array('action' => '')) ?>
 						<div class='edit_settings pane' id="settings_content">
 						<div class="form-stacked left" style='float:left;'>
@@ -270,7 +278,7 @@ $this->js('watch.edit_video', "
 			</div>
 		<?php } ?>
 
-	<div class="main_body" style='margin-left:45px;'>
+	<div class="main_body" style='margin-left:45px;min-height:800px;'>
 	<div style='float:left; width:145px;'>
 		<?php if(glue::auth()->check(array('@'))) 
 			app\widgets\UserMenu::widget(); 
@@ -339,17 +347,19 @@ $this->js('watch.edit_video', "
 			<?php if($model->voteable && glue::auth()->check(array('@'))): ?>
 			<div class="btn-group" style='margin:8px 0 0 0;'>
 				<input type="button" class="btn <?php if($model->currentUserLikes()): echo "active"; endif ?> btn-white btn-like" value="+<?php echo $model->likes>0?$model->likes:1 ?>"/>
-				<input type="button" class="btn <?php if($model->currentUserDislikes()): echo "active"; endif ?> btn-white" value="-<?php echo $model->dislikes>0?$model->dislikes:1 ?>"/>
+				<input type="button" class="btn <?php if($model->currentUserDislikes()): echo "active"; endif ?> btn-white btn-dislike" value="-<?php echo $model->dislikes>0?$model->dislikes:1 ?>"/>
 			</div>
 			<?php endif; ?>
 			<div style='float:right;'>		
-			<?php if(!$model->privateStatistics): ?><a href="#" class="selected">Statistics</a><?php endif; ?>
-			<?php if(glue::auth()->check(array('@'))): ?><a href="#">Add to Playlist</a><?php endif; ?>
-			<a href="#">Share</a>
-			<?php if(glue::auth()->check(array('@'))): ?><a href="#">Report</a><?php endif; ?>
+			<?php if(!$model->privateStatistics): ?><a href="#" id="statistics_tab" class="tab">Statistics</a><?php endif; ?>
+			<?php if(glue::auth()->check(array('@'))): ?><a href="#" id="playlists_tab" class="tab">Add to Playlist</a><?php endif; ?>
+			<a href="#" id="share_tab" class="tab">Share</a>
+			<?php if(glue::auth()->check(array('@'))): ?><a href="#" id="report_tab" class="tab">Report</a><?php endif; ?>
 			</div>
 			<div class="clear"></div>
 		</div>
+		
+		<div class="alert" style='display:none; margin-top:10px;'></div>
 		
 		<div class="share_content like_content video_details_pane">
 		<div class="" style='margin:10px 0 15px 0; font-weight:bold; color:#444444; font-size:16px;'>You liked this video, why not spread the love?</div>
@@ -383,7 +393,7 @@ $this->js('watch.edit_video', "
 			<div class="" style='margin:10px 0 15px 0; font-weight:bold; color:#444444; font-size:16px;'>Report</div>
 			<p>Pick a reason out of the list below and then click "report":</p>
 			<?php $grp=html::radio_group('report_reason'); ?>
-			<div style='float:left;'>
+			<div style='float:left;' id="report_reason">
 			<label class="radio"><?php echo $grp->add('sex'); ?>Sexual Content</label>
 			<label class="radio"><?php echo $grp->add('abuse'); ?>Harmful/Voilent Acts &amp; (Child) Abuse</label>
 			<label class="radio"><?php echo $grp->add('spam'); ?>Spam</label>
@@ -426,6 +436,7 @@ $this->js('watch.edit_video', "
 		<?php } ?>	
 		</div>		
 
+		<?php if($model->allowTextComments||$model->allowVideoComments): ?>
 		<div>
 			<div style='font-size:16px; font-weight:bold; color:#444444; margin:20px 0 5px 0;'><?php echo $model->totalResponses ?> responses</div>
 			<a class='float_right' style='font-size:12px;' href="<?php echo glue::http()->url("/videoresponse/viewAll", array("id"=>$model->_id)) ?>">View All Responses</a>
@@ -435,6 +446,7 @@ $this->js('watch.edit_video', "
 					app\models\VideoResponse::model()->public()->find(array('videoId'=>$model->_id))
 			, 'pageSize' => 10)) ?>
 		</div>
+		<?php endif ?>
 	</div>
 	<div class="clear"></div>
 </div>

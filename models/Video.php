@@ -725,7 +725,7 @@ class Video extends \glue\Db\Document{
 				"user_id" => Glue::user()->_id,
 				"item" => $this->_id,
 				"like" => 1,
-				"ts" => new MongoDate()
+				"ts" => new \MongoDate()
 			),
 			array("upsert"=>true)
 		);
@@ -745,7 +745,7 @@ class Video extends \glue\Db\Document{
 				"user_id" => Glue::user()->_id,
 				"item" => $this->_id,
 				"like" => 0,
-				"ts" => new MongoDate()
+				"ts" => new \MongoDate()
 			),
 			array("upsert"=>true)
 		);
@@ -767,8 +767,9 @@ class Video extends \glue\Db\Document{
 	}
 
 	function report($reason){
-		glue::db()->getCollection("report.video")->update(array('vid' => $this->_id, 'uid' => glue::session()->user->_id),
-			array('vid' => $this->_id, 'uid' => glue::session()->user->_id, 'reason' => $reason, 'ts' => new MongoDate()), array('upsert' => true));
+		glue::db()->report->update(array('ref' => \MongoDBRef::create($this->collectionName(), $this->_id), 'userId' => glue::user()->_id),
+			array('$setOnInsert' => array('reason' => $reason, 'ts' => new \MongoDate())), array('upsert' => true));
+		return true;
 	}
 
 	function get_time_string(){
@@ -810,7 +811,7 @@ class Video extends \glue\Db\Document{
 	}
 
 	function record_statistic($field){
-		glue::db()->video_stats_day->update(array("day"=>new MongoDate(mktime(0, 0, 0, date("m"), date("d"), date("Y"))), "vid"=>$this->_id),
+		glue::db()->video_statistics_day->update(array("day"=>new \MongoDate(mktime(0, 0, 0, date("m"), date("d"), date("Y"))), "vid"=>$this->_id),
 			array('$inc' => array($field => 1)), array("upsert"=>true));
 	}
 	

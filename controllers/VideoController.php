@@ -204,8 +204,8 @@ class videoController extends glue\Controller{
 		$video = Video::model()->findOne(array("_id"=>new MongoId(glue::http()->param('id'))));
 		if(!glue::auth()->check(array('viewable' => $video))){
 			$this->title = 'Video Not Found - StageX';
-			$this->render('deleted', array('video'=>$video));
-			glue::end();
+			echo $this->render('deleted', array('video'=>$video));
+			exit(); //glue::end();
 		}
 
 		$this->title = $video->title.' - StageX';
@@ -318,9 +318,9 @@ class videoController extends glue\Controller{
 		if($id!==null&&$reason!==null){
 			$video = Video::model()->findOne(array('_id' => new MongoId($id)));
 
-			if(!glue::auth()->check(array('deleted' => $video)))
+			if(!$reason||!glue::auth()->check(array('deleted' => $video)))
 				$this->json_error('That video was not found');
-			$video->report($_GET['reason']);
+			$video->report((string)$reason);
 			$this->json_success('The video was reported');
 		}else{
 			$this->json_error(self::UNKNOWN);
