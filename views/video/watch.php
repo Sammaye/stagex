@@ -271,11 +271,12 @@ $this->js('watch.edit_video', "
 		<?php } ?>
 
 	<div class="main_body" style='margin-left:45px;'>
-	<div style='float:left; width:145px;'>f
+	<div style='float:left; width:145px;'>
+		<?php app\widgets\UserMenu::widget() ?>
 	</div>
 	<div style='float:left; width:835px;'>
 		<div style='font-size:12px;'><a href=""><?php echo $model->get_category_text()?></a></div>
-		<h1 style='margin-top:4px;'><?php echo $model->title ?></h1>
+		<h1 style='margin-top:4px; font-size:24px; line-height:27px;'><?php echo $model->title ?></h1>
 		<div class='video_element'>
 			<?php
 			if($model->state == 'failed'){
@@ -303,13 +304,32 @@ $this->js('watch.edit_video', "
 				<b>License: </b><span id='video_licence'><?php echo $model->get_licence_text() ? $model->get_licence_text() : "StageX Licence" ?></span>
 				</div>
 			</div>
-			<div class='right' style='float:left; width:20%; text-align:right;'>
-				<div class="views" style='color: #999999; font-size: 16px; font-weight: bold;'><?php echo !$model->privateStatistics ? '<strong>'.$model->views.'</strong> views' : '' ?></div>
+			<div class='right' style='float:left; width:20%; text-align:right; width:230px;'>
+				<div class="views" style='color: #999999; font-size: 16px; font-weight: bold; float:left;'><?php echo !$model->privateStatistics ? '<strong>'.$model->views.'</strong> views' : '' ?></div>
+				
+				<div class='infocons' style='float:right;'>
+			
+					<span class='listing'>
+						<?php if($model->isUnlisted()){ ?>
+							<img alt='Unlisted' src='/images/unlisted_icon.png'/>
+						<?php }elseif($model->isPrivate()){ ?>
+							<img alt='Private' src='/images/private_icon.png'/>
+						<?php } ?>
+					</span>	
+			
+					<span class='comments'>
+						<?php if(!$model->allowTextComments && !$model->allowVideoComments){ ?>
+							<img alt='Comments Allowed' src='/images/comments_disabled_icon.png'/>
+						<?php }elseif($model->moderated){ ?>
+							<img alt='Moderated' src='/images/moderated_icon.png'/>
+						<?php } ?>
+					</span>	
+				</div>					
 			</div>			
 			<div class="clear"></div>
 		</div>
 
-		<div>
+		<div class="video_action_tabs">
 		<div class="simple-nav left" style='border-bottom:1px solid #cccccc;'>
 		
 			<?php if($model->voteable && glue::auth()->check(array('@'))): ?>
@@ -372,64 +392,39 @@ $this->js('watch.edit_video', "
 			</div><div class="clear"></div>
 		</div>
 
-					<?php if(!$model->private_stats){ ?>
-						<div class="curved_white_filled_box video_action_dialog video_action_stats">
-							<div class='header_outer'>
-								<div class="box_head">Statistics</div>
-								<div class="close"><a href="#"><?php echo utf8_decode('&#215;') ?></a></div>
-							</div>
+		<?php if(!$model->private_stats){ ?>
+			<div class="statistics_content video_details_pane">
+				<div class="" style='margin:10px 0 15px 0; font-weight:bold; color:#444444; font-size:16px;'>Statistics</div>
 
-							<div class='views_status'>
-								<div class='float_left'><span><?php echo $model->views ?></span> views</div>
-								<div class='float_right'><span><?php echo $model->uniqueViews ?></span> unique views</div>
-							</div>
-							<!-- <h2 style='font-size:13px; margin-top:12px;'>Video Statistics for the last week</h2> -->
-							<div id="chartdiv" style="height:200px;width:600px; position:relative;"></div>
+				<div class='views_status'>
+					<div class='' style='float:left; width:200px; text-align:center; font-size:16px;'><?php echo $model->views ?> views</div>
+					<div class='' style='float:left; width:200px; text-align:center; font-size:16px;'><?php echo $model->uniqueViews ?> unique views</div>
+					<div style='float:left; width:200px; text-align:center; font-size:16px;'>
+					<?php $textResponseCount = $model->with('responses', array('type' => 'text', 'deleted' => 0))->count()?>
+					<?php echo $textResponseCount ?> text <?php if($textResponseCount > 1): echo "responses"; else: echo "response"; endif ?>
+					</div>
+					<div>
+					<?php $videoResponseCount = $model->with('responses', array('type' => 'video', 'deleted' => 0))->count()?>
+					<?php echo $videoResponseCount ?> video <?php if($videoResponseCount > 1): echo "responses"; else: echo "response"; endif ?>					
+					</div>
+					<div class="clear"></div>
+				</div>
+				<div id="chartdiv" style="height:200px;width:800px; position:relative; margin-top:20px;"></div>
 
-							<?php
-							$video_stats = $model->getStatistics_dateRange(mktime(0, 0, 0, date("m"), date("d")-7, date("Y")), mktime(0, 0, 0, date("m"), date("d"), date("Y")));
-							app\widgets\highCharts::widget(array(
-							'chartName' => 'video_views_plot',
-							'appendTo' => 'chartdiv',
-							'series' => $video_stats['hits']							
-							)) ?>
-
-							<div class='demo_block_outer'>
-								<div class='demo_block_left'>
-									<h2>Like Demographics</h2>
-									<?php if($model->likes <= 0 && $model->dislikes <= 0){ ?>
-										<p>No one has liked or disliked this video yet</p>
-									<?php }else{ ?>
-										<div class='ratings_block like_block'>
-											<div style='border:1px solid #006600; background:#5bd85b; width:<?php echo ($model->likes/($model->likes+$model->dislikes))*100 > 0 ? (($model->likes/($model->likes+$model->dislikes))*100)."%;" : "5px;" ?>'></div>
-											<span><?php if($model->likes <= 0): echo "No one has liked this video yet"; elseif($model->likes == 1): echo $model->likes." person liked this video"; else: echo $model->likes." people liked this video"; endif; ?></span>
-										</div>
-										<div class="ratings_block dislike_block">
-											<div style='border:1px solid #cc0000; background:#fb5353; width:<?php echo ($model->dislikes/($model->likes+$model->dislikes))*100 > 0 ? (($model->dislikes/($model->likes+$model->dislikes))*100)."%;" : "5px;" ?>'></div>
-											<span><?php if($model->dislikes <= 0): echo "No one has disliked this video yet"; elseif($model->dislikes == 1): echo $model->dislikes." person disliked this video"; else: echo $model->dislikes.' people disliked this video'; endif; ?></span>
-										</div>
-									<?php } ?>
-								</div>
-								<div class='demo_block_right'>
-									<h2>Response Demographics</h2>
-									<?php $videoResponseCount = $model->with('responses', array('type' => 'video', 'deleted' => 0))->count()?>
-									<?php $textResponseCount = $model->with('responses', array('type' => 'text', 'deleted' => 0))->count()?>
-									<p><?php echo $textResponseCount ?> text <?php if($textResponseCount > 1): echo "responses"; else: echo "response"; endif ?></p>
-									<p><?php echo $videoResponseCount ?> video <?php if($videoResponseCount > 1): echo "responses"; else: echo "response"; endif ?></p>
-								</div>
-								<div class="clear"></div>
-							</div>
-						</div>
-					<?php } ?>					
-
-		
+				<?php
+				$video_stats = $model->getStatistics_dateRange(mktime(0, 0, 0, date("m"), date("d")-7, date("Y")), mktime(0, 0, 0, date("m"), date("d"), date("Y")));
+				app\widgets\highCharts::widget(array(
+					'chartName' => 'video_views_plot',
+					'appendTo' => 'chartdiv',
+					'series' => $video_stats['hits']							
+				)) ?>
+			</div>
+		<?php } ?>					
 		</div>
 
 		<div>
-			<div class='grey_bordered_head'>
-				<span><?php echo $model->totalResponses ?> responses</span>
-				<a class='float_right' href="<?php echo glue::http()->url("/videoresponse/view_all", array("id"=>$model->_id)) ?>">View All Responses</a>
-			</div>
+			<div style='font-size:16px; font-weight:bold; color:#444444; margin:20px 0 5px 0;'><?php echo $model->totalResponses ?> responses</div>
+			<a class='float_right' style='font-size:12px;' href="<?php echo glue::http()->url("/videoresponse/viewAll", array("id"=>$model->_id)) ?>">View All Responses</a>
 			<?php $this->renderPartial('response/list', array('model' => $model, 'comments' => 
 				glue::auth()->check(array("^"=>$model)) ? 
 					app\models\VideoResponse::model()->moderated()->find(array('videoId'=>$model->_id)) :

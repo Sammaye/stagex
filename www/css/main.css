@@ -1727,3 +1727,50 @@ textarea{
 .watch_page .share_content .network_bc li{
 	float:left; margin-right:10px;
 }
+
+.watch_page .video_action_tabs .video_details_pane{
+	display:none;
+}
+
+.watch_page .infocons .listing,
+.watch_page .infocons .comments{
+	float:right;
+	display:block;
+  	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=40)";
+  	filter: alpha(opacity=70);
+  	-moz-opacity: 0.4;
+  	-khtml-opacity: 0.4;
+  	opacity: 0.4;	
+}
+
+.watch_page .infocons .comments{
+	margin-right:25px;
+}
+
+.user_side_menu li a{
+	font-size:13px;
+	line-height:20px;
+	display:block;
+	padding:2px 0px 2px 5px;
+}
+
+.user_side_menu li a.selected{
+	background:#f5f5f5;
+}
+
+.user_side_menu .head_divider{
+	color:#666666;
+	border-top:1px solid #eeeeee;
+	font-size:13px;
+	padding:5px 0;
+	margin:10px 0 0;
+	line-height:20px;
+}
+
+.user_side_menu .end_list{
+	margin:15px 0 0;
+}
+
+.user_side_menu .badge{
+	float:right;
+}

@@ -215,8 +215,7 @@ class videoController extends glue\Controller{
 		// This allows us to stop malicious people from sending mature links to kids without having to use two pages
 		if(isset($_SESSION['age_confirmed']) && glue::http()->param('av', '1') == "1")
 			$_SESSION['age_confirmed'] = $video->_id;
-		$age_confirm = isset($_SESSION['age_confirmed']) ? $_SESSION['age_confirmed'] : 0;
-		//$safe_search = glue::session()->authed ? glue::user()->safeSearch : "S";		
+		$age_confirm = isset($_SESSION['age_confirmed']) ? $_SESSION['age_confirmed'] : 0;		
 		if(
 			!glue::auth()->check(array("^"=>$video)) && glue::user()->safeSearch && 
 			$video->mature && $age_confirm != strval($video->_id) 
@@ -237,9 +236,7 @@ class videoController extends glue\Controller{
 		if($playlist_id=glue::http()->param('playlist_id',null))
 			$playlist = apps\models\Playlist::model()->findOne(array('_id' => new MongoId($playlist_id)));
 		$this->layout = 'watch_video_layout';
-		echo $this->render('watch', array("model"=>$video, 'playlist' => isset($playlist)?$playlist:null, 'LastCommentPull' => $now
-			//'comments' => glue::auth()->check(array("^"=>$video)) ? VideoResponse::findAllComments($video, array('$lte' => $now)) : VideoResponse::findPublicComments($video, array('$lte' => $now))
-		));
+		echo $this->render('watch', array("model"=>$video, 'playlist' => isset($playlist)?$playlist:null, 'LastCommentPull' => $now));
 	}
 
 	function action_embedded(){
