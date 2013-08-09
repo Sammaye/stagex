@@ -5,7 +5,7 @@
 	$this->jsFile('/js/playlist_dropdown.js');
 
 	$this->js('watch_later', "
-		$('div.expandable').expander({slicePoint: 60});	
+		$('.expandable').expander();	
 		$('.grey_sticky_toolbar .block-alert').summarise();
 
 		$('.dropdown-group').jdropdown();			

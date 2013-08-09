@@ -177,11 +177,11 @@ $this->js('watch.edit_video', "
 
 <div class="watch_page">
 
-	<?php if(!glue::auth()->check(array('^'=>$model))){ ?>
+	<?php if(glue::auth()->check(array('^'=>$model))){ ?>
 	<div style='background:#4b4b4b; height:30px; padding:15px 20px; color:#fff;'>
 		<img alt='thumbnail' style='border-radius:50px; float:left;' src="<?php echo $model->author->getAvatar(30, 30); ?>"/>
 		<a style='color:#fff;font-size:20px; font-weight:normal; display:inline-block; margin:5px 10px 0 10px; line-height:22px;' href='<?php echo glue::http()->url('/user/view', array('id' => $model->author->_id)) ?>'><?php echo $model->author->getUsername() ?></a>
-		<span style='display:inline-block; font-size:12px;' class='uploaded'><?php echo $model->ago($model->created) ?></span>
+		<span style='display:inline-block; font-size:12px;' class='uploaded'><?php echo date('j M Y',$model->getTs($model->created)) ?></span>
 		<?php if(glue::session()->authed){ ?>
 			<div class='right' style='float:right;'>
 			<div class="subscribe_widget">

@@ -15,7 +15,7 @@
 	<div class='info'>
 		<h3 class='title'><a href="/video/watch?id=<?php echo strval($item->_id) ?>"><?php echo $item->title ?></a></h3>
 		<?php if($item->description){ ?>
-			<div class='expandable description'><?php echo $item->description ?></div>
+			<div class='expandable description'><?php echo nl2br(htmlspecialchars($item->description)) ?></div>
 		<?php } ?>
 		<div class="detail">
 			<?php echo date('d F Y', $item->created->sec) ?>

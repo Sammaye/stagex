@@ -30,6 +30,8 @@ $this->js('videos', "
 	$(function(){
 		//$('.playlist-dropdown').playlistDropdown();
 		
+		$('.expandable').expander();
+		
 		$('.mass_edit_form .alert').summarise();
 		$('.grey_sticky_toolbar .block-alert').summarise()
 

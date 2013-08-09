@@ -817,7 +817,7 @@ class Video extends \glue\Db\Document{
 	
 	function delete(){
 		foreach($video_rows as $video){
-			VideoResponse::model()->Db()->remove(array('$or' => array(
+			\app\models\VideoResponse::model()->Db()->remove(array('$or' => array(
 			array('vid' => $video->_id), array('xtn_vid' => $video->_id)
 			)), array('safe' => true));
 			$video->deleted = 1;
