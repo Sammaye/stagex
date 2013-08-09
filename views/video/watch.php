@@ -36,7 +36,7 @@ $this->js('video_tabs', "
 	$('.report_content .btn-success').click(function(event){
 		event.preventDefault();
 		$.get('/video/report', {id: '".strval($model->_id)."', reason: 
-			$('#report_reason input,#report_reason select,#report_reason textarea').serialize()}, null, 'json'
+			$('#report_reason input:checked').val()}, null, 'json'
 		).done(function(data){
 			if(data.success){
 				$('.video_action_tabs .alert').summarise('set','success','Thank you for helping make the StageX community safer for everyone.');
@@ -79,23 +79,22 @@ $this->js('video_tabs', "
 		event.preventDefault();
 		var text = '', textarea = $(this).parents('.share_item_with_subs').find('.share_status_text');
 
-		if(!textarea.hasClass('share_status_text_unchanged') && textarea.val().length > 0){
+		if(!textarea.hasClass('share_status_text_unchanged') && textarea.val().length > 0)
 			text = textarea.val();
-		}
-
 		$.getJSON('/stream/share', {'type': 'video', 'id': '".strval($model->_id)."', text: text}, function(data){
 			if(data.success){
-				forms.summary($('.video_actions .block_summary'), true, data.message);
+				$('.video_action_tabs .alert').summarise('set','success',data.messsage);
 				$('.share_status_text').val('');
-			}else{
-				forms.summary($('.video_actions .block_summary'), false, data.message);
-			}
+			}else
+				$('.video_action_tabs .alert').summarise('set','error',data.messsage);
 		});
 	});
 ");
 
 $this->js('watch.edit_video', "
 
+	$('.edit_menu .alert').summarise();
+		
 	$(document).on('click', '.edit_menu .btn-tab', function(event){
 		
 		tabClass=$(this).attr('id').replace(/_tab/,'_content');
@@ -114,78 +113,70 @@ $this->js('watch.edit_video', "
 		}
 	});
 
+	$('.edit_menu .save_video').click(function(event){
+		event.preventDefault();
 
-		$('.save_video_edits').click(function(event){
-			event.preventDefault();
+		var fields = $('.edit_panes input,.edit_panes select,.edit_panes textarea').serializeArray();
+		fields[fields.length] = {name: 'id', value: '".strval($model->_id)."'};
 
-			var fields = $('.video_edit_panes input,.video_edit_panes select,.video_edit_panes textarea').serializeArray();
-			fields[fields.length] = {name: 'Video[id]', value: '".strval($model->_id)."'};
+		$.post('/video/save', fields, null, 'json').done(function(data){
+			if(!data.success){
+				$('.edit_menu .alert').summarise('set','error',
+					{message:'<h4>Could not save video</h4>The changes to this video could not be saved because:',list:data.messages});
+			}else{
+				$('.edit_menu .alert').summarise('set','success', 'The changes you made were successfully saved');		
 
-			$.post('/video/save', fields, function(data){
-				if(!data.success){
-					forms.summary($('#video_author_bar .block_summary'), false,
-						'<h2>Could not save video</h2>The changes to this video could not be saved because:', data.errors);
+				/*
+				$('#video_title').html(data.data.title);
+				$('#video_description').html(data.data.description);
+
+				if(!data.data.tags){
+					$('#video_tags').html('');
+				}else{
+					$('#video_tags').html('');
+					for(var i=0; i<data.data.tags.length; i++){
+						$('#video_tags').append('<a href=\'/search?mainSearch='+data.data.tags[i]+'\'><span>'+data.data.tags[i]+'</span></a>');
+					}
+				}
+
+				$('#video_licence').html(data.data.licence);
+				$('#video_category').html(data.data.category);
+				*/
+			}
+		});
+	});
+
+	$(document).on('click', '.delete_video', function(event){
+		event.preventDefault();
+		params={'ids[]':['".strval($model->_id)."']};
+		$.post('/video/delete', params, null, 'json').done(function(data){
+			if(data.success){
+				window.location = '/user/videos';
+			}else
+				$('.edit_menu .alert').summarise('set','error','There was error while trying to delete your video');
+		});			
+	});
+
+	$('.delete_all_responses').click(function(event){
+		event.preventDefault();
+		var type = $(this).data().type;
+
+		$.getJSON('/video/delete_responses', {id: '".strval($model->_id)."', type: type}, function(data){
+			if(data.success){
+				if(type == 'video'){
+					forms.summary($('#video_author_bar .block_summary'), true,
+						'All video responses have been removed from this video successfully.', data.errors);
 				}else{
 					forms.summary($('#video_author_bar .block_summary'), true,
-						'The changes you made were successfully saved.', data.errors);
-
-					$('#video_title').html(data.data.title);
-					$('#video_description').html(data.data.description);
-
-					if(!data.data.tags){
-						$('#video_tags').html('');
-					}else{
-						$('#video_tags').html('');
-						for(var i=0; i<data.data.tags.length; i++){
-							$('#video_tags').append('<a href=\'/search?mainSearch='+data.data.tags[i]+'\'><span>'+data.data.tags[i]+'</span></a>');
-						}
-					}
-
-					$('#video_licence').html(data.data.licence);
-					$('#video_category').html(data.data.category);
-
-					add_expandable_details_link();
+						'All text responses have been removed from this video successfully.', data.errors);
 				}
-			}, 'json');
+			}else{
+				forms.summary($('#video_author_bar .block_summary'), false,
+					'There was an error while trying to remove the responses from this video. Please try again later.', data.errors);
+			}
+			refresh_video_response_list();
 		});
-
-		$(document).on('click', '.delete_video', function(event){
-			event.preventDefault();
-			$.getJSON('/video/remove', {id: '".strval($model->_id)."'}, function(data){
-				if(data.success){
-					window.location = '/user/videos';
-				}else{
-					forms.summary($('#video_author_bar .block_summary'), false, 'There was error while trying to delete your video. We are not sure what but will look into it.');
-				}
-			});
-		});
-
-		$('.select_video_thumbnail .video_thumb_chng').click(function(event){
-			event.preventDefault();
-			$('.select_video_thumbnail .smallThumbOuter').not($(this).parents('.smallThumbOuter')).removeClass('video_thumbnail_selected').find('input').removeAttr('checked');
-			$(this).parents('.smallThumbOuter').addClass('video_thumbnail_selected').find('input').attr('checked', true);
-		});
-
-		$('.delete_all_responses').click(function(event){
-			event.preventDefault();
-			var type = $(this).data().type;
-
-			$.getJSON('/video/delete_responses', {id: '".strval($model->_id)."', type: type}, function(data){
-				if(data.success){
-					if(type == 'video'){
-						forms.summary($('#video_author_bar .block_summary'), true,
-							'All video responses have been removed from this video successfully.', data.errors);
-					}else{
-						forms.summary($('#video_author_bar .block_summary'), true,
-							'All text responses have been removed from this video successfully.', data.errors);
-					}
-				}else{
-					forms.summary($('#video_author_bar .block_summary'), false,
-						'There was an error while trying to remove the responses from this video. Please try again later.', data.errors);
-				}
-				refresh_video_response_list();
-			});
-		});
+	});
 "); ?>
 
 <div class="watch_page">
@@ -211,8 +202,8 @@ $this->js('watch.edit_video', "
 	</div>
 	<?php }else{ ?>
 			<div class='' style='background:#e5e5e5;'>
-				<div class='edit_menu' style='height:30px; padding:10px 0px 10px 45px;'>
-					<div class='alert' style='display:none;'></div>
+				<div class='edit_menu' style='padding:10px 0px 10px 45px;width:980px;'>
+					<div class='alert' style='display:none; margin-bottom:10px;'></div>
 					<input type="button" class="btn btn-primary save_video" value="Save Changes"/>
 					<input type="button" id="settings_tab" class="btn btn-dark btn-inline left btn-tab" value="Settings"/><input type="button" id="details_tab" class="btn btn-dark btn-tab btn-inline right" value="Details"/>
 					<a href='<?php echo glue::http()->url('/video/delete', array('id' => $model->_id)) ?>' class='delete_video'>Delete</a>
@@ -223,7 +214,7 @@ $this->js('watch.edit_video', "
 						<div class="form-stacked left" style='float:left;'>
 							<div class="form_row"><?php echo html::label('Title', 'title') ?><?php echo html::activeTextField($model, 'title') ?></div>
 							<div class="form_row"><?php echo html::label('Description', 'description')?><?php echo html::activeTextarea($model, 'description') ?></div>
-							<div class="form_row last"><?php echo html::label('Tags', 'stringTags') ?><?php echo html::activeTextField($model, 'string_tags') ?></div>			
+							<div class="form_row last"><?php echo html::label('Tags', 'stringTags') ?><?php echo html::activeTextField($model, 'stringTags') ?></div>			
 						</div>
 						<div class='right' style='float:right;width:450px;'>
 							<h4>Category</h4><?php echo html::activeSelectbox($model, 'category', $model->categories('selectBox')) ?>

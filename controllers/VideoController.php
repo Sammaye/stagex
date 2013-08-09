@@ -257,6 +257,25 @@ class videoController extends glue\Controller{
 		}		
 		$this->render('embedded', array('model' => $video));
 	}
+	
+	function action_save(){
+		$this->title = 'Save Video - StageX';
+		if(!glue::auth()->check('ajax','post'))
+			glue::trigger('404');
+		if(
+			(isset($_POST['Video'])&&($id=glue::http()->param('id',null))) &&
+			($video = Video::model()->findOne(array('_id' => new MongoId($id))))
+		){
+			if(!glue::auth()->check(array('^' => $video)))
+				$this->json_error(self::UNKNOWN);
+			$video->attributes=$_POST['Video'];
+			if($video->validate()&&$video->save())
+				$this->json_success(array('model'=>$video->getJSONDocument()));
+			else
+				$this->json_error(array('messages'=>$video->getErrors(),'message'=>'This video could not be saved:'));
+		}
+		$this->json_error(self::UNKNOWN);
+	}
 
 	function action_batchSave(){
 
@@ -315,10 +334,11 @@ class videoController extends glue\Controller{
 		$id=glue::http()->param('id',null);
 		$reason=glue::http()->param('reason',null);
 
+		if(!$reason||array_search($reason, array('sex', 'abuse', 'religious', 'dirty'))===false)
+			$this->json_error('You must enter a valid reporting reason');
 		if($id!==null&&$reason!==null){
 			$video = Video::model()->findOne(array('_id' => new MongoId($id)));
-
-			if(!$reason||!glue::auth()->check(array('deleted' => $video)))
+			if(!glue::auth()->check(array('deleted' => $video)))
 				$this->json_error('That video was not found');
 			$video->report((string)$reason);
 			$this->json_success('The video was reported');
