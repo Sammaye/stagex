@@ -153,7 +153,7 @@ class User extends \glue\User{
 			"following" => array('many', 'Follower', "from_id"),
 			"followers" => array('many', 'Follower', "to_id"),
 			"videos" => array('many', 'Video', "user_id"),
-			"playlists" => array('many', 'Playlist', "user_id"),
+			"playlists" => array('many', 'Playlist', "userId"),
 			'notifications' => array('many', 'Notification', 'user_id'),
 		);
 	}

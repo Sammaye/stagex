@@ -1715,6 +1715,10 @@ textarea{
 	border-bottom:1px solid #cccccc; padding:10px;
 }
 
+.watch_page .playlists_pane{
+	padding:0;
+}
+
 .watch_page .share_content .share_status_text{
 	width:400px;
 	height:120px;

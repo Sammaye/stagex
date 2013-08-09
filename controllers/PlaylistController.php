@@ -12,7 +12,7 @@ class PlaylistController extends glue\Controller{
 		return array(
 			array("allow",
 				"actions"=>array('add', 'edit', 'save_playlist', 'delete', 'batch_delete', 'addVideo', 'add_many_videos', 'get_menu', 'set_detail', 'like', 'unlike', 'clear',
-					'deleteVideo'),
+					'deleteVideo', 'suggestAddTo'),
 				"users"=>array("@*")
 			),
 			array('allow', 'actions' => array('index', 'view', 'get_playlist_bar')),
@@ -362,6 +362,22 @@ class PlaylistController extends glue\Controller{
 			$playlist->save();
 		}
 		GJSON::kill('This playlist was unliked', true);
+	}
+	
+	function action_suggestAddTo(){
+		$this->title='Suggest Playlists - StageX';
+		if(!glue::http()->isAjax())
+			glue::trigger('404');
+		$term=glue::http()->param('term',null);
+		$c=\app\models\Playlist::model()->fts(array('title'),$term,array('deleted'=>0, 'userId' => glue::user()->_id))->limit(100);
+		
+		$res=array();
+		foreach($c as $p){
+			$res[]=array(
+				'title'=>$p->title,'userId'=>$p->userId,'description'=>$p->description,
+				'listing'=>$p->listing,'totalVideos'=>$p->totalVideos,'likes'=>$p->likes,'created'=>date('d M Y',$p->getTs($p->created)));
+		}
+		$this->json_success(array('results'=>$res));
 	}
 
 	public function action_get_menu(){

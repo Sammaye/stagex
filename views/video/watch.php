@@ -89,6 +89,27 @@ $this->js('video_tabs', "
 				$('.video_action_tabs .alert').summarise('set','error',data.messsage);
 		});
 	});
+		
+	$('#search_playlists').on('keyup', function(e){
+		if($(this).val().length>3){
+			$.get('/playlist/suggestAddTo',{term:$(this).val()},null,'json').done(function(data){
+				if(data.success){
+					var container=$('.playlists_content .results');
+					container.empty();
+					if(data.results.length>0){
+						$.each(data.results,function(i,item){
+							container.append($('<div/>').
+								append($('<span/>').text(item.title+'('+item.totalVideos+')'))
+								.append($('<span/>').text(item.created))
+							);
+						});
+					}else{
+						container.append($('<div/>').text('No results found'));
+					}
+				}
+			});
+		}
+	});
 ");
 
 $this->js('watch.edit_video', "
@@ -417,6 +438,17 @@ $this->js('watch.edit_video', "
 				)) ?>
 			</div>
 		<?php } ?>	
+		
+		<?php if(glue::auth()->check(array('@'))): ?>
+		<div class="playlists_content playlists_pane video_details_pane">
+			<div style='background:#f8f8f8;border-bottom:1px solid #e5e5e5;'>
+				<a href="#" class="watch_later" style='display:block; padding:10px;'>Add to Watch Later</a>
+				<input id="search_playlists" type="text" style='margin:10px;margin-top:0;border-radius:2px;' class="input-xxlarge" placeholder="Enter a search term for playlists"/>
+			</div>
+			<div class="results"></div>
+		</div>
+		<?php endif; ?>
+		
 		</div>		
 
 		<?php if($model->allowTextComments||$model->allowVideoComments): ?>
