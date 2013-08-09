@@ -828,20 +828,18 @@ class Video extends \glue\Db\Document{
 	}
 	
 	function removeVideoResponses(){
-		$count = glue::db()->videoresponse->find(array('vid' => $video->_id, 'type' => 'video'))->count();
-		glue::db()->videoresponse->remove(array('vid' => $video->_id, 'type' => 'video'), array('safe' => true));
-		
-		$video->total_responses = $video->total_responses-$count;
-		$video->vid_responses = $video->vid_responses-$count;
-		$video->save();		
+		$count=\app\models\VideoResponse::model()->findAll(array('videoId' => $this->_id, 'type' => 'video'))->count();
+		\app\models\VideoResponse::model()->deleteAll(array('videoId' => $this->_id, 'type' => 'video'));
+		$this->totalResponses = $this->totalResponses-$count;
+		$this->totalVideoResponses = $this->totalVideoResponses-$count;
+		$this->save();		
 	}
 	
 	function removeTextResponses(){
-		$count = glue::db()->videoresponse->find(array('vid' => $video->_id, 'type' => 'text'))->count();
-		glue::db()->videoresponse->remove(array('vid' => $video->_id, 'type' => 'text'), array('safe' => true));
-		
-		$video->total_responses = $video->total_responses-$count;
-		$video->txt_responses = $video->txt_responses-$count;
-		$video->save();		
+		$count = \app\models\VideoResponse::model()->find(array('videoId' => $this->_id, 'type' => 'text'))->count();
+		\app\models\VideoResponse::model()->deleteAll(array('videoId' => $this->_id, 'type' => 'text'));
+		$this->totalResponses = $this->totalResponses-$count;
+		$this->totalTextReponses = $this->totalTextReponses-$count;
+		$this->save();		
 	}
 }

@@ -161,19 +161,15 @@ $this->js('watch.edit_video', "
 		event.preventDefault();
 		var type = $(this).data().type;
 
-		$.getJSON('/video/delete_responses', {id: '".strval($model->_id)."', type: type}, function(data){
+		$.getJSON('/video/deleteResponses', {id: '".strval($model->_id)."', type: type}, function(data){
 			if(data.success){
 				if(type == 'video'){
-					forms.summary($('#video_author_bar .block_summary'), true,
-						'All video responses have been removed from this video successfully.', data.errors);
-				}else{
-					forms.summary($('#video_author_bar .block_summary'), true,
-						'All text responses have been removed from this video successfully.', data.errors);
-				}
-			}else{
-				forms.summary($('#video_author_bar .block_summary'), false,
-					'There was an error while trying to remove the responses from this video. Please try again later.', data.errors);
-			}
+					$('.edit_menu .alert').summarise('set','success','All video responses have been removed from this video successfully');
+				}else
+					$('.edit_menu .alert').summarise('set','success','All text responses have been removed from this video successfully');
+			}else
+				$('.edit_menu .alert').summarise('set','error',
+					{message:'There was an error while trying to remove the responses from this video. Please try again later.',list:data.messages});
 			refresh_video_response_list();
 		});
 	});
@@ -244,16 +240,13 @@ $this->js('watch.edit_video', "
 						<div class="left" style='float:left; margin-right:40px;'>
 							<label class='checkbox'><?php echo $form->checkbox($model, "voteable", 1) ?>Allow users to vote on this video</label>
 							<label class='checkbox'><?php echo $form->checkbox($model, "embeddable", 1) ?>Allow embedding of my video</label>
-							<label class='checkbox'><?php echo $form->checkbox($model, "private_stats", 1) ?>Make all statistics private</label>
+							<label class='checkbox'><?php echo $form->checkbox($model, "privateStatistics", 1) ?>Make all statistics private</label>
 						</div>
 						<div class='left' style='float:left; margin-right:40px;'>
-							<h4>Responses</h4>
-							<?php $group = $form->radio_group($model, "mod_comments") ?>
-							<label class='checkbox'><?php echo $group->add(0) ?><span>Automatically post all comments</span></label>
-							<label class='checkbox'><?php echo $group->add(1) ?><span>Make all moderated</span></label>
-							<label class='checkbox'><?php echo $form->checkbox($model, "voteable_comments", 1) ?><span>Allow users to vote on responses</span></label>
-							<label class='checkbox'><?php echo $form->checkbox($model, "vid_coms_allowed", 1) ?><span>Allow video responses</span></label>
-							<label class='checkbox'><?php echo $form->checkbox($model, "txt_coms_allowed", 1) ?><span>Allow text responses</span></label>
+							<label class='checkbox'><?php echo $form->checkbox($model, "moderated", 1) ?><span>Moderate responses</span></label>
+							<label class='checkbox'><?php echo $form->checkbox($model, "voteableComments", 1) ?><span>Allow users to vote on responses</span></label>
+							<label class='checkbox'><?php echo $form->checkbox($model, "allowVideoComments", 1) ?><span>Allow video responses</span></label>
+							<label class='checkbox'><?php echo $form->checkbox($model, "allowTextComments", 1) ?><span>Allow text responses</span></label>
 						</div>
 						<div class='right' style='float:left;'>
 							<div class='btn delete_all_responses' data-type='video' style='margin-bottom:15px; display:block;'>Delete all video responses</div>
