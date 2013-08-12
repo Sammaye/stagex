@@ -6,7 +6,7 @@ $this->jsFile('/js/jdropdown.js');
 $this->jsFile('/js/views/subscribeButton.js');
 $this->JsFile("/js/jquery.expander.js");
 
-$this->js('video_tabs', "
+$this->js('page', "
 		
 	$.playlist_bar();
 	var video_id = '". $model->_id ."';
@@ -98,21 +98,34 @@ $this->js('video_tabs', "
 					container.empty();
 					if(data.results.length>0){
 						$.each(data.results,function(i,item){
-							container.append($('<div/>').
-								append($('<span/>').text(item.title+'('+item.totalVideos+')'))
-								.append($('<span/>').text(item.created))
+							container.append($('<div class=\"playlist\"/>').data({id:item._id})
+								.append($('<span/>').addClass('name').text(item.title))
+								.append($('<span/>').addClass('video_count').text('('+item.totalVideos+')'))
+								.append($('<span/>').addClass('created').text(item.created))
 							);
 						});
 					}else{
-						container.append($('<div/>').text('No results found'));
+						container.append($('<div class=\"no_results_found\"/>').text('No results found'));
 					}
 				}
 			});
 		}
 	});
+		
+	$(document).on('click', '.playlists_content .playlist', function(e){
+		e.preventDefault();
+		var params = [{name:'playlist_id',value:$(this).data().id},{name:'video_ids[0]',value:'".$model->_id."'}];
+		$.post('/playlist/addVideo', params, null, 'json').done(function(data){
+			if(data.success){
+				$('.video_action_tabs .alert').summarise('set','success','Video added to playlist');
+			}else{
+				$('.video_action_tabs .alert').summarise('set','error','Video could not be added to playlist');
+			}
+		});
+	});		
 ");
 
-$this->js('watch.edit_video', "
+$this->js('edit', "
 
 	$('.edit_menu .alert').summarise();
 		
@@ -198,15 +211,15 @@ $this->js('watch.edit_video', "
 
 <div class="watch_page">
 
-	<?php if(glue::auth()->check(array('^'=>$model))){ ?>
-	<div style='background:#4b4b4b; height:30px; padding:15px 20px; color:#fff;'>
-		<img alt='thumbnail' style='border-radius:50px; float:left;' src="<?php echo $model->author->getAvatar(30, 30); ?>"/>
-		<a style='color:#fff;font-size:20px; font-weight:normal; display:inline-block; margin:5px 10px 0 10px; line-height:22px;' href='<?php echo glue::http()->url('/user/view', array('id' => $model->author->_id)) ?>'><?php echo $model->author->getUsername() ?></a>
-		<span style='display:inline-block; font-size:12px;' class='uploaded'><?php echo date('j M Y',$model->getTs($model->created)) ?></span>
+	<?php if(!glue::auth()->check(array('^'=>$model))){ ?>
+	<div class="user_ribbon_menu">
+		<img alt='thumbnail' class="thumbnail" src="<?php echo $model->author->getAvatar(30, 30); ?>"/>
+		<a class="username" href='<?php echo glue::http()->url('/user/view', array('id' => $model->author->_id)) ?>'><?php echo $model->author->getUsername() ?></a>
+		<span class='uploaded'><?php echo date('j M Y',$model->getTs($model->created)) ?></span>
 		<?php if(glue::session()->authed){ ?>
-			<div class='right' style='float:right;'>
+			<div class='right'>
 			<div class="subscribe_widget">
-				<span class="follower_count">1,000,000 Subscribers</span>
+				<span class="follower_count"><?php echo $model->author->totalFollowers ?> Subscribers</span>
 				<?php if(app\models\Follower::isSubscribed($model->author->_id)){ ?>
 				<input type="button" class='unsubscribe btn button' value="Unsubscribe"/>
 				<?php }else{ ?>
@@ -218,67 +231,66 @@ $this->js('watch.edit_video', "
 		<div class="clear"></div>
 	</div>
 	<?php }else{ ?>
-			<div class='' style='background:#e5e5e5;'>
-				<div class='edit_menu' style='padding:10px 0px 10px 45px;width:980px;'>
-					<div class='alert' style='display:none; margin-bottom:10px;'></div>
-					<input type="button" class="btn btn-primary save_video" value="Save Changes"/>
-					<input type="button" id="settings_tab" class="btn btn-dark btn-inline left btn-tab" value="Settings"/><input type="button" id="details_tab" class="btn btn-dark btn-tab btn-inline right" value="Details"/>
-					<a href='<?php echo glue::http()->url('/video/delete', array('id' => $model->_id)) ?>' class='delete_video'>Delete</a>
+	<div class='edit_ribbon_menu'>
+		<div class='edit_menu'>
+			<div class='alert' style='display:none; margin-bottom:10px;'></div>
+			<input type="button" class="btn btn-primary save_video" value="Save Changes"/>
+			<input type="button" id="settings_tab" class="btn btn-dark btn-inline left btn-tab" value="Settings"/><input type="button" id="details_tab" class="btn btn-dark btn-tab btn-inline right" value="Details"/>
+			<a href='<?php echo glue::http()->url('/video/delete', array('id' => $model->_id)) ?>' class='delete_video'>Delete</a>
+		</div>
+		<div class="edit_panes">
+			<?php $form = html::activeForm(array('action' => '')) ?>
+				<div class='edit_settings pane' id="settings_content">
+				<div class="form-stacked">
+					<div class="form_row"><?php echo html::label('Title', 'title') ?><?php echo html::activeTextField($model, 'title') ?></div>
+					<div class="form_row"><?php echo html::label('Description', 'description')?><?php echo html::activeTextarea($model, 'description') ?></div>
+					<div class="form_row"><?php echo html::label('Tags', 'stringTags') ?><?php echo html::activeTextField($model, 'stringTags') ?></div>			
 				</div>
-				<div class="edit_panes" style='width:980px; margin-left:25px;'>
-					<?php $form = html::activeForm(array('action' => '')) ?>
-						<div class='edit_settings pane' id="settings_content">
-						<div class="form-stacked left" style='float:left;'>
-							<div class="form_row"><?php echo html::label('Title', 'title') ?><?php echo html::activeTextField($model, 'title') ?></div>
-							<div class="form_row"><?php echo html::label('Description', 'description')?><?php echo html::activeTextarea($model, 'description') ?></div>
-							<div class="form_row last"><?php echo html::label('Tags', 'stringTags') ?><?php echo html::activeTextField($model, 'stringTags') ?></div>			
-						</div>
-						<div class='right' style='float:right;width:450px;'>
-							<h4>Category</h4><?php echo html::activeSelectbox($model, 'category', $model->categories('selectBox')) ?>
-							<h4>Adult Content</h4>
-							<label class="checkbox"><?php echo $form->checkbox($model, 'mature', 1) ?>This video is not suitable for family viewing</label>
-							<h4>Listing</h4>
-							<?php $grp = html::activeRadio_group($model, 'listing') ?>
-							<div class="label_options">
-								<label class="radio"><?php echo $grp->add(0) ?>Listed</label>
-								<p class='light'>Your video is public to all users of StageX</p>
-								<label class="radio"><?php echo $grp->add(1) ?>Unlisted</label>
-								<p class='light'>Your video is hidden from listings but can still be accessed directly using the video URL</p>
-								<label class="radio"><?php echo $grp->add(2) ?>Private</label>
-								<p class='light'>No one but you can access this video</p>
-							</div>
-							<h4>Licence (<a href='#'>Learn More</a>)</h4>
-							<?php $grp = html::activeRadio_group($model, 'licence') ?>
-							<div class="label_options">
-								<label class="radio"><?php echo $grp->add('1') ?>Standard StageX Licence</label>
-								<label class="radio"><?php echo $grp->add('2') ?>Creative Commons Licence</label>
-							</div>
-						</div>						
-						</div>
-						<div class="clear"></div>
-
-						<div class='pane' id="details_content">
-						<div class="left" style='float:left; margin-right:40px;'>
-							<label class='checkbox'><?php echo $form->checkbox($model, "voteable", 1) ?>Allow users to vote on this video</label>
-							<label class='checkbox'><?php echo $form->checkbox($model, "embeddable", 1) ?>Allow embedding of my video</label>
-							<label class='checkbox'><?php echo $form->checkbox($model, "privateStatistics", 1) ?>Make all statistics private</label>
-						</div>
-						<div class='left' style='float:left; margin-right:40px;'>
-							<label class='checkbox'><?php echo $form->checkbox($model, "moderated", 1) ?><span>Moderate responses</span></label>
-							<label class='checkbox'><?php echo $form->checkbox($model, "voteableComments", 1) ?><span>Allow users to vote on responses</span></label>
-							<label class='checkbox'><?php echo $form->checkbox($model, "allowVideoComments", 1) ?><span>Allow video responses</span></label>
-							<label class='checkbox'><?php echo $form->checkbox($model, "allowTextComments", 1) ?><span>Allow text responses</span></label>
-						</div>
-						<div class='right' style='float:left;'>
-							<div class='btn delete_all_responses' data-type='video' style='margin-bottom:15px; display:block;'>Delete all video responses</div>
-							<div class='btn delete_all_responses' data-type='text'>Delete all text responses</div>
-						</div>
-						</div>
-						<div class="clear"></div>
-					<?php $form->end(); ?>
+				<div class='right'>
+					<h4>Category</h4><?php echo html::activeSelectbox($model, 'category', $model->categories('selectBox')) ?>
+					<h4>Adult Content</h4>
+					<label class="checkbox"><?php echo $form->checkbox($model, 'mature', 1) ?>This video is not suitable for family viewing</label>
+					<h4>Listing</h4>
+					<?php $grp = html::activeRadio_group($model, 'listing') ?>
+					<div class="label_options">
+						<label class="radio"><?php echo $grp->add(0) ?>Listed</label>
+						<p class='light'>Your video is public to all users of StageX</p>
+						<label class="radio"><?php echo $grp->add(1) ?>Unlisted</label>
+						<p class='light'>Your video is hidden from listings but can still be accessed directly using the video URL</p>
+						<label class="radio"><?php echo $grp->add(2) ?>Private</label>
+						<p class='light'>No one but you can access this video</p>
+					</div>
+					<h4>Licence (<a href='#'>Learn More</a>)</h4>
+					<?php $grp = html::activeRadio_group($model, 'licence') ?>
+					<div class="label_options">
+						<label class="radio"><?php echo $grp->add('1') ?>Standard StageX Licence</label>
+						<label class="radio"><?php echo $grp->add('2') ?>Creative Commons Licence</label>
+					</div>
 				</div>
-			</div>
-		<?php } ?>
+				<div class="clear"></div>						
+				</div>
+				<div class='edit_details pane' id="details_content">
+				<div class="left">
+					<label class='checkbox'><?php echo $form->checkbox($model, "voteable", 1) ?>Allow users to vote on this video</label>
+					<label class='checkbox'><?php echo $form->checkbox($model, "embeddable", 1) ?>Allow embedding of my video</label>
+					<label class='checkbox'><?php echo $form->checkbox($model, "privateStatistics", 1) ?>Make all statistics private</label>
+				</div>
+				<div class='left'>
+					<label class='checkbox'><?php echo $form->checkbox($model, "moderated", 1) ?><span>Moderate responses</span></label>
+					<label class='checkbox'><?php echo $form->checkbox($model, "voteableComments", 1) ?><span>Allow users to vote on responses</span></label>
+					<label class='checkbox'><?php echo $form->checkbox($model, "allowVideoComments", 1) ?><span>Allow video responses</span></label>
+					<label class='checkbox'><?php echo $form->checkbox($model, "allowTextComments", 1) ?><span>Allow text responses</span></label>
+				</div>
+				<div class='button_group'>
+					<div class='btn delete_all_responses' data-type='video'>Delete all video responses</div>
+					<div class='btn delete_all_responses' data-type='text'>Delete all text responses</div>
+				</div>
+				<div class="clear"></div>
+				</div>
+			<?php $form->end(); ?>
+		</div>
+	</div>
+	<?php } ?>
 
 	<div class="main_body" style='margin-left:45px;min-height:800px;'>
 	<div style='float:left; width:145px;'>
@@ -386,7 +398,7 @@ $this->js('watch.edit_video', "
 			<input type="text" style='width:330px; margin-top:10px;' class="select_all_onfoc" value="<?php echo glue::http()->url("/video/watch", array("id"=>$model->_id)) ?>" />
 			<div class="clear"></div>	
 			<?php if($model->embeddable){ ?>
-			<h4>Embedd:</h4>
+			<h4>Embed:</h4>
 			<textarea rows="" cols="" style='width:330px; height:50px;' class="select_all_onfoc"><iframe style="width:560px; height:315px; border:0;" frameborder="0" src="<?php echo glue::http()->url("/video/embedded", array("id"=>$model->_id)) ?>"></iframe></textarea>
 			<?php } ?>
 		</div>
@@ -442,7 +454,7 @@ $this->js('watch.edit_video', "
 		<?php if(glue::auth()->check(array('@'))): ?>
 		<div class="playlists_content playlists_pane video_details_pane">
 			<div style='background:#f8f8f8;border-bottom:1px solid #e5e5e5;'>
-				<a href="#" class="watch_later" style='display:block; padding:10px;'>Add to Watch Later</a>
+				<a href="#" class="playlist watch_later" data-id="<?php echo glue::user()->watchLaterPlaylist()->_id ?>" style='display:block; padding:10px;border:0;'>Add to Watch Later</a>
 				<input id="search_playlists" type="text" style='margin:10px;margin-top:0;border-radius:2px;' class="input-xxlarge" placeholder="Enter a search term for playlists"/>
 			</div>
 			<div class="results"></div>

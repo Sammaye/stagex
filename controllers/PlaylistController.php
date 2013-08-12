@@ -374,7 +374,7 @@ class PlaylistController extends glue\Controller{
 		$res=array();
 		foreach($c as $p){
 			$res[]=array(
-				'title'=>$p->title,'userId'=>$p->userId,'description'=>$p->description,
+				'_id'=>(string)$p->_id, 'title'=>$p->title,'userId'=>$p->userId,'description'=>$p->description,
 				'listing'=>$p->listing,'totalVideos'=>$p->totalVideos,'likes'=>$p->likes,'created'=>date('d M Y',$p->getTs($p->created)));
 		}
 		$this->json_success(array('results'=>$res));

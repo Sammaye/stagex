@@ -1684,7 +1684,7 @@ textarea{
 }
 
 .watch_page .edit_panes .pane{
-	display:none; margin:0 0 10px 20px;
+	display:none; padding-bottom:10px;
 }
 
 .watch_page .edit_menu .btn-primary{
@@ -1777,4 +1777,77 @@ textarea{
 
 .user_side_menu .badge{
 	float:right;
+}
+
+.watch_page .playlists_content .playlist{
+	cursor:pointer;
+	font-size:14px;
+	padding:10px;
+	border-bottom:1px solid #cccccc;
+}
+
+.watch_page .playlists_content .playlist:hover{
+	background:#f1f1f1;
+}
+
+.watch_page .playlist .video_count{
+	color:#999999;
+	margin:0 50px 0 5px;
+}
+
+.watch_page .edit_settings.pane .light{
+	font-size:12px;
+	line-height:14px;
+}
+
+.watch_page .user_ribbon_menu{
+	background:#4b4b4b; height:30px; padding:15px 20px; color:#fff;
+}
+
+.watch_page .user_ribbon_menu .thumbnail{
+	border-radius:50px; float:left;
+}
+
+.watch_page .user_ribbon_menu .username{
+	color:#fff;font-size:20px; font-weight:normal; display:inline-block; margin:5px 10px 0 10px; line-height:22px;
+}
+
+.watch_page .user_ribbon_menu .uploaded{
+	display:inline-block; font-size:12px;
+}
+
+.watch_page .user_ribbon_menu .right{
+	float:right;
+}
+
+.watch_page .edit_ribbon_menu{
+	background:#e5e5e5; padding:10px 10px 0px 45px;
+}
+
+.watch_page .edit_ribbon_menu .edit_menu{
+	padding-bottom:10px;width:980px;
+}
+
+.watch_page .edit_ribbon_menu .edit_panes{
+	width:980px;
+}
+
+.watch_page .edit_panes .edit_settings .form-stacked{
+	float:left;
+}
+
+.watch_page .edit_panes .edit_settings .right{
+	float:right;width:450px;	
+}
+
+.watch_page .edit_panes .edit_details .left{
+	float:left; margin-right:40px;
+}
+
+.watch_page .edit_panes .edit_details .button_group{
+	float:left;
+}
+
+.watch_page .edit_panes .edit_details .button_group .delete_all_responses{
+	margin-bottom:15px; display:block;
 }
