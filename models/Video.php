@@ -467,7 +467,7 @@ class Video extends \glue\Db\Document{
 					$age_key = '50_plus';
 	        }
 
-			$resp = !glue::db()->video_statistics->update(array(
+			$resp = glue::db()->video_statistics->update(array(
 				"sid" => glue::user()->_id instanceof \MongoId ? glue::user()->_id : session_id(),
 				"vid" => $this->_id
 			), array('$setOnInsert'=>array('ts'=>new \MongoDate())), array('upsert'=>true));
