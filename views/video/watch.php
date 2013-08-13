@@ -443,7 +443,7 @@ $this->js('edit', "
 				app\widgets\highCharts::widget(array(
 					'chartName' => 'video_views_plot',
 					'appendTo' => 'chartdiv',
-					'series' => $video_stats['hits']							
+					'series' => $video_stats['hits'] //array(array('name'=>'c','data'=>array(array(1,1),array(2,2))))		
 				)) ?>
 			</div>
 		<?php } ?>	
