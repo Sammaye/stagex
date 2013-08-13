@@ -5,6 +5,7 @@ $this->jsFile('/js/views/playlist_bar.js');
 $this->jsFile('/js/jdropdown.js');
 $this->jsFile('/js/views/subscribeButton.js');
 $this->JsFile("/js/jquery.expander.js");
+$this->jsFile("/js/views/subscribeButton.js");
 
 $this->js('page', "
 		
@@ -13,6 +14,7 @@ $this->js('page', "
 		
 	$('.expandable').expander();
 	$('.video_actions .alert').summarise();
+	$('.subscribe_widget').subscribeButton();
 
 	$('.video_actions .tab').click(function(event){
 		event.preventDefault();
@@ -220,7 +222,7 @@ $this->js('edit', "
 		<span class='uploaded'><?php echo date('j M Y',$model->getTs($model->created)) ?></span>
 		<?php if(glue::session()->authed){ ?>
 			<div class='right'>
-			<div class="subscribe_widget">
+			<div class="subscribe_widget" data-user_id="<?php echo $model->author->_id ?>">
 				<span class="follower_count"><?php echo $model->author->totalFollowers ?> Subscribers</span>
 				<?php if(app\models\Follower::isSubscribed($model->author->_id)){ ?>
 				<input type="button" class='unsubscribe btn button' value="Unsubscribe"/>

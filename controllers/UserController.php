@@ -490,7 +490,7 @@ class userController extends \glue\Controller{
 			$user = User::model()->findOne(array('_id' => new MongoId($id)));
 			$follow = Follower::model()->findOne(array('fromId' => glue::user()->_id, 'toId' => new MongoId($id)));
 
-			if($follow && $user && $subscription->delete())
+			if($follow && $user && $follow->delete())
 				$this->json_success('You have unfollowed this user');
 			else
 				$this->json_error(self::UNKNOWN);

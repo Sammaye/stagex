@@ -23,8 +23,8 @@ class Follower extends \glue\db\Document{
 
 	function relations(){
 		return array(
-			"follower" => array('one', 'User', "_id", 'on' => 'fromId'),
-			"following" => array('one', 'User', "_id", 'on' => 'toId'),
+			"follower" => array('one', 'app\\models\\User', "_id", 'on' => 'fromId'),
+			"following" => array('one', 'app\\models\\User', "_id", 'on' => 'toId'),
 		);
 	}
 
@@ -48,19 +48,13 @@ class Follower extends \glue\db\Document{
 
 	function afterSave(){
 		if($this->getIsNewRecord()){
-			$this->following->totalFollowers = $this->user_subscribed->totalFollowers+1;
-			$this->following->save();
-			
-			$this->follower->totalFollowing = $this->user_subscribed->totalFollowing+1;
-			$this->follower->save();
+			$this->following->saveCounters(array('totalFollowers'=>1));
+			$this->follower->saveCounters(array('totalFollowing'=>1));
 		}
 	}
 
 	function afterDelete(){
-		$this->following->totalFollowers = $this->user_subscribed->totalFollowers > 1 ? $this->user_subscribed->totalFollowers-1 : 0;
-		$this->following->save();
-		
-		$this->follower->totalFollowing = $this->user_subscribed->totalFollowing > 1 ? $this->user_subscribed->totalFollowing-1 : 0;
-		$this->follower->save();
+		$this->following->saveCounters(array('totalFollowers'=>-1),0);
+		$this->follower->saveCounters(array('totalFollowing'=>-1),0);
 	}
 }

@@ -11,11 +11,11 @@
 			settings=$.extend(true,{},options,opts);
 			return this.each(function(){
 				data = $(this).data('subscribeButton');
-
+console.log($(settings.button+".subscribe").length);
 				if(!data){
 					$(this).data('subscribeButton', settings)
-						.on('click', settings.button+" .subscribe", subscribe, {container:this})
-						.on('click', settings.button+" .unsubscribe", unsubscribe, {container:this});
+						.on('click', settings.button+".subscribe", subscribe)
+						.on('click', settings.button+".unsubscribe", unsubscribe);
 					if(!$(this).hasClass('subscribeButton'))
 						$(this).addClass('subscribeButton');
 				}				
@@ -30,30 +30,32 @@
 		}
 	},
 	subscribe=function(e){
+		console.log('here');
 		e.preventDefault();
-		var container=$(event.data.container),
+		var container=$(this).parents('.subscribeButton'),
 			el=$(this),
-			user_id=$(this).data().id!=undefined?$(this).data().id:container.data('subscribeButton').user_id;
+			user_id=$(this).data().id!=undefined?$(this).data().id:container.data().user_id;
 		
-		$.get('/user/subscribe', {id: user_id}, null, 'json').done(function(data){
+		$.get('/user/follow', {id: user_id}, null, 'json').done(function(data){
 			if(data.success){
-				el.removeClass('btn-success subscribe').addClass('btn unsubscribe').text('Unfollow');
+				el.removeClass('btn-success subscribe').addClass('btn unsubscribe').val('Unsubscribe');
 			}else{}
 		});		
 	},
 	unsubscribe=function(e){
 		e.preventDefault();
-		el=$(event.data.container);
-		user_id=$(this).data().id!=undefined?$(this).data().id:el.data('subscribeButton').user_id;
+		var container=$(this).parents('.subscribeButton'),
+			el=$(this),
+			user_id=$(this).data().id!=undefined?$(this).data().id:container.data().user_id;
 		
-		$.get('/user/unsubscribe', {id: user_id}, null, 'json').done(function(data){
+		$.get('/user/unfollow', {id: user_id}, null, 'json').done(function(data){
 			if(data.success){
-				el.removeClass('btn unsubscribe').addClass('btn-success subscribe').text('Follow');
+				el.removeClass('btn unsubscribe').addClass('btn-success subscribe').val('Subscribe');
 			}else{}
 		});				
 	};
 	
-	$.subscribeButton = function( method ) {
+	$.fn.subscribeButton = function( method ) {
 		if ( methods[method] ) {
 			return methods[method].apply( this, Array.prototype.slice.call( arguments, 1 ));
 		} else if ( typeof method === 'object' || ! method ) {
