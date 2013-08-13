@@ -440,6 +440,32 @@ textarea{
     min-width:0;
 }
 
+.btn-clear{
+	background-color: #FFFFFF;
+    border-color: #CCCCCC;
+    color:#626262;
+    background-image:none;
+    padding:0px 10px;
+    height:32px;
+    line-height:32px;
+    font-weight:bold;
+    min-width:0;
+}
+
+.btn-clear.active,
+.btn-clear:active,
+.btn-clear:hover{
+	background:#ebebeb;
+	border-color:#adadad;
+	color:#626262;
+	box-shadow:none;
+}
+
+.btn-clear.active,
+.btn-clear:active{
+	box-shadow:0 3px 5px rgba(0,0,0,0.125) inset;
+}
+
 .btn-inline.right{
 	border-left:1px solid #2e2f2f;
 	border-radius:0 2px 2px 0;
@@ -1698,7 +1724,7 @@ textarea{
 }
 
 .watch_page .edit_menu .delete_video{
-	margin:0 0 0 30px; display:inline-block;
+	margin:0px 0 0 30px; display:inline-block;
 }
 
 .watch_page .video_element{
@@ -1793,7 +1819,7 @@ textarea{
 }
 
 .watch_page .playlists_content .playlist:hover{
-	background:#f1f1f1;
+	background:#e5e5e5;
 }
 
 .watch_page .playlist .video_count{
@@ -1978,4 +2004,30 @@ textarea{
 
 .watch_page .share_content .share_other textarea{
 	width:330px; height:50px;
+}
+
+.edit_details.pane .checkbox,
+.edit_settings.pane .radio,
+.edit_settings.pane .checkbox{
+	font-size:13px;
+}
+
+.watch_page .playlists_content .head{
+	border-bottom:1px solid #e5e5e5;
+}
+
+.watch_page .playlists_content .search a{
+	display:block; padding:10px;border:0;
+}
+
+.watch_page .playlists_content .search input{
+	margin:10px;margin-top:0;border-radius:2px;
+}
+
+.watch_page .playlists_content .results{
+	background:#f1f1f1; height:200px; overflow-y:scroll;
+}
+
+.watch_page .actions_menu .selected{
+	border-bottom:2px solid #3369cb;
 }

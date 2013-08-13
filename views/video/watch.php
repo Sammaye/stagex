@@ -52,9 +52,11 @@ $this->js('page', "
 		var el = $(this);
 		$.getJSON('/video/like', {id: '".strval($model->_id)."'}, function(data){
 			if(data.success){
-				$('#share_tab').trigger('click');
-				$('.btn-like').addClass('active');
-				$('.btn-dislike').removeClass('active');
+				if(!$('.btn-like').hasClass('active')){
+					$('#share_tab').trigger('click');
+					$('.btn-like').addClass('active');
+					$('.btn-dislike').removeClass('active');
+				}
 			}
 		});
 	});
@@ -98,7 +100,7 @@ $this->js('page', "
 					container.empty();
 					if(data.results.length>0){
 						$.each(data.results,function(i,item){
-							container.append($('<div class=\"playlist\"/>').data({id:item._id})
+							container.append($('<div/>').data({id:item._id}).addClass('playlist playlist_item')
 								.append($('<span/>').addClass('name').text(item.title))
 								.append($('<span/>').addClass('video_count').text('('+item.totalVideos+')'))
 								.append($('<span/>').addClass('created').text(item.created))
@@ -112,7 +114,7 @@ $this->js('page', "
 		}
 	});
 		
-	$(document).on('click', '.playlists_content .playlist', function(e){
+	$(document).on('click', '.playlists_content .playlist_item', function(e){
 		e.preventDefault();
 		var params = [{name:'playlist_id',value:$(this).data().id},{name:'video_ids[0]',value:'".$model->_id."'}];
 		$.post('/playlist/addVideo', params, null, 'json').done(function(data){
@@ -356,8 +358,8 @@ $this->js('edit', "
 		<div class="actions_menu">
 			<?php if($model->voteable && glue::auth()->check(array('@'))): ?>
 			<div class="btn-group button_actions">
-				<input type="button" class="btn <?php if($model->currentUserLikes()): echo "active"; endif ?> btn-white btn-like" value="+1"/>
-				<input type="button" class="btn <?php if($model->currentUserDislikes()): echo "active"; endif ?> btn-white btn-dislike" value="-1"/>
+				<input type="button" class="btn <?php if($model->currentUserLikes()): echo "active"; endif ?> btn-clear btn-like" value="+1"/>
+				<input type="button" class="btn <?php if($model->currentUserDislikes()): echo "active"; endif ?> btn-clear btn-dislike" value="-1"/>
 				<span class="votes"><span class="up"><?php echo '+'.$model->likes ?></span> / <span class="down"><?php echo '-'.$model->dislikes ?></span></span>
 			</div>
 			<?php endif; ?>
@@ -448,11 +450,11 @@ $this->js('edit', "
 		
 		<?php if(glue::auth()->check(array('@'))): ?>
 		<div class="playlists_content playlists_pane video_actions_pane">
-			<div style='background:#f8f8f8;border-bottom:1px solid #e5e5e5;'>
-				<a href="#" class="playlist watch_later" data-id="<?php echo glue::user()->watchLaterPlaylist()->_id ?>" style='display:block; padding:10px;border:0;'>Add to Watch Later</a>
-				<input id="search_playlists" type="text" style='margin:10px;margin-top:0;border-radius:2px;' class="input-xxlarge" placeholder="Enter a search term for playlists"/>
+			<div class='search'>
+				<a href="#" class="playlist_item watch_later" data-id="<?php echo glue::user()->watchLaterPlaylist()->_id ?>">Add to Watch Later</a>
+				<input id="search_playlists" type="text" class="input-xxlarge" placeholder="Enter a search term for playlists"/>
 			</div>
-			<div class="results"></div>
+			<div class="results"><div class="no_results_found">Search for a playlist</div></div>
 		</div>
 		<?php endif; ?>
 
