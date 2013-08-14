@@ -397,8 +397,8 @@ class User extends \glue\User{
 	}
 	
 	function getBirthdayTime(){
-		if(isset($this->birthDay,$this->birthMonth,$this->birthYear))
-			return mktime(0, 0, 0, $user->birth_month, $user->birth_day, $user->birth_year);
+		if(isset($this->birthDay,$this->birthMonth,$this->birthYear)&&$this->birthMonth&&$this->birthDay&&$this->birthYear)
+			return mktime(0, 0, 0, $this->birthMonth, $this->birthDay, $this->birthYear);
 		return 0;
 	}
 
