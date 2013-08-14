@@ -5,6 +5,8 @@ use app\models\Video,
 
 class videoController extends glue\Controller{
 	
+	public $tab;
+	
 	public function authRules(){
 		return array(
 			array("allow",

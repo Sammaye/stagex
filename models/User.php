@@ -471,6 +471,6 @@ class User extends \glue\User{
 	
 	function recordWatched($video){
 		glue::db()->watched_history->update(array(
-			'userId' => $this->_id, 'item' => $video->_id), array('$set' => array('ts' => new \MongoDate())), array('upsert' => true));
+			'user_id' => $this->_id, 'item' => $video->_id), array('$set' => array('ts' => new \MongoDate())), array('upsert' => true));
 	}
 }

@@ -21,7 +21,7 @@ class autoresizetextarea extends \glue\Widget{
 		glue::$controller->jsFile("/js/autosize.js");
 		glue::$controller->js('autoresize#'.$this->attribute.'.init', "
 			$(function(){
-				$('#".$id."').autoResize();
+				$('#".$id."').autosize();
 			});
 		");
 

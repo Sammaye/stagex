@@ -138,10 +138,20 @@ $this->js('videos', "
 ?>
 <div class="user_videos_body">
 
+	<div class="tabs-nav">
+		<ul>
+			<li><a href="/user/videos" class="selected">Uploads</a></li>
+			<li><a href="/history/watched">Watched</a></li>
+			<li><a href="/history/ratedVideos">Liked</a></li>
+			<li><a href="/history/ratedVideos?filter=dislikes">Disliked</a></li>
+			<a style='float:right;' class="btn-success" href="<?php echo glue::http()->url('/video/upload', array(), glue::$params['uploadBase']) ?>">Add New Upload</a>
+		</ul>
+	</div>
+
 	<div class="header">
-		<div class="left">
-    	    <a class="btn-success" href="<?php echo glue::http()->url('/video/upload', array(), glue::$params['uploadBase']) ?>">Add New Upload</a>
-    	</div>
+		<!-- <div class="left">
+    	    <a class="btn-success" href="<?php //echo glue::http()->url('/video/upload', array(), glue::$params['uploadBase']) ?>">Add New Upload</a>
+    	</div> -->
     	<div class="right">   
     		<span class='light small amount_found'><?php echo $video_rows->count() ?> found</span>
     		<div class='search form-search'>

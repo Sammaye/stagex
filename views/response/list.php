@@ -1,7 +1,10 @@
 <?php
-glue::$controller->jsFile("/js/autoresizetextarea.js");
+glue::$controller->jsFile("/js/autosize.js");
 
 glue::$controller->js('response_selector', "
+		
+	$('.video_response_selector .alert').summarise()
+		
 	$(document).on('click', '.video_response_selector .response_tab', function(event){
 		event.preventDefault();
 		var stub = $(this).children('.stub'),
@@ -14,16 +17,19 @@ glue::$controller->js('response_selector', "
 		$('.video_response_selector .'+selector).css({ 'display': 'block' });
 	});
 
-	$(document).on('click', '.video_response_selector .new_text_response', function(event){
+	$(document).on('click', '.video_response_selector .post_response', function(event){
 		event.preventDefault();
 		var textarea = $(this).parents('.video_response_selector').find('.text_comment_content'),
 			mode = $('.video_response_list').data('mode') == null ? '' : $('.video_response_list').data('mode');
 
-		$.post('/videoresponse/add_response', { 'content': textarea.val(), 'vid': '".strval($model->_id)."', type: 'text', mode: mode}, function(data){
-			forms.reset($('.video_response_selector .block_summary'));
+		$.post('/videoresponse/add', { 'content': textarea.val(), 'vid': '".strval($model->_id)."', type: 'text', mode: mode}, function(data){
+			//forms.reset($('.video_response_selector .block_summary'));
 			if(!data.success){
 				//console.log('errors', data);
-				forms.summary($('.video_response_selector .block_summary'), false, 'Your reply could not be posted because:', data.messages);
+				$('.video_response_selector .alert').summarise('set','error',{
+					message: 'Your reply could not be posted because:',
+					list: data.messages
+				})
 			}else{
 				textarea.val('');
 				forms.reset($('.video_response_selector .block_summary'));
@@ -56,7 +62,7 @@ glue::$controller->js('watch.response_list', "
 
 	$(function(){
 		get_comments_by_epoch();
-		$('.reply_comment_content').autoResize();
+		$('.reply_comment_content').autosize();
 	});
 
 	$(document).on('click', '.video_response_item .like', function(event){
@@ -189,7 +195,7 @@ glue::$controller->js('watch.response_list', "
 		$('.video_response_list .list').load('/videoresponse/get_comments', { id: '".strval($model->_id)."', page: page, sort: sort, mode: mode,
 			responses_per_page: responses_per_page, refresh: refresh }, function(data){
 
-			$('.reply_comment_content').autoResize();
+			$('.reply_comment_content').autosize();
 		});
 	}
 
@@ -226,7 +232,7 @@ glue::$controller->js('watch.response_list', "
 						'attribute' => 'text_comment_content',
 						'class' => 'text_comment_content'
 					)) ?>
-					<a href='#' class='green_css_button new_text_response' id='post_text_response'>Post Response</a>
+					<input type="button" value="Post Response" class="btn-success post_response"/>
 				</div>
 			<?php } ?>
 

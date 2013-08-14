@@ -466,7 +466,7 @@ $this->js('edit', "
 		<div class="video_comments">
 			<div class="head"><?php echo $model->totalResponses ?> responses</div>
 			<a class='view_all' href="<?php echo glue::http()->url("/videoresponse/viewAll", array("id"=>$model->_id)) ?>">View All Responses</a>
-			<?php $this->renderPartial('response/list', array('model' => $model, 'comments' => 
+			<?php echo $this->renderPartial('response/list', array('model' => $model, 'comments' => 
 				glue::auth()->check(array("^"=>$model)) ? 
 					app\models\VideoResponse::model()->moderated()->find(array('videoId'=>$model->_id)) :
 					app\models\VideoResponse::model()->public()->find(array('videoId'=>$model->_id))

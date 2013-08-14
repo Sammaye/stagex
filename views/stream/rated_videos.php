@@ -1,114 +1,113 @@
 <?php
-	glue::clientScript()->addJsFile('jquery-expander', "/js/jquery-expander.js");
-	glue::clientScript()->addJsFile('playlist_dropdown', '/js/playlist_dropdown.js');
-	glue::clientScript()->addJsFile('j-dropdown', '/js/jdropdown.js');
 
-ob_start();
-	?>
-	<div class='filters_menu'>
-		<div class='item' data-url='<?php echo glue::url()->create('/history/rated_videos') ?>'>Lied Videos</div>
-		<div class='item' data-url='<?php echo glue::url()->create('/history/rated_videos', array('liked' => 0)) ?>'>Disliked Videos</div>
-	</div>
-	<?php
-	$menu_html = ob_get_contents();
-ob_end_clean();
+use glue\Html;
 
-	glue::clientScript()->addJsScript('liked_page', "
-		$(function(){
-			$.playlist_dropdown({ multi_seek_parent: true });
+$this->JsFile("/js/jquery.expander.js");
+$this->JsFile('/js/jdropdown.js');
 
-			$(document).on('click', '.selectAll_input', function(event){
-				if($(this).attr('checked')){
-					$('.video_list input:checkbox').attr('checked', true);
-				}else{
-					$('.video_list input:checkbox').attr('checked', false);
-				}
-			});
+$this->js('page', "
+	//$.playlist_dropdown({ multi_seek_parent: true });
+	$(function(){
+		$('div.expandable').expander({slicePoint: 120});
+	});
 
-			$(document).on('click', '.delete', function(event){
-				event.preventDefault();
-				//console.log('d', {videos: $('.video_list input:checked').serializeArray()});
+    $(document).on('jdropdown.selectItem', '.filters_menu .item', function(e, event){
+        //event.preventDefault();
+		window.location = $(this).data('url');
+    });		
+		
+	$(document).on('click', '.selectAll_input', function(event){
+		if($(this).attr('checked')){
+			$('.video_list input:checkbox').attr('checked', true);
+		}else{
+			$('.video_list input:checkbox').attr('checked', false);
+		}
+	});
 
-				var ar = $('.video_list input:checked').serializeArray(),
-					ret = [];
+	$(document).on('click', '.delete', function(event){
+		event.preventDefault();
+		//console.log('d', {videos: $('.video_list input:checked').serializeArray()});
 
-				for(var i =0; i < ar.length; i++){
-					ret[ret.length] = ar[i].name;
-				}
+		var ar = $('.video_list input:checked').serializeArray(),
+			ret = [];
 
-				$.post('/history/remove_ratings', {items: ret, type: 'video'}, function(data){
-					if(data.success){
-						$('.video_list input:checked').parents('.object_item').remove();
-					}
-				}, 'json');
-			});
+		for(var i =0; i < ar.length; i++){
+			ret[ret.length] = ar[i].name;
+		}
 
-//			$(document).on('click', '.clear_all', function(event){
-//				event.preventDefault();
+		$.post('/history/remove_ratings', {items: ret, type: 'video'}, function(data){
+			if(data.success){
+				$('.video_list input:checked').parents('.object_item').remove();
+			}
+		}, 'json');
+	});
+
+//	$(document).on('click', '.clear_all', function(event){
+//		event.preventDefault();
 //
-//				$.getJSON('/history/remove_all', {type: 'video'}, function(data){
-//					if(data.success){
-//						$('.item_list').html(data.html);
-//					}
-//				});
-//			});
+//		$.getJSON('/history/remove_all', {type: 'video'}, function(data){
+//			if(data.success){
+//				$('.item_list').html(data.html);
+//			}
+//		});
+//	});
 
-			$(document).on('click', '.load_more', function(event){
-				event.preventDefault();
-				var last_ts = $('.video_list .video_item').last().data('ts');
+	$(document).on('click', '.load_more', function(event){
+		event.preventDefault();
+		var last_ts = $('.video_list .video_item').last().data('ts');
 
-				$.getJSON('/history/get_rated_history', {ts: last_ts, type: 'video', filter: 'liked' }, function(data){
-					if(data.success){
-						$('.video_list').append(data.html);
-						$('div.expandable').expander({slicePoint: 60});
-					}else{
-						if(data.noneleft){
-							$('.load_more').html(data.messages[0]);
-						}
-					}
-				});
-			});
+		$.getJSON('/history/get_rated_history', {ts: last_ts, type: 'video', filter: 'liked' }, function(data){
+			if(data.success){
+				$('.video_list').append(data.html);
+				$('div.expandable').expander({slicePoint: 60});
+			}else{
+				if(data.noneleft){
+					$('.load_more').html(data.messages[0]);
+				}
+			}
 		});
-	");
-
-	glue::clientScript()->addJsScript('liked_page.base', "
-		$(function(){
-			$('div.expandable').expander({slicePoint: 60});
-		});
-
-		$('body').append($(".GClientScript::encode($menu_html)."));
-		$('.selected_filter').jdropdown({
-			'orientation': 'over',
-			'menu_div': '.filters_menu',
-			'item': '.filters_menu .item'
-		});
-
-	    $(document).on('jdropdown.selectItem', '.filters_menu .item', function(e, event){
-	        //event.preventDefault();
-			window.location = $(this).data('url');
-	    });
-	");
+	});
+");
 ?>
 <div class="user_history_body">
-	<div class='head_outer'>
-		<div class='head'>Videos You've Liked</div>
+	<div class="tabs-nav">
+		<ul>
+			<li><a href="/user/videos">Uploads</a></li>
+			<li><a href="/history/watched">Watched</a></li>
+			<li><a href="/history/ratedVideos" <?php if(glue::http()->param('filter',null)!=='dislikes') echo 'class="selected"'; ?>>Liked</a></li>
+			<li><a href="/history/ratedVideos?filter=dislikes" <?php if(glue::http()->param('filter',null)==='dislikes') echo 'class="selected"'; ?>>Disliked</a></li>
+			<a style='float:right;' class="btn-success" href="<?php echo glue::http()->url('/video/upload', array(), glue::$params['uploadBase']) ?>">Add New Upload</a>
+		</ul>
 	</div>
 
 	<?php ob_start(); ?>
-		<div class='stickytoolbar-placeholder grey_sticky_bar'>
+		<div class='stickytoolbar-placeholder grey_sticky_toolbar'>
 			<div class='stickytoolbar-bar'>
 				<div class='inner_bar'>
-					<div class='checkbox_input'><?php echo html::checkbox('selectAll', 1, 0, array('class' => 'selectAll_input')) ?></div>
-					<div class='grey_css_button add_to_playlist left_button'>Add To</div>
-					<div class='grey_css_button delete float_left'>Remove</div>
-					<!-- <div class='grey_css_button clear_all' style='float:right;'></div> -->
+					<div class='checkbox_button checkbox_input'><?php echo Html::checkbox('selectAll', 1, 0, array('class' => 'selectAll_input')) ?></div>
+					<button class='btn-grey selected_actions btn_delete'>Delete</button>
+					<div class="btn-group dropdown-group playlist-dropdown">
+						<button class='btn-grey add_to_playlist dropdown-anchor'>Add To <span class="caret">&#9660;</span></button>
+						<div class="dropdown-menu">
+							<div class="head_ribbon">
+								<a href="#" data-id="<?php echo glue::user()->watchLaterPlaylist()->_id ?>" class='watch_later playlist_link'>Watch Later</a>
+								<input type="text" placeholder="Search for Playlists" class="search_input"/>
+							</div>
+							<div class="playlist_results">
+							<div class='item'>
+								Search for playlists above
+							</div>
+							</div>
+						</div>
+					</div>
 				</div>
+				<div class="alert block-alert" style='display:none;'></div>
 			</div>
 		</div>
 	<?php $html = ob_get_contents();
 		ob_end_clean();
-		$this->widget('application/widgets/stickytoolbar.php', array(
-			"element" => '.grey_sticky_bar',
+		app\widgets\stickytoolbar::widget(array(
+			"element" => '.grey_sticky_toolbar',
 			"options" => array(
 				'onFixedClass' => 'grey_sticky_bar-fixed'
 			),
@@ -122,20 +121,16 @@ ob_end_clean();
 		if($items->count() > 0){
 			foreach($items as $k => $item){
 				$item = (Object)$item;
-				$related_o = Video::model()->findOne(array('_id' => $item->item));
+				$video = app\models\Video::model()->findOne(array('_id' => $item->item));
 
-				if(!$related_o instanceof Video)
-					$related_o = new Video;
-
-				$this->partialRender('videos/_video_ext', array('model' => $related_o, 'custid' => $item->_id, 'item' => $item, 'show_checkbox' => true, 'extra_classes' => 'object_item'));
+				if(!$video instanceof app\models\Video)
+					$video = new app\models\Video;
+				echo $this->renderPartial('video/_video_row', array('item' => $video, 'custid' => $item->_id, 'model' => $item, 'show_checkbox' => true, 'extra_classes' => 'object_item'));
 			}
 		}else{ ?>
-			<div class='no_history'>
+			<div class='no_results_found'>
 				No history has been recorded
 			</div>
 		<?php } ?>
 	</div>
-	<?php if($items->count() > 20){ ?>
-		<a class='load_more' href='#'>Load more history</a>
-	<?php } ?>
 </div>

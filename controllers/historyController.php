@@ -1,14 +1,9 @@
 <?php
-class historyController extends GController{
+class historyController extends glue\Controller{
 
 	public $layout = 'user_section';
 
-	// A set of filters to be run before and after the controller action
-	public function filters(){
-		return array('rbam');
-	}
-
-	public function accessRules(){
+	public function authRules(){
 		return array(
 			array("allow", "users"=>array("@*")),
 			array("deny", "users"=>array("*")),
@@ -20,24 +15,23 @@ class historyController extends GController{
 	}
 
 	public function action_watched(){
-		$this->pageTitle = 'Watched Videos - StageX';
-
+		$this->title = 'Watched Videos - StageX';
 		$this->tab = 'watched';
-		$this->render('stream/watched', array('items' =>
-			glue::db()->watched_history->find(array("user_id" => Glue::session()->user->_id))->sort(array('ts' => -1))->limit(20)
+		echo $this->render('stream/watched', array('items' =>
+			glue::db()->watched_history->find(array("user_id" => Glue::user()->_id))->sort(array('ts' => -1))->limit(20)
 		));
 	}
 
-	public function action_rated_videos(){
-		$this->pageTitle = 'Rated Videos - StageX';
+	public function action_ratedVideos(){
+		$this->title = 'Rated Videos - StageX';
 
 		$this->tab = 'likes';
-		$this->subtab = 'liked_videos';
-
-		$_filter = isset($_GET['filter']) ? $_GET['filter'] : null;
-		$items = glue::db()->video_likes->find(array("user_id" => Glue::session()->user->_id, 'like' => 1))->sort(array('ts' => -1))->limit(20);
-
-		$this->render('stream/rated_videos', array('items' => $items, '_filter' => $_filter));
+		$filter=glue::http()->param('filter',null);
+		echo $this->render('stream/rated_videos', array(
+			'items' => $filter=='dislikes'?
+				glue::db()->video_likes->find(array("user_id" => Glue::user()->_id, 'like' => 0))->sort(array('ts' => -1))->limit(20) :
+				glue::db()->video_likes->find(array("user_id" => Glue::user()->_id, 'like' => 1))->sort(array('ts' => -1))->limit(20)
+		));
 	}
 
 	public function action_rated_playlists(){

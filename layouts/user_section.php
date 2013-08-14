@@ -55,16 +55,15 @@ $this->beginPage() ?>
 						<span class="badge"><?php echo glue::user()->totalUploads ?></span></a></li>
 						<li><a href='<?php echo glue::http()->url('/user/playlists') ?>' <?php echo $this->tab == "playlists" ? "class='selected'" : "" ?>>Playlists
 						<span class="badge"><?php echo glue::user()->totalPlaylists ?></span></a></li>
-						<li><a href='<?php echo glue::http()->url('/history/watched') ?>' <?php echo $this->tab == "watched" ? "class='selected'" : "" ?>>Watched</a></li>
-						<li><a href='<?php echo glue::http()->url('/history/rated_videos') ?>' <?php echo $this->tab == "likes" ? "class='selected'" : "" ?>>Likes</a></li>
-						<?php if($this->tab == "likes"){ ?>
-							<li class='indented_row'><a href='<?php echo glue::http()->url('/history/rated_videos') ?>' <?php echo $this->subtab == "liked_videos" ? "class='selected'" : "" ?>>Videos</a></li>
-							<li class='indented_row'><a href='<?php echo glue::http()->url('/history/rated_playlists') ?>' <?php echo $this->subtab == "liked_playlists" ? "class='selected'" : "" ?>>Playlists</a></li>
-						<?php } ?>
+						<!-- 
+						<li><a href='<?php //echo glue::http()->url('/history/watched') ?>' <?php //echo $this->tab == "watched" ? "class='selected'" : "" ?>>Watched</a></li>
+						<li><a href='<?php //echo glue::http()->url('/history/ratedVideos') ?>' <?php //echo $this->tab == "likes" ? "class='selected'" : "" ?>>Likes</a></li>
+						-->
 						<li><a href='<?php echo glue::http()->url('/user/follwoing') ?>' <?php echo $this->tab == "subscriptions" ? "class='selected'" : "" ?>>Following
 						<span class="badge"><?php echo glue::user()->totalFollowing ?></span></a></li>
 						<li><a href='<?php echo glue::http()->url('/stream/notifications') ?>' <?php echo $this->tab == "notifications" ? "class='selected'" : "" ?>>Notifications
 						<span class="badge"><?php echo \app\models\Notification::getNewCount_Notifications() ?></span></a></li>
+						<li><a href='<?php echo glue::http()->url('/stream') ?>' <?php echo $this->tab == "news_feed" ? "class='selected'" : "" ?>>Stream</a></li>
 					</ul>
 					<h3 class='head_divider'>Settings</h3>
 					<ul>
