@@ -2031,3 +2031,11 @@ textarea{
 .watch_page .actions_menu .selected{
 	border-bottom:2px solid #3369cb;
 }
+
+.followers_page .search_input input{
+	width:300px;
+}
+
+.subscription:nth-child(odd){
+	margin-right:15px;
+}

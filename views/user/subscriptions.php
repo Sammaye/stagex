@@ -1,5 +1,8 @@
 <?php
-	glue::clientScript()->addJsScript('user.unsubscribe', "
+
+use glue\Html;
+
+$this->js('user.unsubscribe', "
 
 		$(document).on('click', '.subscribe', function(event){
 			event.preventDefault();
@@ -60,47 +63,36 @@
 			searchTimer=setTimeout('start_search_timer()',1000);
 		}
 	");
-
-	$subscriptions = Subscription::model()->find(array('from_id' => glue::session()->user->_id))->sort(array('username' => 1));
 ?>
-<div class="user_subscriptions_body">
-	<div class="grid_10 alpha usub_left">
-		<div class='head_outer'>
-			<div class='page_head'>Subscriptions</div>
-    		<div class='subs'><?php echo $subscriptions->count() ?> active</div>
-    	</div>
+<div class="followers_page">
 
-		<div class='action_bar'>
-			<div class='search_widget'>
-				<?php $form = html::form(array('method' => 'get')) ?>
-				<div class='middle'><?php
-					echo html::textfield('search_subscriptions', null, array('id' => 'Search_Subscriptions')) ?></div><a href='#' id='Subscriber_search_submit' class='submit'><img alt='search' src='/images/search_icon_small.png'/></a>
-				<?php echo html::submitbutton('Search', array('class' => 'invisible_submit')); $form->end() ?>
-			</div>
-			<div class="clear"></div>
-		</div>
-		<div class='user_subscription_list'>
-		<?php
+	<div class="header" style='margin:20px 0;'>   
+    	<div class='search form-search'>
+		<?php $form = Html::form(array('method' => 'get')); ?>
+			<div class="search_input"><?php echo html::textfield('search',htmlspecialchars(glue::http()->param('query',null)),array('placeholder'=>'Search Subscribers')) ?></div>
+			<button class="submit_search"><span>&nbsp;</span></button>
+		<?php $form->end() ?>
+		</div>    	
+		<div class="clear"></div>
+    </div>
 
-		if(count($subscriptions) > 0){
-			ob_start();
-			?> <div class='list' style='padding:7px 10px;'>{items}<div style='margin-top:7px;'>{pager}<div class="clear"></div></div></div> <?php
-			$template = ob_get_contents();
-			ob_end_clean();
-			$this->widget('glue/widgets/GListView.php', array(
-					'pageSize'	 => 20,
-					"cursor"	 => $subscriptions,
-					'template' 	 => $template,
-					'itemView' => 'user/_subscription.php',
-					'pagerCssClass' => 'grid_list_pager'
-			));
-		}else{
-			?>
-			<div class='none_found'>
-				You have no Subscriptions! Subscribe to a user to keep upto date with that users activity.
-			</div><?php
-		}
-		?>
-		</div>
-	</div>
+	<div class='user_subscription_list'>
+	<?php if(glue::user()->totalFollowing > 0){
+		ob_start();
+		?> <div class='list' style='padding:10px 0;'>{items}<div style='margin-top:7px;'>{pager}<div class="clear"></div></div></div> <?php
+		$template = ob_get_contents();
+		ob_end_clean();
+		glue\widgets\ListView::widget(array(
+				'pageSize'	 => 20,
+				"cursor"	 => app\models\Follower::model()->find(array('fromId'=>glue::user()->_id))->sort(array('username'=>-1)),
+				'template' 	 => $template,
+				'itemView' => 'user/_subscription.php',
+				'pagerCssClass' => 'grid_list_pager'
+		));
+	}else{
+		?><div class='no_results_found'>
+			You have no Subscriptions! Subscribe to a user to keep upto date with that users activity.
+		</div><?php
+	}
+	?></div>
 </div>

@@ -59,7 +59,7 @@ $this->beginPage() ?>
 						<li><a href='<?php //echo glue::http()->url('/history/watched') ?>' <?php //echo $this->tab == "watched" ? "class='selected'" : "" ?>>Watched</a></li>
 						<li><a href='<?php //echo glue::http()->url('/history/ratedVideos') ?>' <?php //echo $this->tab == "likes" ? "class='selected'" : "" ?>>Likes</a></li>
 						-->
-						<li><a href='<?php echo glue::http()->url('/user/follwoing') ?>' <?php echo $this->tab == "subscriptions" ? "class='selected'" : "" ?>>Following
+						<li><a href='<?php echo glue::http()->url('/user/following') ?>' <?php echo $this->tab == "subscriptions" ? "class='selected'" : "" ?>>Following
 						<span class="badge"><?php echo glue::user()->totalFollowing ?></span></a></li>
 						<li><a href='<?php echo glue::http()->url('/stream/notifications') ?>' <?php echo $this->tab == "notifications" ? "class='selected'" : "" ?>>Notifications
 						<span class="badge"><?php echo \app\models\Notification::getNewCount_Notifications() ?></span></a></li>

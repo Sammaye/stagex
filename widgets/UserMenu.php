@@ -19,7 +19,7 @@ class UserMenu extends \glue\Widget{
 								<li><a href='<?php echo glue::http()->url('/user/playlists') ?>' <?php echo $this->tab == "playlists" ? "class='selected'" : "" ?>>Playlists
 								<span class="badge"><?php echo glue::user()->totalPlaylists ?></span></a></li>
 
-								<li><a href='<?php echo glue::http()->url('/user/follwoing') ?>' <?php echo $this->tab == "subscriptions" ? "class='selected'" : "" ?>>Following
+								<li><a href='<?php echo glue::http()->url('/user/following') ?>' <?php echo $this->tab == "subscriptions" ? "class='selected'" : "" ?>>Following
 								<span class="badge"><?php echo glue::user()->totalFollowing ?></span></a></li>
 								<li><a href='<?php echo glue::http()->url('/stream/notifications') ?>' <?php echo $this->tab == "notifications" ? "class='selected'" : "" ?>>Notifications
 								<span class="badge"><?php echo \app\models\Notification::getNewCount_Notifications() ?></span></a></li>

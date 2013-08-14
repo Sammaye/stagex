@@ -150,8 +150,8 @@ class User extends \glue\User{
 
 	function relations(){
 		return array(
-			"following" => array('many', 'Follower', "from_id"),
-			"followers" => array('many', 'Follower', "to_id"),
+			"following" => array('many', 'app\\models\\Follower', "fromId"),
+			"followers" => array('many', 'app\\models\\Follower', "toId"),
 			"videos" => array('many', 'Video', "user_id"),
 			"playlists" => array('many', 'Playlist', "userId"),
 			'notifications' => array('many', 'Notification', 'user_id'),

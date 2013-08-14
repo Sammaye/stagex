@@ -354,14 +354,12 @@ class userController extends \glue\Controller{
 	}
 
 	function action_following(){
-		$this->pageTitle = 'Your Subscriptions - StageX';
+		$this->title = 'Your Subscriptions - StageX';
 
 		$this->layout = 'user_section';
 		$this->tab = 'subscriptions';
 
-		$this->render('user/subscriptions', array(
-			'model' => $this->loadModel()
-		));
+		echo $this->render('user/subscriptions', array('model' => $this->loadModel()));
 	}
 
 	function action_settings(){

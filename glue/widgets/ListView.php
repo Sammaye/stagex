@@ -195,14 +195,17 @@ class ListView extends \glue\Widget{
 		}
 
 		foreach($this->cursor as $_id => $item){
+			for($j=0;$j<5;$j++){
+
 			if(is_string($this->itemView)){ // Is it a file location?
 				ob_start();
 					include $this->getView($this->itemView);
-					$item = ob_get_contents();
+					$html = ob_get_contents();
 				ob_end_clean();
-				echo $item;
+				echo $html;
 			}
 			$i++;
+			}
 		}
 	}
 
