@@ -559,8 +559,8 @@ class userController extends \glue\Controller{
 		}
 	}
 
-	public function action_search_subscribers(){
-		$this->pageTitle = 'Search For Subscriptions - StageX';
+	public function action_searchFollowers(){
+		$this->pageTitle = 'Search Folllowers - StageX';
 
 		if(!glue::http()->isAjax())
 			glue::trigger('404');
@@ -569,14 +569,14 @@ class userController extends \glue\Controller{
 
 		if(count($users) > 0){
 			ob_start();
-			?> <div class='list' style='padding:7px 10px;'>{items}<div style='margin-top:7px;'>{pager}<div class="clear"></div></div></div> <?php
+			?> <div class='list' style='padding:7px 0px;'>{items}<div style='margin-top:7px;'>{pager}<div class="clear"></div></div></div> <?php
 			$template = ob_get_contents();
 			ob_end_clean();
 
 			glue\widgets\ListView::widget(array(
 				'pageSize'	 => 20,
 				'page' 		 => $page,
-				"cursor"	 => $users,
+				"cursor"	 => new Collection($users),
 				'template' 	 => $template,
 				'itemView' => 'user/_subscription.php',
 				'pagerCssClass' => 'grid_list_pager'

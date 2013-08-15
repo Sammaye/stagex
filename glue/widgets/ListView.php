@@ -93,9 +93,9 @@ class ListView extends \glue\Widget{
 
 	function render(){
 
-		if(!$this->cursor instanceof \glue\db\Cursor)
-			trigger_error("You must supply a Cursor for the cursor param of the ListView widget");
-
+		//if(!$this->cursor instanceof \glue\db\Cursor)
+			//trigger_error("You must supply a Cursor for the cursor param of the ListView widget");
+//var_dump($this->cursor); exit();
 		$this->itemCount = $this->cursor->count();
 
 		if($this->enableSorting){
@@ -195,7 +195,7 @@ class ListView extends \glue\Widget{
 		}
 
 		foreach($this->cursor as $_id => $item){
-			//for($j=0;$j<5;$j++){
+			for($j=0;$j<5;$j++){
 
 			if(is_string($this->itemView)){ // Is it a file location?
 				ob_start();
@@ -205,7 +205,7 @@ class ListView extends \glue\Widget{
 				echo $html;
 			}
 			$i++;
-			//}
+			}
 		}
 	}
 
