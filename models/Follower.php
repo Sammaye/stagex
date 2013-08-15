@@ -58,10 +58,10 @@ class Follower extends \glue\db\Document{
 		$this->follower->saveCounters(array('totalFollowing'=>-1),0);
 	}
 	
-	function search($user_id){
+	function search($user_id,$term,$limit=1000){
 		
 		// We need to do a JOIN here...
-		$users=iterator_to_array(\app\models\User::model()->find(array('username'=>new MongoRegex("/^$term/")))->sort(array('username'=>1))->limit(1000));
+		$users=iterator_to_array(\app\models\User::model()->find(array('username'=>new MongoRegex("/^$term/")))->sort(array('username'=>1))->limit($limit));
 		
 		$mongoIds=array();
 		foreach($users as $_id=>$user)

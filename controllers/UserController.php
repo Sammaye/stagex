@@ -563,46 +563,27 @@ class userController extends \glue\Controller{
 		$this->pageTitle = 'Search For Subscriptions - StageX';
 
 		if(!glue::http()->isAjax())
-			glue::route('error/notfound');
+			glue::trigger('404');
+		extract(glue::http()->param(array('query','page')));
+		$users=app\models\Follower::model()->search(glue::user()->_id,$query);
 
-		$query = isset($_POST['query']) ? $_POST['query'] : null;
-		$page = isset($_POST['page']) ? $_POST['page'] : null;
-
-		$sub_model = new Subscription();
-		$subs = $sub_model->Db()->find(array('from_id' => glue::session()->user->_id));
-
-		$_ids = array();
-		foreach($subs as $k=>$v){
-			$_ids[] = $v['to_id'];
-		}
-
-		if(!$query || strlen($query) <= 0){
-			$users = User::model()->find(array('_id' => array('$in' => $_ids)));
-		}else{
-			$users = User::model()->find(array(
-				'$or' => array(
-					array('username' => new MongoRegex('/'.$query.'/i')),
-					array('name' => new MongoRegex('/'.$query.'/i'))
-				), '_id' => array('$in' => $_ids)));
-		}
-
-		if($users->count() > 0){
+		if(count($users) > 0){
 			ob_start();
 			?> <div class='list' style='padding:7px 10px;'>{items}<div style='margin-top:7px;'>{pager}<div class="clear"></div></div></div> <?php
 			$template = ob_get_contents();
 			ob_end_clean();
 
-			$this->widget('glue/widgets/GListView.php', array(
-					'pageSize'	 => 20,
-					'page' 		 => $page,
-					"cursor"	 => $users,
-					'template' 	 => $template,
-					'itemView' => 'user/_subscription.php',
-					'pagerCssClass' => 'grid_list_pager'
+			glue\widgets\ListView::widget(array(
+				'pageSize'	 => 20,
+				'page' 		 => $page,
+				"cursor"	 => $users,
+				'template' 	 => $template,
+				'itemView' => 'user/_subscription.php',
+				'pagerCssClass' => 'grid_list_pager'
 			));
 		}else{
 			?>
-			<div style='font-size:16px; font-weight:normal; padding:45px; text-align:center;'>
+			<div class="no_results_found">
 				No subscriptions were found
 			</div>
 			<?php
