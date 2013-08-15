@@ -159,47 +159,56 @@ $this->js('new_playlist', "
 "); ?>
 <div class="boxed_page_layout_outer user_playlists_page">
 
-	<div class='borderless_head'>
-		<div class='head'>Playlists</div>
-    	<div class='amnt_found'><?php echo $playlist_rows->count() ?> found</div>
+	<div class="tabs-nav">
+		<ul>
+			<li><a href="/user/playlists" class="selected">My Playlists</a></li>
+			<li><a href="/playlist/followed">Followed</a></li>
+			<a style='float:right;' class="btn-success" href="<?php echo glue::http()->url('/playlist/add') ?>">Add Playlist</a>
+		</ul>
+	</div>
 
-    	<div class='green_css_button create_playlist' id='new_playlist'>Create New Playlist</div>
-    	<div class='clearer'></div>
+	<div class="header">
+		<!-- <div class="left">
+    	    <a class="btn-success" href="<?php //echo glue::http()->url('/video/upload', array(), glue::$params['uploadBase']) ?>">Add New Upload</a>
+    	</div> -->
+    	<div class="right">   
+    		<div class='search form-search'>
+			<?php $form = Html::form(array('method' => 'get')); ?><div class="search_input">
+				<?php app\widgets\Jqautocomplete::widget(array(
+					'attribute' => 'query',
+					'value' => urldecode(htmlspecialchars(isset($_GET['query']) ? $_GET['query'] : '')),
+					'placeholder' => 'Search Playlists',
+					'options' => array(
+						'appendTo' => '#user_video_results',
+						'source' => '/user/video_search_suggestions',
+						'minLength' => 2,
+					),
+					'renderItem' => "
+						return $( '<li></li>' )
+							.data( 'item.autocomplete', item )
+							.append( '<a class=\'content\'><span>' + item.label + '</span></div></a>' )
+							.appendTo( ul );
+				"))  ?></div><button class="submit_search"><span>&nbsp;</span></button>
+			<?php $form->end() ?>
+			</div>    	
+    	</div>
+    	<div class="clear"></div>
     </div>
 	<?php ob_start(); ?>
-		<div class='stickytoolbar-placeholder grey_sticky_bar'>
+		<div class='stickytoolbar-placeholder grey_sticky_toolbar'>
 			<div class='stickytoolbar-bar'>
-				<div class='block_summary'></div>
 				<div class='inner_bar'>
-					<div class='checkbox_input'><?php echo html::checkbox('selectAll', 1, 0, array('class' => 'selectAll_input')) ?></div>
-					<div class='grey_css_button selected_actions left_button'>Actions</div>
-					<div class='grey_css_button delete float_left'>Remove</div>
-
-					<div class='search_widget'>
-						<?php $form = html::form(array('method' => 'get')) ?>
-						<div class='middle'><?php
-							echo html::textfield('query', htmlspecialchars(isset($_GET['query']) ? $_GET['query'] : ''), array('id' => 'Playlist_Search')) ?></div><a href='#' id='playlist_search_submit' class='submit'><img alt='search' src='/images/search_icon_small.png'/></a>
-						<?php echo html::submitbutton('Search', array('class' => 'invisible_submit')); $form->end() ?>
-					</div>
-
-					<div class='grey_css_button selected_filter right_button'>
-						<?php if($filter == 'listed'){ ?>
-							Showing Listed Playlists
-						<?php }elseif($filter == 'unlisted'){ ?>
-							Showing Unlisted Playlists
-						<?php }elseif($filter == 'private'){ ?>
-							Showing Private Playlists
-						<?php }else{ ?>
-							Showing All Playlists
-						<?php } ?>
-					</div>
+					<div class='checkbox_button checkbox_input'><?php echo Html::checkbox('selectAll', 1, 0, array('class' => 'selectAll_input')) ?></div>
+					<button class='btn btn-dark selected_actions edit_videos_button'>Edit</button>
+					<button class='btn-grey selected_actions btn_delete'>Delete</button>
 				</div>
+				<div class="alert block-alert" style='display:none;'></div>
 			</div>
 		</div>
 	<?php $html = ob_get_contents();
 	ob_end_clean();
 	app\widgets\stickytoolbar::widget(array(
-		"element" => '.grey_sticky_bar',
+		"element" => '.grey_sticky_toolbar',
 		"options" => array(
 			'onFixedClass' => 'grey_sticky_bar-fixed'
 		),
@@ -221,6 +230,6 @@ $this->js('new_playlist', "
 				'pagerCssClass' => 'grid_list_pager'
 		));
 	}else{ ?>
-		<div class='padded_list_not_found'>No playlists were found for you</div>
+		<div class='no_results_found'>No playlists were found for you</div>
 	<?php } ?>
 </div>

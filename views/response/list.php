@@ -22,7 +22,7 @@ glue::$controller->js('response_selector', "
 		var textarea = $(this).parents('.video_response_selector').find('.text_comment_content'),
 			mode = $('.video_response_list').data('mode') == null ? '' : $('.video_response_list').data('mode');
 
-		$.post('/videoresponse/add', { 'content': textarea.val(), 'vid': '".strval($model->_id)."', type: 'text', mode: mode}, function(data){
+		$.post('/videoresponse/add', { 'content': textarea.val(), 'video_id': '".strval($model->_id)."', type: 'text', mode: mode}, function(data){
 			//forms.reset($('.video_response_selector .block_summary'));
 			if(!data.success){
 				//console.log('errors', data);
@@ -217,58 +217,53 @@ glue::$controller->js('watch.response_list', "
 "); // All Response list related stuff gets shoved into here
 ?>
 
-<div class='video_response_selector'>
+<div class='video_response_selector' style='margin:10px 0;'>
 	<div class='block_summary main_block_summary' style='display:none;'></div>
 	<?php if(($model->allowTextComments || $model->allowVideoComments) && glue::auth()->check(array('@'))){ ?>
-		<ul class="response_tabs">
+		<ul class="type_tabs">
 			<li>Respond with:</li>
-			<?php if($model->allowTextComments): ?><li><a href="#text_response_pane" class="response_tab text_response_tab">Comment<i class="stub" style='left:130px;'></i></a></li><?php endif ?>
-			<?php if($model->allowVideoComments): ?><li><a href="#video_response_pane" class="response_tab video_response_tab">Video<i class="stub" style='<?php if($model->allowTextComments){ echo "display:none;"; } ?> left:205px;'></i></a></li><?php endif ?>
+			<?php if($model->allowTextComments): ?><li><a href="#text_response_pane" class="response_tab text_response_tab">Comment</a></li><?php endif ?>
+			<?php if($model->allowVideoComments): ?><li><a href="#video_response_pane" class="response_tab video_response_tab">Video</a></li><?php endif ?>
 		</ul>
-		<div class="response_panes">
-			<?php if($model->allowTextComments){ ?>
-				<div class='response_pane text_response_pane'>
-					<?php app\widgets\autoresizetextarea::widget(array(
-						'attribute' => 'text_comment_content',
-						'class' => 'text_comment_content'
-					)) ?>
-					<input type="button" value="Post Response" class="btn-success post_response"/>
-				</div>
-			<?php } ?>
+		<?php if($model->allowTextComments){ ?>
+			<div class='response_pane text_response_content'>
+				<?php app\widgets\autoresizetextarea::widget(array(
+					'attribute' => 'text_comment_content', 'class' => 'text_comment_content'
+				)) ?><input type="button" value="Post Response" class="btn-success post_response"/>
+			</div>
+		<?php } ?>
 
-			<?php if($model->allowVideoComments){ ?>
-				<div class='response_pane video_response_pane' style='display:none;'>
-					<div class='inner'>
-						<h2 class='select_head'>Search for and select one of your videos to add it as a response:</h2>
-						<?php app\widgets\Jqautocomplete::widget(array(
-								'attribute' => 'videoResponseSearch',
-								'value' => '',
-								'options' => array(
-									'appendTo' => '#videoResponse_results',
-									'source' => '/videoresponse/response_suggestions',
-									'minLength' => 2,
-									'select' => "js:function(event, ui){
-										$( '.videoResponseSearch' ).val( ui.item.label );
-										$( '#video_response_id' ).val( ui.item._id );
-										return false;
-									}"
-								),
-								'renderItem' => "
-									return $( '<li></li>' )
-										.data( 'item.autocomplete', item )
-										.append( '<a class=\'content\'><img alt=\'thumbnail\' src=\''+ item.image_src +'\'/><span>' + item.label + '</span><div class=\'clearer\'></div></a>' )
-										.appendTo( ul );"
-						)) ?>
-						<input type='hidden' id='video_response_id' name='_id'/>
-						<a href='#' class='green_css_button post_video_response new_video_response' id=''>Post Response</a>
-						<div class="clear"></div>
-					</div>
-					<div class='upload_video'>
-						<p class='dark_grey_text'>Don't see your video there? <?php echo html::a(array('href' => 'http://upload.stagex.co.uk/video/upload', 'text' => 'Upload more videos'))?></p>
-					</div>
+		<?php if($model->allowVideoComments){ ?>
+			<div class='response_pane video_response_content' style='display:none;'>
+				<div class='inner'>
+					<h2 class='select_head'>Search for and select one of your videos to add it as a response:</h2>
+					<?php app\widgets\Jqautocomplete::widget(array(
+						'attribute' => 'videoResponseSearch',
+						'value' => '',
+						'placeholder' => 'Search for a video you uploaded here',
+						'options' => array(
+							'appendTo' => '#videoResponse_results',
+							'source' => '/videoresponse/response_suggestions',
+							'minLength' => 2,
+							'select' => "js:function(event, ui){
+								$( '.videoResponseSearch' ).val( ui.item.label );
+								$( '#video_response_id' ).val( ui.item._id );
+								return false;
+							}"
+						),
+						'renderItem' => "
+							return $( '<li></li>' )
+								.data( 'item.autocomplete', item )
+								.append( '<a class=\'content\'><img alt=\'thumbnail\' src=\''+ item.image_src +'\'/><span>' + item.label + '</span><div class=\'clearer\'></div></a>' )
+								.appendTo( ul );"
+					)) ?>
+					<input type='hidden' id='video_response_id' name='_id'/>
+					<input type="button" value="Post Response" class="btn-success post_response"/>
+					<p class='light'>Don't see your video there? <?php echo html::a(array('href' => 'http://upload.stagex.co.uk/video/upload', 'text' => 'Upload more videos'))?></p>
+					<div class="clear"></div>
 				</div>
-			<?php } ?>
-		</div>
+			</div>
+		<?php } ?>
 		<div class="clear"></div>
 	<?php } ?>
 </div>

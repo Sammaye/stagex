@@ -1,4 +1,8 @@
 <?php
+
+use app\models\VideoResponse,
+	app\models\Video;
+
 class videoresponseController extends \glue\Controller{
 
 	public function authRules(){
@@ -76,73 +80,51 @@ class videoresponseController extends \glue\Controller{
 	}
 
 	public function action_add(){
-		$this->pageTitle = 'Add Video Response - StageX';
-		if(!glue::http()->isAjax())
-			glue::route('error/notfound');
+		$this->title = 'Add Video Response - StageX';
+		if(!glue::auth()->check('ajax','post'))
+			glue::trigger('404');
+		extract(glue::http()->param(array('video_id','type','mode','reply_vid','parent_comment')),null);
 
 		$comment = new VideoResponse();
-		$video = Video::model()->findOne(array('_id' => new MongoId($_POST['vid'])));
-
-		if(!glue::roles()->checkRoles(array('canView' => $video))){
-			GJSON::kill(GJSON::DENIED);
+		$video = Video::model()->findOne(array('_id' => new MongoId($video_id)));
+		if(
+			!$video||!$type||!glue::auth()->check(array('viewable' => $video))
+			||($type!='text'&&$type!='video')
+		)
+			$this->json_error(self::DENIED);
+		
+		$comment->videoId = $video->_id;
+		$comment->video=$video;
+		$comment->type=$type;
+		
+		if(!glue::auth()->check(array('^' => $comment->video))&&$mode=='admin')
+			$mode=null;		
+		if($type == 'text'){
+			if(!$video->allowTextComments)
+				$this->json_error('Text responses have been disabled on this video');
+			$comment->setScenario('text_comment');
+			if($parent_comment){ // Should be a truthy value
+				$comment->threadParentId = new MongoId($parent_comment);
+				if($comment->thread_parent instanceof app\models\VideoResponse && $comment->thread_parent->author instanceof app\models\User)
+					$comment->threadParentUsername = $comment->thread_parent->author->getUsername();
+			}
+			$comment->content = $_POST['content'];
+		}elseif($type == 'video'){
+			if(!$video->allowVideoComments)
+				$this->json_error('Video responses have been disabled on this video');
+			$comment->setScenario('video_comment');
+			$comment->replyVideoId = new MongoId($reply_vid);
 		}
 
-		if(isset($_POST['type']) && $video){
-			if($_POST['type'] == 'text'){
-
-				if(!(bool)$video->txt_coms_allowed){
-					GJSON::kill('Text responses have been disabled on this video');
-				}
-				$comment->setScenario('text_comment');
-
-				if(isset($_POST['parent_comment'])){
-					$_SESSION['last_comment_pull'] = serialize(new MongoDate()); // reset the pull time so the new comment will show correctly on page change
-					$comment->parent_comment = new MongoId($_POST['parent_comment']);
-					if($comment->thread_parent){
-						if($comment->thread_parent->author instanceof User) $comment->reply_tousername = $comment->thread_parent->author->username;
-					}
-				}
-				$comment->vid = new MongoId($_POST['vid']);
-				$comment->content = $_POST['content'];
-			}elseif($_POST['type'] == 'video'){
-
-				if(!(bool)$video->vid_coms_allowed){
-					GJSON::kill('Video responses have been disabled on this video');
-				}
-				$comment->setScenario('video_comment');
-				$comment->vid = new MongoId($_POST['vid']);
-				$comment->xtn_vid = new MongoId($_POST['id']);
-			}
-
-			if($comment->validate()){
-				$comment->save();
-
-				$mode = '';
-				if(glue::roles()->checkRoles(array('^' => $comment->video))){
-					if(isset($_POST['mode'])){
-						switch($_POST['mode']){
-							case "admin":
-								$mode = 'admin';
-								break;
-						}
-					}
-				}
-
-				ob_start();
-					$this->partialRender('responses/_response', array('item' => $comment, 'mode' => $mode));
-					$comment_html = ob_get_contents();
-				ob_end_clean();
-
-				if(glue::session()->user->should_autoshare('c_video')){
-					AutoPublishQueue::add_to_qeue(AutoPublishQueue::V_RES, glue::session()->user->_id, $video->_id, null, $comment->content);
-				}
-
-				//var_dump($comment->in_reply);
-				echo json_encode(array('success' => true, 'approved' => $comment->approved, 'html' => $comment_html, 'messages' => $comment->getErrorMessages()));
-			}else{
-				//var_dump($comment->getErrorMessages());
-				echo json_encode(array('success' => false, 'messages' => $comment->getErrorMessages()));
-			}
+		if($comment->validate()&&$comment->save()){
+			$comment_html=$this->renderPartial('response/_response', array('item' => $comment, 'mode' => $mode));
+			if(glue::user()->autoshareResponses)
+				app\models\AutoPublishQueue::add_to_qeue(app\models\AutoPublishQueue::V_RES, glue::user()->_id, $video->_id, null, $comment->content);
+			//var_dump($comment->in_reply);
+			$this->json_success(array('success' => true, 'approved' => $comment->approved, 'html' => $comment_html));
+		}else{
+			//var_dump($comment->getErrorMessages());
+			echo json_encode(array('success' => false, 'messages' => $comment->getErrors()));
 		}
 	}
 
