@@ -222,8 +222,8 @@ glue::$controller->js('watch.response_list', "
 	<?php if(($model->allowTextComments || $model->allowVideoComments) && glue::auth()->check(array('@'))){ ?>
 		<ul class="type_tabs">
 			<li>Respond with:</li>
-			<?php if($model->allowTextComments): ?><li><a href="#text_response_pane" class="response_tab text_response_tab">Comment</a></li><?php endif ?>
-			<?php if($model->allowVideoComments): ?><li><a href="#video_response_pane" class="response_tab video_response_tab">Video</a></li><?php endif ?>
+			<?php if($model->allowTextComments): ?><li><a href="#text_response_pane" class="type_tab text_response_tab">Comment</a></li><?php endif ?>
+			<?php if($model->allowVideoComments): ?><li><a href="#video_response_pane" class="type_tab video_response_tab">Video</a></li><?php endif ?>
 		</ul>
 		<?php if($model->allowTextComments){ ?>
 			<div class='response_pane text_response_content'>

@@ -2039,3 +2039,19 @@ textarea{
 .subscription:nth-child(odd){
 	margin-right:15px;
 }
+
+.video_response_selector .type_tabs{
+	height:20px;
+}
+
+.video_response_selector .type_tabs li{
+	float:left;
+}
+
+.video_response_selector .type_tabs .type_tab{
+	margin:0 10px;
+}
+
+.video_response_selector .type_tabs .type_tab.selected{
+	
+}
