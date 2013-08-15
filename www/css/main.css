@@ -2079,3 +2079,7 @@ textarea{
 .subscription .username .info{
 	font-size:11px; color:#666666; line-height:20px; margin-top:2px;
 }
+
+.followers_page .header{
+	margin:20px 0;
+}

@@ -25,7 +25,7 @@ $this->js('user.unsubscribe', "
 ");
 ?>
 <div class="followers_page">
-	<div class="header" style='margin:20px 0;'>   
+	<div class="header">   
     	<div class='search form-search form-search_subs'>
 		<?php $form = Html::form(array('method' => 'get')); ?>
 			<div class="search_input"><?php echo html::textfield('query',htmlspecialchars(glue::http()->param('query',null)),array('placeholder'=>'Search Subscribers', 'autocomplete'=>'off')) ?></div>
