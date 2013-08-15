@@ -1,7 +1,11 @@
 <?php
 use glue\Html;
 
+$this->jsFile("/js/views/subscribeButton.js");
 $this->js('user.unsubscribe', "
+	
+	$('.subscribe_widget').subscribeButton();
+		
 	$(document).on('keyup', '.form-search_subs .search_input input', function(event){
 		event.preventDefault();
 		search_subscriptions(true);

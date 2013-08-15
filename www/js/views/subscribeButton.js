@@ -11,7 +11,7 @@
 			settings=$.extend(true,{},options,opts);
 			return this.each(function(){
 				data = $(this).data('subscribeButton');
-console.log($(settings.button+".subscribe").length);
+
 				if(!data){
 					$(this).data('subscribeButton', settings)
 						.on('click', settings.button+".subscribe", subscribe)
@@ -30,7 +30,6 @@ console.log($(settings.button+".subscribe").length);
 		}
 	},
 	subscribe=function(e){
-		console.log('here');
 		e.preventDefault();
 		var container=$(this).parents('.subscribeButton'),
 			el=$(this),
@@ -38,7 +37,7 @@ console.log($(settings.button+".subscribe").length);
 		
 		$.get('/user/follow', {id: user_id}, null, 'json').done(function(data){
 			if(data.success){
-				el.removeClass('btn-success subscribe').addClass('btn unsubscribe').val('Unsubscribe');
+				el.removeClass('btn btn-primary subscribe').addClass('btn unsubscribe').val('Unsubscribe');
 			}else{}
 		});		
 	},
@@ -50,7 +49,7 @@ console.log($(settings.button+".subscribe").length);
 		
 		$.get('/user/unfollow', {id: user_id}, null, 'json').done(function(data){
 			if(data.success){
-				el.removeClass('btn unsubscribe').addClass('btn-success subscribe').val('Subscribe');
+				el.removeClass('btn unsubscribe').addClass('btn btn-primary subscribe').val('Subscribe');
 			}else{}
 		});				
 	};

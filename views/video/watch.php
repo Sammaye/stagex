@@ -5,7 +5,6 @@ $this->jsFile('/js/views/playlist_bar.js');
 $this->jsFile('/js/jdropdown.js');
 $this->jsFile('/js/views/subscribeButton.js');
 $this->JsFile("/js/jquery.expander.js");
-$this->jsFile("/js/views/subscribeButton.js");
 
 $this->js('page', "
 		
@@ -227,7 +226,7 @@ $this->js('edit', "
 				<?php if(app\models\Follower::isSubscribed($model->author->_id)){ ?>
 				<input type="button" class='unsubscribe btn button' value="Unsubscribe"/>
 				<?php }else{ ?>
-				<input type="button" class='subscribe btn-success button' value="Subscribe"/>
+				<input type="button" class='subscribe btn btn-primary button' value="Subscribe"/>
 				<?php } ?>
 			</div>
 			</div>
@@ -430,11 +429,11 @@ $this->js('edit', "
 					<div class='all_views stats_block'><?php echo $model->views ?> views</div>
 					<div class='unique_views stats_block'><?php echo $model->uniqueViews ?> unique views</div>
 					<div class="text_responses stats_block">
-					<?php $textResponseCount = $model->with('responses', array('type' => 'text', 'deleted' => 0))->count()?>
+					<?php $textResponseCount = $model->with('responses', array('type' => 'text', 'deleted' => 0))->count() ?>
 					<?php echo $textResponseCount ?> text <?php if($textResponseCount > 1): echo "responses"; else: echo "response"; endif ?>
 					</div>
 					<div class="video_responses stats_block">
-					<?php $videoResponseCount = $model->with('responses', array('type' => 'video', 'deleted' => 0))->count()?>
+					<?php $videoResponseCount = $model->with('responses', array('type' => 'video', 'deleted' => 0))->count() ?>
 					<?php echo $videoResponseCount ?> video <?php if($videoResponseCount > 1): echo "responses"; else: echo "response"; endif ?>					
 					</div>
 					<div class="clear"></div>
