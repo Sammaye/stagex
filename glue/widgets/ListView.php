@@ -40,7 +40,7 @@ class ListView extends \glue\Widget{
 	 */
 	public $data;
 
-	public $template = "{items}{pager}";
+	public $template = '<div class="list">{items}<div>{pager}<div class="clear"></div></div></div>';
 	public $itemView;
 
 	public $page = 1;
@@ -195,7 +195,7 @@ class ListView extends \glue\Widget{
 		}
 
 		foreach($this->cursor as $_id => $item){
-			for($j=0;$j<5;$j++){
+			//for($j=0;$j<5;$j++){
 
 			if(is_string($this->itemView)){ // Is it a file location?
 				ob_start();
@@ -205,7 +205,7 @@ class ListView extends \glue\Widget{
 				echo $html;
 			}
 			$i++;
-			}
+			//}
 		}
 	}
 

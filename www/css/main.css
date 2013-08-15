@@ -2055,3 +2055,27 @@ textarea{
 .video_response_selector .type_tabs .type_tab.selected{
 	
 }
+
+.subscription{
+	margin-bottom:10px;float:left;height:75px;width:400px;border:1px solid #d8d8d8;border-bottom-width:2px;
+}
+
+.subscription .subscribe_widget{
+	float:right; margin:23px 10px 0 0;
+}
+
+.subscription .thumbnail{
+	float:left;margin-right:10px;width:75px;height:75px;
+}
+
+.subscription .username{
+	float:left;margin-top:20px;overflow:hidden;
+}
+
+.subscription .username a{
+	line-height:20px;font-size:16px;font-weight:bold;
+}
+
+.subscription .username .info{
+	font-size:11px; color:#666666; line-height:20px; margin-top:2px;
+}
