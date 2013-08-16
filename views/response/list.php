@@ -217,7 +217,7 @@ glue::$controller->js('watch.response_list', "
 "); // All Response list related stuff gets shoved into here
 ?>
 
-<div class='video_response_selector' style='margin:10px 0;'>
+<div class='video_response_selector' style='margin:10px 0 30px 0;'>
 	<div class='block_summary main_block_summary' style='display:none;'></div>
 	<?php if(($model->allowTextComments || $model->allowVideoComments) && glue::auth()->check(array('@'))){ ?>
 		<ul class="type_tabs">
@@ -227,9 +227,9 @@ glue::$controller->js('watch.response_list', "
 		</ul>
 		<?php if($model->allowTextComments){ ?>
 			<div class='response_pane text_response_content'>
-				<?php app\widgets\autoresizetextarea::widget(array(
+				<div><?php app\widgets\autoresizetextarea::widget(array(
 					'attribute' => 'text_comment_content', 'class' => 'text_comment_content'
-				)) ?><input type="button" value="Post Response" class="btn-success post_response"/>
+				)) ?></div><input type="button" value="Post Response" class="btn-success post_response"/>
 			</div>
 		<?php } ?>
 

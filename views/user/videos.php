@@ -142,8 +142,8 @@ $this->js('videos', "
 		<ul>
 			<li><a href="/user/videos" class="selected">Uploads</a></li>
 			<li><a href="/history/watched">Watched</a></li>
-			<li><a href="/history/ratedVideos">Liked</a></li>
-			<li><a href="/history/ratedVideos?filter=dislikes">Disliked</a></li>
+			<li><a href="/history/rated">Liked</a></li>
+			<li><a href="/history/rated?filter=dislikes">Disliked</a></li>
 			<a style='float:right;' class="btn-success" href="<?php echo glue::http()->url('/video/upload', array(), glue::$params['uploadBase']) ?>">Add New Upload</a>
 		</ul>
 	</div>
@@ -152,13 +152,12 @@ $this->js('videos', "
 		<!-- <div class="left">
     	    <a class="btn-success" href="<?php //echo glue::http()->url('/video/upload', array(), glue::$params['uploadBase']) ?>">Add New Upload</a>
     	</div> -->
-    	<div class="right">   
-    		<span class='light small amount_found'><?php echo $video_rows->count() ?> found</span>
     		<div class='search form-search'>
 			<?php $form = Html::form(array('method' => 'get')); ?><div class="search_input">
 				<?php app\widgets\Jqautocomplete::widget(array(
 					'attribute' => 'query',
 					'value' => urldecode(htmlspecialchars(isset($_GET['query']) ? $_GET['query'] : '')),
+					'placeholder' => 'Search Uploads',
 					'options' => array(
 						'appendTo' => '#user_video_results',
 						'source' => '/user/video_search_suggestions',
@@ -170,9 +169,9 @@ $this->js('videos', "
 							.append( '<a class=\'content\'><span>' + item.label + '</span></div></a>' )
 							.appendTo( ul );
 				"))  ?></div><button class="submit_search"><span>&nbsp;</span></button>
+				<span class='light small amount_found'><?php echo $video_rows->count() ?> found</span>
 			<?php $form->end() ?>
 			</div>    	
-    	</div>
     	<div class="clear"></div>
     </div>
     
@@ -335,18 +334,11 @@ $this->js('videos', "
 	)); ?>
 
 	<?php if($video_rows->count() > 0){
-		ob_start();
-			?> <div class='video_list'>{items}</div><div style='margin:7px;'>{pager}<div class="clear"></div></div> <?php
-			$template = ob_get_contents();
-		ob_end_clean();
-
 		glue\widgets\ListView::widget(array(
 			'pageSize'	 => 20,
 			'page' 		 => isset($_GET['page']) ? $_GET['page'] : 1,
 			"cursor"	 => $video_rows,
-			'template' 	 => $template,
 			'itemView' 	 => 'video/_video.php',
-			'pagerCssClass' => 'grid_list_pager'
 		));
 	}else{ ?>
 		<div class='no_results_found'>No videos were found</div>

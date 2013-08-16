@@ -40,8 +40,10 @@ class ListView extends \glue\Widget{
 	 */
 	public $data;
 
-	public $template = '<div class="list">{items}<div>{pager}<div class="clear"></div></div></div>';
+	public $template = '<div class="list_contents">{items}<div class="list_pagination">{pager}<div class="clear"></div></div></div>';
 	public $itemView;
+	
+	public $callback;
 
 	public $page = 1;
 	public $pageSize = 20;
@@ -197,12 +199,17 @@ class ListView extends \glue\Widget{
 		foreach($this->cursor as $_id => $item){
 			//for($j=0;$j<5;$j++){
 
-			if(is_string($this->itemView)){ // Is it a file location?
-				ob_start();
-					include $this->getView($this->itemView);
-					$html = ob_get_contents();
-				ob_end_clean();
-				echo $html;
+			$fn=$this->callback;
+			if((is_string($fn) && function_exists($fn)) || (is_object($fn) && ($fn instanceof \Closure))){
+				$fn($i,$item,$this->itemView);
+			}else{
+				if(is_string($this->itemView)){ // Is it a file location?
+					ob_start();
+						include $this->getView($this->itemView);
+						$html = ob_get_contents();
+					ob_end_clean();
+					echo $html;
+				}
 			}
 			$i++;
 			//}

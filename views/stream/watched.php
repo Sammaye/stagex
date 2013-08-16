@@ -8,52 +8,68 @@ $this->js('watched_page', "
 	//$.playlist_dropdown({ multi_seek_parent: true });
 	$(function(){
 		$('div.expandable').expander({slicePoint: 120});
-	});		
-
-	$(document).on('click', '.selectAll_input', function(event){
-		if($(this).attr('checked')){
-			$('.video_list input:checkbox').attr('checked', true);
-		}else{
-			$('.video_list input:checkbox').attr('checked', false);
-		}
-	});
-
-	$(document).on('click', '.delete', function(event){
-		event.preventDefault();
-		//console.log('d', {videos: $('.video_list input:checked').serializeArray()});
-
-		var ar = $('.video_list input:checked').serializeArray(),
-			ret = [];
-		for(var i =0; i < ar.length; i++){
-			ret[ret.length] = ar[i].name;
-		}
-		$.post('/history/remove_watched', {items: ret}, function(data){
-			if(data.success){
-				$('.video_list input:checked').parents('.video_item').remove();
+		
+		$( '#from' ).datepicker({
+			defaultDate: 0,
+			dateFormat: 'dd/mm/yy',
+			changeMonth: true,
+			changeYear: true,
+			numberOfMonths: 1,
+			onClose: function( selectedDate ) {
+				$( '#to' ).datepicker( 'option', 'minDate', selectedDate );
 			}
-		}, 'json');
+		});
+		
+		$( '#to' ).datepicker({
+			defaultDate: '+1w',
+			dateFormat: 'dd/mm/yy',
+			changeMonth: true,
+			changeYear: true,
+			numberOfMonths: 1,
+			onClose: function( selectedDate ) {
+				$( '#from' ).datepicker( 'option', 'maxDate', selectedDate );
+			}
+		});		
 	});
+
+	$('.grey_sticky_toolbar .block-alert').summarise()
+
+	$('.selectAll_input').click(function(){
+		if($(this).prop('checked')==true){
+			$('.video_list input:checkbox').prop('checked', false).trigger('click');
+		}else{
+			$('.video_list input:checkbox').prop('checked', true).trigger('click');
+		}
+	});
+		
+	$(document).on('click', '.grey_sticky_toolbar .btn_delete', function(){
+		params={'ids[]':[]};
+		$('.video_list .video_row .checkbox_col input:checked').each(function(i,item){
+			params['ids[]'][params['ids[]'].length]=$(item).val();
+		});
+
+		$.post('/history/deleteRated', params, null, 'json').done(function(data){
+			if(data.success){
+				$('.grey_sticky_toolbar .block-alert').summarise('set', 'success','The videos you selected were deleted');
+				$.each(params['ids[]'],function(i,item){
+					$('.video_list .video_row[data-id='+item+']').remove();
+				});
+				reset_checkboxes();
+			}else{
+				$('.grey_sticky_toolbar .block-alert').summarise('set', 'error','The videos you selected could not be deleted');
+			}
+		}, 'json');			
+	});		
+		
+	function reset_checkboxes(){
+		$('.selectAll_input').prop('checked',true).trigger('click');
+	}		
 
 	$(document).on('click', '.clear_all', function(event){
 		event.preventDefault();
 		$.getJSON('/history/remove_all_watched', function(data){
 			if(data.success){
 				$('.video_list').html(data.html);
-			}
-		});
-	});
-
-	$(document).on('click', '.load_more', function(event){
-		event.preventDefault();
-		var last_ts = $('.video_list .video_item').last().data('ts');
-		$.getJSON('/history/get_watched_history', {ts: last_ts, filter: 'watched' }, function(data){
-			if(data.success){
-				$('.video_list').append(data.html);
-				$('div.expandable').expander({slicePoint: 60});
-			}else{
-				if(data.noneleft){
-					$('.load_more').html(data.messages[0]);
-				}
 			}
 		});
 	});
@@ -64,12 +80,26 @@ $this->js('watched_page', "
 		<ul>
 			<li><a href="/user/videos">Uploads</a></li>
 			<li><a href="/history/watched" class="selected">Watched</a></li>
-			<li><a href="/history/ratedVideos">Liked</a></li>
-			<li><a href="/history/ratedVideos?filter=dislikes">Disliked</a></li>
+			<li><a href="/history/rated">Liked</a></li>
+			<li><a href="/history/rated?filter=dislikes">Disliked</a></li>
 			<a style='float:right;' class="btn-success" href="<?php echo glue::http()->url('/video/upload', array(), glue::$params['uploadBase']) ?>">Add New Upload</a>
 		</ul>
 	</div>
-
+	<div class="advanced_filter_header">   
+    	<div class='search form-search form-search_subs'>
+		<?php $form = Html::form(array('method' => 'get')); ?>
+			<div class="search_input"><?php echo html::textfield('query',htmlspecialchars(glue::http()->param('query',null)),array('placeholder'=>'Search Videos', 'autocomplete'=>'off')) ?></div>
+			<button class="submit_search"><span>&nbsp;</span></button>
+		<?php $form->end() ?>
+		</div>    	
+		<div class="date_filter">
+			<?php $form = Html::form(array('method' => 'get')); ?>
+			<input type="text" id="from" name="from_date" placeholder="Select a from date"/> <span class="sep">-</span> 
+			<input type="text" id="to" name="to_date" placeholder="Select a to date" />	<button class="btn">Apply</button>
+			<?php $form->end() ?>
+		</div>		
+		<div class="clear"></div>
+    </div>	
 	<?php ob_start(); ?>
 		<div class='stickytoolbar-placeholder grey_sticky_toolbar'>
 			<div class='stickytoolbar-bar'>

@@ -467,8 +467,8 @@ $this->js('edit', "
 			<a class='view_all' href="<?php echo glue::http()->url("/videoresponse/viewAll", array("id"=>$model->_id)) ?>">View All Responses</a>
 			<?php echo $this->renderPartial('response/list', array('model' => $model, 'comments' => 
 				glue::auth()->check(array("^"=>$model)) ? 
-					app\models\VideoResponse::model()->moderated()->find(array('videoId'=>$model->_id)) :
-					app\models\VideoResponse::model()->public()->find(array('videoId'=>$model->_id))
+					app\models\VideoResponse::model()->moderated()->find(array('videoId'=>$model->_id))->sort(array('created'=>-1)) :
+					app\models\VideoResponse::model()->public()->find(array('videoId'=>$model->_id))->sort(array('created'=>-1))
 			, 'pageSize' => 10)) ?>
 		</div>
 		<?php endif ?>
