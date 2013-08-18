@@ -119,6 +119,10 @@ textarea{
 	height:auto;
 }
 
+input.date{
+	width:90px;
+}
+
 .radio,.checkbox{
 	padding:0;
 	margin:0;
@@ -2052,26 +2056,35 @@ textarea{
 	margin-right:15px;
 }
 
-.video_response_selector .type_tabs{
+.video_response_selector .tabs{
 	height:20px; margin:10px 0;
 }
 
-.video_response_selector .type_tabs li{
+.video_response_selector .tabs li{
 	float:left;
 }
 
-.video_response_selector .type_tabs .type_tab{
+.video_response_selector .response_tab{
 	margin:0 10px;
 }
 
-.video_response_selector .type_tabs .type_tab.selected{
-	
+.video_response_selector .response_tab.selected{
+    background-color: #428BCA;
+    color: #FFFFFF;
+    border-radius:5px;
+    padding:5px;
 }
 
 .video_response_selector .text_comment_content{
-	width:100%;
-	height:150px;
+	width:95%;
+	height:100px;
 	border-radius:3px;
+}
+
+.video_response_selector .videoResponseSearch{
+	vetical-align:top;
+	margin-bottom:0;
+	width:500px;
 }
 
 .subscription{
@@ -2128,7 +2141,15 @@ textarea{
 }
 
 .advanced_filter_header input{
-	vertical-align:top; margin:0;
+	vertical-align:top; margin:0; 
+}
+
+.advanced_filter_header input[type="text"]{
+	border-radius:3px;
+}
+
+.advanced_filter_header input.search{
+	width:400px; margin-right:65px;
 }
 
 .advanced_filter_header .search_input input{
@@ -2139,10 +2160,14 @@ textarea{
 	float:right;vertical-align:middle;height:30px;
 }
 
-.advanced_filter_header .date_filter button{
+.advanced_filter_header button{
 	margin:0;height:30px;line-height:30px;
 }
 
-.advanced_filter_header .date_filter .sep{
+.advanced_filter_header .sep{
 	display:inline-block; line-height:30px; margin:0 5px;
+}
+
+.advanced_filter_header .btn{
+	margin-left:20px;
 }

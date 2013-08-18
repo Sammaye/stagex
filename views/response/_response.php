@@ -3,7 +3,7 @@ if(!isset($view)) $view = '';
 if(!isset($mode)) $mode = null;
 
 if($item->type == "text"){ ?>
-<div class='video_response_item video_text_response_item <?php if($view == 'thread' && (count(preg_split('/,/', $item->path)) > 1)): echo " thread_comment"; endif; ?>'
+<div class='response video_text_response_item <?php if($view == 'thread' && (count(preg_split('/,/', $item->path)) > 1)): echo " thread_comment"; endif; ?>'
 	data-id='<?php echo $item->_id ?>' style='margin-bottom:15px;'>
 
 	<?php if(glue::auth()->check(array('^' => $item->video)) && $mode == 'admin'){ ?>
@@ -39,7 +39,7 @@ if($item->type == "text"){ ?>
 			<?php endif; ?>
 			
 			<?php if(glue::auth()->check(array('^' => $item)) || glue::auth()->check(array('^' => $item->video))){ ?>
-				<a href='#' class='delete_button'>Delete</a>
+				<a href='#' class='delete'>Delete</a>
 			<?php }
 			if($item->thread_parent):
 				echo "<a href='".glue::http()->url('/videoresponse/thread', array('id' => $item->_id))."' target='_blank'>View thread</a> ";

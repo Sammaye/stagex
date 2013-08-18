@@ -86,20 +86,14 @@ $this->js('watched_page', "
 		</ul>
 	</div>
 	<div class="advanced_filter_header">   
-    	<div class='search form-search form-search_subs'>
+    	<div class='search'>
 		<?php $form = Html::form(array('method' => 'get')); ?>
-			<div class="search_input"><?php echo html::textfield('query',htmlspecialchars(glue::http()->param('query',null)),array('placeholder'=>'Search Videos', 'autocomplete'=>'off')) ?></div>
-			<button class="submit_search"><span>&nbsp;</span></button>
-		<?php $form->end() ?>
-		</div>    	
-		<div class="date_filter">
-			<?php $form = Html::form(array('method' => 'get')); ?>
-			<input type="text" id="from" name="from_date" placeholder="Select a from date"/> <span class="sep">-</span> 
-			<input type="text" id="to" name="to_date" placeholder="Select a to date" />	<button class="btn">Apply</button>
+			<?php echo html::textfield('query',htmlspecialchars(glue::http()->param('query',null)),array('placeholder'=>'Enter keywords to search by', 'autocomplete'=>'off', 'class'=>'search')) ?>
+			<input type="text" id="from" class="date" name="from_date" placeholder="Enter start date"/> <span class="sep">-</span> 
+			<input type="text" id="to" class="date" name="to_date" placeholder="Enter end date" />	<button class="btn">Search</button>
 			<?php $form->end() ?>
 		</div>		
-		<div class="clear"></div>
-    </div>	
+    </div>		
 	<?php ob_start(); ?>
 		<div class='stickytoolbar-placeholder grey_sticky_toolbar'>
 			<div class='stickytoolbar-bar'>

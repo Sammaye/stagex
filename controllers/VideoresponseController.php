@@ -219,57 +219,33 @@ class videoresponseController extends \glue\Controller{
 		}
 	}
 
-// 	public function action_delete(){
-// 		$this->pageTitle = 'Delete Video Response - StageX';
-// 		if(!glue::http()->isAjax())
-// 			glue::route('error/notfound');
-
-// 		$comment = VideoResponse::model()->findOne(array("_id"=>new MongoId($_GET['id'])));
-// 		if($comment){
-// 			if(!glue::roles()->checkRoles(array('^' => array($comment->video, $comment))))
-// 				GJSON::kill(GJSON::DENIED);
-
-// 			$comment->delete();
-// 			echo json_encode(array("success"=>true));
-// 		}else{
-// 			GJSON::kill(GJSON::UNKNOWN);
-// 		}
-// 	}
-
 	public function action_delete(){
-		$this->pageTitle = 'Remove Video Responses - StageX';
-		if(!glue::http()->isAjax())
-			glue::route('error/notfound');
+		$this->title = 'Remove Responses - StageX';
+		if(!glue::auth()->check('ajax','post'))
+			glue::trigger('404');
+		extract(glue::http()->param(array('video_id','ids')),null);
 
-		$video_id = isset($_GET['vid']) ? $_GET['vid'] : null;
-		$_ids = isset($_GET['ids']) ? $_GET['ids'] : array();
+		$video = app\models\Video::model()->findOne(array('_id' => new MongoId($video_id)));
+		if(!$ids||!$video||(is_array($ids)&&count($ids)<=0))
+			$this->json_error(self::UNKNOWN);
 
-		$video = Video::model()->findOne(array('_id' => new MongoId($video_id)));
-
-		if(count($_ids) <= 0 || !is_array($_ids) || !$video){
-			GJSON::kill(GJSON::UNKNOWN);
+		$mongoIds=array();
+		foreach($ids as $k => $v){
+			$mongoIds[] = new MongoId($v);
 		}
 
-		if(!glue::roles()->checkRoles(array('^' => array($video))))
-			GJSON::kill(GJSON::DENIED);
+		if(glue::auth()->check(array('^' => $video)))
+			$condition=array('_id' => array('$in' => $mongoIds), 'videoId' => $video->_id);
+		else // If this is not done by the owner the user can only delete their own comments
+			$condition=array('_id' => array('$in' => $mongoIds), 'videoId' => $video->_id, 'userId'=>glue::user()->_id);
 
-		foreach($_ids as $k => $v){
-			$_ids[$k] = new MongoId($v);
-		}
+		$comments = app\models\VideoResponse::model()->findAll($condition)->limit(1000); $row_count = $comments->count();
+		app\models\VideoResponse::model()->deleteAll($condition);
+		glue::db()->videoresponse_likes->remove(array("response_id"=>array('$in' => $mongoIds)));
 
-		$comment_rows = glue::db()->videoresponse->find(array('_id' => array('$in' => $_ids), 'vid' => $video->_id));
-		$row_count = $comment_rows->count();
-
-		if(count($_ids) != $row_count)
-			GJSON::kill('Some of the comments you specified could not be found');
-
-		glue::db()->videoresponse->remove(array('_id' => array('$in' => $_ids), 'vid' => $video->_id), array('safe' => true));
-		glue::db()->videoresponse_likes->remove(array("response_id"=>array('$in' => $_ids)));
-
-		$video->total_responses = $video->total_responses-$row_count;
-		$video->save();
-
-		GJSON::kill('The comments you specified were deleted', true);
+		$video->saveCounters(array('totalResponses'=>-$row_count),0);
+		$this->json_success(array('message'=>'The comments you specified were deleted', 'total'=>count($mongoIds), 'updated'=>$row_count,
+			'failed' => count($mongoIds)-$row_count));
 	}
 
 	function action_getmore(){
