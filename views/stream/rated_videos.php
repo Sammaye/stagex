@@ -68,22 +68,23 @@ $this->js('page', "
 ");
 ?>
 <div class="rated_videos_body">
-	<div class="tabs-nav">
+	<div class="tabs-nav videos_nav_top">
 		<ul>
 			<li><a href="/user/videos">Uploads</a></li>
 			<li><a href="/history/watched">Watched</a></li>
-			<li><a href="/history/rated" <?php if(glue::http()->param('filter',null)!=='dislikes') echo 'class="selected"'; ?>>Liked</a></li>
-			<li><a href="/history/rated?filter=dislikes" <?php if(glue::http()->param('filter',null)==='dislikes') echo 'class="selected"'; ?>>Disliked</a></li>
-			<a style='float:right;' class="btn-success btn-upload" href="<?php echo glue::http()->url('/video/upload', array(), glue::$params['uploadBase']) ?>">Add New Upload</a>
+			<li><a href="/history/rated" <?php if(glue::http()->param('tab',null)!=='dislikes') echo 'class="selected"'; ?>>Liked</a></li>
+			<li><a href="/history/rated?tab=dislikes" <?php if(glue::http()->param('tab',null)==='dislikes') echo 'class="selected"'; ?>>Disliked</a></li>
 		</ul>
+		<a class="btn-success btn-upload" href="<?php echo glue::http()->url('/video/upload', array(), glue::$params['uploadBase']) ?>">Add New Upload</a>
 	</div>
 
 	<div class="advanced_filter_header">   
     	<div class='search'>
 		<?php $form = Html::form(array('method' => 'get')); ?>
 			<?php echo html::textfield('query',htmlspecialchars(glue::http()->param('query',null)),array('placeholder'=>'Enter keywords to search by', 'autocomplete'=>'off', 'class'=>'search')) ?>
-			<input type="text" id="from" class="date" name="from_date" placeholder="Enter start date"/> <span class="sep">-</span> 
-			<input type="text" id="to" class="date" name="to_date" placeholder="Enter end date" />	<button class="btn">Search</button>
+			<input type="text" id="from" class="date" name="from_date" placeholder="Enter start date" value="<?php echo htmlspecialchars(glue::http()->param('from_date',null)) ?>"/> <span class="sep">-</span> 
+			<input type="text" id="to" class="date" name="to_date" placeholder="Enter end date" value="<?php echo htmlspecialchars(glue::http()->param('to_date',null)) ?>"/>	<button class="btn">Search</button>
+			<?php echo html::hiddenfield('tab',html::encode(glue::http()->param('tab',null))) ?>
 			<?php $form->end() ?>
 		</div>		
     </div>	

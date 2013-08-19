@@ -76,24 +76,24 @@ $this->js('watched_page', "
 ");
 ?>
 <div class="user_history_body">
-	<div class="tabs-nav">
+	<div class="tabs-nav videos_nav_top">
 		<ul>
 			<li><a href="/user/videos">Uploads</a></li>
 			<li><a href="/history/watched" class="selected">Watched</a></li>
 			<li><a href="/history/rated">Liked</a></li>
-			<li><a href="/history/rated?filter=dislikes">Disliked</a></li>
-			<a style='float:right;' class="btn-success" href="<?php echo glue::http()->url('/video/upload', array(), glue::$params['uploadBase']) ?>">Add New Upload</a>
+			<li><a href="/history/rated?tab=dislikes">Disliked</a></li>
 		</ul>
-	</div>
+		<a class="btn-success btn-upload" href="<?php echo glue::http()->url('/video/upload', array(), glue::$params['uploadBase']) ?>">Add New Upload</a>
+	</div>	
 	<div class="advanced_filter_header">   
     	<div class='search'>
 		<?php $form = Html::form(array('method' => 'get')); ?>
 			<?php echo html::textfield('query',htmlspecialchars(glue::http()->param('query',null)),array('placeholder'=>'Enter keywords to search by', 'autocomplete'=>'off', 'class'=>'search')) ?>
-			<input type="text" id="from" class="date" name="from_date" placeholder="Enter start date"/> <span class="sep">-</span> 
-			<input type="text" id="to" class="date" name="to_date" placeholder="Enter end date" />	<button class="btn">Search</button>
+			<input type="text" id="from" class="date" name="from_date" placeholder="Enter start date" value="<?php echo htmlspecialchars(glue::http()->param('from_date',null)) ?>"/> <span class="sep">-</span> 
+			<input type="text" id="to" class="date" name="to_date" placeholder="Enter end date" value="<?php echo htmlspecialchars(glue::http()->param('to_date',null)) ?>"/>	<button class="btn">Search</button>
 			<?php $form->end() ?>
 		</div>		
-    </div>		
+    </div>	
 	<?php ob_start(); ?>
 		<div class='stickytoolbar-placeholder grey_sticky_toolbar'>
 			<div class='stickytoolbar-bar'>
@@ -129,20 +129,20 @@ $this->js('watched_page', "
 	)); ?>
 
 	<div class='video_list'>
-		<?php
-		if($items->count() > 0){
-			foreach($items as $k => $item){
-				$item = (Object)$item;
-				$video = app\models\Video::model()->findOne(array('_id' => $item->item));
-				if($video instanceof app\models\Video){
-					echo $this->renderPartial('video/_video_row', array('item' => $video, 'custid' => $item->_id, 'model' => $item, 'show_checkbox' => true));
-				}
-			}
-		}else{ ?>
-			<div class='no_results_found'>No watched history has been recorded</div>
-		<?php } ?>
+	
+	<?php if($items->count() > 0){
+		glue\widgets\ListView::widget(array(
+		'pageSize'	 => 20,
+		'page' 		 => glue::http()->param('page',1),
+		"cursor"	 => $items,
+		'callback' => function($i,$item,$view){
+			$v=app\models\Video::model()->findOne(array('_id' => $item['item']));
+			if(!$v instanceof app\models\Video)
+				$v = new app\models\Video;
+			echo glue::$controller->renderPartial($view, array('model' => $item, 'custid' => $item['_id'], 'item' => $v, 'show_checkbox' => true));				
+		},
+		'itemView' 	 => 'video/_video_row',
+		));
+	}else{ ?><div class='no_results_found'>No watched history has been recorded</div><?php } ?>		
 	</div>
-	<?php if($items->count() > 20){ ?>
-		<a class='load_more' href='#'>Load more history</a>
-	<?php } ?>
 </div>

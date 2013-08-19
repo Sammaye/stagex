@@ -385,9 +385,9 @@ class videoController extends glue\Controller{
 			$video->dislike();
 
 			if($video->isPublic())
-				Stream::videoDislike($video->_id, glue::user()->_id);
+				app\models\Stream::videoDislike($video->_id, glue::user()->_id);
 			if(glue::user()->autoshareLikes)
-				AutoPublishQueue::add_to_qeue(AutoPublishQueue::DL_V, glue::user()->_id, $video->_id);
+				app\models\AutoPublishQueue::add_to_qeue(AutoPublishQueue::DL_V, glue::user()->_id, $video->_id);
 
 			$total = $video->likes + $video->dislikes;
 			$this->json_success(array(

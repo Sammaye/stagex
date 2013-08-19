@@ -61,11 +61,15 @@ class Follower extends \glue\db\Document{
 	function search($user_id,$term,$limit=1000){
 		
 		// We need to do a JOIN here...
-		$users=iterator_to_array(\app\models\User::model()->find(array('username'=>new \MongoRegex("/^$term/")))->sort(array('username'=>1))->limit($limit));
-		$mongoIds=array();
-		foreach($users as $_id=>$user)
-			$mongoIds[]=new \MongoId($_id);
-		$following=self::model()->find(array('fromId'=>$user_id,'toId'=>array('$in'=>$mongoIds)));
+		$idRange=array();
+		if($term){
+			$users=iterator_to_array(\app\models\User::model()->find(array('username'=>new \MongoRegex("/^$term/")))->sort(array('username'=>1))->limit($limit));
+			$mongoIds=array();
+			foreach($users as $_id=>$user)
+				$mongoIds[]=new \MongoId($_id);
+			$idRange=array('toId'=>array('$in'=>$mongoIds));
+		}
+		$following=self::model()->find(array_merge(array('fromId'=>$user_id),$idRange));
 		
 		$followedUsers=array();
 		foreach($following as $_id=>$follower){

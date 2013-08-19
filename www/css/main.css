@@ -2171,3 +2171,15 @@ input.date{
 .advanced_filter_header .btn{
 	margin-left:20px;
 }
+
+.videos_nav_top{
+	border-bottom:1px solid #cccccc;height:35px;	
+}
+
+.videos_nav_top ul{
+	float:left;
+}
+
+.videos_nav_top .btn-upload{
+	float:right;
+}

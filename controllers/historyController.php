@@ -16,29 +16,61 @@ class historyController extends glue\Controller{
 
 	public function action_watched(){
 		$this->title = 'Watched Videos - StageX';
-		$this->tab = 'watched';
+		$this->tab = 'videos';
+		
+		extract(glue::http()->param(array('query','from_date','to_date'),null));
+		
+		$timeRange=array();
+		$idRange=array();
+		if($from_date)
+			$timeRange['ts']['$gte']=new MongoDate(strtotime(str_replace('/','-',$from_date)));
+		if($to_date)
+			$timeRange['ts']['$lt']=new MongoDate(strtotime(str_replace('/','-',$to_date.' +1 day')));
+		if($query){
+			$videos=iterator_to_array(\app\models\Video::model()->find(array('title'=>new \MongoRegex("/^$query/")))->sort(array('title'=>1))->limit(1000));
+			$mongoIds=array();
+			foreach($videos as $_id=>$video)
+				$mongoIds[]=new \MongoId($_id);
+			$idRange=array('item'=>array('$in'=>$mongoIds));
+		}
 		echo $this->render('stream/watched', array('items' =>
-			glue::db()->watched_history->find(array("user_id" => Glue::user()->_id))->sort(array('ts' => -1))->limit(20)
+			glue::db()->watched_history->find(array_merge(array("user_id" => Glue::user()->_id),$timeRange,$idRange))->sort(array('ts' => -1))
 		));
 	}
 
 	public function action_rated(){
 		$this->title = 'Rated Videos - StageX';
+		$this->tab = 'videos';
+		
+		extract(glue::http()->param(array('tab','query','from_date','to_date'),null));
+		
+		$timeRange=array();
+		$idRange=array();
+		if($from_date)
+			$timeRange['ts']['$gte']=new MongoDate(strtotime(str_replace('/','-',$from_date)));
+		if($to_date)
+			$timeRange['ts']['$lt']=new MongoDate(strtotime(str_replace('/','-',$to_date.' +1 day')));
+		if($query){
+			$videos=iterator_to_array(\app\models\Video::model()->find(array('title'=>new \MongoRegex("/^$query/")))->sort(array('title'=>1))->limit(1000));
+			$mongoIds=array();
+			foreach($videos as $_id=>$video)
+				$mongoIds[]=new \MongoId($_id);			
+			$idRange=array('item' => array('$in'=>$mongoIds));
+		}
 
-		$this->tab = 'likes';
-		$filter=glue::http()->param('filter',null);
-		echo $this->render('stream/rated_videos', array(
-			'items' => $filter=='dislikes'?
-				glue::db()->video_likes->find(array("user_id" => Glue::user()->_id, 'like' => 0))->sort(array('ts' => -1))->limit(20) :
-				glue::db()->video_likes->find(array("user_id" => Glue::user()->_id, 'like' => 1))->sort(array('ts' => -1))->limit(20)
-		));
+		if($tab=='dislikes')
+			$rated=glue::db()->video_likes->find(array_merge(array("user_id" => Glue::user()->_id, 'like' => 0),$timeRange,$idRange));
+		else
+			$rated=glue::db()->video_likes->find(array_merge(array("user_id" => Glue::user()->_id, 'like' => 1),$timeRange,$idRange));
+		$rated->sort(array('ts' => -1));
+
+		echo $this->render('stream/rated_videos', array('items' => $rated));
 	}
 
 	public function action_followed(){
-		$this->pageTitle = 'Rated Playlists - StageX';
+		$this->title = 'Rated Playlists - StageX';
 
-		$this->tab = 'likes';
-		$this->subtab = 'liked_playlists';
+		$this->tab = 'videos';
 
 		$_filter = isset($_GET['filter']) ? $_GET['filter'] : null;
 		$items = glue::db()->playlist_likes->find(array("user_id" => Glue::session()->user->_id, 'like' => 1))->sort(array('ts' => -1))->limit(20);

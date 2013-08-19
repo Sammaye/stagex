@@ -21,7 +21,8 @@
 	<div style='width:70px;float:left;color:#666666;font-size:14px;margin:0 40px;padding:22px 0 0 0;'>
 		<?php echo $item->duration ?>
 	</div>
-	<div style="width:120px;float:left;font-size:14px;padding-top:22px;">
+	<div style="width:120px;float:left;font-size:14px;padding-top:12px;">
+		<img style='border-radius:50px;vertical-align:middle;' src="<?php echo $item->author->getAvatar(30,30) ?>"/>
 		<a href="/user/view?id=<?php echo $item->author->username ?>"><?php echo $item->author->username ?></a>
 	</div>		
 	<?php endif; ?>
