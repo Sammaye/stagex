@@ -24,6 +24,7 @@ $this->beginPage() ?>
 			echo Html::cssFile("/css/960.css")."\n";
 			echo Html::cssFile("/css/main.css")."\n";
 			echo Html::cssFile("/css/jquery-ui/jquery-ui.css")."\n";
+			//echo Html::cssFile("/css/bootstrap.css")."\n";
 
 			$this->js('ga_script', "var _gaq = _gaq || [];
 			  _gaq.push(['_setAccount', 'UA-31049834-1']);
