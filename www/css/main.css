@@ -2197,3 +2197,12 @@ input.date{
 .playlist_form .form-stacked textarea{
 	height:130px;
 }
+
+.edit_playlist_body .form_left input,
+.edit_playlist_body .form_left textarea{
+	width:95%;
+}
+
+.edit_playlist_body .form_left textarea{
+	height:130px;
+}

@@ -168,7 +168,7 @@ class Playlist extends \glue\db\Document{
 			array('description', 'string', 'max' => '1500', 'message' => 'You can only write 1500 characters for the description.'),
 
 			//array('listing, allow_embedding, allow_like', 'safe', 'on' => 'update'),
-			array('listing', 'in', 'range' => array(1, 2, 3), 'on' => 'update', 'message' => 'You must enter a valid listing'),
+			array('listing', 'in', 'range' => array(0, 1, 2), 'on' => 'update', 'message' => 'You must enter a valid listing'),
 			array('allowEmbedding, allowLike', 'boolean', 'allowNull' => true, 'on' => 'update'),
 		);
 	}

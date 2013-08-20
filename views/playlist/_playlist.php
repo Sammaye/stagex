@@ -8,7 +8,7 @@
 		<?php } ?>		
 	</div>
 	<div class='playlist_item_right' style='float:left;width:400px;margin-right:20px;'>
-		<h3 class='title' style='font-size:18px;line-height: 30px;margin: 0;'><a href='<?php echo glue::http()->url('/playlist/view', array('id' => strval($item->_id))) ?>'><?php echo $item->title ?></a></h3>
+		<h3 class='title' style='font-size:18px;line-height: 30px;margin: 0;'><a href='<?php echo glue::http()->url('/playlist/edit', array('id' => strval($item->_id))) ?>'><?php echo $item->title ?></a></h3>
 		<?php if($item->description){ ?>
 			<div class='expandable description' style='color:#555555;line-height:20px;margin-bottom:5px;font-size:13px;'><?php echo nl2br(htmlspecialchars($item->description)) ?></div>
 		<?php } ?>

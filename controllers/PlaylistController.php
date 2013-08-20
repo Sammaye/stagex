@@ -20,6 +20,7 @@ class PlaylistController extends glue\Controller{
 		);
 	}
 	
+	public $layout='user_section';
 	public $tab='playlists';
 
 	public function action_index(){
@@ -55,82 +56,42 @@ class PlaylistController extends glue\Controller{
 	}
 
 	public function action_edit(){
-		$this->pageTitle = 'Edit Playlist - StageX';
-
-		$playlist = Playlist::model()->findOne(array('_id' => new MongoId($_GET['id']), 'user_id' => glue::session()->user->_id, 'title' => array('$ne' => 'Watch Later')));
-
-		if(!glue::roles()->checkRoles(array('deletedView' => $playlist)) && glue::roles()->checkRoles(array('Owns' => $playlist))){
-			$this->pageTitle = 'Playlist Not Found - StageX';
-			$this->render('Playlist/deleted', array('playlist'=>$playlist));
-			exit();
-		}
-
-		$this->render('Playlist/edit', array('playlist' => $playlist));
+		$this->title = 'Edit Playlist - StageX';
+		
+		$playlist = Playlist::model()->findOne(array('_id' => new MongoId(glue::http()->param('id','')), 'userId' => glue::user()->_id, 'title' => array('$ne' => 'Watch Later')));
+		if(!glue::auth()->check(array('viewable' => $playlist))){
+			$this->title = 'Playlist Not Found - StageX';
+			echo $this->render('deleted');
+		}else
+			echo $this->render('edit', array('playlist' => $playlist));
 	}
 
-	public function action_save_playlist(){
-		$this->pageTitle = 'Save Playlist - StageX';
-
-		if(!glue::http()->isAjax())
-			Glue::route("error/notfound");
-
-		$playlist = Playlist::model()->findOne(array('_id' => new MongoId($_POST['id']), 'deleted' => array('$ne' => 1), 'title' => array('$ne' => 'Watch Later')));
-
-		if(!$playlist){
-			GJSON::kill('That playlist was not found');
-		}
-
-		if(!glue::roles()->checkRoles(array('^' => $playlist))){
-			GJSON::kill(GJSON::DENIED);
-		}
+	public function action_save(){
+		if(glue::auth()->check('ajax','post'))
+			glue::trigger('404');
+		
+		if($playlist = Playlist::model()->findOne(array('_id' => new MongoId(glue::http()->param('id')),'title' => array('$ne' => 'Watch Later'))))
+			$this->json_error('That playlist was not found');
+		if(!glue::auth()->check(array('^' => $playlist)))
+			$this->json_error(self::DENIED);
 
 		if(isset($_POST['Playlist'])){
-			$playlist->_attributes($_POST['Playlist']);
-			if($playlist->validate()){
-
-				$playlist->videos = array();
-				$video_assign_error = false;
-
-				if(isset($_POST['videos'])){
-					if(count($_POST['videos']) > 0){
-						foreach($_POST['videos'] as $k => $v){
-							$video = Video::model()->findOne(array('_id' => new MongoId($v['video_id'])));
-							if($video){
-								$playlist->add_video_at_pos($video->_id, $v['position']);
-							}else{
-								$video_assign_error = true;
-								break;
-							}
-						}
-					}
+			$playlist->attributes=$_POST['Playlist'];
+			$playlist->videos=array();
+			
+			if(($videos=glue::http()->param('videos',array()))&&count($videos)>0&&count($videos)<=500){
+				foreach($videos as $k => $v){
+					if($video = Video::model()->findOne(array('_id' => new MongoId(isset($v['video_id'])?$v['video_id']:''))))
+						$playlist->add_video_at_pos($video->_id, $v['position']);
 				}
-
-				if(count($playlist->videos) > 200){
-					$playlist->addErrorMessage('You cannot have more than 200 videos to a single playlist. Please remove some and continue.');
-					echo json_encode(array('success' => false, 'html' => html::form_summary($playlist, array(
-						'errorHead' => '<h2>Could not save playlist</h2><p>This playlist could not be saved because:</p>'
-					))));
-					exit();
-				}
-
-				if(!$video_assign_error){
-					$playlist->save();
-					echo json_encode(array('success' => true));
-				}else{
-					$playlist->addErrorMessage('One or more videos for this playlist could not be saved because we could not find a valid video to go with it.');
-					echo json_encode(array('success' => false, 'html' => html::form_summary($playlist, array(
-						'errorHead' => '<h2>Could not save playlist</h2><p>This playlist could not be saved because:</p>'
-					))));
-				}
-				exit();
-			}
-
-			echo json_encode(array('success' => false, 'html' => html::form_summary($playlist, array(
-				'errorHead' => '<h2>Could not save playlist</h2><p>This playlist could not be saved because:</p>'
-			))));
-		}else{
-			echo json_encode(array('success' => false));
-		}
+			}			
+			
+			if($playlist->validate()&&$playlist->save())
+				$this->json_success();
+			else
+				$this->json_error(array('message'=>'Playlist could not be saved because:', 'messages'=>$playlist->getErrors()));
+		}else
+			$this->json_error(self::UNKNOWN);
 	}
 
 	function action_delete(){
@@ -255,22 +216,20 @@ class PlaylistController extends glue\Controller{
 			foreach($video_ids as $id)
 				$mongoIds[]=new MongoId($id);
 			$videos=Video::model()->find(array('_id'=>array('$in'=>$mongoIds)));
-			/*if((count($playlist->videos)+1) > 200){ // Commented out for the mo
-				echo json_encode(array('success' => false, 'html' =>
-						$this->get_menu_summary('This video would exceed the 200 slots you have on this playlist')));
-				exit();
-			}*/
+
 			$existingIds=array();
 			foreach($videos as $video){
 				if(!$playlist->videoAlreadyAdded($video->_id))
 					$playlist->addVideo($video->_id);
 			}
+			if(count($playlist->videos)>500)
+				$this->json_error('The video you selected was not added because you aree limited to 500 videos per playlist.');
 			if(!$playlist->save())
 				$this->json_error('The video you selected was not added because of an unknown error.');
 			if($playlist->listing === 0 || $playlist->listing === 1){ // If this playlist is not private
-				Stream::PlaylistAddVideo(glue::user()->_id, $playlist->_id, $video->_id);
+				app\models\Stream::PlaylistAddVideo(glue::user()->_id, $playlist->_id, $video->_id);
 				if(glue::user()->autoshareAddToPlaylist)
-					AutoPublishQueue::add_to_qeue(AutoPublishQueue::PL_V_ADDED, glue::user()->_id, $video->_id, $playlist->_id);
+					app\models\AutoPublishQueue::add_to_qeue(AutoPublishQueue::PL_V_ADDED, glue::user()->_id, $video->_id, $playlist->_id);
 			}
 			$this->json_success('The video you selected was added to '.$playlist->title);			
 		}else
