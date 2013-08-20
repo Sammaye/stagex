@@ -5,17 +5,14 @@ $this->JsFile("/js/jquery.expander.js");
 $this->jsFile('/js/jdropdown.js');
 $this->js('new_playlist', "
 		
-	$('.expandable').expander();
-		
-	$('#playlist_search_submit').on('click', function(){
-		$(this).parents('form').submit();
-	});
+	$('.expandable').expander({slicePoint:40});
+	$('.grey_sticky_toolbar .block-alert').summarise()
 
 	$('.selectAll_input').click(function(){
-		if($(this).attr('checked')){
-			$('.playlist_list input:checkbox').attr('checked', true);
+		if($(this).prop('checked')==true){
+			$('.playlists input:checkbox').prop('checked', false).trigger('click');
 		}else{
-			$('.playlist_list input:checkbox').attr('checked', false);
+			$('.playlists input:checkbox').prop('checked', true).trigger('click');
 		}
 	});
 
