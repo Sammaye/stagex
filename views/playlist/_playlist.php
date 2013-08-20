@@ -8,7 +8,7 @@
 		<img alt='thumbnail' src='<?php echo $large_pic ?>' class='large_pic'/>
 	</div>
 	<div class='playlist_item_right'>
-		<div class='title'><a href='<?php echo glue::url()->create('/playlist/view', array('id' => strval($item->_id))) ?>'><?php echo $item->title ?></a></div>
+		<div class='title'><a href='<?php echo glue::http()->url('/playlist/view', array('id' => strval($item->_id))) ?>'><?php echo $item->title ?></a></div>
 		<div class='video_preview'>
 			<div class='video_count'>
 				<?php echo count($item->videos) ?>

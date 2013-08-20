@@ -656,6 +656,7 @@ input.date{
 
 .alert h4{
 	font-weight:bold;
+	margin:0 0 5px 0;
 }
 
 .alert ul{
@@ -2182,4 +2183,17 @@ input.date{
 
 .videos_nav_top .btn-upload{
 	float:right;
+}
+
+.user_playlists_page .header .search_input input{
+	width:300px;
+}
+
+.playlist_form .form-stacked textarea,
+.playlist_form .form-stacked input[type="text"]{
+	width:95%; border-radius:2px;
+}
+
+.playlist_form .form-stacked textarea{
+	height:130px;
 }

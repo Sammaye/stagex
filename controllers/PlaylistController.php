@@ -11,7 +11,7 @@ class PlaylistController extends glue\Controller{
 	public function authRules(){
 		return array(
 			array("allow",
-				"actions"=>array('add', 'edit', 'save_playlist', 'delete', 'batch_delete', 'addVideo', 'add_many_videos', 'get_menu', 'set_detail', 'like', 'unlike', 'clear',
+				"actions"=>array('create', 'edit', 'save_playlist', 'delete', 'batch_delete', 'addVideo', 'add_many_videos', 'get_menu', 'set_detail', 'like', 'unlike', 'clear',
 					'deleteVideo', 'suggestAddTo'),
 				"users"=>array("@*")
 			),
@@ -19,6 +19,8 @@ class PlaylistController extends glue\Controller{
 			array("deny", "users"=>array("*")),
 		);
 	}
+	
+	public $tab='playlists';
 
 	public function action_index(){
 		$this->action_view();
@@ -38,22 +40,18 @@ class PlaylistController extends glue\Controller{
 		$this->render('Playlist/view', array('playlist' => $playlist, 'user' => $playlist->author));
 	}
 
-	public function action_add(){
+	public function action_create(){
+		$this->title = 'Create Playlist - StageX';
+		$this->layout='user_section';
 
-		$this->pageTitle = 'Add New Playlist - StageX';
-
-		if(!glue::http()->isAjax())
-			Glue::route("error/notfound");
-
-		$playlist = new Playlist();
-		$playlist->_attributes($_POST);
-
-		if($playlist->validate()){
-			$playlist->save();
-			echo json_encode(array('success' => true, 'id' => strval($playlist->_id)));
-		}else{
-			echo json_encode(array('success' => false, 'messages' => $playlist->getErrorMessages()));
+		$model = new Playlist();
+		if(isset($_POST['Playlist'])){
+			$model->attributes=$_POST['Playlist'];
+			if($model->validate()&&$model->save()){
+				glue::http()->redirect('/user/playlists');
+			}
 		}
+		echo $this->render('create',array('model'=>$model));
 	}
 
 	public function action_edit(){

@@ -17,11 +17,11 @@ class Playlist extends \glue\db\Document{
 	 */
 	public $listing = 0; // public, unlisted or private
 	public $allowEmbedding = 1;
-	public $allowLike = 1;
+	public $allowFollowers = 1;
 
 	public $videos = array(); // For each video there is a _id, position and description
 
-	public $likes = 0;
+	public $followers = 0;
 	public $totalVideos = 0;
 
 	public $deleted = 0;
@@ -183,9 +183,7 @@ class Playlist extends \glue\db\Document{
 	function afterSave(){
 		if($this->listing==0){
 			if($this->getIsNewRecord()){
-
-				//$this->author->total_playlists = $this->author->total_playlists+1;
-				//$this->author->save();
+				$this->author->saveCounters(array('totalPlaylists'=>1));
 
 				glue::mysql()->query("INSERT INTO documents (_id, uid, listing, title, description, tags, author_name, type, videos, date_uploaded)
 					VALUES (:_id, :uid, :listing, :title, :description, null, :author_name, :type, :videos, now())", array(
@@ -199,7 +197,7 @@ class Playlist extends \glue\db\Document{
 					":author_name" => glue::user()->username,
 				));
 
-				glue::sitemap()->addUrl(glue::url()->create('/playlist/view', array('id' => $this->_id)), 'hourly', '1.0');
+				glue::sitemap()->addUrl(glue::http()->url('/playlist/view', array('id' => $this->_id)), 'hourly', '1.0');
 
 			}else{
 				glue::mysql()->query("UPDATE documents SET uid = :uid, deleted = :deleted, listing = :listing, title = :title, description = :description,
@@ -220,9 +218,8 @@ class Playlist extends \glue\db\Document{
 
 	function delete(){
 		glue::mysql()->findOne("UPDATE documents SET deleted = 1 WHERE _id = :_id");
-		$this->remove(array('_id' => $this->_id));
-
-		//$this->author->total_playlists = $this->author->total_playlists-1;
+		parent::delete();
+		$this->author->saveCounters(array('totalPlaylists'=>-1),0);
 		return true;
 	}
 }

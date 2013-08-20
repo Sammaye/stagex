@@ -61,6 +61,15 @@ $this->js('watched_page', "
 		}, 'json');			
 	});		
 		
+	$(document).on('click', '.grey_sticky_toolbar .btn_clear', function(){
+		$.post('/history/clearWatched', {}, null, 'json').done(function(data){
+			if(data.success){
+				$('.grey_sticky_toolbar .block-alert').summarise('set', 'success','The videos you selected were deleted');
+			}else
+				$('.grey_sticky_toolbar .block-alert').summarise('set', 'error','The videos you selected could not be deleted');
+		});			
+	});			
+		
 	function reset_checkboxes(){
 		$('.selectAll_input').prop('checked',true).trigger('click');
 	}		
@@ -79,9 +88,9 @@ $this->js('watched_page', "
 	<div class="tabs-nav videos_nav_top">
 		<ul>
 			<li><a href="/user/videos">Uploads</a></li>
-			<li><a href="/history/watched" class="selected">Watched</a></li>
-			<li><a href="/history/rated">Liked</a></li>
-			<li><a href="/history/rated?tab=dislikes">Disliked</a></li>
+			<li><a href="/user/watched" class="selected">Watched</a></li>
+			<li><a href="/user/rated">Liked</a></li>
+			<li><a href="/user/rated?tab=dislikes">Disliked</a></li>
 		</ul>
 		<a class="btn-success btn-upload" href="<?php echo glue::http()->url('/video/upload', array(), glue::$params['uploadBase']) ?>">Add New Upload</a>
 	</div>	
@@ -114,6 +123,7 @@ $this->js('watched_page', "
 							</div>
 						</div>
 					</div>
+					<button class='btn-grey selected_actions btn_clear'>Clear Watched History</button>
 				</div>
 				<div class="alert block-alert" style='display:none;'></div>
 			</div>
