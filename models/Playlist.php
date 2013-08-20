@@ -79,7 +79,7 @@ class Playlist extends \glue\db\Document{
 					$video = new Video;
 
 				if($i==0){
-					$pics[] = $video->getImage(138, 77);
+					$pics[] = $video->getImage(124, 69);
 				}else{
 					$pics[] = $video->getImage(44, 26);
 				}
@@ -88,7 +88,7 @@ class Playlist extends \glue\db\Document{
 
 		for($i; $i < 4; $i++){
 			if($i==0)
-				$pics[] = '/image/video?id=&w=138&h=77';
+				$pics[] = '/image/video?id=&w=124&h=69';
 			else
 				$pics[] = '/image/video?id=&w=44&h=26';
 		}

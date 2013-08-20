@@ -1,8 +1,12 @@
 <?php
 use glue\Html;
 
+$this->JsFile("/js/jquery.expander.js");
 $this->jsFile('/js/jdropdown.js');
 $this->js('new_playlist', "
+		
+	$('.expandable').expander();
+		
 	$('#playlist_search_submit').on('click', function(){
 		$(this).parents('form').submit();
 	});
