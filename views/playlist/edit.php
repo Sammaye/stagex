@@ -1,17 +1,22 @@
 <?php
+$this->JsFile("/js/jquery.expander.js");
 $this->js('edit', "
 
 	$('.alert').summarise();
+	$('.expandable').expander();
 		
 	$(document).on('click', '.btn_save', function(event){
 		event.preventDefault();
 		
 		var fields = [];
-		fields = $('.playlist_form_el').serializeArray();
+		fields = $('.form_left input,.form_left textarea,.form_right input').serializeArray();
 		fields[fields.length] = {name: 'id', value: '".strval($playlist->_id)."'};
-		$('.sortable_list').find('.sortable_item').each(function(i){
-			fields[fields.length] = {name: 'videos['+i+'][video_id]', value: $(this).data('id')};
-			fields[fields.length] = {name: 'videos['+i+'][position]', value: i};
+		$('.sortable_list').find('.video_row').each(function(i){
+			deleted=$(this).data('deleted');
+			if(deleted===false||deleted===undefined){
+				fields[fields.length] = {name: 'videos['+i+'][video_id]', value: $(this).data('id')};
+				fields[fields.length] = {name: 'videos['+i+'][position]', value: i};
+			}
 		});
 
 		$.post('/playlist/save', fields, function(data){
@@ -30,24 +35,28 @@ $this->js('edit', "
 				window.location = '/user/playlists';
 			}else
 				$('.alert').summarise('set','error',{message:'The playlist could not be deleted because:',list:data.messages});
-		});
+		},'json');
 	});
-
-	$(document).on('click', '.video_item .delete', function(event){
+		
+	$(document).on('click', '.btn_cancel', function(event){
 		event.preventDefault();
+		window.location = '/user/playlists';
+	});		
 
-		//$(this).parents('.video_item').removeClass('sortable_item').addClass('sortable_item_deleted');
-		$(this).parents('.video_item').remove();
-		$( '.sortable_list' ).data('sortable')._trigger('update');
-	});
-
-	$(document).on('click', '.mass_delete', function(event){
+	$(document).on('click', '.btn_delete_videos', function(event){
 		event.preventDefault();
-		$('.video_item .select_video:checked').each(function(i){
-			$(this).parents('.video_item').remove();
+		$('.video_row .checkbox_col input:checked').each(function(i){
+			$(this).parents('.video_row').data('deleted',true).find('.inner').css({display:'none'});
+			$(this).parents('.video_row').append(
+				$('<div/>').addClass('deleted').html('This video will be deleted').append($('<a/>').addClass('btn_undo').text('Undo'))
+			);
 		});
-		$( '.sortable_list' ).data('sortable')._trigger('update');
-		$('input#select_all').attr('checked', false);
+		reset_checkboxes();
+	});
+		
+	$(document).on('click', '.btn_undo', function(event){
+		$(this).parents('.video_row').data('deleted',false).find('.inner').css({display:'block'});
+		$(this).parents('.video_row').find('.deleted').remove();
 	});
 
 	$('.selectAll_input').click(function(){
@@ -62,22 +71,25 @@ $this->js('edit', "
 		placeholder: 'playlist_sortable_highlight',
 		handle: '.sortable_handle',
 		update: function(event, ui){
-			$('.sortable_list').find('.sortable_item').each(function(i){
-				$(this).find('.position_val').text(i+1);
-			});
+			//$('.sortable_list').find('.sortable_item').each(function(i){
+				//$(this).find('.position_val').text(i+1);
+			//});
 		},
 	});
 	$( '.sortable_list' ).disableSelection();
+	function reset_checkboxes(){
+		$('.selectAll_input').prop('checked',true).trigger('click');
+	}		
 ");
 ?>
 <div class='edit_playlist_body'>
 	<div class='alert'></div>
 	<div style='margin:0 0 20px 0;'>
-		<input type="submit" class="btn-success" value="Save"/>
-		<input type="button" class="btn" value="Cancel"/>
-		<input type="button" class="btn" value="Delete"/>
+		<input type="submit" class="btn-success btn_save" value="Save"/>
+		<input type="button" class="btn btn_cancel" value="Cancel"/>
+		<input type="button" class="btn btn_delete" value="Delete"/>
 		
-		<span style='float:right;display:block;margin:10px 0 0;color:#666666;'>1,000 Followers</span>
+		<span style='float:right;display:block;margin:10px 0 0;color:#666666;'><?php echo $playlist->followers ?> Followers</span>
 	</div>
 	<div class="form-stacked form_left" style='float:left;width:400px;'>
 		<div class="form_row"><?php echo html::label('Title', 'title') ?><?php echo html::activeTextField($playlist, 'title') ?></div>
@@ -99,7 +111,7 @@ $this->js('edit', "
 	<div class='clear'></div>
 	<div class='' style='padding:10px;height:30px;'>
 		<div class='checkbox_button checkbox_input' style='float:left;margin:8px 20px 0 0;'><?php echo Html::checkbox('selectAll', 1, 0, array('class' => 'selectAll_input')) ?></div>
-		<input type="button" value="Delete" class="btn" style='float:left;'/>
+		<input type="button" value="Delete" class="btn btn_delete_videos" style='float:left;'/>
 	</div>
 	<div class='video_list'>
 		<?php
@@ -107,7 +119,7 @@ $this->js('edit', "
 		if(count($videos) > 0){ ?>
 			<ul class='sortable_list playlist_video_list'>
 			<?php foreach($videos as $k => $video){
-				echo $this->renderPartial('video/_video_row',array('item'=>$video,'show_sorter'=>true,'show_delete'=>true)); 
+				echo $this->renderPartial('video/_video_row',array('item'=>$video,'show_sorter'=>true,'show_delete'=>false,'playlistId'=>$playlist->_id,'useLiTag'=>true)); 
 			} ?>
 			</ul>
 		<?php }else{ ?>

@@ -236,7 +236,7 @@ class videoController extends glue\Controller{
 		}
 
 		if($playlist_id=glue::http()->param('playlist_id',null))
-			$playlist = apps\models\Playlist::model()->findOne(array('_id' => new MongoId($playlist_id)));
+			$playlist = app\models\Playlist::model()->findOne(array('_id' => new MongoId($playlist_id)));
 		$this->layout = 'watch_video_layout';
 		echo $this->render('watch', array("model"=>$video, 'playlist' => isset($playlist)?$playlist:null, 'LastCommentPull' => $now));
 	}

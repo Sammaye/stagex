@@ -217,8 +217,12 @@ class Playlist extends \glue\db\Document{
 	}
 
 	function delete(){
-		glue::mysql()->findOne("UPDATE documents SET deleted = 1 WHERE _id = :_id");
+		glue::mysql()->query("UPDATE documents SET deleted = 1 WHERE _id = :id",array(':id'=>strval($this->_id)));
 		parent::delete();
+		
+		// @todo fix this
+		//glue::db()->playlist_likes->remove(array('item' => $playlist->_id));		
+		
 		$this->author->saveCounters(array('totalPlaylists'=>-1),0);
 		return true;
 	}

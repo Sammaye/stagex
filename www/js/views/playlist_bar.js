@@ -4,8 +4,7 @@
 	methods = {
 		init : function( settings ) {
 			if($('.playlist_bar_outer').length > 0){ // If it is on the page
-				//gg
-				$.getJSON('/playlist/get_playlist_bar', { id: $('.playlist_bar_outer').data().id }, function(data){
+				$.getJSON('/playlist/renderBar', { id: $('.playlist_bar_outer').data().id }, function(data){
 					$('.playlist_bar_outer .playlist_video_list .tray_content').html(data.html);
 				});
 			}

@@ -483,9 +483,9 @@ $this->js('edit', "
 <?php if(glue::auth()->check(array('viewable' => $playlist))){ ?>
 <div class="playlist_bar_outer" data-id='<?php echo $playlist->_id ?>'>
 	<div class='playlist_bar_head'>
-		<div class='float_left head_left'>Playlist: <a href='<?php echo glue::http()->url('/playlist/view', array('id' => $playlist->_id)) ?>'><?php echo html::encode($playlist->title) ?></a> (<?php echo count($playlist->videos) ?> Videos)
+		<div class='head_left' style='float:left;'>Playlist: <a href='<?php echo glue::http()->url('/playlist/view', array('id' => $playlist->_id)) ?>'><?php echo html::encode($playlist->title) ?></a> (<?php echo count($playlist->videos) ?> Videos)
 		- By <b><a href='<?php echo glue::http()->url('/user/view', array('id' => $playlist->userId)) ?>'><?php echo $playlist->author->getUsername(); ?></a></b></div>
-		<button class='float_right view_all_videos'>View All Videos</button>
+		<button class='view_all_videos' style='float:right;'>View All Videos</button>
 	</div>
 	<div class='playlist_content'>
 		<button class='move_left'></button>
