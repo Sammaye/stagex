@@ -402,9 +402,8 @@ class videoController extends glue\Controller{
 	}
 
 	function action_delete(){
-		$this->title = 'Remove Videos - StageX';
-		if(!glue::http()->isAjax())
-			Glue::route("error/notfound");
+		if(!glue::auth()->check('ajax','post'))
+			glue::trigger('404');
 
 		$ids = glue::http()->param('ids',null);
 		if(count($ids) <= 0 || count($ids)>1000){

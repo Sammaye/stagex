@@ -1414,6 +1414,7 @@ input.date{
 	float:right;
 }
 
+.playlist .infocons .listing,
 .video .infocons .listing,
 .video .infocons .comments{
 	float:right;
@@ -1500,57 +1501,70 @@ input.date{
 	margin:0 0 10px 0;
 }
 
+.user_playlists_page .mass_edit_form,
 .user_videos_body .mass_edit_form{
 	margin:0 0 10px 0; background:#f5f5f5; padding:10px; display:none;
 }
 
+.user_playlists_page .mass_edit_form .header,
 .user_videos_body .mass_edit_form .header{
 	margin:0 0 10px 0;
 }
 
+.user_playlists_page .mass_edit_form .header h3,
 .user_videos_body .mass_edit_form .header h3{
 	float:left; margin-right:15px;
 }
 
+.user_playlists_page .mass_edit_form .header .btn-success,
 .user_videos_body .mass_edit_form .header .btn-success{
 	float:right;
 }
 
+.user_playlists_page .mass_edit_form .header .btn-grey,
 .user_videos_body .mass_edit_form .header .btn-grey{
 	float:right; margin-right:15px;
 }
 
+.user_playlists_page .mass_edit_block.form-stacked label,
 .user_videos_body .mass_edit_block.form-stacked label{
 	padding:0;
 }
 
+.user_playlists_page .mass_edit_block.form-stacked textarea,
 .user_videos_body .mass_edit_block.form-stacked textarea{
 	width:400px; height:120px;
 }
 
+.user_playlists_page .mass_edit_block.form-stacked input[type="text"],
 .user_videos_body .mass_edit_block.form-stacked input[type="text"]{
 	width:400px;
 }
 
+.user_playlists_page .mass_edit_block.form-stacked label.radio,
 .user_videos_body .mass_edit_block.form-stacked label.radio{
 	padding: 0 0 0 20px;
 }
 
+.user_playlists_page .mass_edit_block .edit,
 .user_videos_body .mass_edit_block .edit{
 	line-height:20px;
 } 
 
+.user_playlists_page .mass_edit_block .remove,
 .user_videos_body .mass_edit_block .remove{
 	float:left;
 	display:block;
 	margin-right:20px;
 }
 
+.user_playlists_page .mass_edit_block .form,
 .user_videos_body .mass_edit_block .form{
 	display:none;
 	margin:5px 0;
 }
 
+.user_playlists_page .mass_edit_block .right,
 .user_videos_body .mass_edit_block .right{
 	float:left;
 }
@@ -2208,6 +2222,50 @@ input.date{
 	height:130px;
 }
 
+.edit_playlist_body .btn_head{
+	margin:0 0 20px 0;
+}
+
+.edit_playlist_body .btn_head .btn_save{
+	margin:0 10px 0 0;
+}
+
+.edit_playlist_body .btn_head .btn_cancel{
+	margin:0 40px 0 0;
+}
+
+.edit_playlist_body .follow_count{
+	float:right;display:block;margin:10px 0 0;color:#666666;
+}
+
+.edit_playlist_body .form_left{
+	float:left;width:400px;
+}
+
+.edit_playlist_body .form_right{
+	float:right;width:400px;
+}
+
+.edit_playlist_body .videos_bar{
+	padding:10px;height:30px;
+}
+
+.edit_playlist_body .videos_bar .checkbox_input{
+	float:left;margin:8px 20px 0 0;
+}
+
+.edit_playlist_body .videos_bar .btn{
+	float:left;
+}
+
+.edit_playlist_body .video_list .deleted{
+	padding:10px;
+}
+
+.edit_playlist_body .video_list .deleted a{
+	margin:0 10px; cursor:pointer;
+}
+
 .playlist_bar_outer{
 	position:fixed; bottom:0; width:100%; z-index:20000000;
 }
@@ -2287,4 +2345,48 @@ input.date{
 
 .playlist_bar_outer .playlist_video_item .info_pane .uploaded_by a{
 	color:#fff; font-size:11px; font-weight:normal;
+}
+
+.user_playlist_item .infocons .listing{
+	margin-top:0;
+}
+
+.user_playlist_item{
+	padding:10px 0;border-bottom:1px solid #eeeeee;
+}
+
+.user_playlist_item .checkbox_col{
+	float:left;padding:10px 10px 0 10px;
+}
+
+.user_playlist_item .thumbnail{
+	float:left;width:150px;padding-top:6px;
+}
+
+.user_playlist_item .info{
+	float:left;width:400px;margin-right:20px;
+}
+
+.user_playlist_item .info .title{
+	font-size:18px;line-height: 25px;margin: 0;
+}
+
+.user_playlist_item .info .description{
+	color:#555555;line-height:20px;margin-bottom:5px;font-size:13px;
+}
+
+.user_playlist_item .info .created{
+	color:#999999;font-size:11px;
+}
+
+.user_playlist_item .video_count{
+	float:left;padding-top:15px;color:#666666;
+}
+
+.user_playlist_item .infocons{
+	float:right;padding-top:10px;margin-right:20px;
+}
+
+.user_playlists_page .form-search{
+	margin:20px 0 10px 0;
 }

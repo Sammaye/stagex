@@ -84,18 +84,17 @@ $this->js('edit', "
 ?>
 <div class='edit_playlist_body'>
 	<div class='alert'></div>
-	<div style='margin:0 0 20px 0;'>
+	<div class="btn_head">
 		<input type="submit" class="btn-success btn_save" value="Save"/>
 		<input type="button" class="btn btn_cancel" value="Cancel"/>
 		<input type="button" class="btn btn_delete" value="Delete"/>
-		
-		<span style='float:right;display:block;margin:10px 0 0;color:#666666;'><?php echo $playlist->followers ?> Followers</span>
+		<span class="follow_count"><?php echo $playlist->followers ?> Followers</span>
 	</div>
-	<div class="form-stacked form_left" style='float:left;width:400px;'>
+	<div class="form-stacked form_left">
 		<div class="form_row"><?php echo html::label('Title', 'title') ?><?php echo html::activeTextField($playlist, 'title') ?></div>
 		<div class="form_row"><?php echo html::label('Description', 'description')?><?php echo html::activeTextarea($playlist, 'description') ?></div>			
 	</div>
-	<div class='form_right' style='float:right;width:400px;'>
+	<div class='form_right'>
 		<h4>Listing</h4>
 		<?php $grp = html::activeRadio_group($playlist, 'listing') ?>
 		<div class="label_options">
@@ -109,9 +108,9 @@ $this->js('edit', "
 		<label class="checkbox"><?php echo html::activeCheckbox($playlist, 'allowFollowers',1)?>Allow people to follow this playlist</label>
 	</div>	
 	<div class='clear'></div>
-	<div class='' style='padding:10px;height:30px;'>
-		<div class='checkbox_button checkbox_input' style='float:left;margin:8px 20px 0 0;'><?php echo Html::checkbox('selectAll', 1, 0, array('class' => 'selectAll_input')) ?></div>
-		<input type="button" value="Delete" class="btn btn_delete_videos" style='float:left;'/>
+	<div class='videos_bar'>
+		<div class='checkbox_button checkbox_input'><?php echo Html::checkbox('selectAll', 1, 0, array('class' => 'selectAll_input')) ?></div>
+		<input type="button" value="Delete" class="btn btn_delete_videos"/>
 	</div>
 	<div class='video_list'>
 		<?php

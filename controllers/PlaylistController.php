@@ -11,7 +11,7 @@ class PlaylistController extends glue\Controller{
 	public function authRules(){
 		return array(
 			array("allow",
-				"actions"=>array('create', 'edit', 'save', 'delete', 'batch_delete', 'addVideo', 'add_many_videos', 'get_menu', 'set_detail', 'like', 'unlike', 'clear',
+				"actions"=>array('create', 'edit', 'save', 'delete', 'batchDelete', 'addVideo', 'add_many_videos', 'get_menu', 'batchSave', 'like', 'unlike', 'clear',
 					'deleteVideo', 'suggestAddTo'),
 				"users"=>array("@*")
 			),
@@ -56,14 +56,14 @@ class PlaylistController extends glue\Controller{
 	}
 
 	public function action_edit(){
-		$this->title = 'Edit Playlist - StageX';
-		
 		$playlist = Playlist::model()->findOne(array('_id' => new MongoId(glue::http()->param('id','')), 'userId' => glue::user()->_id, 'title' => array('$ne' => 'Watch Later')));
 		if(!glue::auth()->check(array('viewable' => $playlist))){
 			$this->title = 'Playlist Not Found - StageX';
 			echo $this->render('deleted');
-		}else
+		}else{
+			$this->title = 'Playlist: '.$playlist->title.' - StageX';
 			echo $this->render('edit', array('playlist' => $playlist));
+		}
 	}
 
 	public function action_save(){
@@ -105,87 +105,46 @@ class PlaylistController extends glue\Controller{
 		$this->json_success('The playlist was deleted');
 	}
 
-	function action_batch_delete(){
-		$this->pageTitle = 'Delete Playlists - StageX';
-		if(!glue::http()->isAjax())
-			Glue::route("error/notfound");
-
-		$playlists = isset($_POST['playlists']) ? $_POST['playlists'] : null;
-
-		if(count($playlists) <= 0){
-			GJSON::kill('No playlists were selected');
+	function action_batchDelete(){
+		if(!glue::auth()->check('ajax','post'))
+			glue::trigger('404');
+		$ids = glue::http()->param('ids',null);
+		if(count($ids) <= 0 || count($ids)>1000){
+			$this->json_error("No playlists were selected");
 		}
-
-		foreach($playlists as $k => $id){
-			$playlist_ids[$k] = new MongoId($id);
+	
+		foreach($ids as $k => $id)
+			$mongoIds[$k] = new MongoId($id);
+		$playlists = Playlist::model()->find(array('_id' => array('$in' => $mongoIds), 'userId' => glue::user()->_id, 'deleted' => 0));
+	
+		$ids=array(); // We reset these to know which were actually picked from the DB
+		$mongoIds=array();
+		foreach($playlists as $playlist){
+			$ids[]=(string)$playlist->_id;
+			$mongoIds[]=$playlist->_id;
 		}
+		Playlist::model()->deleteAll(array('_id' => array('$in' => $mongoIds)));
+		$playlist->author->saveCounters(array('totalPlaylists'=>-count($mongoIds)),0);
+		glue::mysql()->query('UPDATE documents SET deleted=1 WHERE _id IN :id', array(':id' => $ids));	
+		$this->json_success(array('message'=>'The playlists you selected were deleted','updated'=>count($ids)));
+	}	
 
-		$playlist_rows = Playlist::model()->find(array('_id' => array('$in' => $playlist_ids), 'user_id' => glue::session()->user->_id, 'title' => array('$ne' => 'Watch Later')));
-
-		if(count($playlist_ids) != $playlist_rows->count()){
-			GJSON::kill(GJSON::UNKNOWN);
-		}
-
-		glue::mysql()->query('UPDATE documents SET deleted=1 WHERE uid = :user_id AND _id IN :id', array(
-			':user_id' => strval(glue::session()->user->_id),
-			':id' => $playlists
-		));
-
-		//Playlist::model()->remove(array(('_id' => array('$in' => $playlist_ids), 'user_id' => glue::session()->user->_id));
-
-		$playlist = new Playlist();
-		$playlist->Db()->update(array('_id' => array('$in' => $playlist_ids), 'user_id' => glue::session()->user->_id), array('$set' => array('deleted' => 1)), array('multiple' => true));
-
-		glue::db()->playlist_likes->remove(array('item' => array('$in' => $playlist_ids)));
-
-		glue::session()->user->total_playlists = glue::session()->user->total_playlists > count($playlist_ids) ? glue::session()->user->total_playlists-count($playlist_ids) : 0;
-		glue::session()->user->save();
-
-		GJSON::kill('The playlists you selected were deleted', true);
-	}
-
-	function action_set_detail(){
-		$this->pageTitle = 'Save Playlist - StageX';
-		if(!glue::http()->isAjax())
-			Glue::route("error/notfound");
-
-		if(isset($_POST['field'])){
-			$field = $_POST['field'] == 'listing' ? $_POST['field'] : null;
-		}else{
-			$field = null;
-		}
-
-		$value = isset($_POST['value']) ? $_POST['value'] : null;
-		$playlists = isset($_POST['playlists']) ? $_POST['playlists'] : array();
-
-		if(count($playlists) <= 0){
-			GJSON::kill('No playlists were selected');
-		}
-
-		if(!$field){
-			GJSON::kill('No field was specified for change. Please refresh the page and try again');
-		}
-
-		$validated_playlists = array();
-		foreach($playlists as $k => $id){
-			$playlist = Playlist::model()->findOne(array('_id' => new MongoId($id), 'deleted' => array('$ne' => 1), 'title' => array('$ne' => 'Watch Later')));
-
-			if(glue::roles()->checkRoles(array('^' => $playlist))){
-				$playlist->$field = $value;
-				if($playlist->validate(array($field))){
-					$validated_playlists[] = $playlist;
-				}else{
-					GJSON::kill(array('messages'=>$playlist->getErrorMessages()));
-				}
-			}else{
-				GJSON::kill(GJSON::DENIED);
+	function action_batchSave(){
+		if(!glue::auth()->check('ajax','post'))
+			glue::trigger('404');
+		if(isset($_POST['Playlist'])&&($ids=glue::http()->param('ids',null))!==null){
+			$updated=0;
+			foreach($ids as $id){
+				$playlist = Playlist::model()->findOne(array('_id' => new MongoId($id)));
+				if(!glue::auth()->check(array('^' => $playlist)))
+					continue;
+				$playlist->attributes=$_POST['Playlist'];
+				if($playlist->validate()&&$playlist->save())
+					$updated++;
 			}
+			$this->json_success(array('updated'=>$updated,'failed'=>count($ids)-$updated,'total'=>count($ids)));
 		}
-
-		foreach($validated_playlists as $k => $playlist){
-			$playlist->save();
-		}
-		GJSON::kill('The playlists you selected were saved', true);
+		$this->json_error(self::UNKNOWN);		
 	}
 
 	public function action_addVideo(){
@@ -221,7 +180,6 @@ class PlaylistController extends glue\Controller{
 	}
 
 	function action_deleteVideo(){
-		$this->title = 'Remove Videos From Playlist - StageX';
 		if(!glue::http()->isAjax())
 			glue::trigger('404');
 
@@ -246,79 +204,6 @@ class PlaylistController extends glue\Controller{
 		}
 		$playlist->save();
 		$this->json_success('Videos removed');
-	}
-
-	function action_clear(){
-		$this->title = 'Clear Playlist - StageX';
-		if(!glue::http()->isAjax())
-			glue::trigger('404');
-	
-		$playlist = Playlist::model()->findOne(array('_id' => new MongoId(glue::http()->param('id')), 'userId' => glue::user()->_id));
-		if(!$playlist)
-			$this->json_error('This playlist no longer exists');
-		$playlist->videos = array();
-		$playlist->totalVideos=0;
-		$playlist->save();
-
-		ob_start(); ?>
-			<div class='no_results_found'>No videos were found</div>
-			<?php
-			$html = ob_get_contents();
-		ob_end_clean();
-		$this->json_success(array('html' => $html, 'message' => 'All videos were removed'));
-	}
-
-	function action_like(){
-		$this->pageTitle = 'Like Playlist - StageX';
-		if(!glue::http()->isAjax())
-			Glue::route("error/notfound");
-
-		$playlist = Playlist::model()->findOne(array('_id' => new MongoId($_GET['id'])));
-		//var_dump($playlist);
-
-		if($playlist){
-			$playlist->like();
-			$playlist->save();
-
-			if(!($playlist->listing == 'u' && $playlist->listing =='n')){
-				Stream::like_playlist(glue::session()->user->_id, $playlist->_id);
-
-				if(glue::session()->user->should_autoshare('lk_dl')){
-					AutoPublishQueue::add_to_qeue(AutoPublishQueue::LK_PL, glue::session()->user->_id, null, $playlist->_id);
-				}
-			}
-		}
-		GJSON::kill('This playlist was liked', true);
-	}
-
-	function action_unlike(){
-		$this->pageTitle = 'Unlike Playlist - StageX';
-		if(!glue::http()->isAjax())
-			Glue::route("error/notfound");
-
-		$playlist = Playlist::model()->findOne(array('_id' => new MongoId($_GET['id'])));
-
-		if($playlist){
-			$playlist->unlike();
-			$playlist->save();
-		}
-		GJSON::kill('This playlist was unliked', true);
-	}
-	
-	function action_suggestAddTo(){
-		$this->title='Suggest Playlists - StageX';
-		if(!glue::http()->isAjax())
-			glue::trigger('404');
-		$term=glue::http()->param('term',null);
-		$c=\app\models\Playlist::model()->fts(array('title'),$term,array('deleted'=>0, 'userId' => glue::user()->_id))->limit(100);
-		
-		$res=array();
-		foreach($c as $p){
-			$res[]=array(
-				'_id'=>(string)$p->_id, 'title'=>$p->title,'userId'=>$p->userId,'description'=>$p->description,
-				'listing'=>$p->listing,'totalVideos'=>$p->totalVideos,'likes'=>$p->likes,'created'=>date('d M Y',$p->getTs($p->created)));
-		}
-		$this->json_success(array('results'=>$res));
 	}
 
 	public function action_get_menu(){
@@ -357,6 +242,22 @@ class PlaylistController extends glue\Controller{
 
 		return $html;
 	}
+	
+	function action_suggestAddTo(){
+		$this->title='Suggest Playlists - StageX';
+		if(!glue::http()->isAjax())
+			glue::trigger('404');
+		$term=glue::http()->param('term',null);
+		$c=\app\models\Playlist::model()->fts(array('title'),$term,array('deleted'=>0, 'userId' => glue::user()->_id))->limit(100);
+	
+		$res=array();
+		foreach($c as $p){
+			$res[]=array(
+					'_id'=>(string)$p->_id, 'title'=>$p->title,'userId'=>$p->userId,'description'=>$p->description,
+					'listing'=>$p->listing,'totalVideos'=>$p->totalVideos,'likes'=>$p->likes,'created'=>date('d M Y',$p->getTs($p->created)));
+		}
+		$this->json_success(array('results'=>$res));
+	}	
 
 	function action_renderBar(){
 		if(!glue::http()->isAjax())
