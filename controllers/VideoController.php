@@ -10,8 +10,8 @@ class videoController extends glue\Controller{
 	public function authRules(){
 		return array(
 			array("allow",
-				"actions"=>array( 'upload', 'addUpload', 'getUploadStatus', 'createUpload', 'saveUpload', 'save', 'set_detail',
-					'deleteResponses', 'batch_delete', 'delete', 'report', 'like', 'dislike', 'statistics', 'get_more_statistics', 'undoDelete', 'batchSave' ),
+				"actions"=>array( 'upload', 'addUpload', 'getUploadStatus', 'createUpload', 'saveUpload', 'save',
+					'deleteResponses', 'delete', 'report', 'like', 'dislike', 'analytics', 'getAnalytics', 'undoDelete', 'batchSave' ),
 				"users"=>array("@*")
 			),
 			array('allow', 'actions' => array('index', 'watch', 'embedded')),
@@ -453,53 +453,46 @@ class videoController extends glue\Controller{
 		$this->json_error(self::UNKNOWN);
 	}
 
-	function action_statistics(){
-		$video = Video::model()->findOne(array("_id" => new MongoId($_GET['id'])));
-		if(!$video || !glue::roles()->checkRoles(array('^' => $video))){ // Only the owner of the video can see this
-			glue::route('/error/notfound');
-		}
+	function action_analytics(){
+		$video = Video::model()->findOne(array("_id" => new MongoId(glue::http()->param('id',''))));
+		if(!$video || !glue::auth()->check(array('^' => $video))) // Only the owner of the video can see this
+			glue::trigger('404');
 
-		$this->pageTitle = "View statistics for: ".$video->title;
-		$this->pageDescription = $video->desc;
-		$this->pageKeywords = is_array($video->tags) ? implode(",", $video->tags) : "";
+		$this->layout='user_section';
+		
+		$this->title = "View analytics for: ".$video->title;
+		if($video->description) $this->metaTag('description',$video->description);
+		if(count($video->tags)>0) $this->metaTag('keywords',$video->stringTags);
 //var_dump($video->getStatistics_dateRange(mktime(0, 0, 0, date("m")-1, date("d"), date("Y")), mktime(0, 0, 0, date("m"), date("d"), date("Y"))));
-		$this->render('videos/statistics', array(
+		echo $this->render('statistics', array(
 			"model"=>$video,
 		));
 	}
 
-	function action_get_more_statistics(){
+	function action_getAnalytics(){
 		if(!glue::http()->isAjax())
-			glue::route('/error/notfound');
+			glue::trigger('404');
+		extract(glue::http()->param(array('from','to','id')));
+		if(!$from || !$to)
+			$this->json_error('You entered an invalid to and/or from date');
 
-		$fromDate = isset($_GET['from']) ? $_GET['from'] : null;
-		$toDate = isset($_GET['to']) ? $_GET['to'] : null;
-
-		if(!$fromDate || !$toDate)
-			GJSON::kill('You entered an invalid to and/or from date');
-
-		$split_from = explode('/', $fromDate);
-		$split_to = explode('/', $toDate);
+		$split_from = explode('/', $from);
+		$split_to = explode('/', $to);
 		if(mktime(0, 0, 0, $split_from[1], $split_from[0], $split_from[2]) > mktime(0, 0, 0, $split_to[1], $split_to[0], $split_to[2])){
-			GJSON::kill('You entered an invalid to and/or from date');
+			$this->json_error('You entered an invalid to and/or from date');
 		}
 
-		$model = Video::model()->findOne(array('_id' => new MongoId($_GET['id'])));
-		if(!$model)
-			GJSON::kill('The video you are looking for could not be found.');
-
-		if(!glue::roles()->checkRoles(array('^' => $model))){
-			GJSON::kill(GJSON::DENIED);
-		}
+		if(!($model = Video::model()->findOne(array('_id' => new MongoId($id)))))
+			$this->json_error('The video you are looking for could not be found.');
+		if(!glue::auth()->check(array('^' => $model)))
+			$this->json_error(self::DENIED);
 
 		$fromTs = mktime(0, 0, 0, $split_from[1], $split_from[0], $split_from[2]);
 		$toTs = mktime(23, 0, 0, $split_to[1], $split_to[0], $split_to[2]);
-
 		if($fromTs == $toTs){
 			$toTs = mktime(23, 0, 0, $split_to[1], $split_to[0], $split_to[2]);
 		}
-
-		GJSON::kill($model->getStatistics_dateRange($fromTs, $toTs), true);
+		$this->json_success(array('stats'=>$model->getStatistics_dateRange($fromTs, $toTs)));
 	}
 	
 	public function action_searchSuggestions(){

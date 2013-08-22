@@ -240,6 +240,9 @@ $this->js('edit', "
 			<input type="button" class="btn btn-primary save_video" value="Save Changes"/>
 			<input type="button" id="settings_tab" class="btn btn-dark btn-inline left btn-tab" value="Settings"/><input type="button" id="details_tab" class="btn btn-dark btn-tab btn-inline right" value="Details"/>
 			<a href='<?php echo glue::http()->url('/video/delete', array('id' => $model->_id)) ?>' class='delete_video'>Delete</a>
+			<a href='<?php echo glue::http()->url('/video/analytics', array('id' => $model->_id)) ?>' class=''>Analytics</a>
+			<a href='<?php echo glue::http()->url('/video/delete', array('id' => $model->_id)) ?>' class=''>Responses</a>
+			<a href='<?php echo glue::http()->url('/video/delete', array('id' => $model->_id)) ?>' class=''>2 pending</a>
 		</div>
 		<div class="edit_panes">
 			<?php $form = html::activeForm(array('action' => '')) ?>

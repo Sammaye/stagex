@@ -11,8 +11,7 @@ class PlaylistController extends glue\Controller{
 	public function authRules(){
 		return array(
 			array("allow",
-				"actions"=>array('create', 'edit', 'save', 'delete', 'batchDelete', 'addVideo', 'add_many_videos', 'get_menu', 'batchSave', 'like', 'unlike', 'clear',
-					'deleteVideo', 'suggestAddTo'),
+				"actions"=>array('create', 'edit', 'save', 'delete', 'batchDelete', 'addVideo', 'get_menu', 'batchSave', 'deleteVideo', 'suggestAddTo'),
 				"users"=>array("@*")
 			),
 			array('allow', 'actions' => array('index', 'view', 'renderBar')),
@@ -20,7 +19,6 @@ class PlaylistController extends glue\Controller{
 		);
 	}
 	
-	public $layout='user_section';
 	public $tab='playlists';
 
 	public function action_index(){
@@ -36,6 +34,7 @@ class PlaylistController extends glue\Controller{
 			exit();
 		}
 
+		$this->layout='user_section';
 		$this->pageTitle = $playlist->title.' - StageX';
 		$this->pageDescription = $playlist->description;
 		$this->render('Playlist/view', array('playlist' => $playlist, 'user' => $playlist->author));
@@ -60,6 +59,7 @@ class PlaylistController extends glue\Controller{
 			$this->title = 'Playlist Not Found - StageX';
 			echo $this->render('deleted');
 		}else{
+			$this->layout='user_section';
 			$this->title = 'Playlist: '.$playlist->title.' - StageX';
 			echo $this->render('edit', array('playlist' => $playlist));
 		}

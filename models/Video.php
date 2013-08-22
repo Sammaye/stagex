@@ -581,7 +581,7 @@ class Video extends \glue\Db\Document{
 //var_dump($toTs);
 			foreach(glue::db()->video_statistics_day->find(array(
 				"vid"=>$this->_id,
-				"day"=> array("\$gte" => new \MongoDate($fromTs), "\$lte" => new MongoDate($toTs) ),
+				"day"=> array("\$gte" => new \MongoDate($fromTs), "\$lte" => new \MongoDate($toTs) ),
 			)) as $day){
 				//var_dump($day);
 				foreach($day['hours'] as $k => $v){
@@ -665,7 +665,9 @@ class Video extends \glue\Db\Document{
 			'video_likes' => $sum_video_likes,
 			'video_dislikes' => $sum_video_dislikes,
 			'males' => $sum_males > 0 ? number_format(($total_males_females/$sum_males)*100, 0) : 0,
-			'females' => $sum_females > 0 ? number_format(($total_males_females/$sum_females)*100, 0) : 0
+			'females' => $sum_females > 0 ? number_format(($total_males_females/$sum_females)*100, 0) : 0,
+			'totalMales' => $sum_males,
+			'totalFemales' => $sum_females
 		);
 	}
 

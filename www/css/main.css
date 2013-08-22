@@ -2424,3 +2424,56 @@ input.date{
 .create_playlist_form .form_right{
 	float:right;width:350px;
 }
+
+.video_analytics_body .head{
+	margin: 15px 0 5px 0;font-weight: bold;color: #444444;font-size: 14px;
+}
+
+.video_analytics_body .stats_block{
+	float: left;
+	width: 200px;
+	text-align: center;
+	font-size: 16px;
+}
+
+.video_analytics_body .stats_filter_bar{
+	padding:10px;text-align:right;background:#f8f8f8;
+}
+
+.video_analytics_body .stats_filter_bar input{
+	vertical-align:top; margin:0; 
+}
+
+.video_analytics_body .stats_filter_bar .btn{
+	line-height:30px;
+	height:30px;
+}
+
+.video_analytics_body .stats_filter_bar label{
+	margin-bottom:0;
+	margin-top:0; display:inline-block;float:none;
+}
+
+.video_analytics_body .stats_filter_bar .sep{
+	margin:0 10px; display:inline-block;
+}
+
+.video_analytics_body .overview{
+	margin:20px 0;
+}
+
+.video_analytics_body .overview .stats_block.response{
+	margin-top:25px;
+}
+
+.video_analytics_body .overview .stats_block.response.first{
+	margin-left:200px;
+}
+
+.video_analytics_body .stats_block.likes{
+	color:green;
+}
+
+.video_analytics_body .stats_block.dislikes{
+	color:red;
+}
