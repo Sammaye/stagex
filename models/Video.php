@@ -664,10 +664,8 @@ class Video extends \glue\Db\Document{
 			'text_comments' => $sum_text_comments,
 			'video_likes' => $sum_video_likes,
 			'video_dislikes' => $sum_video_dislikes,
-			'males' => $sum_males > 0 ? number_format(($total_males_females/$sum_males)*100, 0) : 0,
-			'females' => $sum_females > 0 ? number_format(($total_males_females/$sum_females)*100, 0) : 0,
-			'totalMales' => $sum_males,
-			'totalFemales' => $sum_females
+			'males' => ($sum_males > 0 ? number_format(($total_males_females/$sum_males)*100, 0) : 0).'% ('.$sum_males.')',
+			'females' => ($sum_females > 0 ? number_format(($total_males_females/$sum_females)*100, 0) : 0).'% ('.$sum_females.')'
 		);
 	}
 

@@ -173,8 +173,8 @@ $video_stats = $model->getStatistics_dateRange(mktime(0, 0, 0, date("m"), date("
 							$('.likes_count').html(stats.video_likes);
 							$('.dislikes_count').html(stats.video_dislikes);
 
-							$('.males_percent').html(stats.males+'%');
-							$('.females_percent').html(stats.females+'%');
+							$('.males_percent').html(stats.males);
+							$('.females_percent').html(stats.females);
 						}
 					});
 				});
@@ -216,27 +216,15 @@ $video_stats = $model->getStatistics_dateRange(mktime(0, 0, 0, date("m"), date("
 		all views, unique and recurring.</p>
 
 		<table class='table'>
-			<thead>
-				<tr>
-					<th>Referrer</th>
-					<th>Redirects</th>
-					<th>Last Redirect</th>
-				</tr>
-			</thead>
+			<thead><tr><th>Referrer</th><th>Redirects</th><th>Last Redirect</th></tr></thead>
 			<tbody>
 				<?php
 				if($referers->count() > 0){
 					foreach($referers as $k=>$v){ ?>
-						<tr>
-							<td><?php echo $v['referer'] ?></td>
-							<td><?php echo $v['c'] ?></td>
-							<td><?php echo date('d-m-Y H:i:s') ?></td>
-						</tr>
+						<tr><td><?php echo $v['referer'] ?></td><td><?php echo $v['c'] ?></td><td><?php echo date('d-m-Y H:i:s') ?></td></tr>
 					<?php }
 				}else{ ?>
-					<tr>
-						<td colspan="3">No referrers found yet</td>
-					</tr>
+					<tr><td colspan="3">No referrers found yet</td></tr>
 				<?php } ?>
 			</tbody>
 		</table>
