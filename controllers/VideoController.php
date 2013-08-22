@@ -261,7 +261,6 @@ class videoController extends glue\Controller{
 	}
 	
 	function action_save(){
-		$this->title = 'Save Video - StageX';
 		if(!glue::auth()->check('ajax','post'))
 			glue::trigger('404');
 		if(
@@ -280,8 +279,6 @@ class videoController extends glue\Controller{
 	}
 
 	function action_batchSave(){
-
-		$this->title = 'Save Video - StageX';
 		if(!glue::auth()->check('ajax','post'))
 			glue::trigger('404');
 		if(isset($_POST['Video'])&&($ids=glue::http()->param('ids',null))!==null){
@@ -300,8 +297,6 @@ class videoController extends glue\Controller{
 	}
 
 	function action_deleteResponses(){
-		$this->title = 'Delete Video Responses - StageX';
-
 		if(!glue::auth()->check('ajax','post'))
 			glue::trigger('404');
 		if(
@@ -323,7 +318,6 @@ class videoController extends glue\Controller{
 	}
 
 	function action_report(){
-		$this->title = 'Report Video - StageX';
 		if(!glue::auth()->check('ajax','post'))
 			glue::trigger('404');
 		
@@ -344,7 +338,6 @@ class videoController extends glue\Controller{
 	}
 
 	function action_like(){
-		$this->title = 'Like Video - StageX';
 		if(!glue::auth()->check('ajax','post'))
 			glue::trigger('404');
 
@@ -373,7 +366,6 @@ class videoController extends glue\Controller{
 	}
 
 	function action_dislike(){
-		$this->title = 'Dislike Video - StageX';
 		if(!glue::auth()->check('ajax','post'))
 			glue::trigger('404');
 
@@ -433,10 +425,8 @@ class videoController extends glue\Controller{
 	}
 	
 	function action_undoDelete(){
-		$this->title = 'Remove Videos - StageX';
 		if(!glue::http()->isAjax())
-			Glue::route("error/notfound");
-		
+			glue::trigger('404');
 		$id=glue::http()->param('id',null);
 		if(
 			$id===null||
@@ -463,10 +453,7 @@ class videoController extends glue\Controller{
 		$this->title = "View analytics for: ".$video->title;
 		if($video->description) $this->metaTag('description',$video->description);
 		if(count($video->tags)>0) $this->metaTag('keywords',$video->stringTags);
-//var_dump($video->getStatistics_dateRange(mktime(0, 0, 0, date("m")-1, date("d"), date("Y")), mktime(0, 0, 0, date("m"), date("d"), date("Y"))));
-		echo $this->render('statistics', array(
-			"model"=>$video,
-		));
+		echo $this->render('statistics', array("model"=>$video));
 	}
 
 	function action_getAnalytics(){
@@ -496,7 +483,6 @@ class videoController extends glue\Controller{
 	}
 	
 	public function action_searchSuggestions(){
-		$this->title = 'Video Search - StageX';
 		if(!glue::http()->isAjax())
 			glue::trigger('404');
 	

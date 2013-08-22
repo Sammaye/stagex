@@ -433,14 +433,19 @@ class Video extends \glue\Db\Document{
 	 *   	13_16: 1,
 	 *   	17_25: 2
 	 *   },
-	 *   age_gender: [
-	 *   	13_16:{m:1,f:2}
+	 *   male_age: [
+	 *   	13_16:1,
+	 *   ],
+	 *   female_age: [
+	 *   	13_16:2
 	 *   ],
 	 *   v_comments: 0,
 	 *   t_comments: 0,
 	 *   likes: 0,
 	 *   dislikes: 0,
 	 *   age_total: 0,
+	 *   male_age_total: 0,
+	 *   female_age_total: 0,
 	 *   browser_total: 0,
 	 *   male: 0,
 	 *   female: 0,
@@ -480,7 +485,6 @@ class Video extends \glue\Db\Document{
 			if($is_unique){
 				$doc['$inc']['u_hits'] = 1;
 				$doc['$inc']['age.'.$age_key] = 1;
-				$doc['$inc']['age_gender.'.$age_key.'.'.glue::user()->gender] = 1;
 				$doc['$inc']['browser.'.$bname] = 1;
 
 				// These are used to make my life a little easier
@@ -489,8 +493,12 @@ class Video extends \glue\Db\Document{
 
 				if(glue::user()->gender == 'm'){
 					$doc['$inc']['male'] = 1;
+					$doc['$inc']['male_age_total'] = 1;
+					$doc['$inc']['male_age.'.$age_key] = 1;
 				}elseif(glue::user()->gender == 'f'){
 					$doc['$inc']['female'] = 1;
+					$doc['$inc']['female_age_total'] = 1;
+					$doc['$inc']['female_age.'.$age_key] = 1;
 				}
 			}
 
@@ -528,11 +536,11 @@ class Video extends \glue\Db\Document{
 		$sum_video_likes = 0;
 		$sum_video_dislikes = 0;
 
-		$totalMaleAges=array();
-		$totalFemaleAges=array();
-		
-		$maleAgesCount=0;
-		$femaleAgesCount=0;
+		$aggMaleAges=array();
+		$aggFemaleAges=array();
+				
+		$totalMaleAges=0;
+		$totalFemaleAges=0;
 		
 		$maleAgesChart=array();
 		$femaleAgesChart=array();
@@ -544,10 +552,8 @@ class Video extends \glue\Db\Document{
 			$dateFrom = mktime(0, 0, 0, date("m"), date("d")-7, date("Y"));
 			$dateTo = time();
 		}
-//var_dump($toTs-strtotime('+5 days'));
 
 		if($fromTs < strtotime('-4 days', $toTs)){ // Else I am doing days if there is more than one
-//echo "here";
 		  	$newts = $fromTs;
 			while ($newts <= $toTs) {
 				//$newts += 86400;
@@ -555,188 +561,91 @@ class Video extends \glue\Db\Document{
 				$non_unique_views_range[$newts] = 0;
 				$newts = mktime(0,0,0, date('m', $newts), date('d', $newts)+1, date('Y', $newts));
 			}
-
-			//$unique_views_range[mktime(0,0,0, date('m', $newts), date('d', $newts)+1, date('Y', $newts))] = 0;
-			//$non_unique_views_range[mktime(0,0,0, date('m', $newts), date('d', $newts)+1, date('Y', $newts))] = 0;
-
-			foreach(glue::db()->video_statistics_day->find(array(
-				"vid"=>$this->_id,
-				"day"=> array("\$gte" => new \MongoDate($fromTs), "\$lte" => new \MongoDate($toTs) ),
-			)) as $day){
-				//var_dump($day);
-				$non_unique_views_range[$day['day']->sec] = !empty($day['hits']) ? $day['hits'] : 0;
-				$unique_views_range[$day['day']->sec] = !empty($day['u_hits']) ? $day['u_hits'] : 0;
-
-				$sum_browser = \Collection::aggregate(isset($day['browser']) ? $day['browser'] : array(), $sum_browser);
-				$sum_ages = \Collection::aggregate(isset($day['age']) ? $day['age'] : array(), $sum_ages);
-				
-				if(isset($day['age_gender'])){
-					foreach($day['age_gender'] as $age){
-						
-						$m=isset($age['m'])?$age['m']:0;
-						$f=isset($age['f'])?$age['f']:0;
-						
-						$totalMaleAges[$age]+=$m;
-						$totalFemaleAges[$age]=+$f;
-						
-						if($m>0)
-							$maleAgesCount++;
-						if($f>0)
-							$femaleAgesCount++;
-					}
-				}
-
-				$total_browsers += isset($day['browser_total']) ? (int)$day['browser_total'] : 0;
-				$total_ages += isset($day['age_total']) ? (int)$day['age_total'] : 0;
-
-				$sum_video_comments += isset($day['video_comments']) ? (int)$day['video_comments'] : 0;
-				$sum_text_comments += isset($day['text_comments']) ? (int)$day['text_comments'] : 0;
-				$sum_video_likes += isset($day['video_likes']) ? (int)$day['video_likes'] : 0;
-				$sum_video_dislikes += isset($day['video_dislikes']) ? (int)$day['video_dislikes'] : 0;
-
-				$sum_males += isset($day['male']) ? (int)$day['male'] : 0;
-				$sum_females += isset($day['female']) ? (int)$day['female'] : 0;
-			}
-
-		}else{ // else obviously I am doing over a single day
-			//echo "here";
+			
+		}else{
 			$newts = $fromTs;
 			while($newts < $toTs){
 				$newts = $newts+(60*60);
 				$unique_views_range[$newts] = 0;
 				$non_unique_views_range[$newts] = 0;
 			}
-			//var_dump($unique_views_range);
-//var_dump($toTs);
-			foreach(glue::db()->video_statistics_day->find(array(
-				"vid"=>$this->_id,
-				"day"=> array("\$gte" => new \MongoDate($fromTs), "\$lte" => new \MongoDate($toTs) ),
-			)) as $day){
-				//var_dump($day);
+		}
+
+		foreach(glue::db()->video_statistics_day->find(array(
+			"vid"=>$this->_id,
+			"day"=> array('$gte' => new \MongoDate($fromTs), '$lte' => new \MongoDate($toTs))
+		)) as $day){
+			//var_dump($day);
+			if($fromTs < strtotime('-4 days', $toTs)){
+				$non_unique_views_range[$day['day']->sec] = !empty($day['hits']) ? $day['hits'] : 0;
+				$unique_views_range[$day['day']->sec] = !empty($day['u_hits']) ? $day['u_hits'] : 0;
+			}else{				
 				foreach($day['hours'] as $k => $v){
 					$k = $k+1;
 					$non_unique_views_range[mktime($k, 0, 0, date('m', $day['day']->sec), date('d', $day['day']->sec), date('Y', $day['day']->sec))] = !empty($v['v']) ? $v['v'] : 0;
 					$unique_views_range[mktime($k, 0, 0, date('m', $day['day']->sec), date('d', $day['day']->sec), date('Y', $day['day']->sec))] = !empty($v['u']) ? $v['u'] : 0;
-				}
-
-				$sum_browser = \Collection::aggregate(isset($day['browser']) ? $day['browser'] : array(), $sum_browser);
-				$sum_ages = \Collection::aggregate(isset($day['age']) ? $day['age'] : array(), $sum_ages);
-
-				$total_browsers += isset($day['browser_total']) ? (int)$day['browser_total'] : 0;
-				$total_ages += isset($day['age_total']) ? (int)$day['age_total'] : 0;
-
-				$sum_video_comments += isset($day['video_comments']) ? (int)$day['video_comments'] : 0;
-				$sum_text_comments += isset($day['text_comments']) ? (int)$day['text_comments'] : 0;
-				$sum_video_likes += isset($day['video_likes']) ? (int)$day['video_likes'] : 0;
-				$sum_video_dislikes += isset($day['video_dislikes']) ? (int)$day['video_dislikes'] : 0;
-
-				$sum_males += isset($day['male']) ? (int)$day['male'] : 0;
-				$sum_females += isset($day['female']) ? (int)$day['female'] : 0;
+				}					
 			}
-		}
-//var_dump($sum_males);
-		// Now lets get the browser crap
-		$browsers_highCharts_array = array();
-		$u_brows_capt = 'Other';
-		foreach($sum_browser as $k => $sum){
-			if($k =='ie'){
-				$u_brows_capt = "IE";
-			}elseif($k == 'ff'){
-				$u_brows_capt = "Firefox";
-			}elseif($k == 'chrome'){
-				$u_brows_capt = "Chrome";
-			}elseif($k == 'safari'){
-				$u_brows_capt = "Safari";
-			}elseif($k == 'opera'){
-				$u_brows_capt = "Opera";
-			}elseif($k == 'netscape'){
-				$u_brows_capt = "Netscape";
-			}
-			$browsers_highCharts_array[] = array($u_brows_capt, ($sum/$total_browsers)*100);
-		}
+				
+			$sum_browser = \Collection::aggregate(isset($day['browser']) ? $day['browser'] : array(), $sum_browser);
+			$sum_ages = \Collection::aggregate(isset($day['age']) ? $day['age'] : array(), $sum_ages);
+			$aggMaleAges = \Collection::aggregate(isset($day['male_age']) ? $day['male_age'] : array(), $aggMaleAges);
+			$aggFemaleAges = \Collection::aggregate(isset($day['female_age']) ? $day['female_age'] : array(), $aggFemaleAges);
+				
+			$totalMaleAges+=isset($day['male_age_total'])?$day['male_age_total']:0;
+			$totalFemaleAges+=isset($day['female_age_total'])?$day['female_age_total']:0;	
 
-		$ages_highCharts_array = array();
-		$u_age_capt = 'Unknown';
-		foreach($sum_ages as $k => $sum){
-			if($k == '13_16'){
-				$u_age_capt = '13-16';
-			}elseif($k == '17_25'){
-				$u_age_capt = '17-25';
-			}elseif($k == '26_35'){
-				$u_age_capt = '26-35';
-			}elseif($k == '36_50'){
-				$u_age_capt = '36-50';
-			}elseif($k == '50_plus'){
-				$u_age_capt = '50+';
-			}
-			$ages_highCharts_array[] = array($u_age_capt, ($sum/$total_ages)*100);
-		}
+			$total_browsers += isset($day['browser_total']) ? (int)$day['browser_total'] : 0;
+			$total_ages += isset($day['age_total']) ? (int)$day['age_total'] : 0;
 
-		if(count($ages_highCharts_array) <= 0){
-			$ages_highCharts_array = array(array('None', 100));
-		}
+			$sum_video_comments += isset($day['video_comments']) ? (int)$day['video_comments'] : 0;
+			$sum_text_comments += isset($day['text_comments']) ? (int)$day['text_comments'] : 0;
+			$sum_video_likes += isset($day['video_likes']) ? (int)$day['video_likes'] : 0;
+			$sum_video_dislikes += isset($day['video_dislikes']) ? (int)$day['video_dislikes'] : 0;
 
-		if(count($browsers_highCharts_array) <= 0){
-			$browsers_highCharts_array = array(array('None', 100));
+			$sum_males += isset($day['male']) ? (int)$day['male'] : 0;
+			$sum_females += isset($day['female']) ? (int)$day['female'] : 0;
 		}
-		
-		if(count($totalMaleAges)<=0)
-			$totalMaleAges[]=array(array('None',100));
-		else{
-			foreach($totalMaleAges as $age => $c){
-				if($age == '13_16'){
-					$label = '13-16';
-				}elseif($age == '17_25'){
-					$label = '17-25';
-				}elseif($age == '26_35'){
-					$label = '26-35';
-				}elseif($age == '36_50'){
-					$label = '36-50';
-				}elseif($age == '50_plus')
-					$label = '50+';
-				else
-					$label = 'Unknown';
-				$maleAgesChart[] = array($label, ($c/$maleAgesCount)*100);				
-			}
-		}
-		
-		if(count($totalFemaleAges)<=0)
-			$femaleAgesChart[]=array(array('None',100));
-		else{
-			foreach($totalFemaleAges as $age => $c){
-				if($age == '13_16'){
-					$label = '13-16';
-				}elseif($age == '17_25'){
-					$label = '17-25';
-				}elseif($age == '26_35'){
-					$label = '26-35';
-				}elseif($age == '36_50'){
-					$label = '36-50';
-				}elseif($age == '50_plus')
-					$label = '50+';
-				else
-					$label = 'Unknown';
-				$femaleAgesChart[] = array($label, ($c/$maleAgesCount)*100);
-			}
-		}		
-
 		$total_males_females = $sum_males+$sum_females;
 
+//var_dump($sum_males);
+		// Now lets get the browser crap
+		if(count($sum_browser) <= 0){
+			$browsers_highCharts_array = array(array('None', 100));
+		}else{
+			foreach($sum_browser as $k => $sum){
+				if($k =='ie'){
+					$label = "IE";
+				}elseif($k == 'ff'){
+					$label = "Firefox";
+				}elseif($k == 'chrome'){
+					$label = "Chrome";
+				}elseif($k == 'safari'){
+					$label = "Safari";
+				}elseif($k == 'opera'){
+					$label = "Opera";
+				}elseif($k == 'netscape'){
+					$label = "Netscape";
+				}else
+					$label = 'Other';
+				$browsers_highCharts_array[] = array($label, ($sum/$total_browsers)*100);
+			}			
+		}
 		return array(
 			'hits' => $this->formatHighChart(array(
 				"Views"=>$non_unique_views_range,
 				"Unique Views"=>$unique_views_range
 			)),
 			'browsers' => $browsers_highCharts_array,
-			'ages' => $ages_highCharts_array,
+			'ages' => $this->formatHighChartsAgePie($sum_ages, $total_ages),
 			'video_comments' => $sum_video_comments,
 			'text_comments' => $sum_text_comments,
 			'video_likes' => $sum_video_likes,
 			'video_dislikes' => $sum_video_dislikes,
 			'males' => ($sum_males > 0 ? number_format(($total_males_females/$sum_males)*100, 0) : 0).'% ('.$sum_males.')',
 			'females' => ($sum_females > 0 ? number_format(($total_males_females/$sum_females)*100, 0) : 0).'% ('.$sum_females.')',
-			'maleAgesChart' => $maleAgesChart,
-			'maleAgesChart' => $maleAgesChart
+			'maleAgeChart' => $this->formatHighChartsAgePie($aggMaleAges,$totalMaleAges),
+			'femaleAgeChart' => $this->formatHighChartsAgePie($aggFemaleAges,$totalFemaleAges)
 		);
 	}
 
@@ -758,6 +667,31 @@ class Video extends \glue\Db\Document{
 			}
 		}
 		return $allSeries;
+	}
+	
+	function formatHighChartsAgePie($data, $count){
+		if(count($data)<=0)
+			return array(array('None',100));
+		else{
+			$a=array();
+			foreach($data as $k => $c){
+				if($k == '13_16'){
+					$label = '13-16';
+				}elseif($k == '17_25'){
+					$label = '17-25';
+				}elseif($k == '26_35'){
+					$label = '26-35';
+				}elseif($k == '36_50'){
+					$label = '36-50';
+				}elseif($k == '50_plus')
+					$label = '50+';
+				else
+					$label = 'Unknown';
+				//var_dump(($c/$count)*100);
+				$a[] = array($label, ($c/$count)*100,2);
+			}
+			return $a;
+		}		
 	}
 
 	function get_category_text(){

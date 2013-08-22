@@ -128,10 +128,86 @@ $video_stats = $model->getStatistics_dateRange(mktime(0, 0, 0, date("m"), date("
 				        data: ".js_encode($video_stats['ages'])."
 				    }]
 				};
+					
+				var male_age_chart_config = {
+					chart: {
+				    	renderTo: 'male_age_container',
+				        plotBackgroundColor: null,
+				        plotBorderWidth: null,
+				        plotShadow: false
+				    },
+				    title: {
+				    	text: null
+				    },
+				    tooltip: {
+				    	formatter: function() {
+				        	return '<b>'+ this.point.name +'</b>: '+ this.percentage +' %';
+				        }
+				    },
+				    plotOptions: {
+				    	pie: {
+				    		//size: 80,
+				        	allowPointSelect: true,
+				            cursor: 'pointer',
+				            dataLabels: {
+				            	enabled: false,
+				                color: '#000000',
+				                connectorColor: '#000000',
+				                formatter: function() {
+				                	return '<b>'+ this.point.name +'</b>: '+ this.percentage +' %';
+				                }
+				            },
+				       }
+				  	},
+				    series: [{
+				    	type: 'pie',
+				        name: 'Age group share',
+				        data: ".js_encode($video_stats['maleAgeChart'])."
+				    }]
+				};					
 
+				var female_age_chart_config = {
+					chart: {
+				    	renderTo: 'female_age_container',
+				        plotBackgroundColor: null,
+				        plotBorderWidth: null,
+				        plotShadow: false
+				    },
+				    title: {
+				    	text: null
+				    },
+				    tooltip: {
+				    	formatter: function() {
+				        	return '<b>'+ this.point.name +'</b>: '+ this.percentage +' %';
+				        }
+				    },
+				    plotOptions: {
+				    	pie: {
+				    		//size: 80,
+				        	allowPointSelect: true,
+				            cursor: 'pointer',
+				            dataLabels: {
+				            	enabled: false,
+				                color: '#000000',
+				                connectorColor: '#000000',
+				                formatter: function() {
+				                	return '<b>'+ this.point.name +'</b>: '+ this.percentage +' %';
+				                }
+				            },
+				       }
+				  	},
+				    series: [{
+				    	type: 'pie',
+				        name: 'Age group share',
+				        data: ".js_encode($video_stats['femaleAgeChart'])."
+				    }]
+				};						
+					
 				$(function () {
 					browser_chart = new Highcharts.Chart(browser_chart_config);
 			        age_group_chart = new Highcharts.Chart(age_groups_chart_config);
+					maleAgeChart = new Highcharts.Chart(male_age_chart_config);
+					femaleAgeChart = new Highcharts.Chart(female_age_chart_config);
 			    });
 
 				$(document).on('click', '.apply_range', function(event){
@@ -167,6 +243,12 @@ $video_stats = $model->getStatistics_dateRange(mktime(0, 0, 0, date("m"), date("
 
 							age_groups_chart_config.series[0].data = stats.ages;
 							browser_chart = new Highcharts.Chart(age_groups_chart_config);
+					
+							male_age_chart_config.series[0].data = stats.maleAgeChart;
+							browser_chart = new Highcharts.Chart(male_age_chart_config);	
+
+							female_age_chart_config.series[0].data = stats.femaleAgeChart;
+							browser_chart = new Highcharts.Chart(female_age_chart_config);					
 
 							$('.video_comments_count').html(stats.video_comments);
 							$('.text_comments_count').html(stats.text_comments);
@@ -198,13 +280,13 @@ $video_stats = $model->getStatistics_dateRange(mktime(0, 0, 0, date("m"), date("
 
 		<h3>Gender and Age Demographics</h3>
 		<div style='padding:20px 0;'>
-			<div class="stats_block"><span class='males_percent'><?php echo $video_stats['males'] ?></span> Males</div>
-			<div class="stats_block"><span class='females_percent'><?php echo $video_stats['females'] ?></span> Females</div>
+			<div class="stats_block" style='margin-left:70px;'><span class='males_percent'><?php echo $video_stats['males'] ?></span> Males</div>
+			<div class="stats_block" style='margin-left:190px;'><span class='females_percent'><?php echo $video_stats['females'] ?></span> Females</div>
 			<div class="clear"></div>
 		</div>
 		
 		<div style='height:400px;'>
-			<div id="male_age_container" style="min-width: 300px; height: 300px; margin: 0 auto; float:left;"></div>
+			<div id="male_age_container" style="min-width: 300px; height: 300px; margin: 0 auto; float:left; margin-left:20px; margin-right:80px;"></div>
 			<div id="female_age_container" style="min-width: 300px; height: 300px; margin: 0 auto; float:left;"></div>
 		</div>		
 

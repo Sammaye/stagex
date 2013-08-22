@@ -2425,6 +2425,10 @@ input.date{
 	float:right;width:350px;
 }
 
+.video_analytics_body{
+	margin-bottom:100px;
+}
+
 .video_analytics_body .head{
 	margin: 15px 0 5px 0;font-weight: bold;color: #444444;font-size: 14px;
 }
