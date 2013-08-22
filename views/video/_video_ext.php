@@ -39,11 +39,10 @@
 			<div class='expandable description'><?php echo html::encode($desc) ?></div>
 		<?php } ?>			
 	</div>
-	<div class="clear"></div>
-
 	<?php if($model->userHasWatched() && $show_watched_status){ ?>
-		<div class='xtra_info_icons tags_outer'>
-			<span class='tag'>Watched</span>
+		<div class='infocons watchedcon'>
+			<span class='label'>Watched</span>
 		</div>
 	<?php } ?>
+	<div class="clear"></div>
 </div>

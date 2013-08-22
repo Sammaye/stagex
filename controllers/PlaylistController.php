@@ -42,17 +42,16 @@ class PlaylistController extends glue\Controller{
 	}
 
 	public function action_create(){
-		$this->title = 'Create Playlist - StageX';
-		$this->layout='user_section';
+		if(!glue::auth()->check('ajax','post'))
+			glue::trigger('404');
 
 		$model = new Playlist();
 		if(isset($_POST['Playlist'])){
 			$model->attributes=$_POST['Playlist'];
-			if($model->validate()&&$model->save()){
-				glue::http()->redirect('/user/playlists');
-			}
+			if($model->validate()&&$model->save())
+				$this->json_success(array('message' => 'Playlist created', '_id' => strval($model->_id)));
 		}
-		echo $this->render('create',array('model'=>$model));
+		$this->json_error(array('message'=>'Playlist could not be created because:','messages'=>$model->getErrors()));
 	}
 
 	public function action_edit(){
@@ -166,7 +165,7 @@ class PlaylistController extends glue\Controller{
 					$playlist->addVideo($video->_id);
 			}
 			if(count($playlist->videos)>500)
-				$this->json_error('The video you selected was not added because you aree limited to 500 videos per playlist.');
+				$this->json_error('The video you selected was not added because you are limited to 500 videos per playlist.');
 			if(!$playlist->save())
 				$this->json_error('The video you selected was not added because of an unknown error.');
 			if($playlist->listing === 0 || $playlist->listing === 1){ // If this playlist is not private

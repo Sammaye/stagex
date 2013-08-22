@@ -680,6 +680,20 @@ input.date{
 	background:#dff0d8; border:1px solid #d6e9c6;
 }
 
+.label{
+    border-radius: 0.25em 0.25em 0.25em 0.25em;
+    color: #FFFFFF;
+    display: inline;
+    font-size: 75%;
+    font-weight: bold;
+    line-height: 1;
+    padding: 0.2em 0.6em 0.3em;
+    text-align: center;
+    vertical-align: baseline;
+    white-space: nowrap;
+    background-color: #999999;	
+}
+
 .badge{
     background-color: #f1f1f1;
     border-radius: 10px 10px 10px 10px;
@@ -1429,6 +1443,10 @@ input.date{
 
 .video .infocons .comments{
 	margin-right:25px;
+}
+
+.watchedcon{
+	margin-top:35px;
 }
 
 .video .stacked_info{
@@ -2204,12 +2222,12 @@ input.date{
 	width:300px;
 }
 
-.playlist_form .form-stacked textarea,
-.playlist_form .form-stacked input[type="text"]{
+.create_playlist_form .form-stacked textarea,
+.create_playlist_form .form-stacked input[type="text"]{
 	width:95%; border-radius:2px;
 }
 
-.playlist_form .form-stacked textarea{
+.create_playlist_form .form-stacked textarea{
 	height:130px;
 }
 
@@ -2389,4 +2407,20 @@ input.date{
 
 .user_playlists_page .form-search{
 	margin:20px 0 10px 0;
+}
+
+.create_playlist_form{
+	padding:20px;
+}
+
+.create_playlist_form .alert{
+	display:none;margin:10px 0;
+}
+
+.create_playlist_form .form_left{
+	float:left;width:400px;margin-right:50px;
+}
+
+.create_playlist_form .form_right{
+	float:right;width:350px;
 }
