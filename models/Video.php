@@ -433,6 +433,9 @@ class Video extends \glue\Db\Document{
 	 *   	13_16: 1,
 	 *   	17_25: 2
 	 *   },
+	 *   age_gender: [
+	 *   	13_16:{m:1,f:2}
+	 *   ],
 	 *   v_comments: 0,
 	 *   t_comments: 0,
 	 *   likes: 0,
@@ -477,6 +480,7 @@ class Video extends \glue\Db\Document{
 			if($is_unique){
 				$doc['$inc']['u_hits'] = 1;
 				$doc['$inc']['age.'.$age_key] = 1;
+				$doc['$inc']['age_gender.'.$age_key.'.'.glue::user()->gender] = 1;
 				$doc['$inc']['browser.'.$bname] = 1;
 
 				// These are used to make my life a little easier
@@ -524,6 +528,15 @@ class Video extends \glue\Db\Document{
 		$sum_video_likes = 0;
 		$sum_video_dislikes = 0;
 
+		$totalMaleAges=array();
+		$totalFemaleAges=array();
+		
+		$maleAgesCount=0;
+		$femaleAgesCount=0;
+		
+		$maleAgesChart=array();
+		$femaleAgesChart=array();
+		
 		$sum_males = 0;
 		$sum_females = 0;
 
@@ -556,6 +569,22 @@ class Video extends \glue\Db\Document{
 
 				$sum_browser = \Collection::aggregate(isset($day['browser']) ? $day['browser'] : array(), $sum_browser);
 				$sum_ages = \Collection::aggregate(isset($day['age']) ? $day['age'] : array(), $sum_ages);
+				
+				if(isset($day['age_gender'])){
+					foreach($day['age_gender'] as $age){
+						
+						$m=isset($age['m'])?$age['m']:0;
+						$f=isset($age['f'])?$age['f']:0;
+						
+						$totalMaleAges[$age]+=$m;
+						$totalFemaleAges[$age]=+$f;
+						
+						if($m>0)
+							$maleAgesCount++;
+						if($f>0)
+							$femaleAgesCount++;
+					}
+				}
 
 				$total_browsers += isset($day['browser_total']) ? (int)$day['browser_total'] : 0;
 				$total_ages += isset($day['age_total']) ? (int)$day['age_total'] : 0;
@@ -650,6 +679,46 @@ class Video extends \glue\Db\Document{
 		if(count($browsers_highCharts_array) <= 0){
 			$browsers_highCharts_array = array(array('None', 100));
 		}
+		
+		if(count($totalMaleAges)<=0)
+			$totalMaleAges[]=array(array('None',100));
+		else{
+			foreach($totalMaleAges as $age => $c){
+				if($age == '13_16'){
+					$label = '13-16';
+				}elseif($age == '17_25'){
+					$label = '17-25';
+				}elseif($age == '26_35'){
+					$label = '26-35';
+				}elseif($age == '36_50'){
+					$label = '36-50';
+				}elseif($age == '50_plus')
+					$label = '50+';
+				else
+					$label = 'Unknown';
+				$maleAgesChart[] = array($label, ($c/$maleAgesCount)*100);				
+			}
+		}
+		
+		if(count($totalFemaleAges)<=0)
+			$femaleAgesChart[]=array(array('None',100));
+		else{
+			foreach($totalFemaleAges as $age => $c){
+				if($age == '13_16'){
+					$label = '13-16';
+				}elseif($age == '17_25'){
+					$label = '17-25';
+				}elseif($age == '26_35'){
+					$label = '26-35';
+				}elseif($age == '36_50'){
+					$label = '36-50';
+				}elseif($age == '50_plus')
+					$label = '50+';
+				else
+					$label = 'Unknown';
+				$femaleAgesChart[] = array($label, ($c/$maleAgesCount)*100);
+			}
+		}		
 
 		$total_males_females = $sum_males+$sum_females;
 
@@ -665,7 +734,9 @@ class Video extends \glue\Db\Document{
 			'video_likes' => $sum_video_likes,
 			'video_dislikes' => $sum_video_dislikes,
 			'males' => ($sum_males > 0 ? number_format(($total_males_females/$sum_males)*100, 0) : 0).'% ('.$sum_males.')',
-			'females' => ($sum_females > 0 ? number_format(($total_males_females/$sum_females)*100, 0) : 0).'% ('.$sum_females.')'
+			'females' => ($sum_females > 0 ? number_format(($total_males_females/$sum_females)*100, 0) : 0).'% ('.$sum_females.')',
+			'maleAgesChart' => $maleAgesChart,
+			'maleAgesChart' => $maleAgesChart
 		);
 	}
 
@@ -687,12 +758,6 @@ class Video extends \glue\Db\Document{
 			}
 		}
 		return $allSeries;
-	}
-
-	function renderTags(){
-		if(is_array($this->tags)){
-			return implode(", ", $this->tags);
-		}
 	}
 
 	function get_category_text(){

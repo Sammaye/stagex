@@ -198,8 +198,8 @@ $video_stats = $model->getStatistics_dateRange(mktime(0, 0, 0, date("m"), date("
 
 		<h3>Gender and Age Demographics</h3>
 		<div style='padding:20px 0;'>
-			<div class="stats_block"><span class='males_percent'><?php echo $video_stats['males'] ?>% (<?php echo $video_stats['totalMales'] ?>)</span> Males</div>
-			<div class="stats_block"><span class='females_percent'><?php echo $video_stats['females'] ?>% (<?php echo $video_stats['totalFemales'] ?>)</span> Females</div>
+			<div class="stats_block"><span class='males_percent'><?php echo $video_stats['males'] ?></span> Males</div>
+			<div class="stats_block"><span class='females_percent'><?php echo $video_stats['females'] ?></span> Females</div>
 			<div class="clear"></div>
 		</div>
 		
