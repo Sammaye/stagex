@@ -1,5 +1,4 @@
 <?php
-	//$this->addCssFile('jui-theme', '/css/overcast/jquery-ui-1.8.18.custom.css');
 $this->js('statistics', "
 	$(function() {
 		var dates = $( '#from, #to' ).datepicker({
@@ -25,8 +24,8 @@ $video_stats = $model->getStatistics_dateRange(mktime(0, 0, 0, date("m"), date("
 <div class='video_analytics_body'>
 	<div class='video_stats_body grid_block alpha'>
 		<h1>Statistics for <a href='<?php echo glue::http()->url('/video/watch', array('id' => $model->_id)) ?>'><?php echo html::encode($model->title) ?></a></h1>
-		<div class='head'>Overview</div>
 		<div class="overview">
+			<div class="head">Overview:</div>
 			<div class="stats_block stats_block_first"><?php echo $model->views ?> views</div>
 			<div class="stats_block"><?php echo $model->uniqueViews ?> unique views</div>
 			<div class="stats_block likes"><?php echo $model->likes ?> likes</div>
@@ -263,37 +262,31 @@ $video_stats = $model->getStatistics_dateRange(mktime(0, 0, 0, date("m"), date("
 			") ?>
 		</div>
 		<div class="clear"></div>
-		<div style='padding:30px 0;'>
+		<div class="stats_period_caption">
 			<div class='stats_block'><span class="video_comments_count"><?php echo $video_stats['video_comments']?></span> Video Responses</div>
 			<div class='stats_block'><span class="text_comments_count"><?php echo $video_stats['text_comments']?></span> Text Responses</div>
 			<div class='stats_block likes' ><span class="likes_count"><?php echo $video_stats['video_likes']?></span> Likes</div>
 			<div class='stats_block dislikes'><span class="dislikes_count"><?php echo $video_stats['video_dislikes']?></span> Dislikes</div>
 			<div class="clear"></div>
 		</div>
-		<h3>Browsers and Age Groups</h3>
-		<p>Be-aware this data is for unique visits only. We do not record recurring visits of different browser types or age group.</p>
-
-		<div style='height:400px;'>
-			<div id="browser_container" style="min-width: 300px; height: 300px; margin: 0 auto; float:left; margin-left:20px; margin-right:80px;"></div>
-			<div id="age_group_container" style="min-width: 300px; height: 300px; margin: 0 auto; float:left;"></div>
+		<p>The pie charts below only show meaningful data for those who have filled in their profile and only for unique visits to your video</p>
+		<div class="pie_charts first">
+			<div class="stats_block chart_head_left"><span class='males_percent'>Browsers</div>
+			<div class="stats_block chart_head_right"><span class='females_percent'>Age all genders</div>		
+			<div id="browser_container" class="pie_chart left"></div>
+			<div id="age_group_container" class="pie_chart"></div>
 		</div>
-
-		<h3>Gender and Age Demographics</h3>
-		<div style='padding:20px 0;'>
-			<div class="stats_block" style='margin-left:70px;'><span class='males_percent'><?php echo $video_stats['males'] ?></span> Males</div>
-			<div class="stats_block" style='margin-left:190px;'><span class='females_percent'><?php echo $video_stats['females'] ?></span> Females</div>
-			<div class="clear"></div>
-		</div>
-		
-		<div style='height:400px;'>
-			<div id="male_age_container" style="min-width: 300px; height: 300px; margin: 0 auto; float:left; margin-left:20px; margin-right:80px;"></div>
-			<div id="female_age_container" style="min-width: 300px; height: 300px; margin: 0 auto; float:left;"></div>
+		<div class="pie_charts">
+			<div class="stats_block chart_head_left"><span class='males_percent'><?php echo $video_stats['males'] ?></span> males by age</div>
+			<div class="stats_block chart_head_right"><span class='females_percent'><?php echo $video_stats['females'] ?></span> females by age</div>		
+			<div id="male_age_container" class="pie_chart left"></div>
+			<div id="female_age_container" class="pie_chart"></div>
 		</div>		
 
 		<?php
 		// Now get the top 10 referers
 		$referers = glue::db()->video_referers->find(array('video_id' => $model->_id))->sort(array('c' => -1))->limit(10); ?>
-		<h3>Top 10 Referrers (All time)</h3>
+		<h3 class="referrers_head">Top 10 Referrers (All time)</h3>
 		<p>This data is not broken down into time spans, it represents the total referrers since you uploaded the video. It also represents
 		all views, unique and recurring.</p>
 
