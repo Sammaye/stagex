@@ -52,6 +52,9 @@ class VideoResponse extends \glue\db\Document{
 			'moderated' => array(
 				'condition' => array('approved'=>true)
 			),
+			'pending' => array(
+				'condition' => array('approved'=>false)
+			)
 		);
 	}
 
@@ -147,7 +150,7 @@ class VideoResponse extends \glue\db\Document{
 			$this->userId = $this->userId?:glue::user()->_id;
 
 			if($this->video->moderate == 1)
-				$this->approved = !glue::auth()->checkRoles(array('^' => $this->video)) ? false : true;
+				$this->approved = !glue::auth()->check(array('^' => $this->video)) ? false : true;
 			else
 				$this->approved = true;
 

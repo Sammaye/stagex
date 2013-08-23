@@ -2174,6 +2174,10 @@ input.date{
 	float:left;
 }
 
+.advanced_filter_header .ui-autocomplete-input{
+	width:400px;margin-right:20px;
+}
+
 .advanced_filter_header input{
 	vertical-align:top; margin:0; 
 }

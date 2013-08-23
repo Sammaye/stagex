@@ -241,8 +241,8 @@ $this->js('edit', "
 			<input type="button" id="settings_tab" class="btn btn-dark btn-inline left btn-tab" value="Settings"/><input type="button" id="details_tab" class="btn btn-dark btn-tab btn-inline right" value="Details"/>
 			<a href='<?php echo glue::http()->url('/video/delete', array('id' => $model->_id)) ?>' class='delete_video'>Delete</a>
 			<a href='<?php echo glue::http()->url('/video/analytics', array('id' => $model->_id)) ?>' class=''>Analytics</a>
-			<a href='<?php echo glue::http()->url('/video/delete', array('id' => $model->_id)) ?>' class=''>Responses</a>
-			<a href='<?php echo glue::http()->url('/video/delete', array('id' => $model->_id)) ?>' class=''>2 pending</a>
+			<a href='<?php echo glue::http()->url('/videoresponse/list', array('id' => $model->_id)) ?>' class=''>Responses</a>
+			<a href='<?php echo glue::http()->url('/videoresponse/pending', array('id' => $model->_id)) ?>' class=''>2 pending</a>
 		</div>
 		<div class="edit_panes">
 			<?php $form = html::activeForm(array('action' => '')) ?>
@@ -470,7 +470,7 @@ $this->js('edit', "
 			<a class='view_all' href="<?php echo glue::http()->url("/videoresponse/viewAll", array("id"=>$model->_id)) ?>">View All Responses</a>
 			<?php echo $this->renderPartial('response/list', array('model' => $model, 'comments' => 
 				glue::auth()->check(array("^"=>$model)) ? 
-					app\models\VideoResponse::model()->moderated()->find(array('videoId'=>$model->_id))->sort(array('created'=>-1)) :
+					app\models\VideoResponse::model()->find(array('videoId'=>$model->_id))->sort(array('created'=>-1)) :
 					app\models\VideoResponse::model()->public()->find(array('videoId'=>$model->_id))->sort(array('created'=>-1))
 			, 'pageSize' => 10)) ?>
 		</div>

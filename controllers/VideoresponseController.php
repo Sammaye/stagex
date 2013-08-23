@@ -8,37 +8,54 @@ class videoresponseController extends \glue\Controller{
 	public function authRules(){
 		return array(
 			array('allow',
-				'actions' => array('get_comments', 'live_comments', 'index', 'view_all', 'thread'),
+				'actions' => array('getMore', 'getNew', 'index', 'list', 'thread'),
 				'users' => array('*')
 			),
 			array( 'allow', 'users' => array('@*') ),
 			array( 'deny', 'users' => array('*') ),
 		);
 	}
+	
+	public $tab;
 
 	/**
 	 * This is the method by which all video responses for a given video are displayed at once
 	 */
 	public function action_index(){
-		glue::route('error/notfound');
+		glue::trigger('404');
 	}
 
 	public function action_list(){
-		$video = Video::model()->findOne(array('_id' => new MongoId($_GET['id'])));
-
-		$this->pageTitle = 'View All Responses - StageX';
-
-		if(!glue::roles()->checkRoles(array('deletedView' => $video))){
-			$this->render('videos/deleted', array('video'=>$video));
+		$video = Video::model()->findOne(array('_id' => new MongoId(glue::http()->param('id',''))));
+		if(!glue::auth()->check(array('viewable' => $video))){
+			echo $this->render('video/deleted');
 			exit();
 		}
 
+		$this->title = 'View All Responses for '.$video->title.' - StageX';
+		$this->layout='user_section';
+		
 		$now = new MongoDate();
-		$_SESSION['last_comment_pull'] = serialize($now);
-
-		$this->render('responses/all', array('model' => $video,
-			'comments' => Glue::roles()->checkRoles(array("^"=>$video)) ? VideoResponse::findAllComments($video, array('$lte' => $now)) :
-					VideoResponse::findPublicComments($video, array('$lte' => $now))));
+		$_SESSION['lastCommentPull'] = serialize($now);
+		echo $this->render('response/all', array('model' => $video, 'pending' => false, 'comments' => glue::auth()->check(array("^"=>$video)) ? 
+			app\models\VideoResponse::model()->find(array('videoId'=>$video->_id))->sort(array('created'=>-1)) :
+			app\models\VideoResponse::model()->public()->find(array('videoId'=>$video->_id))->sort(array('created'=>-1))
+		)); 
+	}
+	
+	public function action_pending(){
+		$video = Video::model()->findOne(array('_id' => new MongoId(glue::http()->param('id',''))));
+		if(!glue::auth()->check(array('^' => $video)))
+			glue::trigger('404');
+		
+		$this->title = 'Moderate Responses for '.$video->title.' - StageX';
+		$this->layout='user_section';
+		
+		$now = new MongoDate();
+		$_SESSION['lastCommentPull'] = serialize($now);
+		echo $this->render('response/all', array('model' => $video, 'pending' => true, 'comments' => 
+			app\models\VideoResponse::model()->find(array('videoId'=>$video->_id, 'approved'=>false))->sort(array('created'=>-1)) 
+		));		
 	}
 
 	public function action_thread(){
@@ -335,25 +352,22 @@ class videoresponseController extends \glue\Controller{
 	 * For the minute gettting live comments will refresh the list and filters and sorts. I am not sure whether I wish
 	 * to keep it this way or make it keep the filters and sorts.
 	 */
-	function action_liveresponses(){
-		$this->pageTitle = 'Get live Responses - StageX';
-
+	function action_getNew(){
 		if(!glue::http()->isAjax())
-			glue::route('error/notfound');
+			glue::trigger('404');
 
 		$video = Video::model()->findOne(array("_id"=>new MongoId(glue::http()->param('id'))));
-		if($video->user_id == glue::session()->user->_id){
-			$comments = VideoResponse::model()->find(array('vid' => $video->_id, 'deleted' => 0,
-				'user_id' => array('$ne' => glue::session()->user->_id), 'ts' => array('$gt' => unserialize($_SESSION['last_comment_pull'])))
+		if(glue::auth()->check(array('^'=>$video))){
+			$comments = VideoResponse::model()->find(array('videoId' => $video->_id, 'deleted' => 0,
+				'userId' => array('$ne' => glue::user()->_id), 'ts' => array('$gt' => unserialize($_SESSION['LastCommentPull'])))
 			)->sort(array('ts' => -1));
 		}else{
-			$comments = VideoResponse::model()->find(array('vid' => $video->_id, 'approved' => true, 'deleted' => 0,
-				'user_id' => array('$ne' => glue::session()->user->_id), 'ts' => array('$gt' => unserialize($_SESSION['last_comment_pull'])))
+			$comments = VideoResponse::model()->find(array('videoId' => $video->_id, 'approved' => true, 'deleted' => 0,
+				'userId' => array('$ne' => glue::user()->_id), 'ts' => array('$gt' => unserialize($_SESSION['LastCommentPull'])))
 			)->sort(array('ts' => -1));
 		}
-
 		// Now that I got all comments greater lets reset the session
-		echo json_encode(array('success' => true, 'number_comments' => $comments->count()));
+		$this->json_success(array('number_comments'=>$comments->count()));
 	}
 
 	function action_videosuggestions(){

@@ -680,6 +680,21 @@ class userController extends \glue\Controller{
 			?><div class="no_results_found">No subscriptions were found</div><?php
 		}
 	}
+	
+	public function action_searchSuggestions(){
+		if(!glue::http()->isAjax())
+			glue::trigger('404');
+		$term=glue::http()->param('query');
+		$users=app\models\User::model()->find(array('username'=>new MongoRegex("/$term/")));
+		
+		$suggestions=array();
+		foreach($users as $user)
+			$suggestions[]=array(
+				'label'=>$user->username
+			);
+		echo json_encode($suggestions);
+		exit();
+	}
 
 	function action_manage(){
 		$this->render('manage');

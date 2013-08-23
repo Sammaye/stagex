@@ -201,7 +201,7 @@ class videoController extends glue\Controller{
 
 	function action_watch(){
 		$now = new MongoDate();
-		$_SESSION['last_comment_pull'] = serialize($now);
+		$_SESSION['LastCommentPull'] = serialize($now);
 
 		$video = Video::model()->findOne(array("_id"=>new MongoId(glue::http()->param('id'))));
 		if(!glue::auth()->check(array('viewable' => $video))){

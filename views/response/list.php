@@ -194,7 +194,7 @@ glue::$controller->js('list', "
 	}
 
 	function get_comments_by_epoch(){
-		$.getJSON('/videoresponse/live_comments', {'id': '".strval($model->_id)."'}, function(data){
+		$.getJSON('/videoresponse/getNew', {'id': '".strval($model->_id)."'}, function(data){
 			if(data.success){
 				if(data.number_comments == 1){
 					$('.video_response_list .new_comments_notifier a').html(data.number_comments+' new comment since you start viewing');
@@ -213,7 +213,7 @@ glue::$controller->js('list', "
 
 <div class='video_response_selector' style='margin:10px 0 30px 0;'>
 	<div class='alert' style='display:none;'></div>
-	<?php if(($model->allowTextComments || $model->allowVideoComments) && glue::auth()->check(array('@'))){ ?>
+	<?php if(($model->allowTextComments || $model->allowVideoComments) && glue::auth()->check(array('@')) && (isset($hideSelector)&&$hideSelector===false)){ ?>
 		<ul class="tabs">
 			<li>Respond with:</li>
 			<?php if($model->allowTextComments): ?><li><a href="#" id="text_response_tab" class="response_tab text_response_tab selected">Comment</a></li><?php endif ?>

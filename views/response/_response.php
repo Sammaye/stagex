@@ -7,10 +7,11 @@ if($item->type == "text"){ ?>
 	data-id='<?php echo $item->_id ?>' style='margin-bottom:15px;'>
 
 	<?php if(glue::auth()->check(array('^' => $item->video)) && $mode == 'admin'){ ?>
-		<div class='comment_select'><?php echo html::checkbox('selected_comment', strval($item->_id), 0, array('class' => 'response_selector')) ?></div>
+		<div class='checkbox_col' style='float:left;padding:15px 0 0 10px;'><div class="checkbox_input" style=''><?php echo html::checkbox('comment_id[]', strval(isset($custid) ? $custid : $item->_id), 0, 
+				array('class' => 'response_selector')) ?></div></div>
 	<?php } ?>
 	
-	<div style='<?php if(glue::auth()->check(array('^' => $item->video)) && $mode == 'admin'){ echo "margin-left:29px;"; } ?>'>
+	<div style='<?php if(glue::auth()->check(array('^' => $item->video)) && $mode == 'admin'){ echo "margin-left:15px;"; } ?>float:left;'>
 	<a style='font-size:14px;font-weight:bold;line-height:20px;' href='<?php echo glue::http()->url('/user/view', array('id' => strval($item->author->_id))) ?>' class='author'><?php echo $item->author->getUsername() ?></a>
 	<span style='color:#999999;font-size:11px;margin-left:15px;line-height:20px;'><?php echo $item->ago($item->created) ?></span>
 	<div class='response_content' style='line-height:20px;'>
@@ -48,6 +49,7 @@ if($item->type == "text"){ ?>
 		<?php endif; ?>
 	</div>	
 	</div>
+	<div class="clear"></div>
 
 		<?php if(glue::auth()->check(array('@'))){ ?>
 			<div class='reply' style='display:none;'>
