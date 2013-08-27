@@ -33,7 +33,7 @@
 								button: $(this).find(settings.button),
 								settings: $.extend(true, {}, settings, {
 									type: 'itemised',
-									items: typeof items === 'object' ? items : settings.items,
+									items: typeof items === 'object' ? items : settings.items
 								})
 							}).on({ 'click': open });
 							break;
@@ -43,7 +43,7 @@
 								menu: $(this).find(settings.menu),
 								button: $(this).find(settings.button),
 								settings: $.extend(true, {}, settings, {
-									type: 'ajax',
+									type: 'ajax'
 								})								
 							}).on({ 'click': open });
 							break;
@@ -53,7 +53,7 @@
 								menu: $(this).find(settings.menu),
 								button: $(this).find(settings.button),
 								settings: $.extend(true, {}, settings, {
-									type: 'normal',
+									type: 'normal'
 								})									
 							});
 							$(this).find(settings.button).on({ 'click': open });
@@ -64,7 +64,7 @@
 					//$(this).find(settings.button).on('click', function(){ open; });
 					$(this).find(settings.menu).addClass("jdropdown-menu").data('jdropdown', {
 						_: $(this).find(settings.menu),
-						anchor: $(this), 
+						anchor: $(this) 
 						//settings: settings
 					}).css({display:'none'});
 				}

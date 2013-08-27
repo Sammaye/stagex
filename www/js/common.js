@@ -51,7 +51,7 @@ $(function(){
 		'warning_class' : 'alert-warning',
 		'info_class' : 'alert-info',
 		
-		'tpl_close' : '<a href="#" class="close">&#215;</a>',
+		'tpl_close' : '<a href="#" class="close">&#215;</a>'
 	},
 	methods = {
 		init : function(opts, type, content){

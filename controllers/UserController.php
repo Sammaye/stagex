@@ -207,12 +207,12 @@ class userController extends \glue\Controller{
 
 	function action_view(){
 		$this->layout = 'profile';
-
-		if(isset($_GET['id'])){
-			$user = User::model()->findOne(array('_id' => new MongoId($_GET['id'])));
-		}else{
-			$user = glue::session()->user;
-		} //var_dump($user);
+		if(!($user = User::model()->findOne(array('_id' => glue::http()->param('id','') )))){
+			if(glue::user()->authed){
+				$user=glue::user();
+			}else
+				glue::trigger('404');
+		}
 
 		if(!glue::roles()->checkRoles(array('deletedView' => $user)) || !$user->_id instanceof MongoId){
 			$this->layout = 'blank_page';
