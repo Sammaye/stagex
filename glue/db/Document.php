@@ -162,7 +162,7 @@ class Document extends \glue\Model{
 
 		$scopes=$this->scopes();
 		if(isset($scopes[$name])){
-			$this->setDbCriteria($this->mergeCriteria($this->_criteria, $scopes[$name]));
+			$this->setDbCriteria($this->mergeCriteria($this->getDbCriteria(), $scopes[$name]));
 			return $this;
 		}
 		return parent::__call($name,$parameters);

@@ -109,7 +109,6 @@ class videoresponseController extends \glue\Controller{
 			||($type!='text'&&$type!='video')
 		)
 			$this->json_error(self::DENIED);
-		
 		$comment->videoId = $video->_id;
 		$comment->video=$video;
 		$comment->type=$type;
@@ -145,57 +144,28 @@ class videoresponseController extends \glue\Controller{
 		}
 	}
 
-// 	public function action_approve(){
-// 		$this->pageTitle = 'Approve Video Response - StageX';
-// 		if(!glue::http()->isAjax())
-// 			glue::route('error/notfound');
-
-// 		$comment = VideoResponse::model()->findOne(array("_id"=>new MongoId($_GET['id'])));
-
-// 		if($comment){
-// 			if(!glue::roles()->checkRoles(array('^' => $comment->video)))
-// 				GJSON::kill(GJSON::DENIED);
-
-// 			$comment->approve();
-// 			ob_start();
-// 				$this->partialRender('responses/_response', array('item' => $comment, 'mode' => isset($_GET['mode']) ? $_GET['mode'] : ''));
-// 				$comment_html = ob_get_contents();
-// 			ob_end_clean();
-// 			GJSON::kill(array('html' => $comment_html), true);
-// 		}else{
-// 			GJSON::kill(GJSON::UNKNOWN);
-// 		}
-// 	}
-
 	public function action_approve(){
-		$this->pageTitle = 'Approve Many Video Responses - StageX';
-		if(!glue::http()->isAjax())
-			glue::route('error/notfound');
-
-		$video_id = isset($_GET['vid']) ? $_GET['vid'] : null;
-		$_ids = isset($_GET['ids']) ? $_GET['ids'] : array();
-
-		$video = Video::model()->findOne(array('_id' => new MongoId($video_id)));
-
-		if(count($_ids) <= 0 || !is_array($_ids) || !$video){
-			GJSON::kill(GJSON::UNKNOWN);
+		if(!glue::auth()->check('ajax','post'))
+			glue::trigger('404');
+		extract(glue::http()->param(array('video_id','ids')),null);
+		
+		$video = app\models\Video::model()->findOne(array('_id' => new MongoId($video_id)));
+		if(!$ids||!$video||(is_array($ids)&&count($ids)<=0))
+			$this->json_error(self::UNKNOWN);
+		if(!glue::auth()->check(array('^' => $video)))
+			$this->json_error(self::DENIED);		
+		
+		$mongoIds=array();
+		foreach($ids as $k => $v){
+			$mongoIds[] = new MongoId($v);
 		}
-
-		if(!glue::roles()->checkRoles(array('^' => array($video))))
-			GJSON::kill(GJSON::DENIED);
-
-		foreach($_ids as $k => $v){
-			$_ids[$k] = new MongoId($v);
-		}
-
-		$comment_rows = VideoResponse::model()->find(array('_id' => array('$in' => $_ids), 'vid' => $video->_id));
-		if(count($_ids) != $comment_rows->count())
-			GJSON::kill('Some of the comments you specified could not be found');
-
-		foreach($comment_rows as $k => $v){
-			$v->approve();
-		}
-		GJSON::kill('The comments you selected were approved', true);
+		
+		$comments = app\models\VideoResponse::model()->find(array('_id' => array('$in' => $mongoIds), 'videoId' => $video->_id))->limit(1000); 
+		$row_count = $comments->count();
+		foreach($comments as $comment)
+			$comment->approve();
+		$this->json_success(array('message'=>'The comments you specified were approved', 'total'=>count($mongoIds), 'updated'=>$row_count,
+				'failed' => count($mongoIds)-$row_count));		
 	}
 
 	public function action_like(){

@@ -149,11 +149,10 @@ class VideoResponse extends \glue\db\Document{
 		if($this->getIsNewRecord()){
 			$this->userId = $this->userId?:glue::user()->_id;
 
-			if($this->video->moderate == 1)
+			if($this->video->moderated)
 				$this->approved = !glue::auth()->check(array('^' => $this->video)) ? false : true;
 			else
 				$this->approved = true;
-
 			if($this->getScenario() == 'video_comment'){
 				$this->type = 'video';
 			}elseif($this->getScenario() == 'text_comment'){
@@ -230,7 +229,7 @@ class VideoResponse extends \glue\db\Document{
 	}
 
 	function currentUserLikes(){
-		return $this->Db('videoresponse_likes')->findOne(array('userId' => glue::user()->_id, 'responseId' => $this->_id));
+		return glue::db()->videoresponse_likes->findOne(array('userId' => glue::user()->_id, 'responseId' => $this->_id));
 	}
 
 	function like(){

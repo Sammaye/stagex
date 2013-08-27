@@ -143,7 +143,7 @@ class Collection implements \Iterator,\ArrayAccess,\Countable{
 	    }
 	    $arrays = func_get_args();
 	    $merged = array();
-
+	    
 	    while ($arrays) {
 	        $array = array_shift($arrays);
 	        if (!is_array($array)) {
@@ -155,7 +155,7 @@ class Collection implements \Iterator,\ArrayAccess,\Countable{
 	        foreach ($array as $key => $value)
 	            if (is_string($key))
 	                if (is_array($value) && array_key_exists($key, $merged) && is_array($merged[$key]))
-	                    $merged[$key] = call_user_func(__FUNCTION__, $merged[$key], $value);
+	                    $merged[$key] = call_user_func(__METHOD__, $merged[$key], $value);
 	                else
 	                    $merged[$key] = $value;
 	            else

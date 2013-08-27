@@ -467,7 +467,7 @@ $this->js('edit', "
 		<?php if($model->allowTextComments||$model->allowVideoComments): ?>
 		<div class="video_comments">
 			<div class="head"><?php echo $model->totalResponses ?> responses</div>
-			<a class='view_all' href="<?php echo glue::http()->url("/videoresponse/viewAll", array("id"=>$model->_id)) ?>">View All Responses</a>
+			<a class='view_all' href="<?php echo glue::http()->url("/videoresponse/list", array("id"=>$model->_id)) ?>">View All Responses</a>
 			<?php echo $this->renderPartial('response/list', array('model' => $model, 'comments' => 
 				glue::auth()->check(array("^"=>$model)) ? 
 					app\models\VideoResponse::model()->find(array('videoId'=>$model->_id))->sort(array('created'=>-1)) :

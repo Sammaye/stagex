@@ -81,15 +81,27 @@ glue::$controller->js('list', "
 			}
 		});
 	});
-
-	$(document).on('click', '.response .delete', function(event){
+		
+	$(document).on('click', '.response .btn_delete', function(event){
 		event.preventDefault();
 		var el = $(this).parents('.response');
 
 		$.post('/videoresponse/delete', { ids: [el.data().id], video_id:'".strval($model->_id)."' }, function(data){
-			if(data.success)
+			if(data.success&&data.updated>0)
 				el.remove();
 		},'json');
+	});
+				
+	$(document).on('click', '.response .btn_approve', function(event){
+		event.preventDefault();
+		var el = $(this).parents('.response');
+
+		$.get('/videoresponse/approve', { ids: [el.data().id], video_id:'".strval($model->_id)."' }, function(data){
+			if(data.success&&data.updated>0){
+				el.find('.btn_pending').remove();
+				el.find('.btn_approved').css({display:'inline-block'});
+			}
+		}, 'json');
 	});
 
 	$(document).on('click', '.video_response_item .reply_button', function(event){
@@ -134,17 +146,7 @@ glue::$controller->js('list', "
 		}, 'json');
 	});
 
-	$(document).on('click', '.video_response_item .approve_button', function(event){
-		event.preventDefault();
-		var el = $(this), item = $(this).parents('.video_response_item'),
-			mode = $('.video_response_list').data('mode') == null ? '' : $('.video_response_list').data('mode');
 
-		$.get('/videoresponse/approve', { 'id': item.data().id, mode: mode }, function(data){
-			if(data.success){
-				item.replaceWith($(data.html));
-			}
-		}, 'json');
-	});
 
 	$(document).on('click', '.video_response_item .expand_comment_parent', function(event){
 		event.preventDefault();
@@ -213,7 +215,7 @@ glue::$controller->js('list', "
 
 <div class='video_response_selector' style='margin:10px 0 30px 0;'>
 	<div class='alert' style='display:none;'></div>
-	<?php if(($model->allowTextComments || $model->allowVideoComments) && glue::auth()->check(array('@')) && (isset($hideSelector)&&$hideSelector===false)){ ?>
+	<?php if(($model->allowTextComments || $model->allowVideoComments) && glue::auth()->check(array('@')) && (!isset($hideSelector)||$hideSelector===false)){ ?>
 		<ul class="tabs">
 			<li>Respond with:</li>
 			<?php if($model->allowTextComments): ?><li><a href="#" id="text_response_tab" class="response_tab text_response_tab selected">Comment</a></li><?php endif ?>

@@ -28,26 +28,28 @@ if($item->type == "text"){ ?>
 			<i class='small'>This response has been deleted</i>
 		<?php } ?>
 	</div>
+	<?php if(glue::auth()->check(array('@'))||$item->thread_parent): ?>
 	<div class='response_footer' style='line-height:20px;margin-top:7px;'>
-		 <?php if(glue::auth()->check(array('@'))): ?>
-		 	<span style='margin-right:30px;'>
-			<?php if($item->approved): ?>
-				<?php if($item->video->voteable_comments){ echo utf8_decode('&#183;').' '; if($item->currentUserLikes()): ?><a href='#' class='unlike'>Unlike</a><?php else: ?><a href='#' class='like'>Like</a><?php endif; } ?>
-				<span class='likes'><?php if($item->likes > 0): echo "+".$item->likes; endif ?></span>
-				<?php if($item->video->txt_coms_allowed && !glue::auth()->check(array('^' => $item))){ ?><a href='#' class='reply_button'>Comment</a><?php } ?>
-			<?php else: ?>
-				<span class='warning_message'>Comment Awaiting Moderation</span>
-			<?php endif; ?>
-			
-			<?php if(glue::auth()->check(array('^' => $item)) || glue::auth()->check(array('^' => $item->video))){ ?>
-				<a href='#' class='delete'>Delete</a>
-			<?php }
-			if($item->thread_parent):
-				echo "<a href='".glue::http()->url('/videoresponse/thread', array('id' => $item->_id))."' target='_blank'>View thread</a> ";
-			endif; ?>			
+		<span class="btn_approved" style="<?php if(!$item->approved) echo "display:none;"; ?>">
+		<?php if($item->video->voteableComments): ?>
+			<span class="response_likes footer_block">
+		 	<?php if($item->currentUserLikes()): ?><a href='#' class='btn_unlike'>Unlike</a><?php else: ?><a href='#' class='btn_like'>Like</a><?php endif; ?>
+			<span class='likes'><?php if($item->likes > 0): echo "+".$item->likes; endif ?></span>
 			</span>
 		<?php endif; ?>
-	</div>	
+		<?php if($item->video->allowTextComments && !glue::auth()->check(array('^' => $item))){ ?><a href='#' class='btn_reply footer_block'>Reply</a><?php } ?>
+		</span>	
+		<?php if(!$item->approved): ?><span class='btn_pending footer_block' style='color:#C09853;'>Pending 
+			<?php if(glue::auth()->check(array('^' => $item->video))): ?><a href="#" class="btn_approve">Approve</a><?php endif; ?></span><?php endif; ?>
+
+		<?php if(glue::auth()->check(array('^' => $item)) || glue::auth()->check(array('^' => $item->video))){ ?>
+			<a href='#' class='btn_delete footer_block'>Delete</a>
+		<?php }
+		if($item->thread_parent):
+			echo "<a href='".glue::http()->url('/videoresponse/thread', array('id' => $item->_id))."' class='footer_block' target='_blank'>View thread</a> ";
+		endif; ?>			
+	</div>
+	<?php endif; ?>	
 	</div>
 	<div class="clear"></div>
 
