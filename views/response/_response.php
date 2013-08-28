@@ -53,22 +53,20 @@ if($item->type == "text"){ ?>
 	</div>
 	<div class="clear"></div>
 
-		<?php if(glue::auth()->check(array('@'))){ ?>
-			<div class='reply' style='display:none;'>
-				<div class='reply_inner'>
-					<div class='block_summary' style='display:none;'></div>
-					<div class='user_img'><img alt='thumbnail' src='<?php echo glue::user()->getAvatar(40, 40); ?>'/></div>
-					<div class='reply_right'>
-						<?php echo html::textarea('reply_comment_content', null, array('class' => 'reply_comment_content')) ?>
-						<div class='reply_footer'>
-							<div class='green_css_button post_comment_reply' style='float:left;'>Post reply</div>
-							<div class='grey_css_button cancel' style='float:left; margin-left:7px;'>Cancel</div>
-						</div>
-					</div>
-					<div class="clear"></div>
-				</div>
+	<?php if(glue::auth()->check(array('@'))&&$item->video->allowTextComments){ ?>
+	<div class='reply' style='display:none;margin:15px 0 0 35px;'>
+		<div class='alert' style='display:none;'></div>
+		<div class='user_img' style='float:left;width:40px;margin-right:15px;'><img alt='thumbnail' src='<?php echo glue::user()->getAvatar(40, 40); ?>'/></div>
+		<div class='reply_right' style='float:left;width:90%;'>
+			<?php echo html::textarea('reply_comment_content', null, array('class' => 'reply_comment_content')) ?>
+			<div class='reply_footer'>
+			<input type="button" class="btn-success btn_post_reply" value="Post" style='float:left;'/>
+			<input type="button" class="btn btn_cancel" value="Cancel" style='float:left; margin-left:25px;'/>
 			</div>
-		<?php } ?>
+		</div>
+		<div class="clear"></div>
+	</div>
+	<?php } ?>
 
 		<?php if($item->thread_parent): ?>
 			<div class='thread_parent_viewer'>

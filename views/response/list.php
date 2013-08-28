@@ -104,44 +104,35 @@ glue::$controller->js('list', "
 		}, 'json');
 	});
 
-	$(document).on('click', '.video_response_item .reply_button', function(event){
+	$(document).on('click', '.response .btn_reply', function(event){
 		event.preventDefault();
-		var el = $(this).parents('.video_response_item');
+		var el = $(this).parents('.response');
 
-		el.addClass('expanded');
+		el.find('.reply .alert').summarise();
+		el.find('.reply .alert').summarise('reset');	
 		el.find('.reply').css({ 'display': 'block' }).find('textarea').focus();
 	});
 
-	$(document).on('click', '.video_response_item .reply .cancel', function(event){
+	$(document).on('click', '.response .reply .btn_cancel', function(event){
 		event.preventDefault();
-		var item = $(this).parents('.video_response_item');
-
-		if(item.find('.thread_parent_viewer').css('display') != 'block'){ // Then remove expanded class
-			item.removeClass('expanded');
-		}
-		item.find('.reply').css({ 'display':'none' });
+		$(this).parents('.response').find('.reply').css({ 'display':'none' });
 	});
 
-	$(document).on('click', '.video_response_item .reply .post_comment_reply', function(event){
+	$(document).on('click', '.response .btn_post_reply', function(event){
 		event.preventDefault();
-		var el = $(this), item = $(this).parents('.video_response_item'),
-			sort = $('.video_response_list').data('sort') == null ? '' : $('.video_response_list').data('sort'),
+		var el = $(this), item = $(this).parents('.response'),
 			mode = $('.video_response_list').data('mode') == null ? '' : $('.video_response_list').data('mode');
 
-		$.post('/videoresponse/add_response', { 'parent_comment': item.data().id, 'content':  item.find('.reply').find('textarea').val(),
-			sort: sort, mode: mode, vid: '".strval($model->_id)."', type: 'text'}, function(data){
+		$.post('/videoresponse/add', { 'parent_comment': item.data().id, 'content':  item.find('.reply').find('textarea').val(),
+			sort: sort, mode: mode, video_id: '".strval($model->_id)."', type: 'text'}, function(data){
 
-			forms.reset(item.find('.block_summary'));
+			item.find('.reply .alert').summarise();
 			if(data.success){
 				item.find('textarea').val('');
 				item.find('.reply').css({ 'display':'none' });
 				item.after($(data.html).addClass('thread_comment'));
-
-				if(item.find('.thread_parent_viewer').css('display') != 'block'){ // Then remove expanded class
-					item.removeClass('expanded');
-				}
 			}else{
-				forms.summary(item.find('.block_summary'), false, 'Your reply could not be posted because:', data.messages);
+				item.find('.reply .alert').summarise('set','error',{message:'Your reply could not be posted because:', list:data.messages});
 			}
 		}, 'json');
 	});

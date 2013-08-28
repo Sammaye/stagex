@@ -2525,3 +2525,9 @@ input.date{
 .video_analytics_body .referrers_head{
 	margin-top:40px;
 }
+
+.response .reply_comment_content{
+	width:80%;
+	height:80px;
+	border-radius:3px;
+}
