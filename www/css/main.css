@@ -2531,3 +2531,7 @@ input.date{
 	height:80px;
 	border-radius:3px;
 }
+
+.response.thread_comment .content{
+	margin-left:25px;
+}

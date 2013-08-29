@@ -28,42 +28,42 @@ class VideoResponse extends \glue\db\Document{
 
 	function behaviours(){
 		return array(
-			'timestampBehaviour' => array(
-				'class' => 'glue\\behaviours\\Timestamp'
-			)
+				'timestampBehaviour' => array(
+						'class' => 'glue\\behaviours\\Timestamp'
+				)
 		);
 	}
 
 	function defaultScope(){
 		return array(
-			'condition' => array('deleted' => 0),
-			'sort' => array('created'=>-1)
+				'condition' => array('deleted' => 0),
+				'sort' => array('created'=>-1)
 		);
 	}
 
 	function scopes(){
 		return array(
-			'public' => array(
-				'condition' => array('$or' => array(
-					array('approved' => true),
-					array('userId' => glue::user()->_id)
-				))
-			),
-			'moderated' => array(
-				'condition' => array('approved'=>true)
-			),
-			'pending' => array(
-				'condition' => array('approved'=>false)
-			)
+				'public' => array(
+						'condition' => array('$or' => array(
+								array('approved' => true),
+								array('userId' => glue::user()->_id)
+						))
+				),
+				'moderated' => array(
+						'condition' => array('approved'=>true)
+				),
+				'pending' => array(
+						'condition' => array('approved'=>false)
+				)
 		);
 	}
 
 	function relations(){
 		return array(
-			"author" => array('one', 'app\\models\\User', "_id", 'on' => 'userId'),
-			"video" => array('one', 'app\\models\\Video', "_id", 'on' => 'videoId'),
-			"reply_video" => array('one', 'app\\models\\Video', "_id", 'on' => 'replyVideoId'),
-			'thread_parent' => array('one', 'app\\models\\VideoResponse', '_id', 'on' => 'threadParentId')
+				"author" => array('one', 'app\\models\\User', "_id", 'on' => 'userId'),
+				"video" => array('one', 'app\\models\\Video', "_id", 'on' => 'videoId'),
+				"reply_video" => array('one', 'app\\models\\Video', "_id", 'on' => 'replyVideoId'),
+				'thread_parent' => array('one', 'app\\models\\VideoResponse', '_id', 'on' => 'threadParentId')
 		);
 	}
 
@@ -86,49 +86,49 @@ class VideoResponse extends \glue\db\Document{
 	function beforeValidate(){
 		// Custom error handling which makes sure we are actually allowed to post comments to this video before we do.
 		if($this->getIsNewRecord()){
-// 			if($this->getScenario() == 'video_comment'){
-// 				if(!$this->video->allowVideoComments){
-// 					$this->addError('Video responses are currently disabled for this video');
-// 					return false;
-// 				}
-// 			}elseif($this->getScenario() == 'text_comment'){
-// 				if(!$this->video->allowTextComments){
-// 					$this->addError('Text responses are currently disabled for this video');
-// 					return false;
-// 				}
-// 			}
+			// 			if($this->getScenario() == 'video_comment'){
+			// 				if(!$this->video->allowVideoComments){
+			// 					$this->addError('Video responses are currently disabled for this video');
+			// 					return false;
+			// 				}
+			// 			}elseif($this->getScenario() == 'text_comment'){
+			// 				if(!$this->video->allowTextComments){
+			// 					$this->addError('Text responses are currently disabled for this video');
+			// 					return false;
+			// 				}
+			// 			}
 		}
 		return true;
 	}
 
 	function rules(){
 		return array(
-			array('videoId', 'required', 'message' => 'An unknown error occured. Try refreshing the page to fix this.'),
-			array('videoId', 'objExist',
-				'class'=>'app\\models\\Video',
-				'field'=>'_id',
-				'allowNull' => true, 'message' => 'The video you are replying to might no longer exist. Either way we cannot seem to find it now'
-			),
-			array('content', 'required', 'on' => 'text_comment', 'message' => 'You must enter at least something into the comment field to post a text response.'),
-			array('content', 'string', 'max' => '1500', 'message' => 'You can only write 1500 characters for a comment.'),
+				array('videoId', 'required', 'message' => 'An unknown error occured. Try refreshing the page to fix this.'),
+				array('videoId', 'objExist',
+						'class'=>'app\\models\\Video',
+						'field'=>'_id',
+						'allowNull' => true, 'message' => 'The video you are replying to might no longer exist. Either way we cannot seem to find it now'
+				),
+				array('content', 'required', 'on' => 'text_comment', 'message' => 'You must enter at least something into the comment field to post a text response.'),
+				array('content', 'string', 'max' => '1500', 'message' => 'You can only write 1500 characters for a comment.'),
 
-			array('replyVideoId', 'required', 'on' => 'video_comment', 'message' => 'You must specify a video to repond with'),
-			array('replyVideoId', 'objExist',
-				'class'=>'app\\models\\Video',
-				'field'=>'_id',
-				'allowNull' => true,
-				'on' => 'video_comment', 'message' => 'The video you selected cannot be validated. Please choose a different video.'
-			),
-			array('replyVideoId', 'check_already_reply', 'message' => 'This video has already been used as a reply on this one.', 'on' => 'video_comment'),
-			array('replyVideoId', 'check_same_video', 'message' => 'The same video being watched cannot be added as a reply.', 'on' => 'video_comment'),
+				array('replyVideoId', 'required', 'on' => 'video_comment', 'message' => 'You must specify a video to repond with'),
+				array('replyVideoId', 'objExist',
+						'class'=>'app\\models\\Video',
+						'field'=>'_id',
+						'allowNull' => true,
+						'on' => 'video_comment', 'message' => 'The video you selected cannot be validated. Please choose a different video.'
+				),
+				array('replyVideoId', 'check_already_reply', 'message' => 'This video has already been used as a reply on this one.', 'on' => 'video_comment'),
+				array('replyVideoId', 'check_same_video', 'message' => 'The same video being watched cannot be added as a reply.', 'on' => 'video_comment'),
 
-			array('threadParentUsername', 'safe', 'on' => 'text_comment'),
-			array('threadParentUsername', 'objExist',
-				'class'=>'app\\models\\VideoResponse',
-				'field'=>'_id',
-				'allowNull' => true,
-				'on' => 'text_comment', 'message' => 'The comment you were replying to might no longer exist. Either way we cannot seem to find it now.'
-			)
+				array('threadParentUsername', 'safe', 'on' => 'text_comment'),
+				array('threadParentId', 'objExist',
+						'class'=>'app\\models\\VideoResponse',
+						'field'=>'_id',
+						'allowNull' => true,
+						'on' => 'text_comment', 'message' => 'The comment you were replying to might no longer exist. Either way we cannot seem to find it now.'
+				)
 		);
 	}
 
@@ -167,7 +167,7 @@ class VideoResponse extends \glue\db\Document{
 			if($this->video->listing != 1 && $this->video->listing != 2){
 				\app\models\Stream::commentedOn($this->userId, $this->videoId, $this->_id);
 			}
-			
+				
 			if($this->thread_parent instanceof \app\models\VideoResponse)
 				$this->path = rtrim($this->thread_parent->path.','.strval($this->_id),',');
 			else
@@ -184,23 +184,23 @@ class VideoResponse extends \glue\db\Document{
 			if($this->getScenario() == 'text_comment')
 				$counters['totalTextResponses']=1;
 			$this->video->saveCounters($counters);
-			
+				
 			$this->video->record_statistic($this->getScenario() == 'video_comment' ? 'video_comment' : 'text_comment');
 
 			if(!glue::auth()->check(array('^' => $this->video))){
 
 				if($this->video->author->emailVideoResponses){
 					glue::mailer()->mail($this->video->author->email, array('no-reply@stagex.co.uk', 'StageX'), 'Someone replied to one of you videos on StageX',
-						"videos/new_comment.php", array( 'username' => $this->video->author->username, 'approved' => $this->approved,
-						'comment' => $this, 'from' => $this->author, 'video' => $this->video ));
+					"videos/new_comment.php", array( 'username' => $this->video->author->username, 'approved' => $this->approved,
+					'comment' => $this, 'from' => $this->author, 'video' => $this->video ));
 				}
 				\app\models\Notification::newVideoResponse($this->video->user_id, $this->video->_id, $this->approved);
 			}
 			if($this->parent_comment && $this->approved){
 				if($this->thread_parent->author->emailVideoResponses){
 					glue::mailer()->mail($this->thread_parent->author->email, array('no-reply@stagex.co.uk', 'StageX'), 'Someone replied to one of you comments on StageX',
-						"videos/new_comment_reply.php", array( 'username' => $this->thread_parent->author->username,
-						'comment' => $this, 'from' => $this->author, 'video' => $this->video ));
+					"videos/new_comment_reply.php", array( 'username' => $this->thread_parent->author->username,
+					'comment' => $this, 'from' => $this->author, 'video' => $this->video ));
 				}
 				\app\models\Notification::newVideoResponseReply($this->thread_parent->_id, $this->thread_parent->userId, $this->_id, $this->video->_id);
 			}
@@ -217,8 +217,8 @@ class VideoResponse extends \glue\db\Document{
 
 				if(!glue::auth()->check(array('^' => $this->video)) && $this->thread_parent->author->email_vid_response_replies){
 					glue::mailer()->mail($this->thread_parent->author->email, array('no-reply@stagex.co.uk', 'StageX'), 'Someone replied to one of you comments on StageX',
-						"videos/new_comment_reply.php", array( 'username' => $this->thread_parent->author->username,
-						'comment' => $this, 'from' => $this->author, 'video' => $this->video ));
+					"videos/new_comment_reply.php", array( 'username' => $this->thread_parent->author->username,
+					'comment' => $this, 'from' => $this->author, 'video' => $this->video ));
 				}
 				\app\models\Notification::newVideoResponseReply($this->thread_parent->_id, $this->thread_parent->userId, $this->_id, $this->video->_id, $this->userId);
 			}
@@ -234,9 +234,9 @@ class VideoResponse extends \glue\db\Document{
 
 	function like(){
 		glue::db()->videoresponse_likes->update(
-			array("userId"=>glue::user()->_id, "responseId"=>$this->_id),
-			array("userId"=>glue::user()->_id, "responseId"=>$this->_id, "weight"=>"+1", 'videoId' => $this->videoId, "ts" => new MongoDate()),
-			array("upsert"=>true)
+		array("userId"=>glue::user()->_id, "responseId"=>$this->_id),
+		array("userId"=>glue::user()->_id, "responseId"=>$this->_id, "weight"=>"+1", 'videoId' => $this->videoId, "ts" => new MongoDate()),
+		array("upsert"=>true)
 		);
 
 		$this->likes = $this->likes+1;
@@ -252,10 +252,7 @@ class VideoResponse extends \glue\db\Document{
 	}
 
 	function delete(){
-		$video = $this->video;
-		$video->total_responses = $video->total_responses-1;
-		$video->save();
-
+		$this->video->saveCounters(array('totalResponses'=>-1),0);
 		glue::db()->videoresponse_likes->remove(array("responseId"=>$this->_id));
 		parent::delete();
 	}

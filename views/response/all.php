@@ -36,13 +36,14 @@ $this->js('admin', "
 		}
 	});			
 
-	$(document).on('click', '.responses_toolbar .btn_delete', function(event){
+	$(document).on('click', '.stickytoolbar-bar .btn_delete', function(event){
 		params={'ids[]':[]};
 		$('.video_response_list .checkbox_col input:checked').each(function(i,item){
 			params['ids[]'][params['ids[]'].length]=$(item).val();
 		});
+		params['video_id']='".$model->_id."';
 
-		$.post('/videoresponse/batchDelete', params, null, 'json').done(function(data){
+		$.post('/videoresponse/delete', params, null, 'json').done(function(data){
 			if(data.success){
 				$('.grey_sticky_toolbar .block-alert').summarise('set', 'success','The responses you selected were deleted');
 				$.each(params['ids[]'],function(i,item){
@@ -55,20 +56,23 @@ $this->js('admin', "
 		}, 'json');			
 	});
 
-	$(document).on('click', '.responses_toolbar .btn_approve', function(event){
+	$(document).on('click', '.stickytoolbar-bar .btn_approve', function(event){
 		params={'ids[]':[]};
 		$('.video_response_list .checkbox_col input:checked').each(function(i,item){
 			params['ids[]'][params['ids[]'].length]=$(item).val();
 		});
-		$.post('/videoresponse/batchDelete', params, null, 'json').done(function(data){
+		params['video_id']='".$model->_id."';
+		
+		$.post('/videoresponse/approve', params, null, 'json').done(function(data){
 			if(data.success){
-				$('.grey_sticky_toolbar .block-alert').summarise('set', 'success','The responses you selected were deleted');
+				$('.grey_sticky_toolbar .block-alert').summarise('set', 'success','The responses you selected were approved');
 				$.each(params['ids[]'],function(i,item){
-					$('.video_response_list .response[data-id='+item+']').remove();
+					$('.video_response_list .response[data-id='+item+']').find('.btn_pending').remove();
+					$('.video_response_list .response[data-id='+item+']').find('.btn_approved').css({display:'inline-block'});
 				});
 				reset_checkboxes();
 			}else{
-				$('.grey_sticky_toolbar .block-alert').summarise('set', 'error','The responses you selected could not be deleted');
+				$('.grey_sticky_toolbar .block-alert').summarise('set', 'error','The responses you selected could not be approved');
 			}
 		}, 'json');			
 	});		

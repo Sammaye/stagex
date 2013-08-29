@@ -226,11 +226,16 @@ class videoresponseController extends \glue\Controller{
 		else // If this is not done by the owner the user can only delete their own comments
 			$condition=array('_id' => array('$in' => $mongoIds), 'videoId' => $video->_id, 'userId'=>glue::user()->_id);
 
-		$comments = app\models\VideoResponse::model()->findAll($condition)->limit(1000); $row_count = $comments->count();
+		$comments = app\models\VideoResponse::model()->findAll($condition)->limit(1000); 
+		$row_count = $comments->count();
+		
+		$text_count=app\models\VideoResponse::model()->findAll(array_merge($condition,array('type'=>'text')))->limit(1000)->count();
+		$video_count=app\models\VideoResponse::model()->findAll(array_merge($condition,array('type'=>'video')))->limit(1000)->count();
+		
 		app\models\VideoResponse::model()->deleteAll($condition);
 		glue::db()->videoresponse_likes->remove(array("response_id"=>array('$in' => $mongoIds)));
-
-		$video->saveCounters(array('totalResponses'=>-$row_count),0);
+		$video->saveCounters(array('totalResponses'=>-$row_count,'totalTextResponses'=>-$text_count,'totalVideoResponses'=>-$video_count),0);
+		
 		$this->json_success(array('message'=>'The comments you specified were deleted', 'total'=>count($mongoIds), 'updated'=>$row_count,
 			'failed' => count($mongoIds)-$row_count));
 	}

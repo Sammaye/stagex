@@ -124,9 +124,10 @@ glue::$controller->js('list', "
 			mode = $('.video_response_list').data('mode') == null ? '' : $('.video_response_list').data('mode');
 
 		$.post('/videoresponse/add', { 'parent_comment': item.data().id, 'content':  item.find('.reply').find('textarea').val(),
-			sort: sort, mode: mode, video_id: '".strval($model->_id)."', type: 'text'}, function(data){
+			mode: mode, video_id: '".strval($model->_id)."', type: 'text'}, function(data){
 
 			item.find('.reply .alert').summarise();
+			item.find('.reply .alert').summarise('close');
 			if(data.success){
 				item.find('textarea').val('');
 				item.find('.reply').css({ 'display':'none' });
@@ -202,6 +203,11 @@ glue::$controller->js('list', "
 		});
 	}
 "); // All Response list related stuff gets shoved into here
+
+if(isset($ajaxPagination)&&$ajaxPagination){
+	
+}
+
 ?>
 
 <div class='video_response_selector' style='margin:10px 0 30px 0;'>

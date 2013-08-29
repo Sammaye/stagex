@@ -11,12 +11,12 @@ if($item->type == "text"){ ?>
 				array('class' => 'response_selector')) ?></div></div>
 	<?php } ?>
 	
-	<div style='<?php if(glue::auth()->check(array('^' => $item->video)) && $mode == 'admin'){ echo "margin-left:15px;"; } ?>float:left;'>
+	<div class="content" style='<?php if(glue::auth()->check(array('^' => $item->video)) && $mode == 'admin'){ echo "margin-left:15px;"; } ?>float:left;'>
 	<a style='font-size:14px;font-weight:bold;line-height:20px;' href='<?php echo glue::http()->url('/user/view', array('id' => strval($item->author->_id))) ?>' class='author'><?php echo $item->author->getUsername() ?></a>
 	<span style='color:#999999;font-size:11px;margin-left:15px;line-height:20px;'><?php echo $item->ago($item->created) ?></span>
 	<div class='response_content' style='line-height:20px;'>
 		<?php if($item->thread_parent instanceof app\models\VideoResponse): 
-			echo \html::a(glue::http()->url('/user/view', array('id' => strval($item->thread_parent->author->_id))),"@".$item->thread_parent->author->getUsername());
+			echo \html::a(array('href'=>glue::http()->url('/user/view', array('id' => strval($item->thread_parent->author->_id))),'text'=>"@".$item->thread_parent->author->getUsername()));
 		elseif($item->threadParentId instanceof \MongoId):
 			echo "@".$item->threadParentUsername;
 		endif;
@@ -55,7 +55,7 @@ if($item->type == "text"){ ?>
 
 	<?php if(glue::auth()->check(array('@'))&&$item->video->allowTextComments){ ?>
 	<div class='reply' style='display:none;margin:15px 0 0 35px;'>
-		<div class='alert' style='display:none;'></div>
+		<div class='alert' style='display:none;margin-bottom:10px;width:80%;'></div>
 		<div class='user_img' style='float:left;width:40px;margin-right:15px;'><img alt='thumbnail' src='<?php echo glue::user()->getAvatar(40, 40); ?>'/></div>
 		<div class='reply_right' style='float:left;width:90%;'>
 			<?php echo html::textarea('reply_comment_content', null, array('class' => 'reply_comment_content')) ?>
@@ -69,7 +69,7 @@ if($item->type == "text"){ ?>
 	<?php } ?>
 
 		<?php if($item->thread_parent): ?>
-			<div class='thread_parent_viewer'>
+			<div class='thread_parent_viewer' style='display:none;'>
 				<div class='indented_bar'><div>&nbsp;</div></div>
 				<?php if($item->thread_parent->deleted == 1 || !$item->thread_parent){ ?>
 					<i>This comment has since been removed</i>
