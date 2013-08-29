@@ -1,4 +1,7 @@
 <?php
+
+$ajaxPagination=isset($ajaxPagination)?$ajaxPagination:false;
+
 glue::$controller->jsFile("/js/autosize.js");
 
 glue::$controller->js('response_selector', "
@@ -270,7 +273,7 @@ if(isset($ajaxPagination)&&$ajaxPagination){
 				"cursor"	 => $comments,
 				'template' 	 => $template,
 				'data' 		 => array('mode' => isset($mode) ? $mode : ''),
-				'enableAjaxPagination' => true,				
+				'enableAjaxPagination' => $ajaxPagination?:false,				
 				'itemView' => 'response/_response.php',
 				'pagerCssClass' => 'grid_list_pager'
 		));	 ?>

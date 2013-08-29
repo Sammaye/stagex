@@ -472,7 +472,7 @@ $this->js('edit', "
 				glue::auth()->check(array("^"=>$model)) ? 
 					app\models\VideoResponse::model()->find(array('videoId'=>$model->_id))->sort(array('created'=>-1)) :
 					app\models\VideoResponse::model()->public()->find(array('videoId'=>$model->_id))->sort(array('created'=>-1))
-			, 'pageSize' => 10)) ?>
+			, 'pageSize' => 10, 'ajaxPagination'=>true)) ?>
 		</div>
 		<?php endif ?>
 	</div>

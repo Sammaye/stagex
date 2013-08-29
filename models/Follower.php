@@ -33,7 +33,7 @@ class Follower extends \glue\db\Document{
 		$_ids = array();
 
 		foreach($rows as $k => $row){
-			$_ids[] = $row['to_id'];
+			$_ids[] = $row->toId;
 		}
 		return $_ids;
 	}

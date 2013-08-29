@@ -120,7 +120,10 @@ $this->js('admin', "
 					<button class='btn btn-success selected_actions btn_approve'>Approve</button>
 					<button class='btn-grey selected_actions btn_delete'>Delete</button>
 					<?php endif; ?>
-					<a href="#" data-filter="text">Text (<?php echo $model->totalTextResponses ?>)</a><a href="#" data-filter="video">Video (<?php echo $model->totalVideoResponses ?>)</a>
+					<a href="<?php echo glue::http()->url(array("sort"=>'created','order'=>'-1')) ?>">Newest</a>
+					<a href="<?php echo glue::http()->url(array("sort"=>'likes','order'=>'-1')) ?>">Most Liked</a>
+					<a href="<?php echo glue::http()->url(array("filter"=>'type','filter_value'=>'text')) ?>">Text (<?php echo $model->totalTextResponses ?>)</a>
+					<a href="<?php echo glue::http()->url(array("filter"=>'type','filter_value'=>'video')) ?>">Video (<?php echo $model->totalVideoResponses ?>)</a>
 				</div>
 				<div class="alert block-alert"></div>
 			</div>
