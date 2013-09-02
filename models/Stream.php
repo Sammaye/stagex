@@ -46,12 +46,12 @@ class Stream extends \glue\db\Document{
 
 	function relations(){
 		return array(
-			"parent_video" => array('one', 'app\\models\\Video', "_id", 'on' => 'video_id'),
+			"video" => array('one', 'app\\models\\Video', "_id", 'on' => 'videoId'),
 			"original_comment" => array('one', 'app\\models\\VideoResponse', "_id", 'on' => 'comment_id'),
-			'parent_playlist' => array('one', 'app\\models\\Playlist', '_id', 'on' => 'playlist_id'),
-			"status_sender" => array('one', 'app\\models\\User', '_id', 'on' => 'user_id'),
-			"subscribed_user" => array('one', 'app\\models\\User', '_id', 'on' => 'subscribed_user_id'),
-			"commenting_user" => array('one', 'app\\models\\User', '_id', 'on' => 'posted_by_id'),
+			'playlist' => array('one', 'app\\models\\Playlist', '_id', 'on' => 'playlist_id'),
+			"status_sender" => array('one', 'app\\models\\User', '_id', 'on' => 'userId'),
+			"subscribed_user" => array('one', 'app\\models\\User', '_id', 'on' => 'subscribedUserId'),
+			"commenting_user" => array('one', 'app\\models\\User', '_id', 'on' => 'postedById'),
 		);
 	}
 

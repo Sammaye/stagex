@@ -33,17 +33,16 @@ $this->js('page_js', "
 
 	<div id="news_content">
 		<?php
-		if(count($model) > 0){
-			foreach($model as $k => $item){
+		if(count($stream) > 0){
+			foreach($stream as $k => $item)
 				echo $this->renderPartial('stream/streamitem', array('item' => $item, 'hideDelete' => true));
-			}
 		}else{ ?>
 			<div class='no_results_found'>
 				How do you expect there to be any news when your not following anyone? Try subscribing to some users to get some.
 			</div>
 		<?php } ?>
 	</div>
-	<?php if($model->count() > 20){ ?>
+	<?php if($stream->count() > 20){ ?>
 		<a class='load_more' href='#'>Load more stream</a>
 	<?php } ?>
 </div>

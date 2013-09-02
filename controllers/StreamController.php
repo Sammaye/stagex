@@ -30,13 +30,13 @@ class StreamController extends glue\Controller{
 		$subscription_model = new Follower();
 
 		$subscriptions = $subscription_model->getAll_ids();
-		$stream = Stream::model()->find(array('user_id' => array('$in' => $subscriptions),
+		$stream = Stream::model()->find(array('userId' => array('$in' => $subscriptions),
 			'$or' => array(
 				array('type' => array('$nin' => array(Stream::WALL_POST))),
 				array('comment_user' => array('$in' => $subscriptions))
 			)
 		))->sort(array('ts' => -1))->limit(20);
-		echo $this->render('stream/news_feed', array('model' => $stream, 'subscriptions' => $subscriptions));
+		echo $this->render('stream/news_feed', array('stream' => $stream, 'subscriptions' => $subscriptions));
 	}
 
 	public function action_notifications(){
