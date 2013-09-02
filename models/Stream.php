@@ -15,17 +15,17 @@ class Stream extends \glue\db\Document{
 	const SUBSCRIBED_TO = 8;
 	const WALL_POST = 10;
 
-	public $userId;
+	public $to_user_id;
+	public $user_id;
 	public $from_users = array();
 	public $items = array();
 	public $type;
 
-	public $postedById;
 	public $message;
-	public $subscribedUserId;
-	public $videoId;
-	public $itemId;
-	public $itemType;
+	public $subscribed_user_id;
+	public $video_id;
+	public $item_id;
+	public $item_type;
 	public $like;
 
 	function collectionName(){
@@ -46,18 +46,13 @@ class Stream extends \glue\db\Document{
 
 	function relations(){
 		return array(
-			"video" => array('one', 'app\\models\\Video', "_id", 'on' => 'videoId'),
+			"video" => array('one', 'app\\models\\Video', "_id", 'on' => 'video_id'),
 			"original_comment" => array('one', 'app\\models\\VideoResponse', "_id", 'on' => 'comment_id'),
 			'playlist' => array('one', 'app\\models\\Playlist', '_id', 'on' => 'playlist_id'),
-			"status_sender" => array('one', 'app\\models\\User', '_id', 'on' => 'userId'),
-			"subscribed_user" => array('one', 'app\\models\\User', '_id', 'on' => 'subscribedUserId'),
-			"commenting_user" => array('one', 'app\\models\\User', '_id', 'on' => 'postedById'),
+			"status_sender" => array('one', 'app\\models\\User', '_id', 'on' => 'user_id'),
+			"subscribed_user" => array('one', 'app\\models\\User', '_id', 'on' => 'subscribed_user_id'),
+			"commenting_user" => array('one', 'app\\models\\User', '_id', 'on' => 'posted_by_id'),
 		);
-	}
-
-	function beforeSave(){
-		//$this->ts = new MongoDate();
-		return true;
 	}
 
 	function getDateTime(){
@@ -171,8 +166,8 @@ class Stream extends \glue\db\Document{
 
 	static function videoUpload($user_id, $video_id){
 		$status = new static;
-		$status->userId = $user_id;
-		$status->itemId = $video_id;
+		$status->user_id = $user_id;
+		$status->item_id = $video_id;
 		$status->type = Stream::VIDEO_UPLOAD;
 		$status->save();
 	}
@@ -250,8 +245,8 @@ class Stream extends \glue\db\Document{
 			$status->save();
 		}else{
 			$status = new Stream();
-			$status->userId = $user_id;
-			$status->itemId = $playlist_id;
+			$status->user_id = $user_id;
+			$status->item_id = $playlist_id;
 			$status->type = Stream::ADD_TO_PL;
 			$status->addItemBy_id($video_id);
 			$status->save();

@@ -48,7 +48,7 @@ $this->js('new_playlist', "
 	});
 		
 	$(document).on('click', '.btn_modal', function(e){
-		event.preventDefault();
+		e.preventDefault();
 		$.modal({html:".js_encode($createModal)."});
 	});
 		

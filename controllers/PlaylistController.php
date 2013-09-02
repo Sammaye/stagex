@@ -83,7 +83,8 @@ class PlaylistController extends glue\Controller{
 					if($video = Video::model()->findOne(array('_id' => new MongoId(isset($v['video_id'])?$v['video_id']:''))))
 						$playlist->add_video_at_pos($video->_id, $v['position']);
 				}
-			}			
+			}
+			$playlist->totalVideos=count($playlist->videos);			
 			
 			if($playlist->validate()&&$playlist->save())
 				$this->json_success('Playlist saved');
@@ -194,13 +195,18 @@ class PlaylistController extends glue\Controller{
 			$mongoIds[] = new MongoId($v);
 		
 		$playlistVideos=$playlist->videos;
+		$numFound=0;
+		
 		array_walk($playlistVideos, function(&$n) {
 			$n = (string)$n['_id'];
 		});		
 		foreach(Video::model()->find(array('_id'=>array('$in'=>$mongoIds))) as $_id => $video){
-			if(($k=array_search($_id,$playlistVideos))!==false)
+			if(($k=array_search($_id,$playlistVideos))!==false){
 				unset($playlist->videos[$k]);
+				$numFound++;
+			}
 		}
+		$playlist->totalVideos+=-$numFound;
 		$playlist->save();
 		$this->json_success('Videos removed');
 	}

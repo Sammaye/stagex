@@ -30,7 +30,7 @@ class StreamController extends glue\Controller{
 		$subscription_model = new Follower();
 
 		$subscriptions = $subscription_model->getAll_ids();
-		$stream = Stream::model()->find(array('userId' => array('$in' => $subscriptions),
+		$stream = Stream::model()->find(array('user_id' => array('$in' => $subscriptions),
 			'$or' => array(
 				array('type' => array('$nin' => array(Stream::WALL_POST))),
 				array('comment_user' => array('$in' => $subscriptions))
@@ -115,60 +115,19 @@ class StreamController extends glue\Controller{
 		}
 	}
 
-	public function action_deleteitems(){
-		$this->pageTitle = 'Remove Stream - StageX';
+	public function action_delete(){
+		if(!glue::auth()->check('ajax','post'))
+			glue::trigger('404');
+		
+		$ids=glue::http()->param('ids');
+		if(!is_array($ids)||count($ids)<=0)
+			$this->json_error('No stream was selected for deletion');
 
-		if(!glue::http()->isAjax())
-			glue::route(glue::config('404', 'errorPages'));
-
-		if(count($_POST['items']) > 0){
-			$items = array();
-
-			foreach($_POST['items'] as $k=>$v){
-				$items[] = new MongoId($v);
-			}
-			$stream = new Stream;
-			$stream->removeAll_byid($items);
-
-			if(count($_POST['items']) > 1){
-				GJSON::kill('Stream items were deleted', true);
-			}else{
-				GJSON::kill('Stream item was deleted', true);
-			}
-		}else{
-			GJSON::kill('No stream items were selected for deletion');
-		}
-	}
-
-	public function action_clearall(){
-		$this->pageTitle = 'Remove Stream - StageX';
-
-		exit(); // We exit this function for the min, I am not sure if I can trust it
-
-		if(!glue::http()->isAjax())
-			glue::route(glue::config('404', 'errorPages'));
-
-		$stream = new Stream;
-		$stream->removeAll();
-
-		ob_start();
-			$items = Stream::model()->find(array('user_id' => glue::session()->user->_id))->sort(array('ts' => -1))->limit(20);
-
-			if(count($items) > 0){
-				foreach($model as $k => $item){
-					$this->partialRender('stream/streamitem', array('item' => $item));
-				}
-			}else{ ?>
-				<div style='font-size:16px; font-weight:normal; padding:21px;'>No stream has yet been recorded for your user</div>
-			<?php }
-			$html = ob_get_contents();
-		ob_end_clean();
-
-		if($html){
-			echo json_encode(array('success' => true, 'html' => $html));
-		}else{
-			echo json_encode(array('success' => false));
-		}
+		$mongoIds = array();
+		foreach($ids as $k=>$v)
+			$mongoIds[] = new MongoId($v);
+		Stream::model()->deleteAll(array('_id'=>array('$in'=>$mongoIds), 'user_id'=>glue::user()->_id));
+		$this->json_success(array('message'=>'Stream items were deleted','updated'=>count($mongoIds)));
 	}
 
 	function action_getStream(){
@@ -197,7 +156,7 @@ class StreamController extends glue\Controller{
 		$html = '';
 		if($stream->count() > 0){
 			foreach($stream as $k => $item)
-				$html.=$this->renderPartial('stream/streamitem', array('item' => $item, 'hideDelete' => $_hide_del));
+				$html.=$this->renderPartial('stream/streamitem', array('item' => $item, 'hideDelete' => $hide_del));
 			$this->json_success(array('html'=>$html));
 		}else
 			$this->json_error(array('remaining'=>0,'initMessage'=>'No stream could be found','message'=>'There are no more stream items to load'));

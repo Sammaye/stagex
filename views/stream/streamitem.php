@@ -3,20 +3,20 @@ use app\models\Stream;
 if(!isset($hideDelete)) $hideDelete = false;
 ?>
 
-<div data-id='<?php echo $item->_id ?>' data-ts='<?php echo $item->getTs($item->created) ?>' class='streamitem'
+<div data-id='<?php echo $item->_id ?>' data-ts='<?php echo $item->getTs($item->created) ?>' class='streamitem' style='border-bottom:1px solid #e5e5e5;padding:20px 0;'
 	<?php if($item->type == Stream::WALL_POST): ?>data-target_user='<?php echo strval($item->commenting_user->_id) ?>'<?php endif; ?>>
 
 	<?php if(!$hideDelete && (glue::user()->_id == $item->status_sender->_id )): ?>
-		<span class="delete_item"><a href="#"><?php echo utf8_decode('&#215;') ?></a></span>
+		<span class="close_button"><a href="#"><?php echo utf8_decode('&#215;') ?></a></span>
 	<?php endif; ?>
 
 	<?php if($item->type == Stream::WALL_POST): ?>
-		<a href='<?php echo glue::http()->url('/user/view', array('id' => strval($item->commenting_user->_id))) ?>'><img alt='thumbnail' src='<?php echo $item->commenting_user->getAvatar(48, 48) ?>' class='float_left'/></a>
+		<a href='<?php echo glue::http()->url('/user/view', array('id' => strval($item->commenting_user->_id))) ?>'><img alt='thumbnail' src='<?php echo $item->commenting_user->getAvatar(48, 48) ?>' class='' style='float:left;'/></a>
 	<?php else: ?>
-		<a href='<?php echo glue::http()->url('/user/view', array('id' => strval($item->status_sender->_id))) ?>'><img alt='thumbnail' src='<?php echo $item->status_sender->getAvatar(48, 48) ?>' class='float_left'/></a>
+		<a href='<?php echo glue::http()->url('/user/view', array('id' => strval($item->status_sender->_id))) ?>'><img alt='thumbnail' src='<?php echo $item->status_sender->getAvatar(48, 48) ?>' class='' style='float:left;'/></a>
 	<?php endif; ?>
 
-	<div class='stream_item_inner'>
+	<div class='stream_item_inner' style='float:left; margin-left:10px;'>
 		<?php if($item->type == Stream::WALL_POST): ?>
 			<div class='stream_item_head'><?php
 				if(strval($item->commenting_user->_id) == strval($item->status_sender->_id)){
@@ -26,7 +26,7 @@ if(!isset($hideDelete)) $hideDelete = false;
 				 	echo html::a(array('href' => glue::http()->url('/user/view', array('id' => strval($item->commenting_user->_id))),
 						'text' => $item->commenting_user->getUsername()))." posted on ".html::a(array('href' => glue::http()->url('/user/view', array('id' => strval($item->status_sender->_id))),
 						'text' => $item->status_sender->getUsername())).'\'s stream';
-				} ?><span class='sent_date'> - <?php echo $item->getDateTime() ?></span>
+				} ?><span class='sent_date'><?php echo $item->getDateTime() ?></span>
 				</div>
 				<div class='stream_comment'><span class='expandable'><?php echo htmlspecialchars($item->message) ?></span>
 					<?php if(glue::session()->user->_id == $item->status_sender->_id){ ?>
@@ -35,78 +35,39 @@ if(!isset($hideDelete)) $hideDelete = false;
 					<?php } ?>
 				</div>
 		<?php elseif($item->type == Stream::COMMENTED_ON):
-				?><div class='stream_item_head'><?php
-				echo html::a(array('href' => glue::http()->url('/user/view', array('id' => strval($item->status_sender->_id))), 'text' => $item->status_sender->getUsername()))." responded to ".html::a(array('href' => glue::http()->url('/video/watch', array('id' => strval($item->parent_video->_id))),
-					'text' => $item->parent_video->title))?><span class='sent_date'> - <?php echo $item->getDateTime() ?></span>
+				?><div class='stream_item_head' style='margin-bottom:15px;'><?php
+				echo html::a(array('href' => glue::http()->url('/user/view', array('id' => strval($item->status_sender->_id))), 'text' => $item->status_sender->getUsername()))." responded to ".html::a(array('href' => glue::http()->url('/video/watch', array('id' => strval($item->video->_id))),
+					'text' => $item->video->title))?><span class='sent_date'><?php echo $item->getDateTime() ?></span>
 				</div>
-					<div class='stream_media_item'><?php $this->partialRender('videos/_video_ext', array('model' => $item->parent_video, 'hide_a2p_button' => true, 'hideDescription' => true)) ?></div>
-					<div class='responded_with'><?php echo html::a(array('href' => glue::http()->url('/user/view', array('id' => strval($item->status_sender->_id))), 'text' => $item->status_sender->getUsername())) ?> responded with:</div>
-					<div class='stream_video_response'>
-						<?php foreach($item->items as $k => $v){
-							$comment = VideoResponse::model()->findOne(array('_id' => $v));
-							if($comment){
-								if($comment->type == 'text'){ ?>
-									<div class='text_response_item'><?php echo substr(nl2br(html::encode($comment->content)), 0, 800) ?></div>
-								<?php }elseif($comment->type == 'video'){
-
-									$video = $comment->reply_video;
-									if($video): ?>
-										<div class='video_response_item'>
-											<div class='video_image'>
-												<a href='<?php echo glue::http()->url('/video/watch', array('id' => strval($video->_id))) ?>'>
-												<img alt='thumbnail' src="<?php echo $video->getImage(88, 49) ?>"/></a>
-											</div>
-											<div class='title'>
-												<a href='<?php echo glue::http()->url('/video/watch', array('id' => strval($video->_id))) ?>'><?php echo $video->title ?></a>
-											</div>
-										</div>
-									<?php else: $video = new Video; ?>
-										<div class='video_response_item'>
-											<div class='video_image'>
-												<a href='<?php echo glue::http()->url('/video/watch') ?>'>
-												<img alt='thumbnail' src="<?php echo $video->getImage(88, 49) ?>"/></a>
-											</div>
-											<div class='title'>
-												<a href='<?php echo glue::http()->url('/video/watch') ?>'>[Video Deleted]</a>
-											</div>
-										</div>
-									<?php endif; ?>
-								<?php }
-							}else{
-								?><div class='text_response_item'>[Comment Deleted]</div><?php
-							} break; ?>
-						<?php } ?>
-						<?php if(count($item->items) > 1){ ?>
-							<div class='view_more_responses'><a href='<?php echo glue::http()->url('/videoresponse/view_all', array('id' => strval($item->parent_video->_id))) ?>'>+<?php echo count($item->items)-1 ?> more responses</a></div>
-						<?php } ?>
-					</div>
+				<div class='stream_media_item' style='margin-bottom:15px;'><?php echo $this->renderPartial('video/_video_stream', array('model' => $item->video, 'hide_a2p_button' => true, 'hideDescription' => true)) ?></div>
+				<div><a href="">View responses</a></div>
 		<?php elseif($item->type == Stream::VIDEO_RATE):
 				?><div class='stream_item_head'><?php
 				if($item->like == 1){
 					echo html::a(array('href' => glue::http()->url('/user/view', array('id' => $item->status_sender ? strval($item->status_sender->_id) : '')),
 							'text' => $item->status_sender ? $item->status_sender->getUsername() : '[User Deleted]'))." liked ".html::a(array('href' =>
-								glue::http()->url('/video/watch', array('id' => $item->parent_video ? strval($item->parent_video->_id) : '')),
-								'text' => $item->parent_video ? $item->parent_video->title : '[Video Deleted]'));
+								glue::http()->url('/video/watch', array('id' => $item->video ? strval($item->video->_id) : '')),
+								'text' => $item->video ? $item->video->title : '[Video Deleted]'));
 				}else{
 					echo html::a(array('href' => glue::http()->url('/user/view', array('id' => $item->status_sender ? strval($item->status_sender->_id) : '')),
 							'text' => $item->status_sender ? $item->status_sender->getUsername() : '[User Deleted]'))." disliked ".html::a(array('href' =>
-								glue::http()->url('/video/watch', array('id' => $item->parent_video ? strval($item->parent_video->_id) : '')),
-								'text' => $item->parent_video ? $item->parent_video->title : '[Video Deleted]'));
+								glue::http()->url('/video/watch', array('id' => $item->video ? strval($item->video->_id) : '')),
+								'text' => $item->video ? $item->video->title : '[Video Deleted]'));
 				}?><span class='sent_date'> - <?php echo $item->getDateTime() ?></span>
 				</div>
-				<div class='stream_media_item'><?php $this->partialRender('videos/_video_ext', array('model' => $item->parent_video, 'hide_a2p_button' => true, 'descLength' => 500)) ?></div><?php
+				<div class='stream_media_item'><?php $this->partialRender('videos/_video_ext', array('model' => $item->video, 'hide_a2p_button' => true, 'descLength' => 500)) ?></div><?php
 		elseif($item->type == Stream::VIDEO_WATCHED):
 				?><div class='stream_item_head'><?php
-				echo html::a(array('href' => glue::http()->url('/user/view', array('id' => strval($item->status_sender->_id))), 'text' => $item->status_sender->getUsername()))." watched ".html::a(array('href' => glue::http()->url('/video/watch', array('id' => strval($item->parent_video->_id))),
-						'text' => $item->parent_video->title)) ?><span class='sent_date'> - <?php echo $item->getDateTime() ?></span>
+				echo html::a(array('href' => glue::http()->url('/user/view', array('id' => strval($item->status_sender->_id))), 'text' => $item->status_sender->getUsername()))." watched ".html::a(array('href' => glue::http()->url('/video/watch', array('id' => strval($item->video->_id))),
+						'text' => $item->video->title)) ?><span class='sent_date'><?php echo $item->getDateTime() ?></span>
 				</div>
-				<div class='stream_media_item'><?php $this->partialRender('videos/_video_ext', array('model' => $item->parent_video, 'hide_a2p_button' => true, 'descLength' => 500)) ?></div><?php
+				<div class='stream_media_item' style='margin-top:20px;'><?php echo $this->renderPartial('video/_video_stream', array('model' => $item->video, 'hide_a2p_button' => true, 'descLength' => 500)) ?></div><?php
 		elseif($item->type == Stream::VIDEO_UPLOAD):
 				?><div class='stream_item_head'><?php
-				echo html::a(array('href' => glue::http()->url('/user/view', array('id' => strval($item->status_sender->_id))), 'text' => $item->status_sender->getUsername()))." uploaded ".html::a(array('href' => glue::http()->url('/video/watch', array('id' => strval($item->parent_video->_id))),
-						'text' => $item->parent_video->title)) ?><span class='sent_date'> - <?php echo $item->getDateTime() ?></span>
+				echo html::a(array('href' => glue::http()->url('/user/view', array('id' => strval($item->status_sender->_id))), 'text' => $item->status_sender->getUsername()))." uploaded ".html::a(array('href' => glue::http()->url('/video/watch', array('id' => strval($item->video->_id))),
+						'text' => $item->video->title)) ?><span class='sent_date'> - <?php echo $item->getDateTime() ?></span>
 				</div>
-				<div class='stream_media_item'><?php $this->partialRender('videos/_video_ext', array('model' => $item->parent_video, 'hide_a2p_button' => true, 'descLength' => 500)) ?></div><?php
+				<div class='stream_media_item'><?php $this->renderPartial('video/_video_ext', array('model' => $item->video, 'hide_a2p_button' => true, 'descLength' => 500)) ?></div><?php
 		elseif($item->type == Stream::ADD_TO_PL):
 				?><div class='stream_item_head'><?php
 
@@ -179,4 +140,5 @@ if(!isset($hideDelete)) $hideDelete = false;
 				<div class='clearer'></div>
 		<?php endif; ?>
 	</div>
+	<div class="clear"></div>
 </div>

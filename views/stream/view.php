@@ -5,8 +5,6 @@ $this->jsFile('/js/jdropdown.js');
 
 $this->js('streampage.base', "
 	$(function(){
-
-		$('.dropdown-group').jdropdown();
 		
 		$('.expandable').expander({slicePoint: 200});
 
@@ -34,27 +32,15 @@ $this->js('streampage.base', "
 			}
 		});
 
-		$(document).on('click', '.delete_item a', function(event){
+		$(document).on('click', '.streamitem .close_button', function(event){
 			event.preventDefault();
 			var el = $(this).parents('.streamitem');
 
-			$.post('/stream/deleteitems', {items: [$(this).parents('.streamitem').data('id')]}, function(data){
-				if(data.success){
+			$.post('/stream/delete', {ids: [$(this).parents('.streamitem').data('id')]}, function(data){
+				if(data.success&&data.updated>0)
 					el.remove();
-				}
 			}, 'json');
 		});
-
-		$(document).on('click', '.clear_all', function(event){
-			event.preventDefault();
-			$.getJSON('/stream/clearall', function(data){
-				if(data.success){
-					$('.list').html(data.html);
-				}
-			});
-		});
-
-
 	});
 		
 	$(document).on('click', '.load_more', function(event){

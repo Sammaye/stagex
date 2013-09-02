@@ -627,6 +627,7 @@ input.date{
 	border-radius:0px!important;
 }
 
+.close_button,
 .alert .close{
 	display:block;
 	float:right;
@@ -645,6 +646,7 @@ input.date{
 	margin:2px 5px 0 0;
 }
 
+.close_button:hover,
 .alert .close:hover{
 	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=60)";
 	filter: alpha(opacity = 60);
@@ -2534,4 +2536,8 @@ input.date{
 
 .response.thread_comment .content{
 	margin-left:25px;
+}
+
+.streamitem .sent_date{
+	color:#999999; margin:0 0 0 10px;
 }
