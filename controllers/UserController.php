@@ -365,7 +365,7 @@ class userController extends \glue\Controller{
 				$mongoIds[]=new \MongoId($_id);
 			$idRange=array('item'=>array('$in'=>$mongoIds));
 		}
-		echo $this->render('stream/watched', array('items' =>
+		echo $this->render('watched', array('items' =>
 				glue::db()->watched_history->find(array_merge(array("user_id" => Glue::user()->_id),$timeRange,$idRange))->sort(array('ts' => -1))
 		));
 	}
@@ -397,7 +397,7 @@ class userController extends \glue\Controller{
 			$rated=glue::db()->video_likes->find(array_merge(array("user_id" => Glue::user()->_id, 'like' => 1),$timeRange,$idRange));
 		$rated->sort(array('ts' => -1));
 	
-		echo $this->render('stream/rated_videos', array('items' => $rated));
+		echo $this->render('rated_videos', array('items' => $rated));
 	}
 	
 	public function action_followedPlaylists(){
@@ -408,7 +408,7 @@ class userController extends \glue\Controller{
 		$_filter = isset($_GET['filter']) ? $_GET['filter'] : null;
 		$items = glue::db()->playlist_likes->find(array("user_id" => Glue::session()->user->_id, 'like' => 1))->sort(array('ts' => -1))->limit(20);
 	
-		$this->render('stream/rated_playlists', array('items' => $items, '_filter' => $_filter));
+		$this->render('followed_playlists', array('items' => $items, '_filter' => $_filter));
 	}
 	
 	function action_deleteRated(){
