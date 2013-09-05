@@ -389,11 +389,11 @@ class User extends \glue\User{
 	}
 
 	function getUsername(){
-		return glue\Html::encode($this->username);
+		return \glue\Html::encode($this->username);
 	}
 
 	function getAbout(){
-		return nl2br(html::encode($this->about));
+		return nl2br(\glue\Html::encode($this->about));
 	}
 	
 	function getBirthdayTime(){

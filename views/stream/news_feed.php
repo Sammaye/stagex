@@ -24,13 +24,6 @@ $this->js('page_js', "
 ?>
 
 <div class=''>
-	<div class="tabs-nav">
-		<ul>
-			<li><a href="/stream/news" id="news_tab" class="selected">News</a></li>
-			<li><a href="/stream">Activity</a></li>
-		</ul>
-	</div>
-
 	<div id="news_content">
 		<?php
 		if(count($stream) > 0){
@@ -45,7 +38,4 @@ $this->js('page_js', "
 	<?php if($stream->count() > 20){ ?>
 		<a class='load_more' href='#'>Load more stream</a>
 	<?php } ?>
-</div>
-<div style='float:left; width:160px; margin-left:25px;'>
-	<?php //$this->widget("application/widgets/Advertising/Ad_box.php", array( "configuration"=>'skyscraper' )); ?>
 </div>

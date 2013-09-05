@@ -71,17 +71,9 @@ $this->js('streampage.base', "
 		});
 	});		
 ");
-
 ?>
 
 <div>
-
-	<div class="tabs-nav">
-		<ul>
-			<li><a href="/stream/news" id="news_tab">News</a></li>
-			<li><a href="/stream" class="selected">Activity</a></li>
-		</ul>
-	</div>
 	<div class="simple-nav" style='background:#f5f5f5;'>
 		<a href="#" class="selected" data-filter="all">All</a>
 		<a href="#" data-filter="posts">Posts</a>
@@ -102,10 +94,4 @@ $this->js('streampage.base', "
 	<?php if($cursor->count() > 20){ ?>
 		<a class='load_more' href='#'>Load more stream</a>
 	<?php } ?>
-</div>
-<div style='float:left; width:160px; margin-left:25px;'>
-	<?php //$this->widget("application/widgets/Advertising/Ad_box.php", array( "configuration"=>'300_box' )); ?>
-	<div style='margin-top:25px;'>
-		<?php //$this->widget("application/widgets/Advertising/Ad_box.php", array( "configuration"=>'300_box' )); ?>
-	</div>
 </div>

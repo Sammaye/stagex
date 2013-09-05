@@ -48,7 +48,7 @@ class Stream extends \glue\db\Document{
 		return array(
 			"video" => array('one', 'app\\models\\Video', "_id", 'on' => 'video_id'),
 			"original_comment" => array('one', 'app\\models\\VideoResponse', "_id", 'on' => 'comment_id'),
-			'playlist' => array('one', 'app\\models\\Playlist', '_id', 'on' => 'playlist_id'),
+			'playlist' => array('one', 'app\\models\\Playlist', '_id', 'on' => 'item_id'),
 			"status_sender" => array('one', 'app\\models\\User', '_id', 'on' => 'user_id'),
 			"subscribed_user" => array('one', 'app\\models\\User', '_id', 'on' => 'subscribed_user_id'),
 			"commenting_user" => array('one', 'app\\models\\User', '_id', 'on' => 'posted_by_id'),

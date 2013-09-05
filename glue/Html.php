@@ -152,6 +152,12 @@ class Html{
 	public static function a($options = array()){
 		$text = $options['text'];
 		unset($options['text']);
+		
+		if(isset($options['href'])&&is_array($options['href'])){
+			$url=$options['href'][0];
+			unset($options['href'][0]);
+			$options['href']=glue::http()->url($url,$options['href']);
+		}
 
 		return "<a ".implode(" ", self::formOptions($options)).">$text</a>";
 	}

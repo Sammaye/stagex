@@ -206,24 +206,24 @@ class userController extends \glue\Controller{
 	}
 
 	function action_view(){
-		$this->layout = 'profile';
-		if(!($user = User::model()->findOne(array('_id' => glue::http()->param('id','') )))){
-			if(glue::user()->authed){
-				$user=glue::user();
-			}else
-				glue::trigger('404');
-		}
-
-		if(!glue::roles()->checkRoles(array('deletedView' => $user)) || !$user->_id instanceof MongoId){
+		if(!glue::http()->param('id',null)&&glue::auth()->check(array('@'))){
+			$user=glue::user();
+		}elseif(
+			!($user = User::model()->findOne(array('_id' => glue::http()->param('id','') ))) || 
+			!glue::auth()->check(array('viewable' => $user))
+		){
 			$this->layout = 'blank_page';
-			$this->pageTitle = 'User Not Found - StageX';
-			$this->render('user/deleted');
+			$this->title = 'User Not Found - StageX';
+			$this->render('deleted');
 			exit();
 		}
-		$this->pageTitle = $user->getUsername().' - StageX';
-
-		$stream = Stream::model()->find(array('user_id' => $user->_id))->sort(array('ts' => -1))->limit(20);
-		$this->render('profile/stream', array('user' => $user, 'selected_page' => 'stream', 'stream' => $stream));
+		
+		glue::import('@app/controllers/StreamController.php',true);
+		$streamController=new StreamController();
+		
+		$this->layout = 'profile';
+		$this->title = $user->getUsername().' - StageX';
+		echo $this->render('profile/stream', array('user' => $user, 'page' => 'stream', 'cursor' => $streamController->load_single_stream()));
 	}
 
 	function action_view_videos(){
