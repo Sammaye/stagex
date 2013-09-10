@@ -47,6 +47,7 @@ class Sphinx extends \glue\Component{
 	
 	public function index($name){
 		$this->index=$name;
+		return $this;
 	}
 	
 	public function select($select){

@@ -2541,3 +2541,11 @@ input.date{
 .streamitem .sent_date{
 	color:#999999; margin:0 0 0 10px;
 }
+
+.notification_item{
+	padding:10px 0;line-height:21px;
+}
+
+.notification_item .sent_date{
+	color:#999999; margin:0 0 0 10px;
+}

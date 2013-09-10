@@ -30,7 +30,7 @@ class UserMenu extends \glue\Widget{
 			<a href='<?php echo glue::http()->url('/stream/notifications') ?>' <?php echo $this->tab == "notifications" ? "class='selected'" : "" ?>>Notifications
 			<span class="badge"><?php echo \app\models\Notification::getNewCount_Notifications() ?></span></a>
 		</li>
-		<li><a href='<?php echo glue::http()->url('/user/view') ?>' <?php echo $this->tab == "stream" ? "class='selected'" : "" ?>>Profile</a></li>								
+		<li><a href='<?php echo glue::http()->url('/user/view') ?>' <?php echo $this->tab == "profile" ? "class='selected'" : "" ?>>Profile</a></li>								
 		</ul>
 		<h3 class='head_divider'>Settings</h3>
 		<ul>

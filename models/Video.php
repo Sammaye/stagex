@@ -398,7 +398,7 @@ class Video extends \glue\Db\Document{
 				->match('type','video')
 				->filter(array(
 						array('deleted', array(1), true), 
-						array('listing', array(0, 1), true),
+						array('listing', array(1, 2), true),
 				));
 		
 		// Since this will be used for public sorting I think this always applies		

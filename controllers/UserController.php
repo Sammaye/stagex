@@ -205,16 +205,16 @@ class userController extends \glue\Controller{
 		echo $this->render('user/forgot_password', array('model' => $model));
 	}
 
-	function action_view(){
+	function action_view(){ 
 		if(!glue::http()->param('id',null)&&glue::auth()->check(array('@'))){
 			$user=glue::user();
 		}elseif(
-			!($user = User::model()->findOne(array('_id' => glue::http()->param('id','') ))) || 
+			!($user = User::model()->findOne(array('_id' => new MongoId(glue::http()->param('id','')) ))) || 
 			!glue::auth()->check(array('viewable' => $user))
 		){
 			$this->layout = 'blank_page';
 			$this->title = 'User Not Found - StageX';
-			$this->render('deleted');
+			echo $this->render('deleted');
 			exit();
 		}
 		
@@ -222,64 +222,68 @@ class userController extends \glue\Controller{
 		$streamController=new StreamController();
 		
 		$this->layout = 'profile';
+		$this->tab='profile';
 		$this->title = $user->getUsername().' - StageX';
+		
 		echo $this->render('profile/stream', array('user' => $user, 'page' => 'stream', 'cursor' => $streamController->load_single_stream()));
 	}
 
-	function action_view_videos(){
-		$this->layout = 'profile';
-
-		if(isset($_GET['id'])){
-			$user = User::model()->findOne(array('_id' => new MongoId($_GET['id'])));
-		}else{
-			$user = glue::session()->user;
-		}
-
-		if(!glue::roles()->checkRoles(array('deletedView' => $user)) || !$user->_id instanceof MongoId){
+	function action_viewVideos(){
+		if(!glue::http()->param('id',null)&&glue::auth()->check(array('@'))){
+			$user=glue::user();
+		}elseif(
+			!($user = User::model()->findOne(array('_id' => new MongoId(glue::http()->param('id','')) ))) || 
+			!glue::auth()->check(array('viewable' => $user))
+		){
 			$this->layout = 'blank_page';
-			$this->pageTitle = 'User Not Found - StageX';
-			$this->render('user/deleted');
+			$this->title = 'User Not Found - StageX';
+			echo $this->render('deleted');
 			exit();
 		}
-		$this->pageTitle = $user->getUsername().' - StageX';
+		
+		$this->layout='profile';
+		$this->tab='profile';
+		$this->title = $user->getUsername().' - StageX';
 
-		$sphinx = glue::sphinx()->getSearcher();
-		$sphinx->page = isset($_GET['page']) ? $_GET['page'] : 1;
-		$sphinx->setFilter('listing', array(2, 3), true);
-		$sphinx->setSortMode(SPH_SORT_ATTR_DESC, "date_uploaded");
+		$sphinx=glue::sphinx()->index('main')
+			->match(array('title', 'description', 'tags', 'author_name'),glue::http()->param('q',''))
+			->match('type','video')->match('uid',strval($user->_id))
+			->sort(SPH_SORT_TIME_SEGMENTS, "date_uploaded")
+			->filter('deleted', array(1), true)
+			->page(glue::http()->param('page',1));	
+		if(!glue::user()->equal($user))
+			$sphinx->filter('listing',array(1, 2), true);
 
-		$sphinx->query(array('select' => urldecode(isset($_GET['query']) ? $_GET['query'] : ''), 'where' => array('uid' => array(strval($user->_id)),
-			'type' => array('video')), 'results_per_page' => 21), 'main');
-
-		$this->render('profile/videos', array('user' => $user, 'selected_page' => 'videos', 'sphinx' => $sphinx));
+		echo $this->render('profile/videos', array('user' => $user, 'page' => 'videos', 'sphinx' => $sphinx));
 	}
 
-	function action_view_playlists(){
-		$this->layout = 'profile';
-
-		if(isset($_GET['id'])){
-			$user = User::model()->findOne(array('_id' => new MongoId($_GET['id'])));
-		}else{
-			$user = glue::session()->user;
-		}
-
-		if(!glue::roles()->checkRoles(array('deletedView' => $user)) || !$user->_id instanceof MongoId){
+	function action_viewPlaylists(){
+		if(!glue::http()->param('id',null)&&glue::auth()->check(array('@'))){
+			$user=glue::user();
+		}elseif(
+			!($user = User::model()->findOne(array('_id' => new MongoId(glue::http()->param('id','')) ))) || 
+			!glue::auth()->check(array('viewable' => $user))
+		){
 			$this->layout = 'blank_page';
-			$this->pageTitle = 'User Not Found - StageX';
-			$this->render('user/deleted');
+			$this->title = 'User Not Found - StageX';
+			echo $this->render('deleted');
 			exit();
 		}
-		$this->pageTitle = $user->getUsername().' - StageX';
 
-		$sphinx = glue::sphinx()->getSearcher();
-		$sphinx->page = isset($_GET['page']) ? $_GET['page'] : 1;
-		$sphinx->setFilter('listing', array(2, 3), true);
-		$sphinx->setSortMode(SPH_SORT_TIME_SEGMENTS, "date_uploaded");
+		$this->layout='profile';
+		$this->tab='profile';
+		$this->title = $user->getUsername().' - StageX';
+		
+		$sphinx=glue::sphinx()->index('main')
+		->match(array('title', 'description', 'author_name'),glue::http()->param('q',''))
+		->match('type','playlist')->match('uid',strval($user->_id))
+		->sort(SPH_SORT_TIME_SEGMENTS, "date_uploaded")
+		->filter('deleted', array(1), true)
+		->page(glue::http()->param('page',1));
+		if(!glue::user()->equal($user))
+			$sphinx->filter('listing',array(1, 2), true);		
 
-		$sphinx->query(array('select' => urldecode(isset($_GET['query']) ? $_GET['query'] : ''), 'where' => array('uid' => array(strval($user->_id)),
-			'type' => array('playlist'))), 'main');
-
-		$this->render('profile/playlists', array('user' => $user, 'selected_page' => 'playlists', 'sphinx' => $sphinx));
+		echo $this->render('profile/playlists', array('user' => $user, 'page' => 'playlists', 'sphinx' => $sphinx));
 	}
 
 	function action_videos(){

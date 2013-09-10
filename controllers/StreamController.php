@@ -1,7 +1,8 @@
 <?php
 
 use app\models\Follower,
-	app\models\Stream;
+	app\models\Stream,
+	app\models\Notification;
 
 class StreamController extends glue\Controller{
 
@@ -40,13 +41,12 @@ class StreamController extends glue\Controller{
 	}
 
 	public function action_notifications(){
-		$this->pageTitle = 'Notifications - StageX';
+		$this->title = 'Notifications - StageX';
 
-		glue::session()->user->last_notification_pull = new MongoDate();
-		glue::session()->user->save();
+		app\models\User::model()->updateAll(array('_id'=>glue::user()->_id),array('$set'=>array('lastNotificationPull'=>new MongoDate())));
 
 		$this->tab = 'notifications';
-		$this->render('stream/notifications');
+		echo $this->render('stream/notifications');
 	}
 
 	public function action_share(){

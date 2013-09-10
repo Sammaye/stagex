@@ -48,7 +48,7 @@ class Notification extends \glue\db\Document{
 	function relations(){
 		return array(
 			"video" => array('one', 'app\\models\\Video', "_id", 'on' => 'videoId'),
-			"response" => array('one', 'app\\models\\VideoResponse', "_id", 'on' => 'commentId'),
+			"response" => array('one', 'app\\models\\VideoResponse', "_id", 'on' => 'responseId'),
 			"sender" => array('one', 'app\\models\\User', '_id', 'on' => 'userId'),
 		);
 	}
