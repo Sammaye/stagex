@@ -1,0 +1,37 @@
+
+label{
+	float: left;
+    padding-top: 5px;
+    text-align: right;
+    width: 160px;
+    margin-bottom: 5px;
+    font-size: 14px;
+    font-weight: normal;
+    line-height: 20px;
+	margin-right:12px;
+}
+
+select, textarea,
+input[type="text"],
+input[type="password"]{
+    /*border-radius: 4px 4px 4px 4px;*/
+    color: #555555;
+    display: inline-block;
+    font-size: 13px;
+    height: 20px;
+    /*line-height: 20px;*/
+    margin-bottom: 10px;
+    padding: 4px 6px;
+    vertical-align: middle;
+    background-color: #FFFFFF;
+    border: 1px solid #BBBBBB;
+	font-family:Arial, Helvetica, sans-serif;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;
+}
+
+select:focus, textarea:focus,
+input[type="text"]:focus,
+input[type="password"]:focus{
+    border-color:#52A8EC;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(82, 168, 236, 0.6);
+}

@@ -1,0 +1,46 @@
+//
+// Breadcrumbs
+// --------------------------------------------------
+
+
+.breadcrumb {
+  padding: 8px 15px;
+  margin-bottom: @line-height-computed;
+  list-style: none;
+  background-color: @breadcrumb-bg;
+  border-radius: @border-radius-base;
+  > li {
+	  display: inline-block;
+	  zoom: 1;
+	  *display: inline;
+	  > .divider {
+	  	padding: 0 5px;
+	  	color: @breadcrumb-color;
+	  }
+  }
+  > .active {
+    color: @breadcrumb-active-color;
+  }
+}
+
+.breadcrumb-header{
+	ol{
+	  list-style: none;
+	  margin:0;
+	  > li {
+		  display: inline-block;
+		  zoom: 1;
+		  *display: inline;
+		  > .divider {
+		  	padding: 0 5px;
+		  	color: @breadcrumb-color;
+		  }
+	  }
+  	}
+  	h1{
+  		margin:0;
+  	}
+  	h1.jumbo{
+  		font-size: (@font-size-base * 4.5);
+  	}
+}

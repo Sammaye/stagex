@@ -7,20 +7,20 @@
 
 		<div class="form">
 			<?php echo $form->hiddenField($model, 'hash', array('value' => glue::http()->getCsrfToken())) ?>
-			<div class="row">
+			<div class="form-group">
 				<?php echo html::label("Email Address:", "email") ?>
 				<?php echo $form->textField($model, "email", array('class' => 'input-large')) ?>
 			</div>
-			<div class="row">
+			<div class="form-group">
 				<?php echo html::label("Password:", "password") ?>
 				<?php echo $form->passwordfield($model, "password", array('class' => 'input-large')) ?>
 			</div>
-			<div class="noninput_row">
-				<label class="checkbox">
+			  <div class="checkbox">
+			    <label>
 					<?php echo $form->checkbox($model, "remember", 1) ?>
 					Keep me logged in
-				</label>
-			</div>
+			    </label>
+			  </div>			
 
 			<?php if($attempts > 3){ ?>
 				<div class='captcha noninput_row'>
@@ -35,7 +35,7 @@
 			<?php } ?>
 
 			<div class="submit noninput_row">
-				<?php echo html::submitbutton('Sign in', array('class' => 'btn-success')) ?>
+				<?php echo html::submitbutton('Sign in', array('class' => 'btn btn-success', 'type'=>'submit')) ?>
 			</div>
 		</div>
 		<div class='footer'>

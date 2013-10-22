@@ -1,12 +1,4 @@
-body{
-	direction:ltr;
-    margin: 0;
-    padding: 0;
-	font-family:Arial, Helvetica, sans-serif;
-	unicode-bidi: embed;
-	font-size:14px;
-}
-
+/*
 h1{
 	font-size:20px;
 	font-weight:bold;
@@ -53,14 +45,10 @@ p{
 	font-size:14px;
 	line-height:20px;
 }
+*/
 
 .light{
 	color:#666666;
-}
-
-
-.small{
-	font-size:12px;
 }
 
 a,a:hover,a:visited{
@@ -72,42 +60,6 @@ a:hover{
 	text-decoration:underline;
 }
 
-label{
-	float: left;
-    padding-top: 5px;
-    text-align: right;
-    width: 160px;
-    margin-bottom: 5px;
-    font-size: 14px;
-    font-weight: normal;
-    line-height: 20px;
-	margin-right:12px;
-}
-
-select, textarea,
-input[type="text"],
-input[type="password"]{
-    /*border-radius: 4px 4px 4px 4px;*/
-    color: #555555;
-    display: inline-block;
-    font-size: 13px;
-    height: 20px;
-    /*line-height: 20px;*/
-    margin-bottom: 10px;
-    padding: 4px 6px;
-    vertical-align: middle;
-    background-color: #FFFFFF;
-    border: 1px solid #BBBBBB;
-	font-family:Arial, Helvetica, sans-serif;
-    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;
-}
-
-select:focus, textarea:focus,
-input[type="text"]:focus,
-input[type="password"]:focus{
-    border-color:#52A8EC;
-    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(82, 168, 236, 0.6);
-}
 
 select,input[type="file"]{
 	height:auto;
@@ -307,95 +259,6 @@ input.date{
 	border:1px solid #3861BD;
 }
 
-.btn{
-	border-radius: 2px 2px 2px 2px;
-	cursor: pointer;
-	font-size: 14px;
-    height: 32px;
-	line-height: 32px;
-	min-width: 54px;
-	padding: 0 8px;
-    text-align: center;
-	background-color: #F5F5F5;
-	font-family:arial,sans-serif;
-    background-image: -moz-linear-gradient(center top , #F5F5F5, #F1F1F1);
-    border: 1px solid #dddddd; color: #444444;
-    display:inline-block;
-}
-
-.btn.active,
-.btn:hover{
-    background: -moz-linear-gradient(center top , #EEEEEE, #E0E0E0) repeat scroll 0 0 transparent;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) inset;
-	border-color: #CCCCCC;
-	color: #333333;
-}
-
-.btn-success{
-	border-radius: 2px 2px 2px 2px;
-	cursor: pointer;
-	font-size: 14px;
-	height: 32px;
-	line-height: 32px;
-	min-width: 54px;
- 	outline: 0 none;
-	padding: 0 8px;
-	text-align: center;
-	background-color: #3D9400;
-	font-family:arial,sans-serif;
-    background-image: -moz-linear-gradient(center top , #3D9400, #398A00);
-	border: 1px solid #29691D;
-	color: #FFFFFF;
-	display:inline-block;
-    background-color: #5CB85C;
-    border-color: #4CAE4C;
-    color: #FFFFFF;	
-}
-
-.btn-success:visited{
-	color:#ffffff;
-}
-
-.btn-success.active,
-.btn-success:active,
-.btn-success:hover{
-	background-image:none;
-	background-color:#53A93F;
-	border:1px solid #2D6200;
-	background-color:#46A447;
-	border-color:#398439;
-}
-
-.btn:focus,.btn-success:focus{
-	border:1px solid #3861BD;
-}
-
-.btn-success.active,
-.btn-success:active{
-	box-shadow:0 3px 5px rgba(0,0,0,0.125) inset;
-}
-
-.btn-grey{
-	-moz-user-select: none;
-    background-color: #F5F5F5;
-    background-image: -moz-linear-gradient(center top , #F5F5F5, #F1F1F1);
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    border-radius: 2px 2px 2px 2px;
-    color: #6d6d6d;
-    cursor: pointer;
-    display: inline-block;
-    font: normal 14px/27px Roboto,arial,sans-serif;
-    height: 34px;
-    min-width: 54px;
-    padding: 0 10px;
-    text-align: center;
-    margin:0;
-}
-
-.btn-grey:hover{
-	border:1px solid #c6c6c6;
-}
-
 .btn-dark{
 	background-color: #474949;
 	background-image:none;
@@ -416,28 +279,6 @@ input.date{
 	background:#3a3c3c;
 	border-color:#2e2f2f;
 	box-shadow:none;
-	color:#fff;
-}
-
-.btn-primary{
-	background-color: #428BCA;
-    border-color: #428BCA;
-	background-image:none;
-    font-size: 14px;
-    font-weight: normal;
-    color:#fff;
-    line-height: 1.42857;
-    margin-bottom: 0;
-    padding: 6px 12px;
-    text-align: center;
-    vertical-align: middle;
-    white-space: nowrap;      
-}
-
-.btn-primary:hover{
-	background:#357EBD;
-	box-shadow:none;
-	border-color:#3071A9;
 	color:#fff;
 }
 
@@ -1101,12 +942,17 @@ input.date{
 	margin-top:80px;
 }
 
+
 .user_create_body h1{
 	margin-bottom:25px;
 }
 
+.user_create_body .form-cotrol{
+	width:90%;
+}
+
 .user_create_body .submit_row{
-	padding-left:170px;
+	text-align:center;
 	margin-top:20px;
 	margin-bottom:25px;
 }

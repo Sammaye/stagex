@@ -1,0 +1,66 @@
+// The grid container, used to contain the uncontainable
+.grid-container{ width:@grid-width; .clearfix; margin:auto; }
+
+// This denotes a column in the grid
+.grid-container .grid-col{
+	display:inline;
+	float: left;
+	position: relative;
+}
+
+// 49 columns for our pixel perfect page
+//
+// Yes I know! "49?? WTF??!!111" but this grid 
+// will apply to sizing EVERYTHING on the page
+// I calculate a single column processes to about 2% on the page 
+// and is RWD ready for when something like that (if ever) gets to it
+
+.col-1  { width: percentage((1 / @grid-columns)); }
+.col-2  { width: percentage((2 / @grid-columns)); }
+.col-3  { width: percentage((3 / @grid-columns)); }
+.col-4  { width: percentage((4 / @grid-columns)); }
+.col-5  { width: percentage((5 / @grid-columns)); }
+.col-6  { width: percentage((6 / @grid-columns)); }
+.col-7  { width: percentage((7 / @grid-columns)); }
+.col-8  { width: percentage((8 / @grid-columns)); }
+.col-9  { width: percentage((9 / @grid-columns)); }
+.col-10 { width: percentage((10/ @grid-columns)); }
+.col-11 { width: percentage((11/ @grid-columns)); }
+.col-12 { width: percentage((12/ @grid-columns)); }
+.col-13 { width: percentage((13/ @grid-columns)); }
+.col-14 { width: percentage((14/ @grid-columns)); }
+.col-15 { width: percentage((15/ @grid-columns)); }
+.col-16 { width: percentage((16/ @grid-columns)); }
+.col-17 { width: percentage((17/ @grid-columns)); }
+.col-18 { width: percentage((18/ @grid-columns)); }
+.col-19 { width: percentage((19/ @grid-columns)); }
+.col-20 { width: percentage((20/ @grid-columns)); }
+.col-21 { width: percentage((21/ @grid-columns)); }
+.col-22 { width: percentage((22/ @grid-columns)); }
+.col-23 { width: percentage((23/ @grid-columns)); }
+.col-24 { width: percentage((24/ @grid-columns)); }
+.col-25 { width: percentage((25/ @grid-columns)); }
+.col-26 { width: percentage((26/ @grid-columns)); }
+.col-27 { width: percentage((27/ @grid-columns)); }
+.col-28 { width: percentage((28/ @grid-columns)); }
+.col-29 { width: percentage((29/ @grid-columns)); }
+.col-30 { width: percentage((30/ @grid-columns)); }
+.col-31 { width: percentage((31/ @grid-columns)); }
+.col-32 { width: percentage((32/ @grid-columns)); }
+.col-33 { width: percentage((33/ @grid-columns)); }
+.col-34 { width: percentage((34/ @grid-columns)); }
+.col-35 { width: percentage((35/ @grid-columns)); }
+.col-36 { width: percentage((36/ @grid-columns)); }
+.col-37 { width: percentage((37/ @grid-columns)); }
+.col-38 { width: percentage((38/ @grid-columns)); }
+.col-39 { width: percentage((39/ @grid-columns)); }
+.col-40 { width: percentage((40/ @grid-columns)); }
+.col-41 { width: percentage((41/ @grid-columns)); }
+.col-42 { width: percentage((42/ @grid-columns)); }
+.col-43 { width: percentage((43/ @grid-columns)); }
+.col-44 { width: percentage((44/ @grid-columns)); }
+.col-45 { width: percentage((45/ @grid-columns)); }
+.col-46 { width: percentage((46/ @grid-columns)); }
+.col-47 { width: percentage((47/ @grid-columns)); }
+.col-48 { width: percentage((48/ @grid-columns)); }
+.col-49 { width: 100%; }
