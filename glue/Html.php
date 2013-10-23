@@ -545,10 +545,12 @@ class Html{
 		$message = $session_flash[0] ? $session_flash[0] : $message;
 		$class = $session_flash[1] ? $session_flash[1] : $class;
 
-		$html = html::openTag('div', array('class' => 'flash '.$class));
-		$html .= html::openTag('div', array('class' => 'message')).$message.html::closeTag('div');
+		$html = html::openTag('div', array('class' => 'alert '.$class));
+		$html .= '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>';
+		$html .= html::openTag('p', array('class' => 'message')).$message.html::closeTag('p');
 
-		$html .= html::a(array('href' => glue::http()->url('SELF'), 'text' => utf8_decode('&#215;'), 'class' => 'close'));
+		
+		//$html .= html::a(array('href' => glue::http()->url('SELF'), 'text' => utf8_decode('&#215;'), 'class' => 'close'));
 		$html .= html::open_closeTag('div', array('class' => 'clear'));
 
 		$html .= html::closeTag('div');

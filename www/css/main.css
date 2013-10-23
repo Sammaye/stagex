@@ -35,7 +35,7 @@ h5{
 	margin:0 0 10px 0;
 }
 */
-/*
+
 a,a:hover,a:visited{
 	color: #3861BD;
 	text-decoration:none;
@@ -44,8 +44,11 @@ a,a:hover,a:visited{
 a:hover{
 	text-decoration:underline;
 }
-*/
 
+label.radio,
+label.checkbox{
+	font-weight:normal;
+}
 
 select,input[type="file"]{
 	height:auto;
@@ -110,6 +113,10 @@ input.date{
 	border:1px solid #BBBBBB;
 	border-right:0;
 	background:#ffffff;
+}
+
+.form-search .search_input input{
+	border:0;
 }
 
 .form-search input[type="text"]{
@@ -741,8 +748,7 @@ input.date{
 }
 
 .userbody{
-	min-width:980px;
-	margin:15px 45px 0 45px;
+	margin:15px auto;
 }
 
 .userbody .user_side_menu{
@@ -1241,7 +1247,7 @@ input.date{
 
 .user_playlists_page .mass_edit_form .header h3,
 .user_videos_body .mass_edit_form .header h3{
-	float:left; margin-right:15px;
+	float:left; margin:5px 0 0 0; font-size:17px; 
 }
 
 .user_playlists_page .mass_edit_form .header .btn-success,
@@ -1249,8 +1255,8 @@ input.date{
 	float:right;
 }
 
-.user_playlists_page .mass_edit_form .header .btn-grey,
-.user_videos_body .mass_edit_form .header .btn-grey{
+.user_playlists_page .mass_edit_form .header .btn-default,
+.user_videos_body .mass_edit_form .header .btn-default{
 	float:right; margin-right:15px;
 }
 
@@ -1298,12 +1304,13 @@ input.date{
 }
 
 .checkbox_input{
-	background:url('/images/checkbox_o.png') 0 0 no-repeat;
+	background:url('/images/checkbox_n.png') -2px -4px no-repeat;
 	height:18px; width:18px;
 	/*width:24px;
 	height:24px;*/
 	border:0 none;
-	overflow:hidden;	
+	overflow:hidden;
+	border:0;	
 }
 
 .checkbox_input input[type="checkbox"]{
@@ -1311,6 +1318,7 @@ input.date{
 	border:0 none;
 	overflow:hidden;
 	opacity:0.01;
+	filter: alpha(opacity=0);	
 	margin:0;
 	padding:0;
 	/*height:24px;
@@ -1323,7 +1331,7 @@ input.date{
 }
 
 .checkbox_input.checked{
-	background-position:0 -18px;
+	background-position:-2px -56px;
 }
 
 .help_page{
@@ -1888,11 +1896,11 @@ input.date{
 }
 
 .advanced_filter_header input[type="text"]{
-	border-radius:3px;
+	border-radius:3px; float:left;
 }
 
 .advanced_filter_header input.search{
-	width:400px; margin-right:65px;
+	width:400px; margin-right:30px;
 }
 
 .advanced_filter_header .search_input input{
@@ -1903,16 +1911,12 @@ input.date{
 	float:right;vertical-align:middle;height:30px;
 }
 
-.advanced_filter_header button{
-	margin:0;height:30px;line-height:30px;
-}
-
 .advanced_filter_header .sep{
-	display:inline-block; line-height:30px; margin:0 5px;
+	float:left; line-height:30px; margin:0 5px;
 }
 
 .advanced_filter_header .btn{
-	margin-left:20px;
+	margin-left:20px; float:left;
 }
 
 .videos_nav_top{

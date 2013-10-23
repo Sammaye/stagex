@@ -68,22 +68,21 @@ $this->js('page', "
 ");
 ?>
 <div class="rated_videos_body">
-	<div class="tabs-nav videos_nav_top">
-		<ul>
+	<div class="videos_nav_top">
+		<ul class="nav nav-tabs">
 			<li><a href="/user/videos">Uploads</a></li>
 			<li><a href="/user/watched">Watched</a></li>
-			<li><a href="/user/rated" <?php if(glue::http()->param('tab',null)!=='dislikes') echo 'class="selected"'; ?>>Liked</a></li>
-			<li><a href="/user/rated?tab=dislikes" <?php if(glue::http()->param('tab',null)==='dislikes') echo 'class="selected"'; ?>>Disliked</a></li>
+			<li <?php if(glue::http()->param('tab',null)!=='dislikes') echo 'class="active"'; ?>><a href="/user/rated">Liked</a></li>
+			<li <?php if(glue::http()->param('tab',null)==='dislikes') echo 'class="active"'; ?>><a href="/user/rated?tab=dislikes">Disliked</a></li>
 		</ul>
-		<a class="btn-success btn-upload" href="<?php echo glue::http()->url('/video/upload', array(), glue::$params['uploadBase']) ?>">Add New Upload</a>
+		<a class="btn btn-success btn-upload" href="<?php echo glue::http()->url('/video/upload', array(), glue::$params['uploadBase']) ?>">Add New Upload</a>
 	</div>
-
 	<div class="advanced_filter_header">   
-    	<div class='search'>
+    	<div class='search clearfix'>
 		<?php $form = Html::form(array('method' => 'get')); ?>
-			<?php echo html::textfield('query',htmlspecialchars(glue::http()->param('query',null)),array('placeholder'=>'Enter keywords to search by', 'autocomplete'=>'off', 'class'=>'search')) ?>
-			<input type="text" id="from" class="date" name="from_date" placeholder="Enter start date" value="<?php echo htmlspecialchars(glue::http()->param('from_date',null)) ?>"/> <span class="sep">-</span> 
-			<input type="text" id="to" class="date" name="to_date" placeholder="Enter end date" value="<?php echo htmlspecialchars(glue::http()->param('to_date',null)) ?>"/>	<button class="btn">Search</button>
+			<?php echo html::textfield('query',htmlspecialchars(glue::http()->param('query',null)),array('placeholder'=>'Enter keywords to search by', 'autocomplete'=>'off', 'class'=>'search form-control')) ?>
+			<input type="text" id="from" class="date form-control" name="from_date" placeholder="Enter start date" value="<?php echo htmlspecialchars(glue::http()->param('from_date',null)) ?>"/> <span class="sep">-</span> 
+			<input type="text" id="to" class="date form-control" name="to_date" placeholder="Enter end date" value="<?php echo htmlspecialchars(glue::http()->param('to_date',null)) ?>"/>	<button type="button" class="btn btn-default">Search</button>
 			<?php echo html::hiddenfield('tab',html::encode(glue::http()->param('tab',null))) ?>
 			<?php $form->end() ?>
 		</div>		

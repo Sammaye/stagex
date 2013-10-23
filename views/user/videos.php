@@ -149,9 +149,6 @@ $this->js('videos', "
 	</div>	
 
 	<div class="header">
-		<!-- <div class="left">
-    	    <a class="btn-success" href="<?php //echo glue::http()->url('/video/upload', array(), glue::$params['uploadBase']) ?>">Add New Upload</a>
-    	</div> -->
     		<div class='search form-search'>
 			<?php $form = Html::form(array('method' => 'get')); ?><div class="search_input">
 				<?php app\widgets\Jqautocomplete::widget(array(
@@ -169,7 +166,7 @@ $this->js('videos', "
 							.append( '<a class=\'content\'><span>' + item.label + '</span></div></a>' )
 							.appendTo( ul );
 				"))  ?></div><button class="submit_search"><span>&nbsp;</span></button>
-				<span class='light small amount_found'><?php echo $video_rows->count() ?> found</span>
+				<span class='text-muted small amount_found'><?php echo $video_rows->count() ?> found</span>
 			<?php $form->end() ?>
 			</div>    	
     	<div class="clear"></div>
@@ -182,51 +179,50 @@ $this->js('videos', "
     	$vModel->populateDefaults(); 
     	
     	?>
-	   	<div class="header">
+	   	<div class="header clearfix">
     		<h3>Edit Videos</h3>
-    		<input type="button" class="btn-success save" value="Save"/>
-    		<input type="button" class="btn-grey cancel" value="Cancel"/>
-    		<div class="clear"></div>
+    		<button type="button" class="btn btn-success save">Save</button>
+    		<button type="button" class="btn btn-default cancel">Cancel</button>
     	</div>    	
     	
     	<div class='alert'></div>
     	
     	<div class="mass_edit_block form-stacked">
     		<a href="#" class="edit">+ Edit Title</a>
-    		<div class="form">
+    		<div class="form clearfix">
     		<a href="#" class="remove">Remove</a>
     		<div class="right">    	
-    		<label>Title:</label><?php echo $form->textField($vModel,'title') ?>
-    		</div></div><div class="clear"></div>
+    		<label>Title:</label><?php echo $form->textField($vModel,'title',array('class'=>'form-control')) ?>
+    		</div></div>
     	</div>
     	<div class="mass_edit_block form-stacked">
     		<a href="#" class="edit">+ Edit Description</a>
-    		<div class="form">
+    		<div class="form clearfix">
     		<a href="#" class="remove">Remove</a>
     		<div class="right">
-    		<label>Description:</label><?php echo $form->textArea($vModel,'description') ?>
-    		</div></div><div class="clear"></div>
+    		<label>Description:</label><?php echo $form->textArea($vModel,'description',array('class'=>'form-control')) ?>
+    		</div></div>
     	</div>
     	<div class="mass_edit_block form-stacked">
     		<a href="#" class="edit">+ Edit Tags</a>
-    		<div class="form">
+    		<div class="form clearfix">
     		<a href="#" class="remove">Remove</a>
     		<div class="right">
 			<label>Tags:</label>
-    	    <?php echo html::activeTextField($vModel, 'stringTags') ?>	
-			</div></div><div class="clear"></div>
+    	    <?php echo html::activeTextField($vModel, 'stringTags',array('class'=>'form-control')) ?>	
+			</div></div>
     	</div>     	
     	<div class="mass_edit_block form-stacked">
     		<a href="#" class="edit">+ Edit Category</a>
-    		<div class="form">
+    		<div class="form clearfix">
     		<a href="#" class="remove">Remove</a>
     		<div class="right">
-			<label>Category:</label><?php echo html::activeSelectbox($vModel, 'category', $vModel->categories('selectBox')) ?>
-			</div></div><div class="clear"></div>
+			<label>Category:</label><?php echo html::activeSelectbox($vModel, 'category', $vModel->categories('selectBox'),array('class'=>'form-control')) ?>
+			</div></div>
     	</div>    	
     	<div class="mass_edit_block">
     		<a href="#" class="edit">+ Edit Listing</a>
-    		<div class="form">
+    		<div class="form clearfix">
     		<a href="#" class="remove">Remove</a>
     		<div class="right">
 			<?php $grp = html::activeRadio_group($vModel, 'listing') ?>
@@ -237,62 +233,61 @@ $this->js('videos', "
 			<label class="radio"><?php echo $grp->add(2) ?>Private</label>
 			<p class='light'>No one but you can access this video</p>
 			</div>
-			</div><div class="clear"></div>
+			</div>
     	</div>
     	<div class="mass_edit_block form-stacked">
     		<a href="#" class="edit">+ Edit Licence</a>
-    		<div class="form">
+    		<div class="form clearfix">
     		<a href="#" class="remove">Remove</a>
     		<div class="right">
-			<label>Licence:</label>
     	    <?php $grp = html::activeRadio_group($vModel, 'licence') ?>
 			<label class="radio"><?php echo $grp->add('1') ?>Standard StageX Licence</label>
 			<label class="radio"><?php echo $grp->add('2') ?>Creative Commons Licence</label>
 			</div>			
-			</div><div class="clear"></div>
+			</div>
     	</div>     	
     	<div class="mass_edit_block">
     		<a href="#" class="edit">+ Edit Mature Rating</a>
-    		<div class="form">
+    		<div class="form clearfix">
     		<a href="#" class="remove">Remove</a>
     		<div class="right">    	
     		<label class="checkbox"><?php echo $form->checkbox($vModel, 'mature', 1) ?>This video is not suitable for family viewing</label>
-    		</div></div><div class="clear"></div>
+    		</div></div>
     	</div>    	
     	<div class="mass_edit_block">
     		<a href="#" class="edit">+ Edit Statistics</a>
-    		<div class="form">
+    		<div class="form clearfix">
     		<a href="#" class="remove">Remove</a>
     		<div class="right">    	
     		<label class="checkbox"><?php echo $form->checkbox($vModel,'privateStatistics', 1) ?>Make my statistics private</label>
-    		</div></div><div class="clear"></div>
+    		</div></div>
     	</div>
     	<div class="mass_edit_block">
     		<a href="#" class="edit">+ Edit Voting</a>
-    		<div class="form">
+    		<div class="form clearfix">
     		<a href="#" class="remove">Remove</a>
     		<div class="right">    	
     		<label class='checkbox'><?php echo $form->checkbox($vModel, "voteable", 1) ?>Allow users to vote on this video</label>
-    		</div></div><div class="clear"></div>
+    		</div></div>
     	</div>
     	<div class="mass_edit_block">
     		<a href="#" class="edit">+ Edit Embedding</a>
-    		<div class="form">
+    		<div class="form clearfix">
     		<a href="#" class="remove">Remove</a>
     		<div class="right">    	
     		<label class="checkbox"><?php echo $form->checkbox($vModel,'embeddable', 1) ?>Allow my video to be embedded</label>
-    		</div></div><div class="clear"></div>
+    		</div></div>
     	</div>
     	<div class="mass_edit_block">
     		<a href="#" class="edit">+ Edit Comments</a>
-    		<div class="form">
+    		<div class="form clearfix">
     		<a href="#" class="remove">Remove</a>
     		<div class="right">    	
 			<label class='checkbox'><?php echo $form->checkbox($vModel, "moderated", 1) ?>Moderate Responses</label>
 			<label class='checkbox'><?php echo $form->checkbox($vModel, "voteableComments", 1) ?>Allow users to vote on responses</label>
 			<label class='checkbox'><?php echo $form->checkbox($vModel, "allowVideoComments", 1) ?>Allow video responses</label>
 			<label class='checkbox'><?php echo $form->checkbox($vModel, "allowTextComments", 1) ?>Allow text responses</label>
-			</div></div><div class="clear"></div>
+			</div></div>
     	</div>
     	<?php $form->end(); ?>
     </div>
@@ -302,10 +297,10 @@ $this->js('videos', "
 			<div class='stickytoolbar-bar'>
 				<div class='inner_bar'>
 					<div class='checkbox_button checkbox_input'><?php echo Html::checkbox('selectAll', 1, 0, array('class' => 'selectAll_input')) ?></div>
-					<button class='btn btn-dark selected_actions edit_videos_button'>Edit</button>
-					<button class='btn-grey selected_actions btn_delete'>Delete</button>
+					<button class='btn btn-default selected_actions edit_videos_button'>Edit</button>
+					<button class='btn btn-default selected_actions btn_delete'>Delete</button>
 					<div class="btn-group dropdown-group playlist-dropdown">
-						<button class='btn-grey add_to_playlist dropdown-anchor'>Add To <span class="caret">&#9660;</span></button>
+						<button class='btn btn-default add_to_playlist dropdown-anchor'>Add To <span class="caret"></span></button>
 						<div class="dropdown-menu">
 							<div class="head_ribbon">
 								<a href="#" data-id="<?php echo glue::user()->watchLaterPlaylist()->_id ?>" class='watch_later playlist_link'>Watch Later</a>

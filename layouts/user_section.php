@@ -46,9 +46,9 @@ $this->beginPage() ?>
 	<body>
 		<?php $this->beginBody() ?>
 			<?php app\widgets\Menu::widget(); ?>
-			<div class='userbody'>
+			<div class='grid-container userbody'>
 				<?php app\widgets\UserMenu::widget(array('tab'=>$this->tab)) ?>
-				<div class='grid_block alpha omega user_section_main_content' style='float:left; width:820px;'>
+				<div class='user_section_main_content' style='float:left; width:820px;'>
 					<?php echo $content ?>
 				</div>
 				<div class="clear"></div>
