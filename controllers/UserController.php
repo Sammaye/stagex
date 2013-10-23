@@ -41,7 +41,7 @@ class userController extends \glue\Controller{
 				}
 			}
 		}
-
+//var_dump($model->getErrors());
 		echo $this->render("create", array("model" => $model));
 	}
 

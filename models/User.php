@@ -172,7 +172,7 @@ class User extends \glue\User{
 
 	function rules(){
 		return array(
-		array('username, password, email', 'required'),
+		array('username, password, email', 'required', 'message' => 'You must fill in all of the fields'),
 
 		array('autoshareUploads, autoshareResponses, autoshareLikes, autoshareAddToPlaylist, birthdayPrivacy, genderPrivacy, countryPrivacy,
 				singleSignOn, emailLogins, autoplayVideos, useDivx, canUpload, banned', 'boolean', 'allowNull'=>true),

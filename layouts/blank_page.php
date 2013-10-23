@@ -46,6 +46,7 @@ $this->beginPage() ?>
 	<body>
 		<?php $this->beginBody() ?>
 			<?php app\widgets\Menu::widget() ?>
+		
 			<?php echo $content ?>
 			<div id="mainSearch_results"></div>
 		<?php $this->endBody() ?>

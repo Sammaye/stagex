@@ -306,7 +306,6 @@ class Model{
 	 * @param boolean $runEvents Whether or not to run the events of the model
 	 */
 	public function validate($runEvents = true){
-
 		$data = $this->getAttributes();
 		$this->clearErrors();
 		$this->setValidated(false);
@@ -314,13 +313,15 @@ class Model{
 		if($runEvents && !$this->onBeforeValidate()){
 			$this->setValidated(true); return false; // NOT VALID
 		}
+
 		if(($validator=$this->getValidator())!==null){
 			$validator->model=$this;
 			$validator->scenario=$this->getScenario();
 			$validator->rules=$this->getRules($validator->scenario);
+			//$valid=true;
 			$valid=$validator->run();
 		}
-
+		
 		$this->error_codes=\glue\Collection::mergeArray($this->error_codes,$validator->error_codes);
 		$this->error_messages=\glue\Collection::mergeArray($this->error_messages,$validator->error_messages);
 

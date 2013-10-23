@@ -8,6 +8,57 @@ use glue,
 class Menu extends \glue\Widget{
 
 	function render(){ ?>
+	
+<div class="navbar navbar-default navbar-fixed-top">
+  <!-- Brand and toggle get grouped for better mobile display -->
+  <div class="grid-container">
+  <div class="navbar-header">
+    <a class="navbar-brand" href="<?php echo glue::http()->url('/') ?>"><img src="/images/main_logo.png" alt="StageX"/></a>
+  </div>
+
+  <form class="navbar-form navbar-left">
+	<div class="form-search">
+		<input type="text" class="form-search-input"/>
+		<button type="submit" class="btn btn-primary"><span>&nbsp;</span></button>
+	</div>
+  </form>
+
+  <div class="navbar-nav">
+    <a href="<?php echo Glue::http()->url("/video") ?>">Browse</a>
+  </div>
+
+	<div class="navbar-right">
+	  <div class="navbar-nav">
+		<?php if(glue::session()->authed){ ?>
+		<?php $newNotifications = \app\models\Notification::getNewCount_Notifications(); ?>
+	  	<a href="/stream/notifications" class="notification <?php if($newNotifications > 0): echo "new_notifications"; endif; ?>">
+	  		<?php if($newNotifications > 100){ ?>
+				100+
+			<?php }else{
+				echo $newNotifications;
+			} ?>
+		</a>
+		<img src="<?php echo glue::user()->getAvatar(30,30) ?>" style="width:30px;height:30px;"/>				
+	    <a href="<?php echo Glue::http()->url("/user/videos", array('id' => glue::user()->_id)) ?>"><?php echo glue::user()->getUsername() ?></a>
+	    <a href="<?php echo Glue::http()->url("/help") ?>">Help</a>
+		<?php }else{ ?>	  
+	    <a href="<?php echo Glue::http()->url("/user/create") ?>">Signup</a>
+	    <a href="<?php echo Glue::http()->url("/user/login") ?>">Login</a>
+	    <a href="<?php echo Glue::http()->url("/help") ?>">Help</a>
+	    <?php } ?>
+	  </div>
+  	</div>
+  	</div>
+</div>	
+
+		<?php if(html::hasFlashMessage()){
+			?><div style='width:980px; margin:15px 45px;'><?php 
+			echo html::getFlashMessage();
+			?></div><?php 
+		}
+	}
+	
+	function old_render(){ ?>
 		<div class='menu' style=''>
 			<div class="menu_left">
 				<ul>
@@ -56,8 +107,7 @@ class Menu extends \glue\Widget{
 
 								<?php $newNotifications = \app\models\Notification::getNewCount_Notifications(); ?>
 								<a class='notification_area <?php if($newNotifications > 0): echo "new_notifications"; endif; ?>' href='/stream/notifications'>
-								<?php
-								if($newNotifications > 100){ ?>
+								<?php if($newNotifications > 100){ ?>
 									100+
 								<?php }else{
 									echo $newNotifications;
@@ -78,12 +128,6 @@ class Menu extends \glue\Widget{
 				</div>
 				<div class="clear"></div>
 			<?php } ?>
-		</div>
-
-		<?php if(html::hasFlashMessage()){
-			?><div style='width:980px; margin:15px 45px;'><?php 
-			echo html::getFlashMessage();
-			?></div><?php 
-		}
+		</div><?php 	
 	}
 }

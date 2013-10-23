@@ -28,7 +28,7 @@ class Validation extends \glue\Component{
 			throw new Exception("A valid set of rules must be applied");
 
 		$this->clearErrors();
-		
+		//echo "unning validator";
 		foreach($this->rules as $k => $rule){
 			$valid=$this->validateRule($rule)&&$valid;
 		}
@@ -81,6 +81,11 @@ class Validation extends \glue\Component{
 			}
 		}
 
+		//if(!$valid)
+			//var_dump($rule);
+		
+		//var_dump($message);
+		
 		// If there is only one field to this rule then we can actually apply it to that field
 		if(!$valid && count($scope) <= 1){
 			if($message)

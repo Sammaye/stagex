@@ -138,14 +138,14 @@ $this->js('videos', "
 ?>
 <div class="user_videos_body">
 
-	<div class="tabs-nav videos_nav_top">
-		<ul>
-			<li><a href="/user/videos" class="selected">Uploads</a></li>
+	<div class="videos_nav_top">
+		<ul class="nav nav-tabs">
+			<li class="active"><a href="/user/videos">Uploads</a></li>
 			<li><a href="/user/watched">Watched</a></li>
 			<li><a href="/user/rated">Liked</a></li>
 			<li><a href="/user/rated?tab=dislikes">Disliked</a></li>
 		</ul>
-		<a class="btn-success btn-upload" href="<?php echo glue::http()->url('/video/upload', array(), glue::$params['uploadBase']) ?>">Add New Upload</a>
+		<a class="btn btn-success btn-upload" href="<?php echo glue::http()->url('/video/upload', array(), glue::$params['uploadBase']) ?>">Add New Upload</a>
 	</div>	
 
 	<div class="header">

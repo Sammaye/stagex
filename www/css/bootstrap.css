@@ -1051,7 +1051,7 @@ output {
 }
 .form-control {
   display: block;
-  width: 100%;
+  width: 94.5%;
   line-height: 20px;
   height: 20px;
   padding: 4px 6px;
@@ -1361,7 +1361,7 @@ textarea.input-lg {
 }
 .form-search-input {
   display: block;
-  width: 100%;
+  width: 94.5%;
   line-height: 20px;
   height: 20px;
   padding: 4px 6px;
@@ -1448,7 +1448,7 @@ textarea.form-search-input {
 }
 .form-search-lg .form-search-input {
   display: block;
-  width: 100%;
+  width: 94.5%;
   line-height: 20px;
   height: 20px;
   padding: 4px 6px;
