@@ -1,3 +1,45 @@
+.form-vertical .row{}
+
+.form-vertical label{
+    padding-top: 5px;
+    text-align: right;
+    width: 160px;
+    margin-bottom: 5px;
+    font-size: 14px;
+    font-weight: normal;
+    line-height: 20px;
+	margin-right:12px;	
+}
+
+.form-vertical .noninput_row{
+	padding-left:170px;
+}
+
+.form-vertical .submit{}
+
+.form-vertical .footer{
+	border-top:1px solid #cccccc;
+	text-align:center;
+	padding-top:10px;
+	margin-top:20px;
+}
+
+.form-vertical .submit_row{
+	padding-left:170px;
+}
+
+.form-stacked{
+	
+}
+
+.form-stacked label{
+	display:block;
+	float:none;
+	text-align:left;
+	width:auto;
+	margin:0 0 5px 0;
+}
+
 
 label{
 	float: left;
@@ -56,5 +98,53 @@ input[type="password"]:focus{
 .radio input[type="radio"],.checkbox input[type="checkbox"]{
 	float: left;
     margin-left: -20px;
+}
+*/
+
+/*
+h1{
+	font-size:20px;
+	font-weight:bold;
+	margin:10px 0;
+	color:#333333;
+	line-height:22px;
+}
+
+h2{
+	font-size:18px;
+	font-weight:bold;
+	margin:10px 0;
+	color:#333333;
+}
+
+h3{
+	font-size:16px;
+	font-weight:bold;
+	margin:10px 0;
+	color:#333333;
+}
+
+h4{
+	margin:10px 0;
+	font-weight:bold;
+	color:#333333;
+	font-size:14px;
+}
+
+h5{
+	font-weight:bold;
+	color:#333333;
+	font-size:13px;
+	margin:0 0 10px 0;
+}
+*/
+/*
+a,a:hover,a:visited{
+	color: #3861BD;
+	text-decoration:none;
+}
+
+a:hover{
+	text-decoration:underline;
 }
 */

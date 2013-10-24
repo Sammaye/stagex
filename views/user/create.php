@@ -1,10 +1,11 @@
 <?php use glue\Html; ?>
 <div class='user_create_body grid-container'>
-	<h1>Register for a StageX account</h1>
-	<?php $form = html::activeForm(array('class'=>'form-horizontal')); ?>
 		<?php echo html::form_summary($model, array(
 			'errorHead' => '<h4>Could not complete registration</h4>Your account could not be created because:'
 		)) ?>
+	<h1>Register for a StageX account</h1>
+	<?php $form = html::activeForm(array('class'=>'form-horizontal')); ?>
+
 
 		<?php echo $form->hiddenfield($model, "hash", array("value"=>glue::http()->getCsrfToken())) ?>
 		<div class="form">

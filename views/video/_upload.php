@@ -26,25 +26,25 @@
 				</div>
 
 				<?php $form = html::activeForm(array('action' => '')) ?>
-					<div class="form-stacked left">
-						<div class="form_row"><?php echo html::label('Title', 'title') ?><?php echo html::activeTextField($model, 'title') ?></div>
-						<div class="form_row"><?php echo html::label('Description', 'description')?><?php echo html::activeTextarea($model, 'description') ?></div>
-						<div class="form_row last"><?php echo html::label('Tags', 'stringTags') ?><?php echo html::activeTextField($model, 'string_tags') ?></div>			
-						<input type="button" class="btn-success" value="Save Video Details"/>
+					<div class="left">
+						<div class="form-group"><?php echo html::label('Title', 'title') ?><?php echo html::activeTextField($model, 'title',array('class' => 'form-control')) ?></div>
+						<div class="form-group"><?php echo html::label('Description', 'description')?><?php echo html::activeTextarea($model, 'description',array('class' => 'form-control')) ?></div>
+						<div class="form-group last"><?php echo html::label('Tags', 'stringTags') ?><?php echo html::activeTextField($model, 'string_tags',array('class' => 'form-control')) ?></div>			
+						<input type="button" class="btn btn-success" value="Save Video Details"/>
 					</div>
 					<div class='right'>
-						<h4>Category</h4><?php echo html::activeSelectbox($model, 'category', $model->categories('selectBox')) ?>
-						<h4>Adult Content</h4>
+						<h4>Category</h4><?php echo html::activeSelectbox($model, 'category', $model->categories('selectBox'),array('class' => 'form-control')) ?>
+						<h4 class="adult">Adult Content</h4>
 						<label class="checkbox"><?php echo $form->checkbox($model, 'mature', 1) ?>This video is not suitable for family viewing</label>
 						<h4>Listing</h4>
 						<?php $grp = html::activeRadio_group($model, 'listing') ?>
 						<div class="label_options">
 							<label class="radio"><?php echo $grp->add(0) ?>Listed</label>
-							<p class='light'>Your video is public to all users of StageX</p>
+							<p class='text-muted'>Your video is public to all users of StageX</p>
 							<label class="radio"><?php echo $grp->add(1) ?>Unlisted</label>
-							<p class='light'>Your video is hidden from listings but can still be accessed directly using the video URL</p>
+							<p class='text-muted'>Your video is hidden from listings but can still be accessed directly using the video URL</p>
 							<label class="radio"><?php echo $grp->add(2) ?>Private</label>
-							<p class='light'>No one but you can access this video</p>
+							<p class='text-muted'>No one but you can access this video</p>
 						</div>
 						<h4>Licence (<a href='#'>Learn More</a>)</h4>
 						<?php $grp = html::activeRadio_group($model, 'licence') ?>

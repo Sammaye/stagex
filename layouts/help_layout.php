@@ -16,12 +16,9 @@ $this->beginPage() ?>
 		<?php
 			echo Html::jsFile('/js/jquery.js')."\n";
 			echo Html::jsFile('/js/jquery-ui.js')."\n";
-
-			echo Html::jsFile("/js/facebox.js")."\n";
 			echo Html::jsFile('/js/common.js')."\n";
 
-			echo Html::cssFile("/css/reset.css")."\n";
-			echo Html::cssFile("/css/960.css")."\n";
+			echo Html::cssFile("/css/bootstrap.css")."\n";
 			echo Html::cssFile("/css/main.css")."\n";
 
 			$this->js('ga_script', "var _gaq = _gaq || [];
@@ -50,8 +47,13 @@ $this->beginPage() ?>
 		<div class="help_page help_layout">
 		<div class='head'>
 			<div class="left">
-			<div><a href="/help">Support</a> &rsaquo; <?php echo isset($model) ? $model->getBreadCrumb() : '' ?></div>
-			<h1 class="hero"><?php if(isset($model)&&$model!==null): echo $model->title; else: echo "404 Not Found"; endif; ?></h1>
+			<div class="breadcrumb-header">
+			<ol class="">
+			  <li><a href="/help">Support</a> <span class="divider">/</span></li>
+			  <?php echo isset($model) ? $model->getBreadCrumb() : '' ?>
+			</ol>
+			<h1 class="jumbo"><?php if(isset($model)&&$model!==null): echo $model->title; else: echo "404 Not Found"; endif; ?></h1>
+			</div>			
 			</div>
     		<div class='search form-search'>
 			<?php $form = Html::form(array('method' => 'get', 'action' => '/help/search')); ?><div class="search_input">
