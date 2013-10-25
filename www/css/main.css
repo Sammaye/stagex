@@ -1393,10 +1393,15 @@ input.date{
 .watch_page .share_content .share_status_text{
 	width:400px;
 	height:120px;
+	margin-bottom:15px;
 }
 
 .watch_page .share_content h4{
 	margin-top:0;
+}
+
+.watch_page .share_content .network_bc{
+	list-style:none; padding:0;
 }
 
 .watch_page .share_content .network_bc li{
@@ -1646,7 +1651,7 @@ input.date{
 }
 
 .watch_page .share_content .share_item_with_subs{
-	float:left; margin-right:45px;
+	float:left; margin-right:20px;
 }
 
 .watch_page .share_content .share_other{

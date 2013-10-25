@@ -386,8 +386,8 @@ $this->js('edit', "
 			<div class='share_item_with_subs'>
 			<h4>Share with your subscribers</h4>
 			<?php echo html::textarea('share_status_text', 'Add some text here if you wish to describe why you shared this video or just click the share button to continue', 
-					array('class' => 'share_status_text share_status_text_unchanged')) ?>
-			<div><input type="button" class="btn-success" value="Share"/></div>
+					array('class' => 'share_status_text share_status_text_unchanged form-control')) ?>
+			<div><input type="button" class="btn btn-success" value="Share"/></div>
 			</div>
 		<?php } ?>
 		<div class="share_other">
@@ -399,7 +399,7 @@ $this->js('edit', "
 				<li><g:plusone size="medium" annotation="inline" href="<?php echo glue::http()->url('/video/watch', array('id' => $model->_id)) ?>"></g:plusone></li>
 			</ul>		
 			<div class="clear"></div>
-			<input type="text" class="select_all_onfoc" value="<?php echo glue::http()->url("/video/watch", array("id"=>$model->_id)) ?>" />
+			<input type="text" class="select_all_onfoc form-control" value="<?php echo glue::http()->url("/video/watch", array("id"=>$model->_id)) ?>" />
 			<div class="clear"></div>	
 			<?php if($model->embeddable){ ?>
 			<h4>Embed:</h4>
@@ -421,7 +421,7 @@ $this->js('edit', "
 			<label class="radio"><?php echo $grp->add('dirty'); ?>Just plain dirty</label>
 			</div>
 			<div class="submit_report">
-			<input type="button" class="btn-success" value="Report Video"/>
+			<input type="button" class="btn btn-success" value="Report Video"/>
 			<p class="light">Abuse of this function may result in account deletion</p>
 			</div><div class="clear"></div>
 		</div>
