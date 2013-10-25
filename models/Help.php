@@ -31,13 +31,18 @@ class Help extends \glue\db\Document{
 		$breadcrumb = explode(",", $this->path);
 		$final_breadcrumb = array();
 
+		$c=0;
 		foreach($breadcrumb as $i => $item){
 			if($item != $this->normalisedTitle){
 				$itemModel = self::model()->findOne(array('normalisedTitle' => $item));
-				$final_breadcrumb[$i] = \html::a(array('href' => glue::http()->url('/help/view', array('title' => $item)), 'text' => $itemModel->title));
-			}
+				$final_breadcrumb[$i] = \html::openTag('li')
+					.\html::a(array('href' => glue::http()->url('/help/view', array('title' => $item)), 'text' => $itemModel->title))
+					.($c<(count($breadcrumb)-2)?\html::openTag('span',array('class'=>'divider')).'/'.\html::closeTag('span'):'')
+					.\html::closeTag('li');
+			} $c++;
 		}
-		return implode(' '.utf8_decode('&rsaquo;').' ', $final_breadcrumb);
+		return implode(' ',$final_breadcrumb);
+		//implode(' '.utf8_decode('&rsaquo;').' ', $final_breadcrumb);
 	}
 
 	function getParentTopic_selectedVal(){

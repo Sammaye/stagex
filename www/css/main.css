@@ -122,6 +122,19 @@ input.date{
 	border:1px solid #3861BD;
 }
 
+.btn-search-icon span{
+	background:url(/images/search_icon_small_white.png) no-repeat 0 0;
+	margin:0 0 0 3px;
+	width:20px;
+	display:block;	
+}
+
+.form-search-lg .btn-search-icon span{
+	background:url(/images/search_icon_small_white.png) no-repeat 2px 4px;
+	width:20px;
+	display:block;	
+}
+
 .btn-dark{
 	background-color: #474949;
 	background-image:none;
@@ -1314,6 +1327,14 @@ input.date{
 	width:200px;
 }
 
+.help_layout .result h2{
+	font-size:25px;
+}
+
+.help_layout .result .breadcrumb{
+	padding:5px 0 0 0; background:none;
+}
+
 .help_page .no_results_found,
 .help_page_view .no_results_found{
 	text-align:left;
@@ -1321,6 +1342,14 @@ input.date{
 
 .help_page_view .article{
 	margin-bottom:30px;
+}
+
+.help_page_view .pages{
+	list-style:none; padding:0;
+}
+
+.help_page_view .pages h2{
+	font-size:25px;
 }
 
 .help_modal .form-vertical{
@@ -1349,6 +1378,10 @@ input.date{
 
 .help_page .search_head{
 	margin:50px 0;
+}
+
+.help_search_large .form-search-input{
+	width:600px;
 }
 
 .help_page .search_head .head_breadcrumb{

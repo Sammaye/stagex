@@ -1,25 +1,33 @@
 <div class="help_page help_layout">
 	<div class='search_head'>
-		<div class='head_breadcrumb'><a href="/help">Support</a> &rsaquo;</div>
-	    <div class='search hero-search'>
-			<?php $form = html::form(array('action' => '/help/search', 'method' => 'get')); ?><div class="search_input">
-				<?php app\widgets\Jqautocomplete::widget(array(
-					'attribute' => 'query',
-					'value' => htmlspecialchars(glue::http()->param('query', '')),				
-					'options' => array(
-						'appendTo' => '#help_search_results',
-						'source' => '/help/suggestions',
-						'minLength' => 2,
-					), 'placeholder' => 'Type in your question and search',
-					'renderItem' => "
-						return $( '<li></li>' )
-							.data( 'item.autocomplete', item )
-							.append( '<a class=\'content\'>' + item.label + '</a>' )
-							.appendTo( ul );
-				")) ?></div><button class="submit_search"><span>&nbsp;</span></button>
+		<div class="breadcrumb-header">
+		<ol class="">
+		  <li><a href="/help">Support</a> <span class="divider">/</span></li>
+		  <li><a href="/help/search">Search</a> <span class="divider">/</span></li>
+		</ol>
+		<div class="form-search-lg help_search_large">
+			<?php $form = html::form(array('action' => '/help/search', 'method' => 'get')); ?>
+			<?php app\widgets\Jqautocomplete::widget(array(
+				'htmlOptions' => array(
+					'class' => 'form-search-input',
+				),
+				'attribute' => 'query',
+				'value' => htmlspecialchars(glue::http()->param('query', '')),				
+				'options' => array(
+					'appendTo' => '#help_search_results',
+					'source' => '/help/suggestions',
+					'minLength' => 2,
+				), 'placeholder' => 'Type in your question and search',
+				'renderItem' => "
+					return $( '<li></li>' )
+						.data( 'item.autocomplete', item )
+						.append( '<a class=\'content\'>' + item.label + '</a>' )
+						.appendTo( ul );
+			")) ?>			
+			<button type="submit" class="btn btn-primary btn-search-icon"><span>&nbsp;</span></button>
 			<?php $form->end() ?>
-		</div> 	
-		<div class="clear"></div>
+		</div>				
+		</div>		
 	</div>
 
 	<div class='article'>

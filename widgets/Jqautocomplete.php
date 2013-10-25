@@ -6,6 +6,8 @@ use glue;
 
 class Jqautocomplete extends \glue\Widget{
 
+	public $htmlOptions=array();
+	
 	public $options = array();
 	public $renderItem;
 	public $value;
@@ -44,7 +46,7 @@ class Jqautocomplete extends \glue\Widget{
 			$js .= "});";
 
 			glue::$controller->js('jqauto_complete_'.$this->attribute, $js);
-			echo \html::textfield($this->attribute, $this->value ? $this->value : null, array('class' => $this->attribute, 'placeholder'=>$this->placeholder));
+			echo \html::textfield($this->attribute, $this->value ? $this->value : null, array_merge(array('class' => $this->attribute, 'placeholder'=>$this->placeholder),$this->htmlOptions));
 		}
 	}
 }
