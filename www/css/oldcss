@@ -1,3 +1,68 @@
+
+.btn-dark{
+	background-color: #474949;
+	background-image:none;
+    border-color: #474949;
+    font-size: 14px;
+    font-weight: normal;
+    color:#fff;
+    line-height: 1.42857;
+    margin-bottom: 0;
+    padding: 6px 12px;
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;    
+}
+
+.btn-dark.active,
+.btn-dark:hover{
+	background:#3a3c3c;
+	border-color:#2e2f2f;
+	box-shadow:none;
+	color:#fff;
+}
+
+.btn-white{
+	background-color: #FFFFFF;
+    background-image: none;
+    border: 1px solid #D9D9D9;
+    line-height:28px;
+    border-radius: 3px 3px 3px 3px;
+    cursor:pointer;
+    height:28px;
+    padding:0 10px;
+    color:#626262;
+    font-size:14px;
+    font-weight:bold;
+    min-width:0;
+}
+
+.btn-clear{
+	background-color: #FFFFFF;
+    border-color: #CCCCCC;
+    color:#626262;
+    background-image:none;
+    padding:0px 10px;
+    height:32px;
+    line-height:32px;
+    font-weight:bold;
+    min-width:0;
+}
+
+.btn-clear.active,
+.btn-clear:active,
+.btn-clear:hover{
+	background:#ebebeb;
+	border-color:#adadad;
+	color:#626262;
+	box-shadow:none;
+}
+
+.btn-clear.active,
+.btn-clear:active{
+	box-shadow:0 3px 5px rgba(0,0,0,0.125) inset;
+}
+
 .form-vertical .row{}
 
 .form-vertical label{

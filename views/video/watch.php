@@ -238,7 +238,10 @@ $this->js('edit', "
 		<div class='edit_menu'>
 			<div class='alert' style='display:none; margin-bottom:10px;'></div>
 			<input type="button" class="btn btn-primary save_video" value="Save Changes"/>
-			<input type="button" id="settings_tab" class="btn btn-dark btn-inline left btn-tab" value="Settings"/><input type="button" id="details_tab" class="btn btn-dark btn-tab btn-inline right" value="Details"/>
+			<div class="btn-group">
+			<button type="button" id="settings_tab" class="btn btn-white btn-tab">Settings</button>
+			<button type="button" id="details_tab" class="btn btn-white btn-tab">Details</button>
+			</div>
 			<a href='<?php echo glue::http()->url('/video/delete', array('id' => $model->_id)) ?>' class='delete_video'>Delete</a>
 			<a href='<?php echo glue::http()->url('/video/analytics', array('id' => $model->_id)) ?>' class=''>Analytics</a>
 			<a href='<?php echo glue::http()->url('/videoresponse/list', array('id' => $model->_id)) ?>' class=''>Responses</a>
@@ -247,24 +250,24 @@ $this->js('edit', "
 		<div class="edit_panes">
 			<?php $form = html::activeForm(array('action' => '')) ?>
 				<div class='edit_settings pane' id="settings_content">
-				<div class="form-stacked">
-					<div class="form_row"><?php echo html::label('Title', 'title') ?><?php echo html::activeTextField($model, 'title') ?></div>
-					<div class="form_row"><?php echo html::label('Description', 'description')?><?php echo html::activeTextarea($model, 'description') ?></div>
-					<div class="form_row"><?php echo html::label('Tags', 'stringTags') ?><?php echo html::activeTextField($model, 'stringTags') ?></div>			
+				<div class="left">
+					<div class="form-group"><?php echo html::label('Title', 'title') ?><?php echo html::activeTextField($model, 'title',array('class'=>'form-control')) ?></div>
+					<div class="form-group"><?php echo html::label('Description', 'description')?><?php echo html::activeTextarea($model, 'description',array('class'=>'form-control')) ?></div>
+					<div class="form-group"><?php echo html::label('Tags', 'stringTags') ?><?php echo html::activeTextField($model, 'stringTags',array('class'=>'form-control')) ?></div>			
 				</div>
 				<div class='right'>
-					<h4>Category</h4><?php echo html::activeSelectbox($model, 'category', $model->categories('selectBox')) ?>
-					<h4>Adult Content</h4>
+					<h4>Category</h4><?php echo html::activeSelectbox($model, 'category', $model->categories('selectBox'),array('class'=>'form-control')) ?>
+					<h4 class="adult">Adult Content</h4>
 					<label class="checkbox"><?php echo $form->checkbox($model, 'mature', 1) ?>This video is not suitable for family viewing</label>
 					<h4>Listing</h4>
 					<?php $grp = html::activeRadio_group($model, 'listing') ?>
 					<div class="label_options">
 						<label class="radio"><?php echo $grp->add(0) ?>Listed</label>
-						<p class='light'>Your video is public to all users of StageX</p>
+						<p class='text-muted'>Your video is public to all users of StageX</p>
 						<label class="radio"><?php echo $grp->add(1) ?>Unlisted</label>
-						<p class='light'>Your video is hidden from listings but can still be accessed directly using the video URL</p>
+						<p class='text-muted'>Your video is hidden from listings but can still be accessed directly using the video URL</p>
 						<label class="radio"><?php echo $grp->add(2) ?>Private</label>
-						<p class='light'>No one but you can access this video</p>
+						<p class='text-muted'>No one but you can access this video</p>
 					</div>
 					<h4>Licence (<a href='#'>Learn More</a>)</h4>
 					<?php $grp = html::activeRadio_group($model, 'licence') ?>
@@ -288,8 +291,8 @@ $this->js('edit', "
 					<label class='checkbox'><?php echo $form->checkbox($model, "allowTextComments", 1) ?><span>Allow text responses</span></label>
 				</div>
 				<div class='button_group'>
-					<div class='btn delete_all_responses' data-type='video'>Delete all video responses</div>
-					<div class='btn delete_all_responses' data-type='text'>Delete all text responses</div>
+					<div class='btn btn-white delete_all_responses' data-type='video'>Delete all video responses</div>
+					<div class='btn btn-white delete_all_responses' data-type='text'>Delete all text responses</div>
 				</div>
 				<div class="clear"></div>
 				</div>
