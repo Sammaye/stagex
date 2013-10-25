@@ -1,3 +1,11 @@
+.arrow-up{
+	border-top: 0 dotted;
+	border-bottom: 4px solid #000000;
+	border-bottom-color: #fff;
+	border-top-color: #fff;
+	content: "";
+}
+
 label.radio,
 label.checkbox{
 	font-weight:normal;
@@ -1366,16 +1374,12 @@ input.date{
 	height:464px; border-radius:4px; background:#000; border:1px solid #000; color:#fff; text-align:center; font-size:30px;
 }
 
-.watch_page .video_element .progress{
+.watch_page .video_element .status-message{
 	margin-top:190px;
 }
 
 .watch_page .main_body{
 	margin:40px 0 0 45px; width:980px;
-}
-
-.watch_page .btn-like{
-	margin-right:15px;
 }
 
 .watch_page .video_actions_pane{
@@ -2126,6 +2130,10 @@ input.date{
 
 .response.thread_comment .content{
 	margin-left:25px;
+}
+
+.response .response_footer .footer_block{
+	margin-right:10px;
 }
 
 .streamitem .sent_date{

@@ -29,7 +29,7 @@ if($item->type == "text"){ ?>
 		<?php } ?>
 	</div>
 	<?php if(glue::auth()->check(array('@'))||$item->thread_parent): ?>
-	<div class='response_footer' style='line-height:20px;margin-top:7px;'>
+	<div class='response_footer' style='line-height:20px;margin-top:7px;font-size:12px;'>
 		<span class="btn_approved" style="<?php if(!$item->approved) echo "display:none;"; ?>">
 		<?php if($item->video->voteableComments): ?>
 			<span class="response_likes footer_block">
@@ -58,10 +58,10 @@ if($item->type == "text"){ ?>
 		<div class='alert' style='display:none;margin-bottom:10px;width:80%;'></div>
 		<div class='user_img' style='float:left;width:40px;margin-right:15px;'><img alt='thumbnail' src='<?php echo glue::user()->getAvatar(40, 40); ?>'/></div>
 		<div class='reply_right' style='float:left;width:90%;'>
-			<?php echo html::textarea('reply_comment_content', null, array('class' => 'reply_comment_content')) ?>
+			<div class="form-group"><?php echo html::textarea('reply_comment_content', null, array('class' => 'reply_comment_content form-control')) ?></div>
 			<div class='reply_footer'>
-			<input type="button" class="btn-success btn_post_reply" value="Post" style='float:left;'/>
-			<input type="button" class="btn btn_cancel" value="Cancel" style='float:left; margin-left:25px;'/>
+			<input type="button" class="btn btn-success btn_post_reply" value="Post" style='float:left;'/>
+			<input type="button" class="btn btn-white btn_cancel" value="Cancel" style='float:left; margin-left:25px;'/>
 			</div>
 		</div>
 		<div class="clear"></div>

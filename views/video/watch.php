@@ -315,9 +315,9 @@ $this->js('edit', "
 		<div class='video_element'>
 			<?php
 			if($model->state == 'failed'){
-				?><div class='progress'>KaBoom! We could not complete this video, sorry! &lt;/3</div><?php
+				?><div class='status-message'>KaBoom! We could not complete this video, sorry! &lt;/3</div><?php
 			}elseif($model->state == 'uploading' || $model->isProcessing()){
-				?><div class='progress'>Hold on, we're processing...</div><?php
+				?><div class='status-message'>Hold on, we're processing...</div><?php
 			}else{
 				app\widgets\videoPlayer::widget(array(
 					"mp4"=>$model->mp4, "ogg"=>$model->ogg, "width"=>825, "height"=>464
@@ -364,10 +364,9 @@ $this->js('edit', "
 		<div class="video_actions">
 		<div class="actions_menu">
 			<?php if($model->voteable && glue::auth()->check(array('@'))): ?>
-			<div class="btn-group button_actions">
-				<input type="button" class="btn <?php if($model->currentUserLikes()): echo "active"; endif ?> btn-clear btn-like" value="+1"/>
-				<input type="button" class="btn <?php if($model->currentUserDislikes()): echo "active"; endif ?> btn-clear btn-dislike" value="-1"/>
-				<span class="votes"><span class="up"><?php echo '+'.$model->likes ?></span> / <span class="down"><?php echo '-'.$model->dislikes ?></span></span>
+			<div class="btn-group" style='margin-top:8px;'>
+				<button type="button" class="btn <?php if($model->currentUserLikes()): echo "active"; endif ?> btn-success btn-like"><span class="caret arrow-up">&nbsp;</span> <span style='margin-left:5px;'><?php echo '+1,776,678'; ?></span></button>
+				<button type="button" class="btn <?php if($model->currentUserDislikes()): echo "active"; endif ?> btn-error btn-dislike"><span class="caret" style='border-top-color:#fff;'>&nbsp;</span> <span style='margin-left:5px;'><?php echo '-170,567' ?></button>
 			</div>
 			<?php endif; ?>
 			<div class="simple-nav">		
