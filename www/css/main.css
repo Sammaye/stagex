@@ -823,12 +823,8 @@ input.date{
 	margin:0 0 10px 0;
 }
 
-.profile_settings .external_link label{
-	float:none;
-}
-
 .profile_settings .external_link input{
-	margin:0 15px 0 0;
+	width:80%;
 }
 
 .profile_settings .external_link div{
@@ -1506,15 +1502,15 @@ input.date{
 }
 
 .watch_page .user_ribbon_menu{
-	background:#4b4b4b; height:30px; padding:15px 20px; color:#fff;
+	padding:8px 0px; color:#444; background:#eee;
 }
 
 .watch_page .user_ribbon_menu .thumbnail{
-	border-radius:50px; float:left;
+	border-radius:50px; float:left; margin:0;
 }
 
 .watch_page .user_ribbon_menu .username{
-	color:#fff;font-size:20px; font-weight:normal; display:inline-block; margin:5px 10px 0 10px; line-height:22px;
+	display:inline-block;margin:5px 10px 0 10px; font-size:28px;
 }
 
 .watch_page .user_ribbon_menu .uploaded{
@@ -1523,6 +1519,10 @@ input.date{
 
 .watch_page .user_ribbon_menu .right{
 	float:right;
+}
+
+.watch_page .user_ribbon_menu .subscribe_widget{
+	margin-top:4px;line-height:30px;
 }
 
 .watch_page .edit_ribbon_menu{

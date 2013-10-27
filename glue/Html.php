@@ -30,6 +30,8 @@ class Html{
 	 * @param $options
 	 */
 	public static function formOptions($options){
+		if(is_string($options))
+			return array("class=\"$options\"");
 		$inputOptions = array();
 		foreach($options as $option => $value){
 				$inputOptions[] = $option.'="'.$value.'"';

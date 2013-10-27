@@ -215,24 +215,23 @@ $this->js('edit', "
 <div class="watch_page">
 
 	<?php if(!glue::auth()->check(array('^'=>$model))){ ?>
-	<div class="user_ribbon_menu">
+	<div class="user_ribbon_menu clearfix"><div class="grid-container">
 		<img alt='thumbnail' class="thumbnail" src="<?php echo $model->author->getAvatar(30, 30); ?>"/>
-		<a class="username" href='<?php echo glue::http()->url('/user/view', array('id' => $model->author->_id)) ?>'><?php echo $model->author->getUsername() ?></a>
-		<span class='uploaded'><?php echo date('j M Y',$model->getTs($model->created)) ?></span>
-		<?php if(glue::session()->authed){ ?>
-			<div class='right'>
+		<a class="username h3" href='<?php echo glue::http()->url('/user/view', array('id' => $model->author->_id)) ?>'><?php echo $model->author->getUsername() ?></a>
+		<span class='text-muted small'><?php echo date('j M Y',$model->getTs($model->created)) ?></span>
+		<div class='right'>
 			<div class="subscribe_widget" data-user_id="<?php echo $model->author->_id ?>">
-				<span class="follower_count"><?php echo $model->author->totalFollowers ?> Subscribers</span>
+				<span class="follower_count text-muted"><?php echo $model->author->totalFollowers ?> Subscribers</span>
+				<?php if(glue::session()->authed){ ?>
 				<?php if(app\models\Follower::isSubscribed($model->author->_id)){ ?>
-				<input type="button" class='unsubscribe btn button' value="Unsubscribe"/>
+				<button type="button" class='unsubscribe button btn btn-error'>Unsubscribe</button>
 				<?php }else{ ?>
-				<input type="button" class='subscribe btn btn-primary button' value="Subscribe"/>
+				<button type="button" class='subscribe btn btn-primary button'>Subscribe</button>
+				<?php } ?>
 				<?php } ?>
 			</div>
-			</div>
-		<?php } ?>
-		<div class="clear"></div>
-	</div>
+		</div>
+	</div></div>
 	<?php }else{ ?>
 	<div class='edit_ribbon_menu'>
 		<div class='edit_menu'>

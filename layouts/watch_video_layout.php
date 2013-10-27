@@ -16,8 +16,7 @@ $this->beginPage() ?>
 		<?php
 			echo Html::jsFile('/js/jquery.js')."\n";
 			echo Html::jsFile('/js/jquery-ui.js')."\n";
-
-			echo Html::jsFile("/js/facebox.js")."\n";
+			
 			echo Html::jsFile('/js/common.js')."\n";
 
 			echo Html::cssFile("/css/bootstrap.css")."\n";

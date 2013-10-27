@@ -539,7 +539,6 @@ class userController extends \glue\Controller{
 		$this->tab = "profile";
 
 		$model = $this->loadModel();
-
 		if(isset($_POST['User'])){
 			if(isset($_POST['User']['action']))
 				$model->setScenario($_POST['User']['action']);

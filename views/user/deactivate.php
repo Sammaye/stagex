@@ -7,8 +7,8 @@
 	the size of your account however deletions will occur as fast as humanly (or robotly) possible.</p>
 
 	<form method="post" action="<?php echo $_SERVER['REQUEST_URI'] ?>">
-		<div class='btn-success go_back' onclick="window.location='/user/settings'; return false;">No, wait! I didn't mean to press it</div>
-		<a href='<?php echo glue::http()->url('/user/deactivate', array('delete' => 1)) ?>' class="submit">I am sure, delete me</a>
+		<div class='btn btn-success go_back' onclick="window.location='/user/settings'; return false;">No, wait! I didn't mean to press it</div>
+		<a href='<?php echo glue::http()->url('/user/deactivate', array('delete' => 1)) ?>' class="btn btn-link">I am sure, delete me</a>
 	</form>
 	<div class="clear"></div>
 </div>
