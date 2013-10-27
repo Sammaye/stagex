@@ -808,7 +808,7 @@ input.date{
 }
 
 .profile_settings .about textarea{
-	width:370px; height:110px;
+	height:180px;
 }
 
 .profile_settings .external_links_head{
@@ -1366,8 +1366,16 @@ input.date{
 	margin-right:60px;
 }
 
+.watch_page .edit_ribbon_menu .alert{
+	display:none; margin-bottom:10px;	
+}
+
 .watch_page .edit_menu .delete_video{
-	margin:0px 0 0 30px; display:inline-block;
+	margin:0 0 0 60px; display:inline-block;
+}
+
+.watch_page .edit_menu .btn-link{
+	float:right;
 }
 
 .watch_page .video_element{
@@ -1379,7 +1387,16 @@ input.date{
 }
 
 .watch_page .main_body{
-	margin:40px 0 0 45px; width:980px;
+	margin:40px auto 45px auto; width:980px;
+}
+
+.watch_page .share_content .embed{
+	margin-top:5px;
+}
+
+.watch_page .video_actions .alert{
+	display:none; margin-top:10px;
+	margin-bottom:0;
 }
 
 .watch_page .video_actions_pane{
@@ -1425,6 +1442,18 @@ input.date{
 
 .watch_page .infocons .comments{
 	margin-right:25px;
+}
+
+.watch_page .actions_menu .btn-group{
+	margin-top:8px;
+}
+
+.watch_page .actions_menu .caret{
+	border-top-color:#fff;
+}
+
+.watch_page .actions_menu .btn-caption{
+	margin-left:5px;
 }
 
 .user_side_menu li a{

@@ -236,16 +236,15 @@ $this->js('edit', "
 	<?php }else{ ?>
 	<div class='edit_ribbon_menu'>
 		<div class='edit_menu'>
-			<div class='alert' style='display:none; margin-bottom:10px;'></div>
+			<div class='alert'></div>
 			<input type="button" class="btn btn-primary save_video" value="Save Changes"/>
 			<div class="btn-group">
 			<button type="button" id="settings_tab" class="btn btn-white btn-tab">Settings</button>
 			<button type="button" id="details_tab" class="btn btn-white btn-tab">Details</button>
 			</div>
-			<a href='<?php echo glue::http()->url('/video/delete', array('id' => $model->_id)) ?>' class='delete_video'>Delete</a>
-			<a href='<?php echo glue::http()->url('/video/analytics', array('id' => $model->_id)) ?>' class=''>Analytics</a>
-			<a href='<?php echo glue::http()->url('/videoresponse/list', array('id' => $model->_id)) ?>' class=''>Responses</a>
-			<a href='<?php echo glue::http()->url('/videoresponse/pending', array('id' => $model->_id)) ?>' class=''>2 pending</a>
+			<button type="button" class='delete_video btn btn-error'>Delete</button>
+			<a href='<?php echo glue::http()->url('/video/analytics', array('id' => $model->_id)) ?>' class='btn btn-link'>Analytics</a>
+			<a href='<?php echo glue::http()->url('/videoresponse/list', array('id' => $model->_id)) ?>' class='btn btn-link'>Responses (2 pending)</a>
 		</div>
 		<div class="edit_panes">
 			<?php $form = html::activeForm(array('action' => '')) ?>
@@ -301,7 +300,7 @@ $this->js('edit', "
 	</div>
 	<?php } ?>
 
-	<div class="main_body">
+	<div class="main_body grid-container clearfix">
 	<div class="left_menu">
 		<?php if(glue::auth()->check(array('@'))) 
 			app\widgets\UserMenu::widget(); 
@@ -364,9 +363,9 @@ $this->js('edit', "
 		<div class="video_actions">
 		<div class="actions_menu">
 			<?php if($model->voteable && glue::auth()->check(array('@'))): ?>
-			<div class="btn-group" style='margin-top:8px;'>
-				<button type="button" class="btn <?php if($model->currentUserLikes()): echo "active"; endif ?> btn-success btn-like"><span class="caret arrow-up">&nbsp;</span> <span style='margin-left:5px;'><?php echo '+1,776,678'; ?></span></button>
-				<button type="button" class="btn <?php if($model->currentUserDislikes()): echo "active"; endif ?> btn-error btn-dislike"><span class="caret" style='border-top-color:#fff;'>&nbsp;</span> <span style='margin-left:5px;'><?php echo '-170,567' ?></button>
+			<div class="btn-group">
+				<button type="button" class="btn <?php if($model->currentUserLikes()): echo "active"; endif ?> btn-success btn-like"><span class="caret arrow-up">&nbsp;</span> <span class="btn-caption"><?php echo '+'.$model->likes; ?></span></button>
+				<button type="button" class="btn <?php if($model->currentUserDislikes()): echo "active"; endif ?> btn-error btn-dislike"><span class="caret">&nbsp;</span> <span class="btn-caption"><?php echo '-'.$model->dislikes ?></span></button>
 			</div>
 			<?php endif; ?>
 			<div class="simple-nav">		
@@ -378,20 +377,20 @@ $this->js('edit', "
 			<div class="clear"></div>
 		</div>
 		
-		<div class="alert" style='display:none; margin-top:10px;'></div>
+		<div class="alert"></div>
 		
 		<div class="share_content video_actions_pane">
 		<div class="head">Why not spread the love?</div>
 		<?php if(glue::session()->authed){ ?>
 			<div class='share_item_with_subs'>
-			<h4>Share with your subscribers</h4>
+			<p>Share with your subscribers</p>
 			<?php echo html::textarea('share_status_text', 'Add some text here if you wish to describe why you shared this video or just click the share button to continue', 
 					array('class' => 'share_status_text share_status_text_unchanged form-control')) ?>
 			<div><input type="button" class="btn btn-success" value="Share"/></div>
 			</div>
 		<?php } ?>
 		<div class="share_other">
-			<h4>Share Elsewhere</h4>
+			<p>Share Elsewhere</p>
 			<ul class="network_bc">
 				<li><a rel='new_window' href="http://www.facebook.com/sharer.php?u=<?php echo urlencode(glue::http()->url("/video/watch", array("id"=>$model->_id))) ?>"><img alt='fb' src="/images/fb_large.png"/></a></li>
 				<li><a rel='new_window' href="http://twitter.com/share?url=<?php echo urlencode(glue::http()->url("/video/watch", array("id"=>$model->_id))) ?>"><img alt='twt' src="/images/twt_large.png"/></a></li>
@@ -402,14 +401,14 @@ $this->js('edit', "
 			<input type="text" class="select_all_onfoc form-control" value="<?php echo glue::http()->url("/video/watch", array("id"=>$model->_id)) ?>" />
 			<div class="clear"></div>	
 			<?php if($model->embeddable){ ?>
-			<h4>Embed:</h4>
-			<textarea rows="" cols="" class="select_all_onfoc"><iframe style="width:560px; height:315px; border:0;" frameborder="0" src="<?php echo glue::http()->url("/video/embedded", array("id"=>$model->_id)) ?>"></iframe></textarea>
+			<p class="embed">Embed:</p>
+			<textarea rows="" cols="" class="select_all_onfoc form-control"><iframe style="width:560px; height:315px; border:0;" frameborder="0" src="<?php echo glue::http()->url("/video/embedded", array("id"=>$model->_id)) ?>"></iframe></textarea>
 			<?php } ?>
 		</div>
 		<div class="clear"></div>
 		</div>
 					
-		<div class="report_content video_actions_pane">
+		<div class="report_content video_actions_pane clearfix">
 			<div class="head">Report</div>
 			<p>Pick a reason out of the list below and then click "report":</p>
 			<?php $grp=html::radio_group('report_reason'); ?>
@@ -420,17 +419,17 @@ $this->js('edit', "
 			<label class="radio"><?php echo $grp->add('religious'); ?>Hate Preaching/Religious</label>
 			<label class="radio"><?php echo $grp->add('dirty'); ?>Just plain dirty</label>
 			</div>
-			<div class="submit_report">
+			<div class="submit_report clearfix">
 			<input type="button" class="btn btn-success" value="Report Video"/>
 			<p class="light">Abuse of this function may result in account deletion</p>
-			</div><div class="clear"></div>
+			</div>
 		</div>
 
 		<?php if(!$model->private_stats){ ?>
 			<div class="statistics_content video_actions_pane">
 				<div class="head">Statistics</div>
 
-				<div class='views_stats'>
+				<div class='views_stats clearfix'>
 					<div class='all_views stats_block'><?php echo $model->views ?> views</div>
 					<div class='unique_views stats_block'><?php echo $model->uniqueViews ?> unique views</div>
 					<div class="text_responses stats_block">
@@ -441,7 +440,6 @@ $this->js('edit', "
 					<?php $videoResponseCount = $model->with('responses', array('type' => 'video', 'deleted' => 0))->count() ?>
 					<?php echo $videoResponseCount ?> video <?php if($videoResponseCount > 1): echo "responses"; else: echo "response"; endif ?>					
 					</div>
-					<div class="clear"></div>
 				</div>
 				<div id="chartdiv" style="height:200px;width:800px; position:relative; margin-top:20px;"></div>
 				<?php
@@ -458,7 +456,7 @@ $this->js('edit', "
 		<div class="playlists_content playlists_pane video_actions_pane">
 			<div class='search'>
 				<a href="#" class="playlist_item watch_later" data-id="<?php echo glue::user()->watchLaterPlaylist()->_id ?>">Add to Watch Later</a>
-				<input id="search_playlists" type="text" class="input-xxlarge" placeholder="Enter a search term for playlists"/>
+				<input id="search_playlists" type="text" class="form-control" placeholder="Enter a search term for playlists"/>
 			</div>
 			<div class="results"><div class="no_results_found">Search for a playlist</div></div>
 		</div>
@@ -478,7 +476,6 @@ $this->js('edit', "
 		</div>
 		<?php endif ?>
 	</div>
-	<div class="clear"></div>
 </div>
 </div>
 

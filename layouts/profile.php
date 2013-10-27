@@ -70,8 +70,7 @@ $this->beginPage() ?>
 			echo Html::jsFile("/js/facebox.js")."\n";
 			echo Html::jsFile('/js/common.js')."\n";
 
-			echo Html::cssFile("/css/reset.css")."\n";
-			echo Html::cssFile("/css/960.css")."\n";
+			echo Html::cssFile("/css/bootstrap.css")."\n";
 			echo Html::cssFile("/css/main.css")."\n";
 			echo Html::cssFile("/css/jquery-ui/jquery-ui.css")."\n";
 			//echo Html::cssFile("/css/bootstrap.css")."\n";

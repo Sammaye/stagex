@@ -12,45 +12,45 @@
 			<div class="right">
 				<p><b>Choose a profile picture:</b></p>
 				<?php echo $form->filefield($model, "avatar") ?>
-				<?php echo $form->hiddenField($model, "action", array('value' => "updatePic")) ?>
+				<?php echo $form->hiddenField($model, "action", array('value' => "updatePic form-control")) ?>
 				<p class="light">Maximum upload size: 2 Megabytes</p>
-				<?php echo html::submitButton("Set Profile Picture", array('class'=>'btn-success')) ?>
+				<?php echo html::submitButton("Set Profile Picture", array('class'=>'btn btn-success')) ?>
 			</div>
 			<div class="clear"></div>
 		</div>
 	<?php $form->end() ?>
 
 	<?php $form = html::activeForm(); ?>
-		<div class="form_row">
+		<div class="form-group">
 			<?php echo html::label("Username:", "username") ?>
-			<div class="form_row"><?php echo $form->textField($model, "username") ?></div>
+			<div class="form_row"><?php echo $form->textField($model, "username",array("class"=>"form-control")) ?></div>
 			<div class="help-block"><p class="light">Usernames can contain numbers, letters and _</p></div>
 		</div>
 
-		<div class="form_row">
+		<div class="form-group">
 			<?php echo html::label("Name / Nick Name:", "name") ?>
-			<?php echo $form->textField($model, "name") ?>
+			<?php echo $form->textField($model, "name",array('class'=>'form-control')) ?>
 		</div>
-		<div class="form_row">
-			<?php echo html::label("Gender:", "gender") ?>
-			<?php echo $form->selectBox($model, "gender", array(""=>"Select Gender:", "m"=>"Male", "f"=>"Female")) ?>
+		<div class="form-group">
+			<?php echo html::label("Gender:", "gender", array('class'=>'grid-col-7')) ?>
+			<div class="grid-col-15"><?php echo $form->selectBox($model, "gender", array(""=>"Select Gender:", "m"=>"Male", "f"=>"Female"),array('class'=>'form-control')) ?></div>
 			<label class="checkbox show_on_profile"><?php echo $form->checkbox($model, 'genderPrivacy') ?>Show on profile</label>
 		</div>
-		<div class="form_row birthday">
-			<?php echo html::label("Birthday:", "birthday"); ?>
-			<?php echo $form->selectBox($model, "birthDay", glue\util\DateTime::getDaysOfMonth(), array("head"=>array("", "Day:"), 'class' => 'birth_day'));
-			echo $form->selectBox($model, "birthMonth", glue\util\DateTime::getMonthsOfYear(), array("head"=>array("", "Month:"), 'class' => 'birth_month'));
-			echo $form->selectBox($model, "birthYear", glue\util\DateTime::getYearRange(), array("head"=>array("", "Year:"))) ?>
+		<div class="form-group birthday">
+			<?php echo html::label("Birthday:", "birthday", array('class'=>'grid-col-7')); ?>
+			<?php echo $form->selectBox($model, "birthDay", glue\util\DateTime::getDaysOfMonth(), array("head"=>array("", "Day:"), 'class' => 'birth_day form-control grid-col-5'));
+			echo $form->selectBox($model, "birthMonth", glue\util\DateTime::getMonthsOfYear(), array("head"=>array("", "Month:"), 'class' => 'birth_month form-control grid-col-8'));
+			echo $form->selectBox($model, "birthYear", glue\util\DateTime::getYearRange(), array("head"=>array("", "Year:"),"class"=>'form-control grid-col-6')) ?>
 			<label class="checkbox show_on_profile"><?php echo $form->checkbox($model, 'birthdayPrivacy') ?>Show on profile</label>
 		</div>
-		<div class="form_row">
-			<?php echo html::label("Country:", "country"); ?>
-			<?php echo $form->selectBox($model, "country", new Collection('countries', array("code", "name")), array("head"=>array("", "Country:"))) ?>
+		<div class="form-group">
+			<?php echo html::label("Country:", "country", array('class'=>'grid-col-7')); ?>
+			<?php echo $form->selectBox($model, "country", new Collection('countries', array("code", "name")), array("head"=>array("", "Country:"),"class"=>"form-control grid-col-18")) ?>
 			<label class="checkbox show_on_profile"><?php echo $form->checkbox($model, 'countryPrivacy') ?>Show on profile</label>
 		</div>
-		<div class="form_row about">
+		<div class="form-group about">
 			<?php echo html::label("About Yourself:", "about"); ?>
-			<?php echo $form->textarea($model, "about") ?>
+			<?php echo $form->textarea($model, "about",array('class'=>'form-control')) ?>
 		</div>
 	
 		<p class="external_links_head"><b>External Links</b></p>
@@ -111,6 +111,6 @@
 			<a href="#" class="addExternalLink">Add New External Link</a>
 		</div>
 		
-		<?php echo html::submitbutton('Save Profile Information', array('class' => 'btn-success'))?>
+		<?php echo html::submitbutton('Save Profile Information', array('class' => 'btn btn-success'))?>
 	<?php $form->end() ?>
 </div>
