@@ -51,7 +51,7 @@
 		});
 	");
 ?>
-<div class="boxed_page_layout_outer">
+<div class="boxed_page_layout_outer watch_later_body">
 
 	<?php ob_start(); ?>
 	
@@ -59,8 +59,8 @@
 			<div class='stickytoolbar-bar'>
 				<div class='inner_bar'>
 					<div class='checkbox_button checkbox_input'><?php echo html::checkbox('selectAll', 1, 0, array('class' => 'selectAll_input')) ?></div>
-					<div class="btn-group dropdown-group playlist-dropdown">
-						<button class='btn-grey add_to_playlist dropdown-anchor'>Add To <span class="caret">&#9660;</span></button>
+					<div class="dropdown-group playlist-dropdown">
+						<button class='btn btn-default add_to_playlist dropdown-anchor'>Add To <span class="caret"></span></button>
 						<div class="dropdown-menu">
 							<div class="head_ribbon">
 								<a href="#" data-id="<?php echo glue::user()->watchLaterPlaylist()->_id ?>" class='watch_later playlist_link'>Watch Later</a>
@@ -73,8 +73,8 @@
 							</div>
 						</div>
 					</div>
-					<button class='btn-grey selected_actions btn_delete'>Remove</button>
-					<button class='btn-grey selected_actions btn_delete_all'>Clear Queue</button>					
+					<button class='btn btn-error selected_actions btn_delete'>Remove</button>
+					<button class='btn btn-error selected_actions btn_delete_all'>Clear Queue</button>					
 				</div>
 				<div class="alert block-alert"></div>
 			</div>

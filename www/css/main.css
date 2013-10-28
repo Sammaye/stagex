@@ -21,6 +21,10 @@ input.date{
 	width:90px;
 }
 
+.dropdown-group{
+	float:left;
+}
+
 .form-search .search_input{
 	float:left;
 	padding:7px 7px 0 7px;
@@ -252,19 +256,7 @@ input.date{
 	border-radius:0;
 }
 
-.label{
-    border-radius: 0.25em 0.25em 0.25em 0.25em;
-    color: #FFFFFF;
-    display: inline;
-    font-size: 75%;
-    font-weight: bold;
-    line-height: 1;
-    padding: 0.2em 0.6em 0.3em;
-    text-align: center;
-    vertical-align: baseline;
-    white-space: nowrap;
-    background-color: #999999;	
-}
+
 
 .badge{
     background-color: #f1f1f1;
@@ -313,27 +305,12 @@ input.date{
 	background:#ffffff; border-bottom:1px solid #cccccc;
 }
 
-.grey_sticky_toolbar .button{
-	float:left; border-radius:3px;
-	background:#f2f2f2; border:1px solid #dbdbdb;
-	line-height:20px;
-	font-size:14px;
-	height:32px;
-	margin:0;
-	padding:0 8px;
-	color:#6d6d6d;
-	cursor:pointer;
-	margin-right:10px;
+.grey_sticky_toolbar .btn{
+	margin:0 15px;
 }
 
-.grey_sticky_toolbar .button:hover{
-	background:#eeeeee;
-	border:1px solid #2D6200;
-}
-
-.grey_sticky_toolbar .button:active{
-	background:#cccccc;
-	border:1px solid #2D6200;
+.grey_sticky_toolbar .btn:first-child{
+	margin-left:0;
 }
 
 .grey_sticky_toolbar .checkbox_button{
@@ -952,6 +929,9 @@ input.date{
 }
 
 .video .thumbnail{
+	padding:0;
+	border:0;
+	border-radius:0;
 	margin:0 10px 0 0;
 }
 
@@ -1008,7 +988,7 @@ input.date{
 }
 
 .watchedcon{
-	margin-top:35px;
+	margin-top:25px;
 }
 
 .video .stacked_info{
@@ -1029,6 +1009,10 @@ input.date{
 
 .video .encoding{
 	padding:25px 0 0 15px; float:left;
+}
+
+.video .avatar{
+	border-radius:50%;width:25px;height:25px;vertical-align:middle;margin-right:8px;
 }
 
 .video .encoding .encoding_failed{

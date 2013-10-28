@@ -26,7 +26,7 @@
 		<h3 class='title'><a href="/video/watch?id=<?php echo strval($model->_id) ?>"><?php echo $model->title ?></a></h3>
 		<?php if($model->author): ?>
 			<div class='uploader'>
-				<img style='border-radius:50%;width:25px;height:25px;vertical-align:middle;margin-right:8px;' src="<?php echo $model->author->getAvatar(30,30) ?>"/><a href="<?php echo glue::http()->url('/user/view', array('id' => $model->author->_id)) ?>"><?php echo $model->author->getUsername() ?></a> <?php echo date('j M Y',$model->getTs($model->created)) ?>
+				<img style='' class='avatar' src="<?php echo $model->author->getAvatar(30,30) ?>"/><a href="<?php echo glue::http()->url('/user/view', array('id' => $model->author->_id)) ?>"><?php echo $model->author->getUsername() ?></a> <span class="text-muted"><?php echo date('j M Y',$model->getTs($model->created)) ?></span>
 			</div>
 		<?php endif;
 
@@ -40,8 +40,8 @@
 		<?php } ?>			
 	</div>
 	<?php if($model->userHasWatched() && $show_watched_status){ ?>
-		<div class='infocons watchedcon'>
-			<span class='label'>Watched</span>
+		<div class='infocons watchedcon h4'>
+			<span class='label label-default'>Watched</span>
 		</div>
 	<?php } ?>
 	<div class="clear"></div>
