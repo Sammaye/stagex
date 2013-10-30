@@ -297,10 +297,10 @@ $this->js('videos', "
 			<div class='stickytoolbar-bar'>
 				<div class='inner_bar'>
 					<div class='checkbox_button checkbox_input'><?php echo Html::checkbox('selectAll', 1, 0, array('class' => 'selectAll_input')) ?></div>
-					<button class='btn btn-default selected_actions edit_videos_button'>Edit</button>
-					<button class='btn btn-default selected_actions btn_delete'>Delete</button>
-					<div class="btn-group dropdown-group playlist-dropdown">
-						<button class='btn btn-default add_to_playlist dropdown-anchor'>Add To <span class="caret"></span></button>
+					<button class='btn btn-white selected_actions edit_videos_button'>Edit</button>
+					<button class='btn btn-error selected_actions btn_delete'>Delete</button>
+					<div class="dropdown-group playlist-dropdown">
+						<button class='btn btn-white add_to_playlist dropdown-anchor'>Add To <span class="caret"></span></button>
 						<div class="dropdown-menu">
 							<div class="head_ribbon">
 								<a href="#" data-id="<?php echo glue::user()->watchLaterPlaylist()->_id ?>" class='watch_later playlist_link'>Watch Later</a>

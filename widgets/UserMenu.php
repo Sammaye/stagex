@@ -9,8 +9,15 @@ class UserMenu extends \glue\Widget{
 
 	public $tab;
 	
-	function render(){ ?>
+	function render(){ 
+	
+		glue::$controller->js('userMenu', "
+			//$('.user_side_menu a.selected').parent().prev().children('a').addClass('partial_selected');		
+			//$('.user_side_menu a.selected').parent().next().children('a').addClass('partial_selected');
+		");
+		?>
 	<div class='user_side_menu'>
+		<div>
 		<ul>
 		<li><a href='<?php echo glue::http()->url('/stream/news') ?>' <?php echo $this->tab == "news_feed" ? "class='selected'" : "" ?>>News Feed</a></li>
 		<li class='wl_item'><a href='<?php echo glue::http()->url('/user/watchLater') ?>' <?php echo $this->tab == "watch_later" ? "class='selected'" : "" ?>>Watch Later</a></li>
@@ -41,6 +48,7 @@ class UserMenu extends \glue\Widget{
 		<ul class='end_list'>
 		<li><a href='<?php echo glue::http()->url('/user/logout') ?>'>Logout</a></li>
 		</ul>
+		</div>
 	</div><?php 
 	}
 }

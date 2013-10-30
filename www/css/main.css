@@ -302,7 +302,7 @@ input.date{
 }
 
 .grey_sticky_toolbar .stickytoolbar-bar{
-	background:#ffffff; border-bottom:1px solid #cccccc;
+	background:#eeeeee; /*border-bottom:1px solid #cccccc;*/
 }
 
 .grey_sticky_toolbar .btn{
@@ -311,6 +311,10 @@ input.date{
 
 .grey_sticky_toolbar .btn:first-child{
 	margin-left:0;
+}
+
+.grey_sticky_toolbar .alert{
+	margin:0; padding:10px;
 }
 
 .grey_sticky_toolbar .checkbox_button{
@@ -561,27 +565,53 @@ input.date{
 	margin:15px auto;
 }
 
-.userbody .user_side_menu{
+.user_side_menu{
 	width:145px; margin:0 15px 0 0;float:left;
+}
+
+.user_side_menu div{
+	border-right:1px solid #eee;
+	/*box-shadow:  inset        -1px 0px 4px rgba(50, 50, 50, 0.25);*/
+	
 }
 
 .user_side_menu ul{
 	list-style:none;
 	padding:0;
+	
 }
 
-.userbody .user_side_menu li a{
+.user_side_menu li a{
 	font-size:13px;
 	line-height:20px;
 	display:block;
 	padding:2px 0px 2px 5px;
+	
+	
+	padding:5px 10px;
+	border:1px solid transparent;
+	border-left:3px solid transparent;
 }
 
-.userbody .user_side_menu li a.selected{
+.user_side_menu li a.partial_selected{
+	border-right:1px solid #eee;
+}
+
+.user_side_menu li a.selected{
 	background:#f5f5f5;
+	
+	background:#fff;
+	border-color:#eee transparent #eee #428BCA;
+	border-radius:3px 0 0 3px;
+	color:#000;
+	font-weight:bold;
+	margin-right: -1px;
+	box-shadow:         -6px 0px 6px rgba(50, 50, 50, 0.15);
+	/*box-shadow:         -7px 0px 6px rgba(50, 50, 50, 0.25);*/
+	
 }
 
-.userbody .user_side_menu .head_divider{
+.user_side_menu .head_divider{
 	color:#666666;
 	border-top:1px solid #eeeeee;
 	font-size:13px;
@@ -590,7 +620,7 @@ input.date{
 	line-height:20px;
 }
 
-.userbody .user_side_menu .end_list{
+.user_side_menu .end_list{
 	margin:15px 0 0;
 }
 
@@ -1436,29 +1466,6 @@ input.date{
 	margin-left:5px;
 }
 
-.user_side_menu li a{
-	font-size:13px;
-	line-height:20px;
-	display:block;
-	padding:2px 0px 2px 5px;
-}
-
-.user_side_menu li a.selected{
-	background:#f5f5f5;
-}
-
-.user_side_menu .head_divider{
-	color:#666666;
-	border-top:1px solid #eeeeee;
-	font-size:13px;
-	padding:5px 0;
-	margin:10px 0 0;
-	line-height:20px;
-}
-
-.user_side_menu .end_list{
-	margin:15px 0 0;
-}
 
 .user_side_menu .badge{
 	float:right;
