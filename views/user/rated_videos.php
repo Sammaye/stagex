@@ -49,7 +49,7 @@ $this->js('page', "
 			params['ids[]'][params['ids[]'].length]=$(item).val();
 		});
 
-		$.post('/history/deleteRated', params, null, 'json').done(function(data){
+		$.post('/user/removeRated', params, null, 'json').done(function(data){
 			if(data.success){
 				$('.grey_sticky_toolbar .block-alert').summarise('set', 'success','The videos you selected were deleted');
 				$.each(params['ids[]'],function(i,item){
@@ -92,9 +92,9 @@ $this->js('page', "
 			<div class='stickytoolbar-bar'>
 				<div class='inner_bar'>
 					<div class='checkbox_button checkbox_input'><?php echo Html::checkbox('selectAll', 1, 0, array('class' => 'selectAll_input')) ?></div>
-					<button class='btn-grey selected_actions btn_delete'>Delete</button>
-					<div class="btn-group dropdown-group playlist-dropdown">
-						<button class='btn-grey add_to_playlist dropdown-anchor'>Add To <span class="caret">&#9660;</span></button>
+					<button class='btn btn-error selected_actions btn_delete'>Delete</button>
+					<div class="dropdown-group playlist-dropdown">
+						<button class='btn btn-white add_to_playlist dropdown-anchor'>Add To <span class="caret"></span></button>
 						<div class="dropdown-menu">
 							<div class="head_ribbon">
 								<a href="#" data-id="<?php echo glue::user()->watchLaterPlaylist()->_id ?>" class='watch_later playlist_link'>Watch Later</a>

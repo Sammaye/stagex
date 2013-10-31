@@ -11,7 +11,7 @@ class PlaylistController extends glue\Controller{
 	public function authRules(){
 		return array(
 			array("allow",
-				"actions"=>array('create', 'edit', 'save', 'delete', 'batchDelete', 'addVideo', 'get_menu', 'batchSave', 'deleteVideo', 'suggestAddTo'),
+				"actions"=>array('create', 'edit', 'save', 'delete', 'batchDelete', 'addVideo', 'get_menu', 'batchSave', 'deleteVideo', 'suggestAddTo','clear'),
 				"users"=>array("@*")
 			),
 			array('allow', 'actions' => array('index', 'view', 'renderBar')),
@@ -128,7 +128,7 @@ class PlaylistController extends glue\Controller{
 		glue::mysql()->query('UPDATE documents SET deleted=1 WHERE _id IN :id', array(':id' => $ids));	
 		$this->json_success(array('message'=>'The playlists you selected were deleted','updated'=>count($ids)));
 	}	
-
+	
 	function action_batchSave(){
 		if(!glue::auth()->check('ajax','post'))
 			glue::trigger('404');
@@ -210,6 +210,18 @@ class PlaylistController extends glue\Controller{
 		$playlist->save();
 		$this->json_success('Videos removed');
 	}
+	
+	function action_clear(){
+		if(!glue::auth()->check('ajax','post'))
+			glue::trigger('404');
+		if(!($playlist = Playlist::model()->findOne(array('_id' => new MongoId(glue::http()->param('id',''))))))
+			$this->json_error('That playlist could not be found');
+		if(!glue::auth()->check(array('^' => $playlist)))
+			$this->json_error(self::DENIED);
+		$playlist->videos=array();
+		$playlist->save();
+		$this->json_success('The playlist was cleared');
+	}	
 
 	public function action_get_menu(){
 		$this->pageTitle = 'Get Playlists - StageX';

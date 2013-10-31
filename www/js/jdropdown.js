@@ -74,7 +74,6 @@
 		destroy: function(){}
 	},
 	open = function(event){
-		console.log('here');
 		event.preventDefault();
 
 		var anchor = $(this).parents('.jdropdown-anchor'),
@@ -115,6 +114,8 @@
 			default:
 				break;
 		}
+		
+		var offset=$(this).offset();
 
 		if(settings.orientation == 'above'){
 			data.menu.css({
@@ -135,8 +136,8 @@
 		}else{
 			data.menu.css({
 				'position': 'absolute',
-				left:0,
-				top:$(this).outerHeight(),
+				left:offset.left,
+				top:offset.top +$(this).outerHeight(),
 				'display': 'block',
 				'z-index' : 99999999999
 			});
@@ -189,7 +190,7 @@
 			}else{
 				data.menu.css({
 					'position': 'absolute',
-					'left': (offset.left - container.outerWidth()) + $('.jdropdown-active').outerWidth(),
+					'left': offset.left, //(offset.left - container.outerWidth()) + $('.jdropdown-active').outerWidth(),
 					'top': (offset.top + $('.jdropdown-active').outerHeight()),
 					'display': 'block'
 				});

@@ -22,13 +22,13 @@ class Jqautocomplete extends \glue\Widget{
 				if($this->renderItem && !isset($this->options['select'])){
 					$this->options['select'] = "
 					function( event, ui ) {
-						$( '.".$this->attribute."' ).val( ui.item.label );
+						$( '#".$this->attribute."' ).val( ui.item.label );
 						return false;
 					}";
 				}
 
 				$js .= "
-						$('.".$this->attribute."').autocomplete(
+						$('#".$this->attribute."').autocomplete(
 							" . js_encode($this->options) . "
 						)
 				";

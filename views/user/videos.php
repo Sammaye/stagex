@@ -150,11 +150,14 @@ $this->js('videos', "
 
 	<div class="header">
     		<div class='search form-search'>
-			<?php $form = Html::form(array('method' => 'get')); ?><div class="search_input">
+			<?php $form = Html::form(array('method' => 'get')); ?>
 				<?php app\widgets\Jqautocomplete::widget(array(
 					'attribute' => 'query',
 					'value' => urldecode(htmlspecialchars(isset($_GET['query']) ? $_GET['query'] : '')),
 					'placeholder' => 'Search Uploads',
+					'htmlOptions' => array(
+						'class' => 'form-search-input col-38'
+					),
 					'options' => array(
 						'appendTo' => '#user_video_results',
 						'source' => '/user/video_search_suggestions',
@@ -165,7 +168,7 @@ $this->js('videos', "
 							.data( 'item.autocomplete', item )
 							.append( '<a class=\'content\'><span>' + item.label + '</span></div></a>' )
 							.appendTo( ul );
-				"))  ?></div><button class="submit_search"><span>&nbsp;</span></button>
+				"))  ?><button class="btn submit_search"><span>&nbsp;</span></button>
 				<span class='text-muted small amount_found'><?php echo $video_rows->count() ?> found</span>
 			<?php $form->end() ?>
 			</div>    	
@@ -182,7 +185,7 @@ $this->js('videos', "
 	   	<div class="header clearfix">
     		<h3>Edit Videos</h3>
     		<button type="button" class="btn btn-success save">Save</button>
-    		<button type="button" class="btn btn-default cancel">Cancel</button>
+    		<button type="button" class="btn btn-white cancel">Cancel</button>
     	</div>    	
     	
     	<div class='alert'></div>
@@ -304,7 +307,7 @@ $this->js('videos', "
 						<div class="dropdown-menu">
 							<div class="head_ribbon">
 								<a href="#" data-id="<?php echo glue::user()->watchLaterPlaylist()->_id ?>" class='watch_later playlist_link'>Watch Later</a>
-								<input type="text" placeholder="Search for Playlists" class="search_input"/>
+								<input type="text" placeholder="Search for Playlists" class="form-control"/>
 							</div>
 							<div class="playlist_results">
 							<div class='item'>
@@ -328,6 +331,7 @@ $this->js('videos', "
 		'html' => $html
 	)); ?>
 
+	<div class="video_list">
 	<?php if($video_rows->count() > 0){
 		glue\widgets\ListView::widget(array(
 			'pageSize'	 => 20,
@@ -338,4 +342,5 @@ $this->js('videos', "
 	}else{ ?>
 		<div class='no_results_found'>No videos were found</div>
 	<?php } ?>
+	</div>
 </div>

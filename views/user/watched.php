@@ -48,7 +48,7 @@ $this->js('watched_page', "
 			params['ids[]'][params['ids[]'].length]=$(item).val();
 		});
 
-		$.post('/history/deleteRated', params, null, 'json').done(function(data){
+		$.post('/user/removeWatched', params, null, 'json').done(function(data){
 			if(data.success){
 				$('.grey_sticky_toolbar .block-alert').summarise('set', 'success','The videos you selected were deleted');
 				$.each(params['ids[]'],function(i,item){
@@ -62,26 +62,17 @@ $this->js('watched_page', "
 	});		
 		
 	$(document).on('click', '.grey_sticky_toolbar .btn_clear', function(){
-		$.post('/history/clearWatched', {}, null, 'json').done(function(data){
+		$.post('/user/clearWatched', {}, null, 'json').done(function(data){
 			if(data.success){
-				$('.grey_sticky_toolbar .block-alert').summarise('set', 'success','The videos you selected were deleted');
-			}else
-				$('.grey_sticky_toolbar .block-alert').summarise('set', 'error','The videos you selected could not be deleted');
+				$('.grey_sticky_toolbar .block-alert').summarise('set', 'success','Your watched history has been cleared');
+				$('.video_list').html('');
+			}
 		});			
 	});			
 		
 	function reset_checkboxes(){
 		$('.selectAll_input').prop('checked',true).trigger('click');
 	}		
-
-	$(document).on('click', '.clear_all', function(event){
-		event.preventDefault();
-		$.getJSON('/history/remove_all_watched', function(data){
-			if(data.success){
-				$('.video_list').html(data.html);
-			}
-		});
-	});
 ");
 ?>
 <div class="user_history_body">
@@ -108,9 +99,9 @@ $this->js('watched_page', "
 			<div class='stickytoolbar-bar'>
 				<div class='inner_bar'>
 					<div class='checkbox_button checkbox_input'><?php echo Html::checkbox('selectAll', 1, 0, array('class' => 'selectAll_input')) ?></div>
-					<button class='btn-grey selected_actions btn_delete'>Delete</button>
-					<div class="btn-group dropdown-group playlist-dropdown">
-						<button class='btn-grey add_to_playlist dropdown-anchor'>Add To <span class="caret">&#9660;</span></button>
+					<button class='btn btn-error selected_actions btn_delete'>Delete</button>
+					<div class="dropdown-group playlist-dropdown">
+						<button class='btn btn-white add_to_playlist dropdown-anchor'>Add To <span class="caret"></span></button>
 						<div class="dropdown-menu">
 							<div class="head_ribbon">
 								<a href="#" data-id="<?php echo glue::user()->watchLaterPlaylist()->_id ?>" class='watch_later playlist_link'>Watch Later</a>
@@ -123,7 +114,7 @@ $this->js('watched_page', "
 							</div>
 						</div>
 					</div>
-					<button class='btn-grey selected_actions btn_clear'>Clear Watched History</button>
+					<button class='btn btn-error selected_actions btn_clear'>Clear Watched History</button>
 				</div>
 				<div class="alert block-alert" style='display:none;'></div>
 			</div>

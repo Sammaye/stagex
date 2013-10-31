@@ -45,8 +45,10 @@
 		$(document).on('click', '.grey_sticky_toolbar .btn_delete_all', function(event){
 			event.preventDefault();
 			$.getJSON('/playlist/clear', {id: '".$model->_id."'}, function(data){
-				if(data.success)
-					$('.video_list').html(data.html);
+				if(data.success){
+					$('.grey_sticky_toolbar .block-alert').summarise('set', 'success','Your watch later list was cleared');
+					$('.video_list').html('');
+				}
 			});
 		});
 	");
@@ -60,7 +62,7 @@
 				<div class='inner_bar'>
 					<div class='checkbox_button checkbox_input'><?php echo html::checkbox('selectAll', 1, 0, array('class' => 'selectAll_input')) ?></div>
 					<div class="dropdown-group playlist-dropdown">
-						<button class='btn btn-default add_to_playlist dropdown-anchor'>Add To <span class="caret"></span></button>
+						<button class='btn btn-white add_to_playlist dropdown-anchor'>Add To <span class="caret"></span></button>
 						<div class="dropdown-menu">
 							<div class="head_ribbon">
 								<a href="#" data-id="<?php echo glue::user()->watchLaterPlaylist()->_id ?>" class='watch_later playlist_link'>Watch Later</a>

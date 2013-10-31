@@ -38,7 +38,7 @@ class ListView extends \glue\Widget{
 	/**
 	 * Additional data to be passed to the view when rendering
 	 */
-	public $data;
+	public $data=array();
 
 	public $template = '<div class="list_contents">{items}<div class="list_pagination">{pager}<div class="clear"></div></div></div>';
 	public $itemView;

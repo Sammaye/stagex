@@ -415,7 +415,7 @@ class userController extends \glue\Controller{
 		$this->render('followed_playlists', array('items' => $items, '_filter' => $_filter));
 	}
 	
-	function action_deleteRated(){
+	function action_removeRated(){
 		if(!glue::auth()->check('ajax','post'))
 			glue::trigger('404');
 		extract(glue::http()->param(array('ids')));
@@ -446,15 +446,15 @@ class userController extends \glue\Controller{
 		$this->json_success(array('message'=>'Videos deleted', 'updated'=>$updated,'failed'=>$failed));
 	}
 	
-	function action_deleteWatched(){
+	function action_removeWatched(){
 		if(!glue::auth()->check('ajax','post'))
 			glue::trigger('404');
-		extract(glue::http()->param('ids'));
-		if(!$ids||(is_array($_ids)&&count($_ids) <= 0))
+		$ids=glue::http()->param('ids');
+		if(!$ids||(is_array($ids)&&count($ids) <= 0))
 			$this->json_error(self::UNKNOWN);
 	
 		$mongoIds = array();
-		foreach($_ids as $k=>$v){
+		foreach($ids as $k=>$v){
 			$mongoIds[$k] = new MongoId($v);
 		}
 		glue::db()->watched_history->remove(array('_id' => array('$in' => $mongoIds), 'user_id' => glue::user()->_id));

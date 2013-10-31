@@ -58,10 +58,12 @@ input.date{
 }
 
 .form-search .submit_search span{
-	background:url(/images/search_icon_small.png) no-repeat 0 0;
+	background:url(/images/search_icon_small.png) no-repeat 1px 3px;
+	/*
 	margin:0 0 0 3px;
 	width:20px;
 	display:block;
+	*/
 }
 
 .form-search .submit_search{
@@ -72,13 +74,15 @@ input.date{
 	background-image: -webkit-linear-gradient(center top, #F5F5F5 0%, #F1F1F1 100%);
 	background-image: -ms-linear-gradient(center top, #F5F5F5 0%, #F1F1F1 100%);
 	/*background: -moz-linear-gradient(center top , #F5F5F5 0%, #F1F1F1 100%) repeat scroll 0 0 transparent;*/
-    border: 1px solid #BBBBBB;
+	border: 1px solid #BBBBBB;
+	/*
     border-radius: 0 3px 3px 0;
     display: block;
     float: left;
     height: 32px;
 	line-height:15px;
 	font-size:13px;
+	*/
 }
 
 .form-search .submit_search:focus{
@@ -154,21 +158,9 @@ input.date{
 }
 
 .dropdown-menu{
-	
-}
-
-.dropdown-menu{
-	width:250px; /*padding-bottom: 6px; padding-top: 6px;*/ 
-    z-index: 10;
+	width:350px; /*padding-bottom: 6px; padding-top: 6px;*/ 
 	display:none;
-	-moz-transition: opacity 0.218s ease 0s;
-    background: none repeat scroll 0 0 #FFFFFF;
-    border: 1px solid rgba(0, 0, 0, 0.2);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    cursor: default;
-    font-size: 13px;
-    margin: 0;
-    outline: medium none;
+    padding:0;
     z-index:1000; overflow:hidden;
 }
 
@@ -176,6 +168,11 @@ input.date{
 	border-top: 1px solid #EBEBEB;
     margin-bottom: 6px;
     margin-top: 6px;
+}
+
+.dropdown-menu .form-control{
+	width:80%;
+	margin:0 0 10px 10px;
 }
 
 .dropdown-menu .item{
@@ -1072,7 +1069,7 @@ input.date{
 }
 
 .user_videos_body .header{
-	margin:20px 0 10px 0;
+	margin:10px 0 10px 0;
 }
 
 .user_videos_body .header .left{
@@ -1088,7 +1085,6 @@ input.date{
 }
 
 .user_videos_body .header .form-search{
-	float:left;
 }
 
 .mass_edit_form .alert{
@@ -1115,8 +1111,8 @@ input.date{
 	float:right;
 }
 
-.user_playlists_page .mass_edit_form .header .btn-default,
-.user_videos_body .mass_edit_form .header .btn-default{
+.user_playlists_page .mass_edit_form .header .btn-white,
+.user_videos_body .mass_edit_form .header .btn-white{
 	float:right; margin-right:15px;
 }
 
@@ -1792,7 +1788,7 @@ input.date{
 }
 
 .advanced_filter_header{
-	margin:20px 0 5px 0;
+	margin:10px 0;
 }
 
 .advanced_filter_head .form-search{
@@ -2171,4 +2167,13 @@ input.date{
 
 .notification_item .sent_date{
 	color:#999999; margin:0 0 0 10px;
+}
+
+.video_row .thumbnail{
+	padding:0;
+	border:0;
+}
+
+.video_row .thumbnail img{
+	border-radius:3px;	
 }
