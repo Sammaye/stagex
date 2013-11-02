@@ -21,6 +21,10 @@ input.date{
 	width:90px;
 }
 
+.text-silent{
+	color:#ddd;
+}
+
 .dropdown-group{
 	float:left;
 }

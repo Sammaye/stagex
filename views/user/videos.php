@@ -18,11 +18,37 @@ $this->js('playlists', "
 		});	
 		console.log(params);
 		$.post('/playlist/addVideo', params, null, 'json').done(function(data){
+			$('.playlists-panel').css({display:'none'});
 			if(data.success){
-				alert('worked');
+				$('.message-panel').css({display:'block'}).find('p').addClass('text-success').html((id_length>1?'Videos ':'Video ')+'added to playlist');
 			}else{
+				$('.message-panel').css({display:'block'}).find('p').addClass('text-error')
+					.html((id_length>1?'Videos ':'Video ')+'could not be added to playlist due to an internal error');
 			}
 		});
+	});
+		
+	$('.playlist-dropdown').on('jdropdown.open', function(){
+		var menu=$(this);
+		menu.find('.message-panel').css({display:'none'});
+		menu.find('.playlists-panel').css({display:'block'});
+	});
+		
+	$(document).on('click','.playlist-dropdown .message-back',function(e){
+		e.preventDefault();
+		var menu=$(this).parents('.playlist-dropdown');
+		menu.find('.message-panel').css({display:'none'});
+		menu.find('.playlists-panel').css({display:'block'});
+	});
+		
+	$(document).on('click','.playlist-dropdown .message-close',function(e){
+		e.preventDefault();
+		var menu=$(this).parents('.playlist-dropdown');
+		menu.find('.message-panel').css({display:'none'});
+		menu.find('.playlists-panel').css({display:'block'});
+
+		// trigger close
+		$('.dropdown-group').jdropdown('close');
 	});
 ");
 
@@ -305,14 +331,20 @@ $this->js('videos', "
 					<div class="dropdown-group playlist-dropdown">
 						<button class='btn btn-white add_to_playlist dropdown-anchor'>Add To <span class="caret"></span></button>
 						<div class="dropdown-menu">
-							<div class="head_ribbon">
-								<a href="#" data-id="<?php echo glue::user()->watchLaterPlaylist()->_id ?>" class='watch_later playlist_link'>Watch Later</a>
-								<input type="text" placeholder="Search for Playlists" class="form-control"/>
+							<div class="playlists-panel">
+								<div class="head_ribbon">
+									<a href="#" data-id="<?php echo glue::user()->watchLaterPlaylist()->_id ?>" class='watch_later playlist_link'>Watch Later</a>
+									<input type="text" placeholder="Search for Playlists" class="form-control"/>
+								</div>
+								<div class="playlist_results">
+								<div class='item'>
+									Search for playlists above
+								</div>
+								</div>
 							</div>
-							<div class="playlist_results">
-							<div class='item'>
-								Search for playlists above
-							</div>
+							<div class="message-panel" style='display:none;padding:20px;'>
+								<p style='font-size:16px;'></p>
+								<a href="#" class="message-back">Back</a> <span class="text-silent">|</span> <a href="#" class="message-close">Close</a>
 							</div>
 						</div>
 					</div>

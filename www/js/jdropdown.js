@@ -71,6 +71,10 @@
 				return this;
 			});
 		},
+		close: function(){
+			close();
+			
+		},
 		destroy: function(){}
 	},
 	open = function(event){
