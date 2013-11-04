@@ -1,7 +1,6 @@
 <?php
 glue::clientScript()->addJsFile('jquery-expander', "/js/jquery-expander.js");
 glue::clientScript()->addJsFile('j-dropdown', '/js/jdropdown.js');
-glue::clientScript()->addJsFile('playlist_dropdown', '/js/playlist_dropdown.js');
 
 glue::clientScript()->addJsScript('page', "
 	$(function(){
@@ -95,6 +94,7 @@ glue::clientScript()->addJsScript('user.subscribe', "
 $video_count = count($playlist->videos);
 ?>
 <div class='container_16'>
+
 <div class='grid_16 alpha omega view_playlist_body'>
 	<div class='main_content_outer'>
 		<div class='grid_5 alpha main_content_left'>

@@ -42,7 +42,7 @@ class UserMenu extends \glue\Widget{
 		<h3 class='head_divider'>Settings</h3>
 		<ul>
 		<li><a href='<?php echo glue::http()->url('/user/settings') ?>' <?php echo $this->tab == "settings" ? "class='selected'" : "" ?>>Account Settings</a></li>
-		<li><a href='<?php echo glue::http()->url('/user/profile') ?>' <?php echo $this->tab == "profile" ? "class='selected'" : "" ?>>Profile Settings</a></li>
+		<li><a href='<?php echo glue::http()->url('/user/profile') ?>' <?php echo $this->tab == "profile_settings" ? "class='selected'" : "" ?>>Profile Settings</a></li>
 		<li><a href='<?php echo glue::http()->url('/user/activity') ?>' <?php echo $this->tab == "activity" ? "class='selected'" : "" ?>>Account Activity</a></li>
 		</ul>
 		<ul class='end_list'>

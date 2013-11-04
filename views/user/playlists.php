@@ -133,87 +133,89 @@ $this->js('new_playlist', "
 "); ?>
 <div class="user_playlists_page">
 
-	<div class="tabs-nav videos_nav_top">
-		<ul>
-			<li><a href="/user/playlists" class="selected">My Playlists</a></li>
-			<li><a href="/playlist/followed">Followed</a></li>
+	<div class="videos_nav_top">
+		<ul class="nav nav-tabs">
+			<li class="active"><a href="/user/playlists">My Playlists</a></li>
+			<li><a href="/playlists/following">Following</a></li>
 		</ul>
-		<a class="btn-success btn-upload btn_modal" href="<?php echo glue::http()->url('/playlist/create') ?>">Add Playlist</a>
-	</div>
+		<a class="btn btn-success btn-upload" href="<?php echo glue::http()->url('/playlist/create') ?>">Add New Playlist</a>
+	</div>	
 
-	<div class="header">   
-    	<div class='search form-search'>
-		<?php $form = Html::form(array('method' => 'get')); ?><div class="search_input">
-			<?php app\widgets\Jqautocomplete::widget(array(
-				'attribute' => 'query',
-				'value' => urldecode(htmlspecialchars(isset($_GET['query']) ? $_GET['query'] : '')),
-				'placeholder' => 'Search Playlists',
-				'options' => array(
-					'appendTo' => '#user_video_results',
-					'source' => '/user/video_search_suggestions',
-					'minLength' => 2,
-				),
-				'renderItem' => "
-					return $( '<li></li>' )
-						.data( 'item.autocomplete', item )
-						.append( '<a class=\'content\'><span>' + item.label + '</span></div></a>' )
-						.appendTo( ul );
-			"))  ?></div><button class="submit_search"><span>&nbsp;</span></button>
-		<?php $form->end() ?>
-		<div class="clear"></div>
-		</div>    	
-    </div>
+	<div class="header">
+    		<div class='search form-search'>
+			<?php $form = Html::form(array('method' => 'get')); ?>
+				<?php app\widgets\Jqautocomplete::widget(array(
+					'attribute' => 'query',
+					'value' => urldecode(htmlspecialchars(isset($_GET['query']) ? $_GET['query'] : '')),
+					'placeholder' => 'Search Playlists',
+					'htmlOptions' => array(
+						'class' => 'form-search-input col-38'
+					),
+					'options' => array(
+						'appendTo' => '#user_video_results',
+						'source' => '/user/video_search_suggestions',
+						'minLength' => 2,
+					),
+					'renderItem' => "
+						return $( '<li></li>' )
+							.data( 'item.autocomplete', item )
+							.append( '<a class=\'content\'><span>' + item.label + '</span></div></a>' )
+							.appendTo( ul );
+				"))  ?><button class="btn submit_search"><span>&nbsp;</span></button>
+			<?php $form->end() ?>
+			</div>    	
+    	<div class="clear"></div>
+    </div>	
     
     <div class="mass_edit_form">
     	<?php $form=Html::activeForm(); 
     	$pModel=new app\models\Playlist(); ?>
-	   	<div class="header">
+	   	<div class="header clearfix">
     		<h3>Edit Playlists</h3>
-    		<input type="button" class="btn-success save" value="Save"/>
-    		<input type="button" class="btn-grey cancel" value="Cancel"/>
-    		<div class="clear"></div>
+    		<button type="button" class="btn btn-success save">Save</button>
+    		<button type="button" class="btn btn-white cancel">Cancel</button>
     	</div>    	
     	
     	<div class='alert'></div>
     	
-    	<div class="mass_edit_block form-stacked">
+    	<div class="mass_edit_block form-stacked clearfix">
     		<a href="#" class="edit">+ Edit Title</a>
     		<div class="form">
     		<a href="#" class="remove">Remove</a>
     		<div class="right">    	
-    		<label>Title:</label><?php echo $form->textField($pModel,'title') ?>
-    		</div></div><div class="clear"></div>
+    		<label>Title:</label><?php echo $form->textField($pModel,'title','form-control') ?>
+    		</div></div>
     	</div>
-    	<div class="mass_edit_block form-stacked">
+    	<div class="mass_edit_block form-stacked clearfix">
     		<a href="#" class="edit">+ Edit Description</a>
     		<div class="form">
     		<a href="#" class="remove">Remove</a>
     		<div class="right">
-    		<label>Description:</label><?php echo $form->textArea($pModel,'description') ?>
-    		</div></div><div class="clear"></div>
+    		<label>Description:</label><?php echo $form->textArea($pModel,'description','form-control') ?>
+    		</div></div>
     	</div>
-    	<div class="mass_edit_block">
+    	<div class="mass_edit_block clearfix">
     		<a href="#" class="edit">+ Edit Listing</a>
     		<div class="form">
     		<a href="#" class="remove">Remove</a>
     		<div class="right">
 			<?php $grp = html::activeRadio_group($pModel, 'listing') ?>
 			<label class="radio"><?php echo $grp->add(0) ?>Listed</label>
-			<p class='light'>Your video is public to all users of StageX</p>
+			<p class='text-muted'>Your video is public to all users of StageX</p>
 			<label class="radio"><?php echo $grp->add(1) ?>Unlisted</label>
-			<p class='light'>Your video is hidden from listings but can still be accessed directly using the video URL</p>
+			<p class='text-muted'>Your video is hidden from listings but can still be accessed directly using the video URL</p>
 			<label class="radio"><?php echo $grp->add(2) ?>Private</label>
-			<p class='light'>No one but you can access this video</p>
+			<p class='text-muted'>No one but you can access this video</p>
 			</div>
-			</div><div class="clear"></div>
+			</div>
     	</div>
-    	<div class="mass_edit_block">
+    	<div class="mass_edit_block clearfix">
     		<a href="#" class="edit">+ Edit Followable</a>
     		<div class="form">
     		<a href="#" class="remove">Remove</a>
     		<div class="right">    	
     		<label class="checkbox"><?php echo $form->checkbox($pModel,'allowFollowers', 1) ?>Allow users to follow my playlist</label>
-    		</div></div><div class="clear"></div>
+    		</div></div>
     	</div>
     	<?php $form->end(); ?>
     </div>    
@@ -223,8 +225,8 @@ $this->js('new_playlist', "
 			<div class='stickytoolbar-bar'>
 				<div class='inner_bar'>
 					<div class='checkbox_button checkbox_input'><?php echo Html::checkbox('selectAll', 1, 0, array('class' => 'selectAll_input')) ?></div>
-					<button class='btn btn-dark selected_actions edit_videos_button'>Edit</button>
-					<button class='btn-grey selected_actions btn_delete'>Delete</button>
+					<button class='btn btn-white selected_actions edit_videos_button'>Edit</button>
+					<button class='btn btn-error selected_actions btn_delete'>Delete</button>
 				</div>
 				<div class="alert block-alert" style='display:none;'></div>
 			</div>

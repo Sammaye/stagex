@@ -140,8 +140,8 @@
 		}else{
 			data.menu.css({
 				'position': 'absolute',
-				left:offset.left,
-				top:offset.top +$(this).outerHeight(),
+				left:0,
+				top:$(this).outerHeight(),
 				'display': 'block',
 				'z-index' : 99999999999
 			});
@@ -187,15 +187,15 @@
 			if(settings.orientation == 'left'){
 				data.menu.css({
 					'position': 'absolute',
-					'left': offset.left,
-					'top': (offset.top + $('.jdropdown-active').outerHeight()),
+					'left': 0,
+					'top': ($('.jdropdown-active').outerHeight()),
 					'display': 'block'
 				});
 			}else{
 				data.menu.css({
 					'position': 'absolute',
-					'left': offset.left, //(offset.left - container.outerWidth()) + $('.jdropdown-active').outerWidth(),
-					'top': (offset.top + $('.jdropdown-active').outerHeight()),
+					'left': 0, //(offset.left - container.outerWidth()) + $('.jdropdown-active').outerWidth(),
+					'top': ($('.jdropdown-active').outerHeight()),
 					'display': 'block'
 				});
 			}

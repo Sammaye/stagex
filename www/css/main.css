@@ -27,6 +27,11 @@ input.date{
 
 .dropdown-group{
 	float:left;
+	position:relative;
+}
+
+.dropdown-group .btn{
+	margin:0!important;
 }
 
 .form-search .search_input{
@@ -307,11 +312,11 @@ input.date{
 }
 
 .grey_sticky_toolbar .btn{
-	margin:0 15px;
+	margin:0 0 0 15px;
 }
 
-.grey_sticky_toolbar .btn:first-child{
-	margin-left:0;
+.grey_sticky_toolbar .btn-error{
+	margin-left:35px;
 }
 
 .grey_sticky_toolbar .alert{
@@ -319,7 +324,11 @@ input.date{
 }
 
 .grey_sticky_toolbar .checkbox_button{
-	float:left; margin:8px 15px 0 0;
+	float:left; margin:8px 0 0 0;
+}
+
+.grey_sticky_toolbar .dropdown-group{
+	margin:0 0 0 15px;
 }
 
 .grey_sticky_toolbar .search{
@@ -1909,6 +1918,14 @@ input.date{
 	margin:0 10px; cursor:pointer;
 }
 
+.edit_playlist_body .playlist_video_list{
+	list-style:none; padding:0;
+}
+
+.edit_playlist_body h1{
+	margin-top:0;
+}
+
 .playlist_bar_outer{
 	position:fixed; bottom:0; width:100%; z-index:20000000;
 }
@@ -2003,7 +2020,11 @@ input.date{
 }
 
 .user_playlist_item .thumbnail{
-	float:left;width:150px;padding-top:6px;
+	float:left;width:150px;padding:0;padding-top:6px;border:0;border-radius:0;
+}
+
+.user_playlist_item .thumbnail img{
+	display:inline;
 }
 
 .user_playlist_item .info{
@@ -2031,7 +2052,7 @@ input.date{
 }
 
 .user_playlists_page .form-search{
-	margin:20px 0 10px 0;
+	margin:10px 0 10px 0;
 }
 
 .create_playlist_form{

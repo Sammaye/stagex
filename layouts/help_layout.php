@@ -55,11 +55,16 @@ $this->beginPage() ?>
 			<h1 class="jumbo"><?php if(isset($model)&&$model!==null): echo $model->title; else: echo "404 Not Found"; endif; ?></h1>
 			</div>			
 			</div>
+			
     		<div class='search form-search'>
-			<?php $form = Html::form(array('method' => 'get', 'action' => '/help/search')); ?><div class="search_input">
+			<?php $form = Html::form(array('method' => 'get')); ?>
 				<?php app\widgets\Jqautocomplete::widget(array(
 					'attribute' => 'query',
 					'value' => urldecode(htmlspecialchars(isset($_GET['query']) ? $_GET['query'] : '')),
+					'placeholder' => 'Search Help',
+					'htmlOptions' => array(
+						'class' => 'form-search-input'
+					),
 					'options' => array(
 						'appendTo' => '#help_search_results',
 						'source' => '/help/suggestions',
@@ -70,7 +75,7 @@ $this->beginPage() ?>
 							.data( 'item.autocomplete', item )
 							.append( '<a class=\'content\'><span>' + item.label + '</span></div></a>' )
 							.appendTo( ul );
-				"))  ?></div><button class="submit_search"><span>&nbsp;</span></button>
+				"))  ?><button class="btn submit_search"><span>&nbsp;</span></button>
 			<?php $form->end() ?>
 			<div class="clear"></div>
 			<p class='ask'><a href='https://getsatisfaction.com/stagex'>Ask a Question on the Forums</a></p>

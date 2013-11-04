@@ -536,7 +536,7 @@ class userController extends \glue\Controller{
 	function action_profile(){
 		$this->title = 'Profile Settings - StageX';
 		$this->layout = "user_section";
-		$this->tab = "profile";
+		$this->tab = "profile_settings";
 
 		$model = $this->loadModel();
 		if(isset($_POST['User'])){

@@ -11,7 +11,7 @@ class PlaylistController extends glue\Controller{
 	public function authRules(){
 		return array(
 			array("allow",
-				"actions"=>array('create', 'edit', 'save', 'delete', 'batchDelete', 'addVideo', 'get_menu', 'batchSave', 'deleteVideo', 'suggestAddTo','clear'),
+				"actions"=>array('create', 'edit', 'save', 'delete', 'batchDelete', 'addVideo', 'get_menu', 'batchSave', 'deleteVideo', 'ajaxsearch','clear'),
 				"users"=>array("@*")
 			),
 			array('allow', 'actions' => array('index', 'view', 'renderBar')),
@@ -34,7 +34,7 @@ class PlaylistController extends glue\Controller{
 			exit();
 		}
 
-		$this->layout='user_section';
+		$this->layout='playlist_layout';
 		$this->pageTitle = $playlist->title.' - StageX';
 		$this->pageDescription = $playlist->description;
 		$this->render('Playlist/view', array('playlist' => $playlist, 'user' => $playlist->author));
@@ -59,7 +59,7 @@ class PlaylistController extends glue\Controller{
 			$this->title = 'Playlist Not Found - StageX';
 			echo $this->render('deleted');
 		}else{
-			$this->layout='user_section';
+			$this->layout='playlist_layout';
 			$this->title = 'Playlist: '.$playlist->title.' - StageX';
 			echo $this->render('edit', array('playlist' => $playlist));
 		}
@@ -162,18 +162,19 @@ class PlaylistController extends glue\Controller{
 
 			$existingIds=array();
 			foreach($videos as $video){
-				if(!$playlist->videoAlreadyAdded($video->_id))
+				if(!$playlist->videoAlreadyAdded($video->_id)){
 					$playlist->addVideo($video->_id);
+					if($playlist->listing === 0 || $playlist->listing === 1){ // If this playlist is not private
+						app\models\Stream::PlaylistAddVideo(glue::user()->_id, $playlist->_id, $video->_id);
+						if(glue::user()->autoshareAddToPlaylist)
+							app\models\AutoPublishQueue::add_to_qeue(AutoPublishQueue::PL_V_ADDED, glue::user()->_id, $video->_id, $playlist->_id);
+					}				
+				}
 			}
 			if(count($playlist->videos)>500)
 				$this->json_error('The video you selected was not added because you are limited to 500 videos per playlist.');
 			if(!$playlist->save())
 				$this->json_error('The video you selected was not added because of an unknown error.');
-			if($playlist->listing === 0 || $playlist->listing === 1){ // If this playlist is not private
-				app\models\Stream::PlaylistAddVideo(glue::user()->_id, $playlist->_id, $video->_id);
-				if(glue::user()->autoshareAddToPlaylist)
-					app\models\AutoPublishQueue::add_to_qeue(AutoPublishQueue::PL_V_ADDED, glue::user()->_id, $video->_id, $playlist->_id);
-			}
 			$this->json_success('The video you selected was added to '.$playlist->title);			
 		}else
 			$this->json_error('The video you selected was not added because of an unknown error.');
@@ -222,46 +223,8 @@ class PlaylistController extends glue\Controller{
 		$playlist->save();
 		$this->json_success('The playlist was cleared');
 	}	
-
-	public function action_get_menu(){
-		$this->pageTitle = 'Get Playlists - StageX';
-		if(!glue::http()->isAjax())
-			Glue::route("error/notfound");
-
-		$watch_later = Playlist::model()->findOne(array('title' => 'Watch Later', 'user_id' => glue::session()->user->_id)); // Get the always top one
-		$playlists = Playlist::model()->find(array('user_id' => glue::session()->user->_id, 'title' => array('$ne' => 'Watch Later'),
-			'deleted' => array('$ne' => 1)))->sort(array('ts' => -1))->limit(1000);
-		?><div>
-			<div style='max-height:300px; overflow:auto;'>
-				<div class='item' data-playlist='<?php echo $watch_later ? $watch_later->_id : '' ?>'>Watch Later</div>
-				<div class='divider'></div>
-				<?php
-				if(count($playlists) > 0){
-					foreach($playlists as $k => $v){ ?>
-						<div class='item' data-playlist='<?php echo $v->_id ?>'><?php echo $v->title ?></div>
-					<?php }
-				}else{ ?>
-					<div style='padding:10px; font-size:14px; color:#999999; line-height:17px;'>No Playlists exist</div>
-				<?php } ?>
-			</div>
-		</div><?php
-
-	}
-
-	function get_menu_summary($message){
-		ob_start(); ?>
-			<div style='padding:15px; text-align:center;'>
-				<div style='font-size:16px; font-weight:normal; line-height:20px;'><?php echo $message ?></div>
-				<div class='grey_css_button back_reload' style='margin-top:15px;'>Back</div>
-			</div>
-			<?php $html = ob_get_contents();
-		ob_end_clean();
-
-		return $html;
-	}
 	
-	function action_suggestAddTo(){
-		$this->title='Suggest Playlists - StageX';
+	function action_ajaxsearch(){
 		if(!glue::http()->isAjax())
 			glue::trigger('404');
 		$term=glue::http()->param('term',null);

@@ -7,8 +7,9 @@
 	$this->js('watch_later', "
 		$('.expandable').expander();	
 		$('.grey_sticky_toolbar .block-alert').summarise();
-
-		$('.dropdown-group').jdropdown();			
+			
+		$('.dropdown-group').jdropdown();
+		$('.playlist-dropdown').playlist_dropdown();				
 
 		$('.selectAll_input').click(function(){
 			if($(this).prop('checked')==true){
@@ -64,14 +65,20 @@
 					<div class="dropdown-group playlist-dropdown">
 						<button class='btn btn-white add_to_playlist dropdown-anchor'>Add To <span class="caret"></span></button>
 						<div class="dropdown-menu">
-							<div class="head_ribbon">
-								<a href="#" data-id="<?php echo glue::user()->watchLaterPlaylist()->_id ?>" class='watch_later playlist_link'>Watch Later</a>
-								<input type="text" placeholder="Search for Playlists" class="search_input"/>
+							<div class="playlists-panel">
+								<div class="head_ribbon">
+									<a href="#" data-id="<?php echo glue::user()->watchLaterPlaylist()->_id ?>" class='watch_later playlist_link'>Watch Later</a>
+									<input type="text" placeholder="Search for Playlists" class="form-control"/>
+								</div>
+								<div class="playlist_results">
+								<div class='item'>
+									Search for playlists above
+								</div>
+								</div>
 							</div>
-							<div class="playlist_results">
-							<div class='item'>
-								Search for playlists above
-							</div>
+							<div class="message-panel" style='display:none;padding:20px;'>
+								<p style='font-size:16px;'></p>
+								<a href="#" class="message-back">Back</a> <span class="text-silent">|</span> <a href="#" class="message-close">Close</a>
 							</div>
 						</div>
 					</div>

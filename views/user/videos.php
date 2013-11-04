@@ -6,57 +6,12 @@ $this->JsFile("/js/jquery.expander.js");
 $this->JsFile('/js/jdropdown.js');
 $this->JsFile('/js/playlist_dropdown.js');
 
-$this->js('playlists', "
-	$(document).on('click', '.playlist-dropdown .playlist_link', function(e){
-		e.preventDefault();
-		var params = [{name:'playlist_id',value:$(this).data().id}];
-		
-		id_length=0;
-		$('.video_list .video .checkbox_col input:checked').each(function(i,item){
-			params[params.length]={name:['video_ids['+id_length+']'],value:$(item).val()};
-			id_length++;
-		});	
-		console.log(params);
-		$.post('/playlist/addVideo', params, null, 'json').done(function(data){
-			$('.playlists-panel').css({display:'none'});
-			if(data.success){
-				$('.message-panel').css({display:'block'}).find('p').addClass('text-success').html((id_length>1?'Videos ':'Video ')+'added to playlist');
-			}else{
-				$('.message-panel').css({display:'block'}).find('p').addClass('text-error')
-					.html((id_length>1?'Videos ':'Video ')+'could not be added to playlist due to an internal error');
-			}
-		});
-	});
-		
-	$('.playlist-dropdown').on('jdropdown.open', function(){
-		var menu=$(this);
-		menu.find('.message-panel').css({display:'none'});
-		menu.find('.playlists-panel').css({display:'block'});
-	});
-		
-	$(document).on('click','.playlist-dropdown .message-back',function(e){
-		e.preventDefault();
-		var menu=$(this).parents('.playlist-dropdown');
-		menu.find('.message-panel').css({display:'none'});
-		menu.find('.playlists-panel').css({display:'block'});
-	});
-		
-	$(document).on('click','.playlist-dropdown .message-close',function(e){
-		e.preventDefault();
-		var menu=$(this).parents('.playlist-dropdown');
-		menu.find('.message-panel').css({display:'none'});
-		menu.find('.playlists-panel').css({display:'block'});
-
-		// trigger close
-		$('.dropdown-group').jdropdown('close');
-	});
-");
-
 $this->js('videos', "
 	$(function(){
-		//$('.playlist-dropdown').playlistDropdown();
-		
 		$('.expandable').expander();
+		
+		$('.dropdown-group').jdropdown();
+		$('.playlist-dropdown').playlist_dropdown();		
 		
 		$('.mass_edit_form .alert').summarise();
 		$('.grey_sticky_toolbar .block-alert').summarise()
@@ -69,8 +24,6 @@ $this->js('videos', "
 			}
 		});
 
-		$('.dropdown-group').jdropdown();
-		
 		$(document).on('click', '.edit_videos_button', function(){
 			$('.mass_edit_form').css({display:'block'});
 		});
