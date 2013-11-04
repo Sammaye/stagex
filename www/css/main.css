@@ -1926,6 +1926,22 @@ input.date{
 	margin-top:0;
 }
 
+.edit_playlist_body .edit_ribbon_menu .btn-group{
+	margin:0 60px;
+}
+
+.edit_playlist_body .share_area .form-control{
+	display:inline; margin-left:10px;
+}
+
+.share_area .share_network_btn{
+	margin-top:1px;
+}
+
+.share_network_btn + .share_network_btn{
+	margin-left:10px;
+}
+
 .playlist_bar_outer{
 	position:fixed; bottom:0; width:100%; z-index:20000000;
 }
@@ -2201,4 +2217,8 @@ input.date{
 
 .video_row .thumbnail img{
 	border-radius:3px;	
+}
+
+.playlist_sortable_highlight{
+	height: 71px;background:#f1f1f1;
 }

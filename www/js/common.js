@@ -17,6 +17,10 @@ $(document).on('click', '.checkbox_input input', function(e){
 	}
 });
 
+$(document).on('focus','.select_all_onfoc',function(){
+	$(this).select();
+});
+
 /**
  * Open link in new Window Plugin
  * 

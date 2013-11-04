@@ -133,10 +133,11 @@ $this->js('edit', "
 	
 	<h1><?php echo $playlist->title ?></h1>
 	
-	<div style='margin:10px 0 20px 0;'>
-		<a rel='new_window' href="http://www.facebook.com/sharer.php?u=<?php echo urlencode(glue::http()->url("/playlist/view", array("id"=>$playlist->_id))) ?>"><img alt='fb' src="/images/fb_large.png"/></a>
-		<a rel='new_window' href="http://twitter.com/share?url=<?php echo urlencode(glue::http()->url("/playlist/view", array("id"=>$playlist->_id))) ?>"><img alt='twt' src="/images/twt_large.png"/></a>
-		<g:plusone size="medium" annotation="inline" href="<?php echo glue::http()->url('/playlist/view', array('id' => $playlist->_id)) ?>"></g:plusone>
+	<div style='margin:10px 0 20px 0;' class="share_area">
+		<a rel='new_window' class="share_network_btn" style='background:url(/images/social_icons.png) no-repeat 0 0; width:32px; height:32px; display:block; float:left;' href="http://www.facebook.com/sharer.php?u=<?php echo urlencode(glue::http()->url("/playlist/view", array("id"=>$playlist->_id))) ?>"></a>
+		<a rel='new_window' class="share_network_btn" style='background:url(/images/social_icons.png) no-repeat -32px 0; width:32px; height:32px; display:block; float:left;' href="http://twitter.com/share?url=<?php echo urlencode(glue::http()->url("/playlist/view", array("id"=>$playlist->_id))) ?>"></a>
+		<a rel="new_window" class="share_network_btn" style='background:url(/images/social_icons.png) no-repeat -64px 0; width:32px; height:32px; display:block; float:left;' href="https://plus.google.com/u/0/share?url=<?php echo urlencode(glue::http()->url("/playlist/view", array("id"=>$playlist->_id))) ?>"></a>
+		<input type="text" value="<?php echo glue::http()->url('/playlist/view', array('id' => $playlist->_id)) ?>" class="form-control select_all_onfoc col-15"/>
 	</div>	
 	
 	<p><?php echo $playlist->descrption ?></p>
