@@ -1865,6 +1865,10 @@ input.date{
 	height:130px;
 }
 
+.edit_playlist_body .top_grey_bar{
+	background:#eee;
+}
+
 .edit_playlist_body .form_left input,
 .edit_playlist_body .form_left textarea{
 	width:95%;
@@ -1932,6 +1936,47 @@ input.date{
 
 .edit_playlist_body .share_area .form-control{
 	display:inline; margin-left:10px;
+}
+
+.edit_playlist_body .edit_panes .pane{
+	display:none;
+}
+
+.edit_playlist_body .edit_panes .left{
+	float:left;
+}
+
+.edit_playlist_body .edit_panes .form-control{
+	width:480px;
+}
+
+.edit_playlist_body .edit_panes textarea{
+	height:150px;
+}
+
+.edit_playlist_body .edit_panes .right{
+	float:right;
+	width:450px;
+}
+
+.edit_playlist_body .edit_menu{
+	padding:10px 0;
+}
+
+.edit_playlist_body .playlist_description{
+	margin:10px 0 10px 0; font-size:16px; color:#666;
+}
+
+.edit_playlist_body .edit_menu_text{
+	float:right;margin:7px 0 7px;color:#777;
+}
+
+.edit_playlist_body .main_playlist_body{
+	margin:0 auto;padding:40px 0;
+}
+
+.edit_playlist_body .left_menu{
+	width:145px; float:left;margin-right:15px;
 }
 
 .share_area .share_network_btn{
@@ -2221,4 +2266,40 @@ input.date{
 
 .playlist_sortable_highlight{
 	height: 71px;background:#f1f1f1;
+}
+
+.author_top_bar{
+	border-bottom:1px solid #eee;
+}
+
+.author_top_bar .grid-container{
+	padding:15px 0;
+}
+
+.author_top_bar .user_image{
+	float:left;
+}
+
+.author_top_bar .user_image img{
+	float:left;margin:0;border-radius:50%;vetical-align:middle;padding:0;border:0;
+}
+
+.author_top_bar .user_text{
+	float:left;margin:4px 0 0 10px;
+}
+
+.author_top_bar .user_text a{
+	color:#3861bd;
+}
+
+.author_top_bar .user_text .sep{
+	margin:0 5px;color:#666;
+}
+
+.author_top_bar .right{
+	float:right;
+}
+
+.author_top_bar .subscribe_widget{
+	line-height:30px;
 }

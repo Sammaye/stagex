@@ -28,16 +28,15 @@ class PlaylistController extends glue\Controller{
 	public function action_view(){
 		$playlist = Playlist::model()->findOne(array('_id' => new MongoId(glue::http()->param('id')), 'deleted' => array('$ne' => 1)));
 
-		if(!glue::roles()->checkRoles(array('deletedView' => $playlist, 'deniedView' => $playlist))){
-			$this->pageTitle = 'Playlist Not Found - StageX';
-			$this->render('Playlist/deleted', array('playlist'=>$playlist));
-			exit();
+		if(!glue::auth()->check(array('viewable' => $playlist))){
+			$this->title = 'Playlist Not Found - StageX';
+			echo $this->render('deleted');
+		}else{
+			$this->layout='playlist_layout';
+			$this->title = 'Playlist: '.$playlist->title.' - StageX';
+			$this->metaTag('description', $playlist->description);
+			echo $this->render('view', array('model' => $playlist));
 		}
-
-		$this->layout='playlist_layout';
-		$this->pageTitle = $playlist->title.' - StageX';
-		$this->pageDescription = $playlist->description;
-		$this->render('Playlist/view', array('playlist' => $playlist, 'user' => $playlist->author));
 	}
 
 	public function action_create(){
@@ -51,18 +50,6 @@ class PlaylistController extends glue\Controller{
 				$this->json_success(array('message' => 'Playlist created', '_id' => strval($model->_id)));
 		}
 		$this->json_error(array('message'=>'Playlist could not be created because:','messages'=>$model->getErrors()));
-	}
-
-	public function action_edit(){
-		$playlist = Playlist::model()->findOne(array('_id' => new MongoId(glue::http()->param('id','')), 'userId' => glue::user()->_id, 'title' => array('$ne' => 'Watch Later')));
-		if(!glue::auth()->check(array('viewable' => $playlist))){
-			$this->title = 'Playlist Not Found - StageX';
-			echo $this->render('deleted');
-		}else{
-			$this->layout='playlist_layout';
-			$this->title = 'Playlist: '.$playlist->title.' - StageX';
-			echo $this->render('edit', array('playlist' => $playlist));
-		}
 	}
 
 	public function action_save(){

@@ -3,20 +3,30 @@ if(isset($playlistId)&&$playlistId)
 	$videoUrl=glue::http()->url('/video/watch',array('id'=>$item->_id,'playlist_id'=>$playlistId));
 else
 	$videoUrl=glue::http()->url('/video/watch',array('id'=>$item->_id));
+
+if(!isset($model)||!$model){
+	$model=new app\models\Video();
+	$model->title='This video is unavailable';
+	$model->deleted=1; // Stands to reason this video was deleted
+}
 ?>
 <<?php if(isset($useLiTag)&&$useLiTag): echo 'li'; else: echo 'div'; endif; ?> 
 		class="video_row" data-id="<?php echo isset($custid)?$custid:$item->_id ?>" style='padding:10px 0;border-bottom:1px solid #eeeeee;'>
 	<div class="inner">
-	<div class='checkbox_col' style='float:left;padding-top:16px;width:15px;margin:0 10px 0 10px;'><div class="checkbox_input" style=''><?php echo html::checkbox('video_id[]', strval(isset($custid) ? $custid : $item->_id), 0) ?></div></div>
+	<?php if(isset($admin)&&$admin): ?><div class='checkbox_col' style='float:left;padding-top:16px;width:15px;margin:0 10px 0 10px;'><div class="checkbox_input" style=''><?php echo html::checkbox('video_id[]', strval(isset($custid) ? $custid : $item->_id), 0) ?></div></div><?php endif; ?>
 	<?php if(isset($show_sorter)&&$show_sorter): ?><div style='float:left;padding-top:13px;width:15px;margin:0 5px 0 5px;cursor:pointer;' class='sortable_handle'><img alt='sort' src='/images/sortable_icon.png'/></div><?php endif; ?>
 	<?php if(isset($show_delete)&&$show_delete): ?><div style='float:left;padding-top:14px;width:15px;margin:0 12px 0 0px;color:#333333;opacity:0.5;font-size:22px;font-weight:bold;cursor:pointer;'>&times;</div><?php endif; ?>
 	<?php if(!glue::auth()->check(array('viewable'=>$item))): ?>
 	<div class="deleted" style='float:left;margin:2px 10px 0 0;'>
-		This video has been deleted
+		<?php if($item->deleted){ ?>
+			This video has been deleted
+		<?php }else{ ?>
+			This video is unavailable
+		<?php } ?>
 	</div>
 	<?php else: ?>
 	<div class='thumbnail' style='position:relative;float:left;width:88px;margin:2px 10px 0 0;'><a href="<?php echo $videoUrl ?>" >
-		<img alt='<?php echo Html::encode($item->title) ?>' src="<?php echo $item->getImage(88, 49) ?>"/></a>
+		<img alt='<?php echo html::encode($item->title) ?>' src="<?php echo $item->getImage(88, 49) ?>"/></a>
 		<?php if($item->state == 'finished'): ?>
 		<div class='duration'><span><?php echo $item->get_time_string() ?></span></div>
 		<a class='add_to_playlist' href='#'><img alt='Add to Playlist' src='/images/add_tooltip.png'/></a>

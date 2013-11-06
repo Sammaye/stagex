@@ -6,7 +6,7 @@
 		<?php } ?>		
 	</div>
 	<div class='info'>
-		<h3 class='title'><a href='<?php echo glue::http()->url('/playlist/edit', array('id' => strval($item->_id))) ?>'><?php echo $item->title ?></a></h3>
+		<h3 class='title'><a href='<?php echo glue::http()->url('/playlist/view', array('id' => strval($item->_id))) ?>'><?php echo $item->title ?></a></h3>
 		<?php if($item->description){ ?>
 			<div class='expandable description'><?php echo nl2br(htmlspecialchars($item->description)) ?></div>
 		<?php } ?>
