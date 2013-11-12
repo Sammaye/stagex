@@ -676,7 +676,7 @@ class userController extends \glue\Controller{
 			glue\widgets\ListView::widget(array(
 				'pageSize'	 => 20,
 				'page' 		 => $page,
-				"cursor"	 => new Collection($users),
+				"cursor"	 => $query?new Collection($users):$users,
 				'itemView' => 'user/_subscription.php',
 			));
 		}else{

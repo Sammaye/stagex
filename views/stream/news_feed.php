@@ -31,7 +31,7 @@ $this->js('page_js', "
 				echo $this->renderPartial('stream/streamitem', array('item' => $item, 'hideDelete' => true));
 		}else{ ?>
 			<div class='no_results_found'>
-				How do you expect there to be any news when your not following anyone? Try subscribing to some users to get some.
+				You have no Subscriptions! Subscribe to a user to keep upto date with that users activity.
 			</div>
 		<?php } ?>
 	</div>

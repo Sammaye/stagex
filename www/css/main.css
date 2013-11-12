@@ -1764,6 +1764,10 @@ input.date{
 	margin-bottom:10px;float:left;height:75px;width:400px;border:1px solid #d8d8d8;border-bottom-width:2px;
 }
 
+.subscription img{
+	padding:0; border:0; border-radius:0;
+}
+
 .subscription .subscribe_widget{
 	float:right; margin:23px 10px 0 0;
 }
@@ -1856,12 +1860,7 @@ input.date{
 	width:300px;
 }
 
-.create_playlist_form .form-stacked textarea,
-.create_playlist_form .form-stacked input[type="text"]{
-	width:95%; border-radius:2px;
-}
-
-.create_playlist_form .form-stacked textarea{
+.create_playlist_form textarea{
 	height:130px;
 }
 
@@ -2116,6 +2115,10 @@ input.date{
 	margin:10px 0 10px 0;
 }
 
+.create_playlist_modal{
+	width:850px;
+}
+
 .create_playlist_form{
 	padding:20px;
 }
@@ -2302,4 +2305,12 @@ input.date{
 
 .author_top_bar .subscribe_widget{
 	line-height:30px;
+}
+
+.playlist_item .thumbnail{
+	padding:0; border:0;
+}
+
+.playlist_item .thumbnail img{
+	display:inline;
 }

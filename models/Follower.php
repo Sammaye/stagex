@@ -68,14 +68,22 @@ class Follower extends \glue\db\Document{
 			foreach($users as $_id=>$user)
 				$mongoIds[]=new \MongoId($_id);
 			$idRange=array('toId'=>array('$in'=>$mongoIds));
+			
+			$following=self::model()->find(array_merge(array('fromId'=>$user_id),$idRange));
+			
+			$followedUsers=array();
+			foreach($following as $_id=>$follower){
+				if($user=$users[strval($follower->toId)])
+					$followedUsers[strval($user->_id)]=$user;
+			}
+			return $followedUsers;			
+			
+		}else{
+			$following=self::model()->find(array('fromId'=>$user_id))->limit(20);
+			foreach($following as $_id=>$follower)
+				$mongoIds[]=new \MongoId($follower->toId);			
+			$users=\app\models\User::model()->find(array('_id'=>array('$in'=>$mongoIds)))->sort(array('username'=>1));
+			return $users;
 		}
-		$following=self::model()->find(array_merge(array('fromId'=>$user_id),$idRange));
-		
-		$followedUsers=array();
-		foreach($following as $_id=>$follower){
-			if($user=$users[strval($follower->toId)])
-				$followedUsers[strval($user->_id)]=$user;
-		}
-		return $followedUsers;
 	}
 }

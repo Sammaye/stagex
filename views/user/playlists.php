@@ -1,38 +1,8 @@
 <?php
 use glue\Html;
 
-ob_start(); 
-$model=new app\models\Playlist; ?>
-<div class="create_playlist_form">
-<div class="alert"></div>
-<?php $form = html::activeForm(array('id' => 'create_form')) ?>
-<div class="form-stacked form_left">
-	<div class="form_row"><?php echo html::label('Title', 'title') ?><?php echo html::activeTextField($model, 'title') ?></div>
-	<div class="form_row"><?php echo html::label('Description', 'description')?><?php echo html::activeTextarea($model, 'description') ?></div>			
-	<input type="submit" class="btn-success btn_create" value="Create Playlist"/>
-</div>
-<div class='form_right'>
-	<h4>Listing</h4>
-	<?php $grp = html::activeRadio_group($model, 'listing') ?>
-	<div class="label_options">
-		<label class="radio"><?php echo $grp->add(0) ?>Listed</label>
-		<p class='light'>Your video is public to all users of StageX</p>
-		<label class="radio"><?php echo $grp->add(1) ?>Unlisted</label>
-		<p class='light'>Your video is hidden from listings but can still be accessed directly using the video URL</p>
-		<label class="radio"><?php echo $grp->add(2) ?>Private</label>
-		<p class='light'>No one but you can access this video</p>
-	</div>
-	<label class="checkbox"><?php echo $form->checkbox($model, 'allowFollowers',1)?>Allow people to follow this playlist</label>
-</div>
-<div class="clear"></div>
-<?php $form->end() ?>
-</div>
-<?php $createModal=ob_get_clean();
-
-
 $this->JsFile("/js/jquery.expander.js");
 $this->jsFile('/js/jdropdown.js');
-$this->jsFile("/js/modal.js");
 $this->js('new_playlist', "
 		
 	$('.expandable').expander({slicePoint:40});
@@ -47,18 +17,13 @@ $this->js('new_playlist', "
 		}
 	});
 		
-	$(document).on('click', '.btn_modal', function(e){
-		e.preventDefault();
-		$.modal({html:".js_encode($createModal)."});
-	});
-		
 	$(document).on('submit', '#create_form', function(){
 		$.post('/playlist/create', $(this).serialize(), function(data){
 			if(data.success){
-				window.location='/playlist/edit?id='+data._id;
+				window.location='/playlist/view?id='+data._id;
 			}else{
 				$('.create_playlist_form .alert').summarise();
-				$('.create_playlist_form .alert').summarise('set', 'error', {message:data.message,list:data.messages});	
+				$('.create_playlist_form .alert').summarise('set', 'error', {message:'<p>'+data.message+'</p>',list:data.messages});	
 			}
 		}, 'json');
 		return false;
@@ -138,7 +103,7 @@ $this->js('new_playlist', "
 			<li class="active"><a href="/user/playlists">My Playlists</a></li>
 			<li><a href="/playlists/following">Following</a></li>
 		</ul>
-		<a class="btn btn-success btn-upload" href="<?php echo glue::http()->url('/playlist/create') ?>">Add New Playlist</a>
+		<a class="btn btn-success btn-upload" data-toggle="modal" data-target="#myModal">Add New Playlist</a>
 	</div>	
 
 	<div class="header">
@@ -164,7 +129,6 @@ $this->js('new_playlist', "
 				"))  ?><button class="btn submit_search"><span>&nbsp;</span></button>
 			<?php $form->end() ?>
 			</div>    	
-    	<div class="clear"></div>
     </div>	
     
     <div class="mass_edit_form">
@@ -252,4 +216,38 @@ $this->js('new_playlist', "
 		<div class='no_results_found'>No playlists were found for you</div>
 	<?php } ?>
 	</div>
+</div>
+
+<!-- Create Playlist Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog create_playlist_modal">
+  <?php $model=new app\models\Playlist; ?>
+  <?php $form = html::activeForm(array('id' => 'create_form')) ?>
+    <div class="modal-content">
+      <div class="modal-body create_playlist_form clearfix">
+		<div class="alert"></div>
+		<div class="form_left">
+			<div class="form-group"><?php echo html::label('Title', 'title') ?><?php echo html::activeTextField($model, 'title', 'form-control') ?></div>
+			<div class="form-group"><?php echo html::label('Description', 'description')?><?php echo html::activeTextarea($model, 'description', 'form-control') ?></div>			
+		</div>
+		<div class='form_right'>
+			<h4>Listing</h4>
+			<?php $grp = html::activeRadio_group($model, 'listing') ?>
+			<div class="label_options">
+				<label class="radio"><?php echo $grp->add(0) ?>Listed</label>
+				<p class='text-muted'>Your video is public to all users of StageX</p>
+				<label class="radio"><?php echo $grp->add(1) ?>Unlisted</label>
+				<p class='text-muted'>Your video is hidden from listings but can still be accessed directly using the video URL</p>
+				<label class="radio"><?php echo $grp->add(2) ?>Private</label>
+				<p class='text-muted'>No one but you can access this video</p>
+			</div>
+		</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-success">Create Playlist</button>
+      </div>
+    </div>
+    <?php $form->end() ?>
+  </div>
 </div>

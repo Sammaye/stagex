@@ -37,7 +37,7 @@
 		
 		$.get('/user/follow', {id: user_id}, null, 'json').done(function(data){
 			if(data.success){
-				el.removeClass('btn btn-primary subscribe').addClass('btn unsubscribe').val('Unsubscribe');
+				el.removeClass('btn btn-primary subscribe').addClass('btn btn-error unsubscribe').val('Unsubscribe');
 			}else{}
 		});		
 	},
@@ -49,7 +49,7 @@
 		
 		$.get('/user/unfollow', {id: user_id}, null, 'json').done(function(data){
 			if(data.success){
-				el.removeClass('btn unsubscribe').addClass('btn btn-primary subscribe').val('Subscribe');
+				el.removeClass('btn btn-error unsubscribe').addClass('btn btn-primary subscribe').val('Subscribe');
 			}else{}
 		});				
 	};

@@ -10,6 +10,6 @@
 		<div class='info'><?php echo $user->totalUploads ?> videos - <?php echo $user->totalPlaylists ?> playlists</div>
 	</div>
 	<div class="subscribe_widget" data-user_id="<?php echo $user->_id ?>">
-		<input type="button" class='unsubscribe btn button' value="Unsubscribe"/>
+		<input type="button" class='unsubscribe btn button btn-error' value="Unsubscribe"/>
 	</div>	
 </div>

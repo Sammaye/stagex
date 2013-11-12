@@ -4,12 +4,17 @@ use glue\Html;
 $this->jsFile("/js/views/subscribeButton.js");
 $this->js('user.unsubscribe', "
 	
+	var preVal='',
+		t = setInterval(function(){ search(); },1000);
+		
 	$('.subscribe_widget').subscribeButton();
 		
-	$(document).on('keyup', '.form-search_subs .search_input input', function(event){
-		event.preventDefault();
-		search_subscriptions(true);
-	});
+	function search(){
+		var term=$('.form-search_subs .form-search-input').val();
+		if(term!=preVal)
+			search_subscriptions(true);
+		preVal=term;
+	}		
 		
 	$('.form-search_subs form').submit(function(){
 		return false;
@@ -24,19 +29,18 @@ $this->js('user.unsubscribe', "
 		var act_page = 1;
 		if(!refresh)
 			act_page = page;
-		$('.user_subscription_list').load('/user/searchFollowers', { query: $('.form-search_subs .search_input input').val(), page: act_page }, function(data){});
+		$('.user_subscription_list').load('/user/searchFollowers', { query: $('.form-search_subs .form-search-input').val(), page: act_page }, function(data){});
 	}
 ");
 ?>
 <div class="followers_page">
-	<div class="header">   
+	<div class="header">
     	<div class='search form-search form-search_subs'>
 		<?php $form = Html::form(array('method' => 'get')); ?>
-			<div class="search_input"><?php echo html::textfield('query',htmlspecialchars(glue::http()->param('query',null)),array('placeholder'=>'Search Subscribers', 'autocomplete'=>'off')) ?></div>
-			<button class="submit_search"><span>&nbsp;</span></button>
+			<?php echo html::textfield('query',htmlspecialchars(glue::http()->param('query',null)),array('placeholder'=>'Search Subscribers', 'autocomplete'=>'off', 'class'=>'form-search-input col-38')) ?>
+			<button class="btn submit_search"><span>&nbsp;</span></button>
 		<?php $form->end() ?>
-		</div>    	
-		<div class="clear"></div>
+		</div>	
     </div>
 	<div class='user_subscription_list'>
 	<?php if(glue::user()->totalFollowing > 0){

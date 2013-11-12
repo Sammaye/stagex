@@ -113,7 +113,7 @@ $this->js('edit', "
 			<div class="btn-group">
 			<button type="button" id="settings_tab" class="btn btn-white btn-tab">Settings</button>
 			</div>
-			<button type="button" class='delete_video btn btn-error'>Delete</button>
+			<button type="button" class='btn btn-error btn_delete'>Delete</button>
 			
 			<span class="edit_menu_text"><?php echo $model->followers.($model->followers===1?' follower':' followers') ?></span>
 		</div>
