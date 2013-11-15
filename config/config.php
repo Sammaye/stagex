@@ -218,7 +218,11 @@ return array(
 				'Owns' => function($object){
 					if(glue::auth()->check('^@'))
 						return true;
-					if(is_array($object)){
+					if($object instanceof \app\models\User){
+						if(strval(Glue::user()->_id) === strval($object->_id)){
+							return true;
+						}						
+					}elseif(is_array($object)){
 						foreach($object as $item){
 							if(strval(Glue::user()->_id) == strval($item->userId)){
 								return true;

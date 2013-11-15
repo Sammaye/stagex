@@ -58,7 +58,7 @@ class Sphinx extends \glue\Component{
 	public function match($field,$keywords){
 		if(strlen($keywords) > 0)
 			$this->condition .= (is_array($field)?'@('.implode(',',$field).')':'@'.$field) . 
-				(is_array($keywords)?explode(' ',$keywords):$keywords);
+				(is_array($keywords)?' '.explode(' ',$keywords).' ':' '.$keywords.' ');
 		return $this;
 	}
 	

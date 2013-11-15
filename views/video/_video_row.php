@@ -34,7 +34,7 @@ if(!isset($model)||!$model){
 	</div>
 	<div style="width:400px;float:left;">
 		<span style='font-size:16px;line-height:20px;color:#333333;'><a href="<?php echo $videoUrl ?>"><?php echo $item->title ?></a></span>
-		<div class="expandable" style='color:#999999;font-size:12px;line-height:17px;'><?php echo $item->description ?></div>
+		<div class="expandable text-muted" style='font-size:13px;line-height:17px;'><?php echo $item->description ?></div>
 	</div>
 	<div style='width:70px;float:left;color:#666666;font-size:14px;margin:0 20px;padding:22px 0 0 0;'>
 		<?php echo $item->duration?:'&nbsp;'; ?>

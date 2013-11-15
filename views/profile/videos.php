@@ -1,41 +1,59 @@
+<?php 
+glue::$controller->js('',"
+	$(function(){
+		//$('div.expandable').expander({slicePoint: 120});
+		
+		$( '#from' ).datepicker({
+			defaultDate: 0,
+			dateFormat: 'dd/mm/yy',
+			changeMonth: true,
+			changeYear: true,
+			numberOfMonths: 1,
+			onClose: function( selectedDate ) {
+				$( '#to' ).datepicker( 'option', 'minDate', selectedDate );
+			}
+		});
+		
+		$( '#to' ).datepicker({
+			defaultDate: '+1w',
+			dateFormat: 'dd/mm/yy',
+			changeMonth: true,
+			changeYear: true,
+			numberOfMonths: 1,
+			onClose: function( selectedDate ) {
+				$( '#from' ).datepicker( 'option', 'maxDate', selectedDate );
+			}
+		});		
+	});		
+");
+
+?>
+
 <div class='grid_16 alpha omega profile_videos_body' style='margin-bottom:250px;'>
+
+	<div class="advanced_filter_header">   
+    	<div class='search clearfix' style='padding-left:10px;'>
+		<?php $form = html::form(array('method' => 'get')); ?>
+			<?php echo html::textfield('query',htmlspecialchars(glue::http()->param('query',null)),array('placeholder'=>'Enter keywords to search by', 'autocomplete'=>'off', 'class'=>'search form-control')) ?>
+			<input type="text" id="from" class="date form-control" name="from_date" placeholder="Enter start date" value="<?php echo htmlspecialchars(glue::http()->param('from_date',null)) ?>"/> <span class="sep">-</span> 
+			<input type="text" id="to" class="date form-control" name="to_date" placeholder="Enter end date" value="<?php echo htmlspecialchars(glue::http()->param('to_date',null)) ?>"/>	<button class="btn btn-default">Search</button>
+			<?php $form->end() ?>
+		</div>		
+    </div>
+
 	<div class='main_content_outer'>
-		<div class='profile_media_top_bar'>
-			<div class='profile_media_title'>Videos</div>
-			<div class='profile_media_amt_fnd'><?php echo $sphinx->total_found ?> found</div>
-
-			<div class='profile_media_search'>
-				<div class='search_widget'>
-					<?php $form = html::form(array('method' => 'get')) ?>
-					<div class='middle'><?php
-						echo html::textfield('query', htmlspecialchars(isset($_GET['query']) ? $_GET['query'] : '')) ?></div><a href='#' id='profile_search_submit' class='submit_search'><img alt='search' src='/images/search_icon_small.png'/></a>
-					<?php echo html::hiddenfield('id', strval($user->_id)) ?>
-					<?php echo html::submitbutton('Search', array('class' => 'invisible_submit')); $form->end() ?>
-				</div>
-			</div>
-		</div>
-
-		<div class='grid_5 alpha video_list' style='width:740px; padding:10px;'>
+		<div class='video_list'>
 			<?php
-			$i = 0;
-			if($sphinx->matches){
-				foreach($sphinx->matches as $k => $model){
-					if($model instanceof Video){
-						$this->partialRender('videos/_video_large', array('item' => $model, 'last' => $i%3 == 0 ? true : false));
-						$i++;
-					}
-				}
+			if($sphinx->totalFound> 0){
+				glue\widgets\ListView::widget(array(
+				'pageSize'	 => 20,
+				'page' 		 => isset($_GET['page']) ? $_GET['page'] : 1,
+				"cursor"	 => $sphinx,
+				'itemView' 	 => 'video/_video.php',
+				));
 			}else{ ?>
-				<div class='profile_media_none_found'>
-					Nothing to see here!
-				</div>
-			<?php } ?>
-
-			<?php if($sphinx->total_found > 21): ?><div class='clearer'></div><div class='profile_media_pager'><?php echo $sphinx->renderPager('grid_list_pager') ?><div class="clear"></div></div><?php endif ?>
+				<div class='no_results_found'>No videos were found</div>
+			<?php } ?>			
 		</div>
-		<div class='grid_3 omega' style='width:180px; margin-top:15px;'>
-			<?php $this->widget("application/widgets/Advertising/Ad_box.php", array( "configuration"=>'skyscraper' )); ?>
-		</div>
-		<div class='clearer'></div>
 	</div>
 </div>

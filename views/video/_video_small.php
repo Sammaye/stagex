@@ -17,8 +17,8 @@ if(!isset($model)||!$model){
 	<div class='info'>
 		<h3 class='title' style='font-size:14px;line-height:17px;margin-bottom:5px;'><a href="/video/watch?id=<?php echo strval($model->_id) ?>"><?php echo $model->title ?></a></h3>
 		<?php if($model->author instanceof \app\models\User): ?>
-			<div class='uploader'>
-				<img style='border-radius:50%;width:25px;height:25px;vertical-align:middle;margin-right:8px;' src="<?php echo $model->author->getAvatar(30,30) ?>"/>
+			<div class='uploader' style='font-size:12px;'>
+				<span style='color:#999999;'>00:05:34 - </span>
 				<a href="<?php echo glue::http()->url('/user/view', array('id' => $model->author->_id)) ?>"><?php echo $model->author->getUsername() ?></a>
 				<span style='color:#999999;'><?php echo date('j M Y',$model->getTs($model->created)) ?></span>
 			</div>

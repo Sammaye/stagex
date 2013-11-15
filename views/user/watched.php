@@ -152,7 +152,7 @@ $this->js('watched_page', "
 			$v=app\models\Video::model()->findOne(array('_id' => $item['item']));
 			if(!$v instanceof app\models\Video)
 				$v = new app\models\Video;
-			echo glue::$controller->renderPartial($view, array('model' => $item, 'custid' => $item['_id'], 'item' => $v, 'show_checkbox' => true));				
+			echo glue::$controller->renderPartial($view, array('model' => $item, 'custid' => $item['_id'], 'item' => $v, 'show_checkbox' => true,'admin'=>true));				
 		},
 		'itemView' 	 => 'video/_video_row',
 		));

@@ -245,7 +245,7 @@ class userController extends \glue\Controller{
 		$this->tab='profile';
 		$this->title = $user->getUsername().' - StageX';
 
-		$sphinx=glue::sphinx()->index('main')
+		$sphinx=glue::sphinx()
 			->match(array('title', 'description', 'tags', 'author_name'),glue::http()->param('q',''))
 			->match('type','video')->match('uid',strval($user->_id))
 			->sort(SPH_SORT_TIME_SEGMENTS, "date_uploaded")
@@ -253,8 +253,7 @@ class userController extends \glue\Controller{
 			->page(glue::http()->param('page',1));	
 		if(!glue::user()->equal($user))
 			$sphinx->filter('listing',array(1, 2), true);
-
-		echo $this->render('profile/videos', array('user' => $user, 'page' => 'videos', 'sphinx' => $sphinx));
+		echo $this->render('profile/videos', array('user' => $user, 'page' => 'videos', 'sphinx' => $sphinx->query('main','Video')));
 	}
 
 	function action_viewPlaylists(){
@@ -274,7 +273,7 @@ class userController extends \glue\Controller{
 		$this->tab='profile';
 		$this->title = $user->getUsername().' - StageX';
 		
-		$sphinx=glue::sphinx()->index('main')
+		$sphinx=glue::sphinx()
 		->match(array('title', 'description', 'author_name'),glue::http()->param('q',''))
 		->match('type','playlist')->match('uid',strval($user->_id))
 		->sort(SPH_SORT_TIME_SEGMENTS, "date_uploaded")
@@ -283,7 +282,7 @@ class userController extends \glue\Controller{
 		if(!glue::user()->equal($user))
 			$sphinx->filter('listing',array(1, 2), true);		
 
-		echo $this->render('profile/playlists', array('user' => $user, 'page' => 'playlists', 'sphinx' => $sphinx));
+		echo $this->render('profile/playlists', array('user' => $user, 'page' => 'playlists', 'sphinx' => $sphinx->query('main','Playlist')));
 	}
 
 	function action_videos(){

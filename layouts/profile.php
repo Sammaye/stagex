@@ -97,20 +97,23 @@ $this->beginPage() ?>
 	<body>
 		<?php $this->beginBody() ?>
 			<?php app\widgets\Menu::widget(); ?>
-			<div class='userbody'>
+			<div class='userbody grid-container'>
 				<?php app\widgets\UserMenu::widget(array('tab'=>$this->tab)) ?>
 				<div class='grid_block alpha omega user_section_main_content' style='float:left; width:820px;'>
 				
 			<div class='top' style='position:relative; min-height:135px;'>
 				<div class='head_outer'>
-					<div class='user_image'><img src="<?php echo $user->getAvatar(125, 125); ?>" alt='thumbnail'/></div>
-					<div class='user_about'>
-						<h1 class='username'><?php echo $user->getUsername() ?></h1>
-						<div class='expandable_small'>
+					<div class='user_image' style='float:left; position:absolute;width:125px;height:125px;'><img src="<?php echo $user->getAvatar(125, 125); ?>" alt='thumbnail'/></div>
+					<div class='user_about' style='margin-left:140px;min-height:95px;'>
+						<h1 class='username' style='margin-top:0;'><?php echo $user->getUsername() ?></h1>
+						<div class='expandable_small' style='float:left;'>
 							<div class='mini_about'><?php echo substr(htmlspecialchars($user->about), 0, 80); if($user->about): echo '...'; endif; echo html::a(array('href' => '#', 'text' => 'About this user', 'class' => 'expand_user_about')) ?></div>
-							<div class='full_about' style='display:none;'>
+							<div class='full_about' style='display:none; margin-bottom:20px;'>
+								<?php if($user->getAbout()){ ?>
 								<p><?php echo $user->getAbout(); ?></p>
+								<?php } ?>
 
+								<?php if(count($user->external_links)>0){ ?>
 								<div style='margin-bottom:15px;'>
 									<?php $urls = array_chunk(is_array($user->external_links) ? $user->external_links : array(), 3); ?>
 									<?php for($i = 0, $size= count($urls); $i < $size; $i++){ ?>
@@ -121,43 +124,48 @@ $this->beginPage() ?>
 										</ul>
 									<?php } ?>
 								</div>
+								<?php } ?>
 
 								<div class='user_details'>
-									<?php if(($user->profile_privacy['gender'] != 1 || glue::session()->user->_id == $user->_id) && $user->gender): ?><div><b>Gender:</b> <?php echo $user->gender == 'm' ? "Male" : "Female" ?></div><?php endif; ?>
-									<?php if(($user->profile_privacy['birthday'] != 1 || glue::session()->user->_id == $user->_id)
-										&& $user->birth_day && $user->birth_month && $user->birth_year): ?><div><b>Birthday:</b> <?php echo date('d M Y', mktime(0, 0, 0, $user->birth_month, $user->birth_day, $user->birth_year))?></div><?php endif; ?>
-									<?php if(($user->profile_privacy['country'] != 1 || glue::session()->user->_id == $user->_id) && $user->country): ?><div><b>Country:</b> <?php $countries = new GListProvider('countries', array("code", "name")); echo $user->country ? $countries[$user->country] : "N/A"; ?></div><?php endif; ?>
-									<div><b>Date Joined:</b> <?php echo date('d M Y', $user->getTs($user->created))?></div>
+								<?php if(($user->profile_privacy['gender'] != 1 || glue::session()->user->_id == $user->_id) && $user->gender): 
+									?><div><b>Gender:</b> <?php echo $user->gender == 'm' ? "Male" : "Female" ?></div><?php endif; ?>
+								<?php if(($user->profile_privacy['birthday'] != 1 || glue::session()->user->_id == $user->_id)
+									&& $user->birth_day && $user->birth_month && $user->birth_year): 
+									?><div><b>Birthday:</b> <?php echo date('d M Y', mktime(0, 0, 0, $user->birth_month, $user->birth_day, $user->birth_year))?></div><?php endif; ?>
+								<?php if(($user->profile_privacy['country'] != 1 || glue::session()->user->_id == $user->_id) && $user->country): 
+									?><div><b>Country:</b> <?php $countries = new GListProvider('countries', array("code", "name")); echo $user->country ? $countries[$user->country] : "N/A"; ?></div><?php endif; ?>
+								<div><b>Date Joined:</b> <?php echo date('d M Y', $user->getTs($user->created))?></div>
 								</div>
 
 								<div class='shrink_about'><?php echo html::a(array('href' => '#', 'text' => 'Show Less', 'class' => 'shrink_user_about'))?></div>
 							</div>
 						</div>
+					<div class='user_subscription clearfix' style='float:right;'>
+					
+				<div class="subscribe_widget" data-user_id="<?php echo $user->_id ?>">
+					<span class="follower_count text-muted"><?php echo $user->totalFollowers ?> Subscribers</span>
+					<?php if(glue::session()->authed/*&&!glue::auth()->check(array('^'=>glue::user()))*/){ ?>
+					<?php if(app\models\Follower::isSubscribed($user->_id)){ ?>
+					<button type="button" class='unsubscribe button btn btn-error'>Unsubscribe</button>
+					<?php }else{ ?>
+					<button type="button" class='subscribe btn btn-primary button'>Subscribe</button>
+					<?php } ?>
+					<?php } ?>
+				</div>					
+					</div>	
+					<div class="clear"></div>					
 					</div>
-					<div class='user_subscription'>
-						<?php if($user->_id != glue::user()->_id){
-							if(glue::session()->authed){
-								if(Subscription::isSubscribed($user->_id)){ ?>
-									<div class='unsubscribe grey_css_button_right'><div>Unsubscribe</div></div>
-								<?php }else{ ?>
-									<div class='subscribe green_css_button_right'><div>Subscribe</div></div>
-								<?php }
-							}
-						}else{ ?>
-							<a href='/user/profile' class='grey_css_button_right'>Edit Profile</a>
-						<?php } ?>
-						<div class='clearer'></div>
-						<div class='subscribers'><span><?php echo $user->total_subscribers ?></span> Subscribers</div>
-					</div>
-					<div class='clearer'></div>
-					<div class='nav_bar'>
-						<ul>
-							<li><?php echo html::a(array('href'=>array('/user/view','id'=>$user->_id),'text'=>'Stream','class'=>$page=='stream'?'selected':'')) ?></li>
-							<li><?php echo html::a(array('href'=>array('/user/viewVideos', 'id'=>$user->_id),'text'=>'Videos','class'=>$page=='videos'?'selected':'')) ?></li>
-							<li><?php echo html::a(array('href'=>array('/user/viewPlaylists', 'id'=>$user->_id),'text'=>'Playlists','class'=>$page=='playlists'?'selected':'')) ?></li>
-						</ul>
-						<div class='clearer'></div>
-					</div>
+					
+					<div class="videos_nav_top">
+					<ul class="nav nav-tabs" style='margin-left:135px;'>
+					<li class="<?php echo $page=='stream'?'active':'' ?>"><?php echo html::a(array('href'=>array('/user/view','id'=>$user->_id),'text'=>'Stream')) ?></li>
+					<li class="<?php echo $page=='videos'?'active':'' ?>"><a href="<?php echo glue::http()->url('/user/viewVideos',array('id'=>$user->_id)) ?>">Videos <span class="badge"><?php echo $user->totalUploads ?></span></a></li>
+					<li class="<?php echo $page=='playlists'?'active':'' ?>"><a href="<?php echo glue::http()->url('/user/viewPlaylists', array('id'=>$user->_id)) ?>">Playlists <span class="badge"><?php echo $user->totalPlaylists ?></span></a></li>
+					</ul>
+					<?php if(glue::auth()->check(array('^'=>glue::user()))){ ?>
+					<a class="btn btn-link btn-upload" href="<?php echo glue::http()->url('/user/profile') ?>">Edit Profile</a>
+					<?php } ?>
+					</div>						
 				</div>
 			</div>				
 				
