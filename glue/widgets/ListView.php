@@ -247,7 +247,7 @@ class ListView extends \glue\Widget{
 
 		foreach($this->cursor as $_id => $item){
 			//for($j=0;$j<5;$j++){
-
+			
 			$fn=$this->callback;
 			if((is_string($fn) && function_exists($fn)) || (is_object($fn) && ($fn instanceof \Closure))){
 				$fn($i,$item,$this->itemView);

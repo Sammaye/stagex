@@ -58,7 +58,7 @@ $this->beginPage() ?>
 			</div>
 			
     		<div class='search form-search'>
-			<?php $form = Html::form(array('method' => 'get')); ?>
+			<?php $form = Html::form(array('method' => 'get', 'action'=>glue::http()->url('/help/search'))); ?>
 				<?php app\widgets\Jqautocomplete::widget(array(
 					'attribute' => 'query',
 					'value' => urldecode(htmlspecialchars(isset($_GET['query']) ? $_GET['query'] : '')),

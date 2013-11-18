@@ -68,7 +68,8 @@
 			</div>
 			<div class='list_pager'><?php //echo $sphinx->renderPager('grid_list_pager') ?><div class="clear"></div></div>
 		<?php }else{ ?>
-			<p class="no_results_found">You can try searching with different parts of what you entered to see if you get hits</p>
+			<h1>No results</h1>
+			<p class="no_results_found no_results_help_search">You can try searching with different parts of what you entered to see if you get hits</p>
 		<?php } ?>			
 		</div>
 		<div class='clear'></div>

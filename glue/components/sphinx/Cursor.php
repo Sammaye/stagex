@@ -40,12 +40,13 @@ class Cursor implements \Iterator, \Countable{
 	
 	function current() {
 		if(($c=current($this->matches)) !== false){
+			//var_dump($c);
 			$fn=$this->iteratorCallback;
 			$className=$this->className;
 			if((is_string($fn) && function_exists($fn)) || (is_object($fn) && $fn instanceof \Closure))
 				return $fn($c['attrs'],$this->className);
 			elseif($this->className)
-				$className::model()->findOne(array('_id' => new \MongoId($c['attrs']['_id'])));
+				return $className::model()->findOne(array('_id' => new \MongoId($c['attrs']['_id'])));
 			else 
 				return (Object)$c['attrs'];
 		}else

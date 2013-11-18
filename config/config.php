@@ -209,7 +209,7 @@ return array(
 					return true;
 				},
 				'denied' => function($item){
-					if($item->listing&&$item->listing == 2 && strval(glue::user()->_id) != strval($item->author->_id))
+					if($item->listing&&($item->listing == 2 && strval(glue::user()->_id) != strval($item->author->_id)))
 						return false;
 					return true;
 				},

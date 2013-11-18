@@ -1,5 +1,4 @@
 <?php
-
 	$last_ts = isset($model) ? $model->ts : '';
 	if(isset($item)){
 		if(isset($item->ts)) $last_ts =  $item->ts;

@@ -68,7 +68,7 @@ class Playlist extends \glue\db\Document{
 		return $video->getImage(138, 77);
 	}
 
-	function get4Pics(){
+	function get4Pics($large_width=null,$large_height=null){
 		$pics = array(); $i = 0;
 
 		if(count($this->videos) > 0){
@@ -79,7 +79,7 @@ class Playlist extends \glue\db\Document{
 					$video = new Video;
 
 				if($i==0){
-					$pics[] = $video->getImage(124, 69);
+					$pics[] = $video->getImage(isset($large_width)?$large_width:124, isset($large_height)?$large_height:69);
 				}else{
 					$pics[] = $video->getImage(44, 26);
 				}
@@ -181,37 +181,35 @@ class Playlist extends \glue\db\Document{
 	}
 
 	function afterSave(){
-		if($this->listing==0){
-			if($this->getIsNewRecord()){
-				$this->author->saveCounters(array('totalPlaylists'=>1));
+		if($this->getIsNewRecord()){
+			$this->author->saveCounters(array('totalPlaylists'=>1));
 
-				glue::mysql()->query("INSERT INTO documents (_id, uid, listing, title, description, tags, author_name, type, videos, date_uploaded)
-					VALUES (:_id, :uid, :listing, :title, :description, null, :author_name, :type, :videos, now())", array(
-					":_id" => strval($this->_id),
-					":uid" => strval($this->user_id),
-					":listing" => $this->listing,
-					":title" => $this->title,
-					":description" => $this->description,
-					":type" => "playlist",
-					":videos" => count($this->videos),
-					":author_name" => glue::user()->username,
-				));
+			glue::mysql()->query("INSERT INTO documents (_id, uid, listing, title, description, tags, author_name, type, videos, date_uploaded)
+				VALUES (:_id, :uid, :listing, :title, :description, null, :author_name, :type, :videos, now())", array(
+				":_id" => strval($this->_id),
+				":uid" => strval($this->user_id),
+				":listing" => $this->listing,
+				":title" => $this->title,
+				":description" => $this->description,
+				":type" => "playlist",
+				":videos" => count($this->videos),
+				":author_name" => glue::user()->username,
+			));
 
-				glue::sitemap()->addUrl(glue::http()->url('/playlist/view', array('id' => $this->_id)), 'hourly', '1.0');
+			glue::sitemap()->addUrl(glue::http()->url('/playlist/view', array('id' => $this->_id)), 'hourly', '1.0');
 
-			}else{
-				glue::mysql()->query("UPDATE documents SET uid = :uid, deleted = :deleted, listing = :listing, title = :title, description = :description,
-						author_name = :author_name, videos = :videos WHERE _id = :_id", array(
-					":_id" => strval($this->_id),
-					":uid" => strval($this->userId),
-					":deleted" => $this->deleted,
-					":listing" => $this->listing,
-					":title" => $this->title,
-					":description" => $this->description,
-					":author_name" => glue::user()->username,
-					":videos" => count($this->videos)
-				));
-			}
+		}else{
+			glue::mysql()->query("UPDATE documents SET uid = :uid, deleted = :deleted, listing = :listing, title = :title, description = :description,
+				author_name = :author_name, videos = :videos WHERE _id = :_id", array(
+				":_id" => strval($this->_id),
+				":uid" => strval($this->userId),
+				":deleted" => $this->deleted,
+				":listing" => $this->listing,
+				":title" => $this->title,
+				":description" => $this->description,
+				":author_name" => glue::user()->username,
+				":videos" => count($this->videos)
+			));
 		}
 		return true;
 	}
