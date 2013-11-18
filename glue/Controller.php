@@ -167,13 +167,13 @@ class Controller {
 			$lines[] = implode("\n", $this->linkTags);
 		}
 		if (!empty($this->cssFiles)) {
-			$lines[] = implode("\n", $this->cssFiles);
+			$lines[] = implode("", $this->cssFiles);
 		}
 		if (!empty($this->css)) {
 			$lines[] = implode("\n", $this->css);
 		}
 		if (!empty($this->jsFiles[self::HEAD])) {
-			$lines[] = implode("\n", $this->jsFiles[self::HEAD]);
+			$lines[] = implode("", $this->jsFiles[self::HEAD]);
 		}
 		if (!empty($this->js[self::HEAD])) {
 			$lines[] = Html::js(implode("\n", $this->js[self::HEAD]));
@@ -190,7 +190,7 @@ class Controller {
 	{
 		$lines = array();
 		if (!empty($this->jsFiles[self::BODY_BEGIN])) {
-			$lines[] = implode("\n", $this->jsFiles[self::BODY_BEGIN]);
+			$lines[] = implode("", $this->jsFiles[self::BODY_BEGIN]);
 		}
 		if (!empty($this->js[self::BODY_BEGIN])) {
 			$lines[] = Html::js(implode("\n", $this->js[self::BODY_BEGIN]));
@@ -207,7 +207,7 @@ class Controller {
 	{
 		$lines = array();
 		if (!empty($this->jsFiles[self::BODY_END])) {
-			$lines[] = implode("\n", $this->jsFiles[self::BODY_END]);
+			$lines[] = implode("", $this->jsFiles[self::BODY_END]);
 		}
 		if (!empty($this->js[self::BODY_END])) {
 			$lines[] = Html::js(implode("\n", $this->js[self::BODY_END]));

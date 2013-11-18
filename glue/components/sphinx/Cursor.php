@@ -12,6 +12,12 @@ class Cursor implements \Iterator, \Countable{
 
 	public $iteratorCallback;
 	
+	/** These are for client side skip and limit */
+	public $skip=0;
+	public $limit=0;
+	
+	public $run=false;
+	
 	public function __construct($result,$className=null) {
 		$this->matches = isset($result['matches'])?$result['matches']:array();
 		reset($this->matches);
@@ -35,6 +41,7 @@ class Cursor implements \Iterator, \Countable{
 	function current() {
 		if(($c=current($this->matches)) !== false){
 			$fn=$this->iteratorCallback;
+			$className=$this->className;
 			if((is_string($fn) && function_exists($fn)) || (is_object($fn) && $fn instanceof \Closure))
 				return $fn($c['attrs'],$this->className);
 			elseif($this->className)
@@ -63,5 +70,25 @@ class Cursor implements \Iterator, \Countable{
 	
     public function rewind() {
         reset($this->matches);
+        if(!$this->run){
+        	
+        	if($this->limit<=0)
+        		$limit=null;
+        	else
+        		$limit=$this->limit;
+        	
+        	$this->matches=array_slice($this->matches, $this->skip, $limit, true);
+        	$this->run=true;
+        }
+    }
+    
+    public function skip($n){
+    	$this->skip=$n;
+    	return $this;
+    }
+    
+    public function limit($n){
+    	$this->limit=$n;
+    	return $this;
     }
 }

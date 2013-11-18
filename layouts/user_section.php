@@ -4,7 +4,7 @@ use \glue\Html;
 
 $this->beginPage() ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html xmlns:fb="http://www.facebook.com/2008/fbml">
+<html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<meta http-equiv="content-language" content="en"/>
@@ -14,15 +14,15 @@ $this->beginPage() ?>
 		<title><?php echo Html::encode($this->title) ?></title>
 
 		<?php
-			echo Html::jsFile('/js/jquery.js')."\n";
-			echo Html::jsFile('/js/jquery-ui.js')."\n";
+			echo Html::jsFile('/js/jquery.js');
+			echo Html::jsFile('/js/jquery-ui.js');
 
-			echo Html::jsFile('/js/bootstrap.js')."\n";
-			echo Html::jsFile('/js/common.js')."\n";
+			echo Html::jsFile('/js/bootstrap.js');
+			echo Html::jsFile('/js/common.js');
 
-			echo Html::cssFile("/css/bootstrap.css")."\n";
-			echo Html::cssFile("/css/main.css")."\n";
-			echo Html::cssFile("/css/jquery-ui/jquery-ui.css")."\n";
+			echo Html::cssFile("/css/bootstrap.css");
+			echo Html::cssFile("/css/main.css");
+			echo Html::cssFile("/css/jquery-ui/jquery-ui.css");
 
 			$this->js('ga_script', "var _gaq = _gaq || [];
 			  _gaq.push(['_setAccount', 'UA-31049834-1']);
@@ -48,7 +48,7 @@ $this->beginPage() ?>
 			<?php app\widgets\Menu::widget(); ?>
 			<div class='grid-container userbody'>
 				<?php app\widgets\UserMenu::widget(array('tab'=>$this->tab)) ?>
-				<div class='user_section_main_content' style='float:left; width:820px;'>
+				<div class='user_section_main_content grid-col-41' >
 					<?php echo $content ?>
 				</div>
 				<div class="clear"></div>

@@ -1521,6 +1521,7 @@ input.date{
 	float:right;
 }
 
+.profile_page .subscribe_widget,
 .watch_page .user_ribbon_menu .subscribe_widget{
 	margin-top:4px;line-height:30px;
 }
@@ -2312,5 +2313,34 @@ input.date{
 }
 
 .playlist_item .thumbnail img{
-	display:inline;
+	display:inline; border-radius:3px;
+}
+
+.profile_page{
+	margin-bottom:250px;
+}
+
+.profile_page .user_profile_main_nav{
+	border: 1px solid #ddd; border-top: 0; border-radius: 0 0 3px 3px; border-bottom-width: 2px;
+}
+
+.profile_page .simple-nav a{
+	padding:15px 15px;
+}
+
+.profile_page .simple-nav .selected{
+	background:#eee;	
+	border:0;
+}
+
+.profile_page .user_profile_main_nav.form-search_subs{
+	padding:10px 0 10px 15px;
+}
+
+.profile_page .advanced_filter_header.user_profile_main_nav{
+	margin:0; padding:10px 0 10px 10px;
+}
+
+.profile_page .user_profile_tabs{
+	margin-top:10px;
 }

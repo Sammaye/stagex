@@ -773,6 +773,9 @@ class Video extends \glue\Db\Document{
 
 	function get_time_string(){
 
+		if($this->duration<=0||!$this->duration)
+			return '00:00:00';
+		
 		$time = $this->duration/1000;
 		//$time = 3600+(60*32)+(50);
 		$time_string = '';

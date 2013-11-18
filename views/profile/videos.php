@@ -1,5 +1,5 @@
 <?php 
-glue::$controller->js('',"
+glue::$controller->js('page',"
 	$(function(){
 		//$('div.expandable').expander({slicePoint: 120});
 		
@@ -26,13 +26,11 @@ glue::$controller->js('',"
 		});		
 	});		
 ");
-
 ?>
+<div class='profile_videos_body'>
 
-<div class='grid_16 alpha omega profile_videos_body' style='margin-bottom:250px;'>
-
-	<div class="advanced_filter_header">   
-    	<div class='search clearfix' style='padding-left:10px;'>
+	<div class="advanced_filter_header user_profile_main_nav">   
+    	<div class='search clearfix'>
 		<?php $form = html::form(array('method' => 'get')); ?>
 			<?php echo html::textfield('query',htmlspecialchars(glue::http()->param('query',null)),array('placeholder'=>'Enter keywords to search by', 'autocomplete'=>'off', 'class'=>'search form-control')) ?>
 			<input type="text" id="from" class="date form-control" name="from_date" placeholder="Enter start date" value="<?php echo htmlspecialchars(glue::http()->param('from_date',null)) ?>"/> <span class="sep">-</span> 
@@ -41,19 +39,17 @@ glue::$controller->js('',"
 		</div>		
     </div>
 
-	<div class='main_content_outer'>
-		<div class='video_list'>
-			<?php
-			if($sphinx->totalFound> 0){
-				glue\widgets\ListView::widget(array(
-				'pageSize'	 => 20,
-				'page' 		 => isset($_GET['page']) ? $_GET['page'] : 1,
-				"cursor"	 => $sphinx,
-				'itemView' 	 => 'video/_video.php',
-				));
-			}else{ ?>
-				<div class='no_results_found'>No videos were found</div>
-			<?php } ?>			
-		</div>
+	<div class='video_list'>
+		<?php
+		if($sphinx_cursor->totalFound> 0){
+			glue\widgets\ListView::widget(array(
+			'pageSize'	 => 20,
+			'page' 		 => isset($_GET['page']) ? $_GET['page'] : 1,
+			"cursor"	 => $sphinx_cursor,
+			'itemView' 	 => 'video/_video.php',
+			));
+		}else{ ?>
+			<div class='no_results_found'>No public videos were found</div>
+		<?php } ?>			
 	</div>
 </div>

@@ -4,6 +4,8 @@
 	if(isset($item)){
 		if(isset($item->ts)) $last_ts =  $item->ts;
 	}
+	if(!isset($model))
+		$model=$item;
 
 	if(!isset($extra_classes)) $extra_classes = '';
 	if(!isset($show_checkbox)) $show_checkbox = false;

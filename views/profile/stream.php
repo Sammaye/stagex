@@ -45,7 +45,7 @@ glue::$controller->js('dfgfdgfdgv', "
 ?>
 
 <div>
-	<div class="simple-nav" style='background:#f5f5f5;'>
+	<div class="simple-nav user_profile_main_nav">
 		<a href="#" class="selected" data-filter="all">All</a>
 		<a href="#" data-filter="posts">Posts</a>
 		<a href="#" data-filter="comments">Comments</a>

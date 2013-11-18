@@ -17,7 +17,7 @@ class userController extends \glue\Controller{
 	public function authRules(){
 		return array(
 			array('allow',
-				'actions' => array('create', 'login', 'view', 'recover', 'view_videos', 'view_playlists', 'fbLogin', 'googleLogin'),
+				'actions' => array('create', 'login', 'view', 'recover', 'viewVideos', 'viewPlaylists', 'fbLogin', 'googleLogin'),
 				'users' => array('*')
 			),
 			array('allow', 'actions' => '*', 'users' => array('@*')),
@@ -209,67 +209,66 @@ class userController extends \glue\Controller{
 		if(!glue::http()->param('id',null)&&glue::auth()->check(array('@'))){
 			$user=glue::user();
 		}elseif(
+			!glue::http()->param('id',null) ||
 			!($user = User::model()->findOne(array('_id' => new MongoId(glue::http()->param('id','')) ))) || 
 			!glue::auth()->check(array('viewable' => $user))
 		){
-			$this->layout = 'blank_page';
-			$this->title = 'User Not Found - StageX';
-			echo $this->render('deleted');
-			exit();
+			glue::trigger('404');
 		}
 		
 		glue::import('@app/controllers/StreamController.php',true);
 		$streamController=new StreamController();
 		
-		$this->layout = 'profile';
-		$this->tab='profile';
+		$this->layout = 'profile_layout';
+		if(glue::auth()->check(array('^'=>$user)))
+			$this->tab='profile';
+		else
+			$this->tab=null;
 		$this->title = $user->getUsername().' - StageX';
 		
-		echo $this->render('profile/stream', array('user' => $user, 'page' => 'stream', 'cursor' => $streamController->load_single_stream()));
+		echo $this->render('profile/stream', array('user' => $user, 'page' => 'stream', 'cursor' => $streamController->load_single_stream(null,$user)));
 	}
 
 	function action_viewVideos(){
 		if(!glue::http()->param('id',null)&&glue::auth()->check(array('@'))){
 			$user=glue::user();
 		}elseif(
+			!glue::http()->param('id',null) ||
 			!($user = User::model()->findOne(array('_id' => new MongoId(glue::http()->param('id','')) ))) || 
 			!glue::auth()->check(array('viewable' => $user))
 		){
-			$this->layout = 'blank_page';
-			$this->title = 'User Not Found - StageX';
-			echo $this->render('deleted');
-			exit();
+			glue::trigger('404');
 		}
 		
-		$this->layout='profile';
+		$this->layout='profile_layout';
 		$this->tab='profile';
 		$this->title = $user->getUsername().' - StageX';
 
 		$sphinx=glue::sphinx()
 			->match(array('title', 'description', 'tags', 'author_name'),glue::http()->param('q',''))
-			->match('type','video')->match('uid',strval($user->_id))
+			->match('type','video')
+			->match('uid',strval($user->_id))
 			->sort(SPH_SORT_TIME_SEGMENTS, "date_uploaded")
 			->filter('deleted', array(1), true)
 			->page(glue::http()->param('page',1));	
 		if(!glue::user()->equal($user))
 			$sphinx->filter('listing',array(1, 2), true);
-		echo $this->render('profile/videos', array('user' => $user, 'page' => 'videos', 'sphinx' => $sphinx->query('main','Video')));
+		echo $this->render('profile/videos', array('user' => $user, 'page' => 'videos', 
+				'sphinx' => $sphinx, 'sphinx_cursor' => $sphinx->query('main','Video')));
 	}
 
 	function action_viewPlaylists(){
 		if(!glue::http()->param('id',null)&&glue::auth()->check(array('@'))){
 			$user=glue::user();
 		}elseif(
+			!glue::http()->param('id',null) ||
 			!($user = User::model()->findOne(array('_id' => new MongoId(glue::http()->param('id','')) ))) || 
 			!glue::auth()->check(array('viewable' => $user))
 		){
-			$this->layout = 'blank_page';
-			$this->title = 'User Not Found - StageX';
-			echo $this->render('deleted');
-			exit();
+			glue::trigger('404');
 		}
 
-		$this->layout='profile';
+		$this->layout='profile_layout';
 		$this->tab='profile';
 		$this->title = $user->getUsername().' - StageX';
 		
@@ -282,7 +281,7 @@ class userController extends \glue\Controller{
 		if(!glue::user()->equal($user))
 			$sphinx->filter('listing',array(1, 2), true);		
 
-		echo $this->render('profile/playlists', array('user' => $user, 'page' => 'playlists', 'sphinx' => $sphinx->query('main','Playlist')));
+		echo $this->render('profile/playlists', array('user' => $user, 'page' => 'playlists', 'sphinx' => $sphinx->query('main','app\models\Playlist')));
 	}
 
 	function action_videos(){

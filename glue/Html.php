@@ -109,7 +109,7 @@ class Html{
 	public static function cssFile($url,$media=null){
 		if($media!=null)
 			$media=' media="'.$media.'"';
-		return '<link rel="stylesheet" type="text/css" href="'.$url.'"'.$media.' />';
+		return '<link rel="stylesheet" type="text/css" href="'.$url.'"'.$media.' />'."\n";
 	}
 
 	/**
@@ -125,7 +125,7 @@ class Html{
 	 * @param string $url
 	 */
 	public static function jsFile($url){
-		return '<script type="text/javascript" src="'.$url.'"></script>';
+		return '<script type="text/javascript" src="'.$url.'"></script>'."\n";
 	}
 
 	/**
