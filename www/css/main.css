@@ -2336,3 +2336,20 @@ input.date{
 .playlist_box_item .small_images{
 	float:left; width:44px;
 }
+
+.user_playlist_subscription_item .listing{
+	margin:0 10px;
+  	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=40)";
+  	filter: alpha(opacity=40);
+  	-moz-opacity: 0.4;
+  	-khtml-opacity: 0.4;
+  	opacity: 0.4;	
+}
+
+.user_playlist_subscription_item .created .username{
+	margin-left:10px;
+}
+
+.user_playlist_subscription_item .btn_subscribe{
+	display:none;
+}

@@ -101,6 +101,32 @@ $this->js('edit', "
 	function reset_checkboxes(){
 		$('.selectAll_input').prop('checked',true).trigger('click');
 	}		
+		
+	$(document).on('click', '.subscribe_to_playlist .btn_subscribe', function(){
+		
+		var btn=$(this),
+			container=$(this).parents('.subscribe_to_playlist');
+		
+		$.post('".glue::http()->url('/playlist/subscribe')."', {id:container.data('id')}, null, 'json')
+		.done(function(data){
+			if(data.success){
+				btn.removeClass('btn-success btn_subscribe').addClass('btn-error btn_unsubscribe').html('Unsubscribe');
+			}
+		});
+	});
+		
+	$(document).on('click', '.subscribe_to_playlist .btn_unsubscribe', function(){
+		
+		var btn=$(this),
+			container=$(this).parents('.subscribe_to_playlist');
+		
+		$.post('".glue::http()->url('/playlist/unsubscribe')."', {id:container.data('id')}, null, 'json')
+		.done(function(data){
+			if(data.success){
+				btn.removeClass('btn-error btn_unsubscribe').addClass('btn-success btn_subscribe').html('Subscribe to Playlist');
+			}
+		});
+	});		
 ");
 ?>
 <div class='edit_playlist_body'>
@@ -146,14 +172,12 @@ $this->js('edit', "
 <?php }else{ ?>
 <div class="author_top_bar">
 <div class="grid-container">
-
 	<div class="user_image">
 	<img alt='thumbnail' class="thumbnail" src="<?php echo $model->author->getAvatar(30, 30); ?>"/>
 	</div>
 	<div class="user_text">
 	<a href="<?php echo glue::http()->url('/user/view', array('id' => $model->author->_id)) ?>" class="h3"><?php echo $model->author->getUsername() ?></a><span class="sep h3">/</span><a href="" class="h3">Playlists</a>
 	</div>
-
 	<div class='right'>
 	<div class="subscribe_widget" data-user_id="<?php echo $model->author->_id ?>">
 		<span class="follower_count text-muted"><?php echo $model->author->totalFollowers ?> Subscribers</span>
@@ -166,7 +190,6 @@ $this->js('edit', "
 		<?php } ?>
 	</div>
 	</div>
-
 </div>
 </div>
 <?php } ?>
@@ -185,9 +208,13 @@ $this->js('edit', "
 	
 	<div class="clearfix">
 	<?php if(!glue::auth()->check(array('^'=>$model))&&glue::auth()->check(array('@'))){ ?>
-	<div style='float:left;' class="clearfix">
-		<button class="btn btn-success" type="button" style='float:left;border-radius:4px 0 0 4px;'>Subscribe to Playlist</button>
-		<span style='float:left;display:block;border:1px solid #eeeeee;font-size:14px;color:#999;padding:6px 10px;border-radius:0 4px 4px 0;'><?php echo $model->followers ?></span>
+	<div style='float:left;' class="clearfix subscribe_to_playlist" data-id="<?php echo $model->_id ?>">
+		<?php if(!$model->user_is_subscribed(glue::user())){ ?>
+		<button class="btn btn-success btn_subscribe" type="button" style='float:left;border-radius:4px 0 0 4px;'>Subscribe to Playlist</button>
+		<?php }else{ ?>
+		<button class="btn btn-error btn_unsubscribe" type="button" style='float:left;border-radius:4px 0 0 4px;'>Unsubscribe</button>
+		<?php } ?>
+		<span class="subscriber_count" style='float:left;display:block;border:1px solid #eeeeee;font-size:14px;color:#999;padding:6px 10px;border-radius:0 4px 4px 0;'><?php echo $model->followers ?></span>
 	</div>
 	<?php } ?>
 	<div style='margin:0px 0 0 0;float:right;' class="share_area col-25 clearfix">

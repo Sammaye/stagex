@@ -224,4 +224,8 @@ class Playlist extends \glue\db\Document{
 		$this->author->saveCounters(array('totalPlaylists'=>-1),0);
 		return true;
 	}
+	
+	function user_is_subscribed($user){
+		return glue::db()->playlist_subscription->findOne(array('user_id' => $user->_id, 'playlist_id' => $this->_id))!==null;
+	}
 }

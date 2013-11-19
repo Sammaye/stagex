@@ -11,7 +11,8 @@ class PlaylistController extends glue\Controller{
 	public function authRules(){
 		return array(
 			array("allow",
-				"actions"=>array('create', 'edit', 'save', 'delete', 'batchDelete', 'addVideo', 'get_menu', 'batchSave', 'deleteVideo', 'ajaxsearch','clear'),
+				"actions"=>array('create', 'edit', 'save', 'delete', 'batchDelete', 'addVideo', 'get_menu', 'batchSave', 'deleteVideo', 'ajaxsearch',
+						'clear', 'subscribe', 'unsubscribe'),
 				"users"=>array("@*")
 			),
 			array('allow', 'actions' => array('index', 'view', 'renderBar')),
@@ -210,6 +211,48 @@ class PlaylistController extends glue\Controller{
 		$playlist->save();
 		$this->json_success('The playlist was cleared');
 	}	
+	
+	function action_subscribe(){
+		if(glue::auth()->check('ajax','post')){
+				
+			if(
+				($id=glue::http()->param('id',null))===null ||
+				($playlist=Playlist::model()->findOne(array("_id"=>new MongoId($id))))===null
+			)
+				$this->json_error('Playlist not found');
+			
+			$f=glue::db()->playlist_subscription->update(
+				array('user_id' => glue::user()->_id, 'playlist_id' => $playlist->_id), 
+				array('$set'=>array('update_time' => new MongoDate())),
+				array('upsert' => true)
+			);
+			if(isset($f['upserted'])&&$f['upserted']){
+				$playlist->saveCounters(array('followers' => 1));
+				$this->json_success('You have subscribed to this playlist');
+			} // Be silent about the relationship already existing
+			
+			$this->json_error(self::UNKNOWN);
+		}else
+			glue::trigger('404');		
+	}
+	
+	function action_unsubscribe(){
+		if(glue::auth()->check('ajax','post')){
+			if(
+				($id=glue::http()->param('id',null))===null ||
+				($playlist=Playlist::model()->findOne(array("_id"=>new MongoId($id))))===null
+			)
+				$this->json_error('Playlist not found');
+			
+			$f=glue::db()->playlist_subscription->remove(array('user_id' => glue::user()->_id, 'playlist_id' => $playlist->_id));
+			if($f['n']>0){
+				$playlist->saveCounters(array('followers' => -1));
+				$this->json_success('You have unsubscribed from this playlist');				
+			}
+			$this->json_error(self::UNKNOWN);
+		}else
+			glue::trigger('404');		
+	}
 	
 	function action_ajaxsearch(){
 		if(!glue::http()->isAjax())

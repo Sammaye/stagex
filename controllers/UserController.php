@@ -226,7 +226,7 @@ class userController extends \glue\Controller{
 			$this->tab=null;
 		$this->title = $user->getUsername().' - StageX';
 		
-		echo $this->render('profile/stream', array('user' => $user, 'page' => 'stream', 'cursor' => $streamController->load_single_stream(null,$user)));
+		echo $this->render('view_stream', array('user' => $user, 'page' => 'stream', 'cursor' => $streamController->load_single_stream(null,$user)));
 	}
 
 	function action_viewVideos(){
@@ -254,7 +254,7 @@ class userController extends \glue\Controller{
 		if(!glue::user()->equals($user)){
 			$sphinx->filter('listing',array(1, 2), true);
 		}
-		echo $this->render('profile/videos', array('user' => $user, 'page' => 'videos', 
+		echo $this->render('view_videos', array('user' => $user, 'page' => 'videos', 
 				'sphinx' => $sphinx, 'sphinx_cursor' => $sphinx->query('main','Video')));
 	}
 
@@ -282,7 +282,7 @@ class userController extends \glue\Controller{
 		if(!glue::user()->equals($user))
 			$sphinx->filter('listing',array(1, 2), true);		
 
-		echo $this->render('profile/playlists', array('user' => $user, 'page' => 'playlists', 'sphinx' => $sphinx->query('main','app\models\Playlist')));
+		echo $this->render('view_playlists', array('user' => $user, 'page' => 'playlists', 'sphinx' => $sphinx->query('main','app\models\Playlist')));
 	}
 
 	function action_videos(){
@@ -403,15 +403,15 @@ class userController extends \glue\Controller{
 		echo $this->render('rated_videos', array('items' => $rated));
 	}
 	
-	public function action_followedPlaylists(){
-		$this->title = 'Rated Playlists - StageX';
+	public function action_PlaylistSubscriptions(){
+		$this->title = 'Playlist Subscriptions - StageX';
 		$this->layout = 'user_section';
-		$this->tab = 'videos';
+		$this->tab = 'playlists';
 	
 		$_filter = isset($_GET['filter']) ? $_GET['filter'] : null;
-		$items = glue::db()->playlist_likes->find(array("user_id" => Glue::session()->user->_id, 'like' => 1))->sort(array('ts' => -1))->limit(20);
+		$items= glue::db()->playlist_subscription->find(array('user_id' => glue::user()->_id))->sort(array('ts' => -1))->limit(20);
 	
-		$this->render('followed_playlists', array('items' => $items, '_filter' => $_filter));
+		echo $this->render('playlist_subscriptions', array('playlist_rows' => $items, '_filter' => $_filter));
 	}
 	
 	function action_removeRated(){

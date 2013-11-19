@@ -101,7 +101,7 @@ $this->js('new_playlist', "
 	<div class="videos_nav_top">
 		<ul class="nav nav-tabs">
 			<li class="active"><a href="/user/playlists">My Playlists</a></li>
-			<li><a href="/playlists/following">Following</a></li>
+			<li><a href="/user/playlistSubscriptions">Subscribed</a></li>
 		</ul>
 		<a class="btn btn-success btn-upload" data-toggle="modal" data-target="#myModal">Add New Playlist</a>
 	</div>	
