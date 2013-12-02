@@ -1,7 +1,7 @@
-<div class='container_16 stream_body user_notifications_body'>
+<div class='stream_body user_notifications_body'>
 	<?php
 	$stream = app\models\Notification::model()->find(array('userId' => glue::user()->_id))->sort(array('created' => -1))->limit(20);
-	if(count($stream) <= 0){
+	if($stream->count() <= 0){
 		?><div class='no_results_found'>You have no new notifications</div><?php
 	}
 

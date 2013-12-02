@@ -16,17 +16,14 @@
 	<div class='checkbox_col'><div class="checkbox_input" style=''><?php echo html::checkbox('video_id[]', strval(isset($custid) ? $custid : $model->_id), 0) ?></div></div>
 	<?php endif; ?>
 	<div class='thumbnail' style='position:relative;float:left;'><a href="/video/watch?id=<?php echo strval($model->_id) ?>" >
-		<img alt='<?php echo Html::encode($model->title) ?>' src="<?php echo $model->getImage(138, 77) ?>"/></a>
-		<?php if($model->state == 'finished'): ?>
-		<div class='duration'><span><?php echo $model->get_time_string() ?></span></div>
-		<a class='add_to_playlist' href='#'><img alt='Add to Playlist' src='/images/add_tooltip.png'/></a>
-		<?php endif ?>
-	</div>		
+	<img alt='<?php echo Html::encode($model->title) ?>' src="<?php echo $model->getImage(138, 77) ?>"/></a></div>		
 	<div class='info'>
 		<h3 class='title'><a href="/video/watch?id=<?php echo strval($model->_id) ?>"><?php echo $model->title ?></a></h3>
 		<?php if($model->author): ?>
 			<div class='uploader'>
-				<img style='' class='avatar' src="<?php echo $model->author->getAvatar(30,30) ?>"/><a href="<?php echo glue::http()->url('/user/view', array('id' => $model->author->_id)) ?>"><?php echo $model->author->getUsername() ?></a> <span class="text-muted"><?php echo date('j M Y',$model->getTs($model->created)) ?></span>
+				<span class="duration"><?php echo $model->get_time_string() ?></span><span class="sep">-</span>
+				<a href="<?php echo glue::http()->url('/user/view', array('id' => $model->author->_id)) ?>"><?php echo $model->author->getUsername() ?></a>
+				<span class="uploaded"><?php echo date('j M Y',$model->getTs($model->created)) ?></span>
 			</div>
 		<?php endif;
 

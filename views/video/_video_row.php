@@ -11,13 +11,13 @@ if(!isset($model)||!$model){
 }
 ?>
 <<?php if(isset($useLiTag)&&$useLiTag): echo 'li'; else: echo 'div'; endif; ?> 
-		class="video_row" data-id="<?php echo isset($custid)?$custid:$item->_id ?>" style='padding:10px 0;border-bottom:1px solid #eeeeee;'>
+		class="video_row" data-id="<?php echo isset($custid)?$custid:$item->_id ?>">
 	<div class="inner">
-	<?php if(isset($admin)&&$admin): ?><div class='checkbox_col' style='float:left;padding-top:16px;width:15px;margin:0 10px 0 10px;'><div class="checkbox_input" style=''><?php echo html::checkbox('video_id[]', strval(isset($custid) ? $custid : $item->_id), 0) ?></div></div><?php endif; ?>
-	<?php if(isset($show_sorter)&&$show_sorter): ?><div style='float:left;padding-top:13px;width:15px;margin:0 5px 0 5px;cursor:pointer;' class='sortable_handle'><img alt='sort' src='/images/sortable_icon.png'/></div><?php endif; ?>
-	<?php if(isset($show_delete)&&$show_delete): ?><div style='float:left;padding-top:14px;width:15px;margin:0 12px 0 0px;color:#333333;opacity:0.5;font-size:22px;font-weight:bold;cursor:pointer;'>&times;</div><?php endif; ?>
+	<?php if(isset($admin)&&$admin): ?><div class='checkbox_col'><div class="checkbox_input" style=''><?php echo html::checkbox('video_id[]', strval(isset($custid) ? $custid : $item->_id), 0) ?></div></div><?php endif; ?>
+	<?php if(isset($show_sorter)&&$show_sorter): ?><div class='sortable_handle'><img alt='sort' src='/images/sortable_icon.png'/></div><?php endif; ?>
+	<?php if(isset($show_delete)&&$show_delete): ?><div class='delete_handle'>&times;</div><?php endif; ?>
 	<?php if(!glue::auth()->check(array('viewable'=>$item))): ?>
-	<div class="deleted" style='float:left;margin:2px 10px 0 0;'>
+	<div class="deleted">
 		<?php if($item->deleted){ ?>
 			This video has been deleted
 		<?php }else{ ?>
@@ -25,22 +25,15 @@ if(!isset($model)||!$model){
 		<?php } ?>
 	</div>
 	<?php else: ?>
-	<div class='thumbnail' style='position:relative;float:left;width:88px;margin:2px 10px 0 0;'><a href="<?php echo $videoUrl ?>" >
+	<div class='thumbnail'><a href="<?php echo $videoUrl ?>" >
 		<img alt='<?php echo html::encode($item->title) ?>' src="<?php echo $item->getImage(88, 49) ?>"/></a>
-		<?php if($item->state == 'finished'): ?>
-		<div class='duration'><span><?php echo $item->get_time_string() ?></span></div>
-		<a class='add_to_playlist' href='#'><img alt='Add to Playlist' src='/images/add_tooltip.png'/></a>
-		<?php endif ?>
 	</div>
-	<div style="width:400px;float:left;">
-		<span style='font-size:16px;line-height:20px;color:#333333;'><a href="<?php echo $videoUrl ?>"><?php echo $item->title ?></a></span>
-		<div class="expandable text-muted" style='font-size:13px;line-height:17px;'><?php echo $item->description ?></div>
+	<div class="info">
+		<span class='title'><a href="<?php echo $videoUrl ?>"><?php echo $item->title ?></a></span>
+		<div class="expandable text-muted description"><?php echo $item->description ?></div>
 	</div>
-	<div style='width:70px;float:left;color:#666666;font-size:14px;margin:0 20px;padding:22px 0 0 0;'>
-		<?php echo $item->duration?:'&nbsp;'; ?>
-	</div>
-	<div style="width:120px;float:left;font-size:14px;padding-top:12px;">
-		<img style='border-radius:50px;vertical-align:middle;' src="<?php echo $item->author->getAvatar(30,30) ?>"/>
+	<div class="uploader_info">
+		<span class="duration"><?php echo $item->get_time_string() ?></span><span class="sep">-</span>
 		<a href="/user/view?id=<?php echo $item->author->_id ?>"><?php echo $item->author->username ?></a>
 	</div>		
 	<?php endif; ?>

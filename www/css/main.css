@@ -920,7 +920,7 @@ input.date{
 }
 
 .video .info{
-	float:left; width:350px;
+	float:left; width:450px;
 }
 
 .video .info h3{
@@ -943,7 +943,11 @@ input.date{
 
 .video .info .uploader{
 	font-size:12px;
-	color:#555555;
+	color:#999;
+}
+
+.video .info .uploader .sep{
+	margin:0 5px;
 }
 
 .video .infocons{
@@ -2243,13 +2247,54 @@ input.date{
 	color:#999999; margin:0 20px;
 }
 
+.video_row{
+	padding:10px 0;border-bottom:1px solid #eeeeee;
+}
+
+.video_row .checkbox_col{
+	float:left;padding-top:16px;width:15px;margin:0 10px 0 10px;
+}
+
+.video_row .sortable_handle{
+	float:left;padding-top:13px;width:15px;margin:0 5px 0 5px;cursor:pointer;
+}
+
+.video_row .delete_handle{
+	float:left;padding-top:14px;width:15px;margin:0 12px 0 0px;color:#333333;opacity:0.5;font-size:22px;font-weight:bold;cursor:pointer;
+}
+
+.video_row .deleted{
+	float:left;margin:2px 10px 0 0; color:#999;
+}
+
 .video_row .thumbnail{
 	padding:0;
 	border:0;
+	position:relative;float:left;width:88px;margin:2px 10px 0 0;
 }
 
 .video_row .thumbnail img{
 	border-radius:3px;	
+}
+
+.video_row .info{
+	width:400px;float:left;
+}
+
+.video_row .info .title{
+	font-size:16px;line-height:20px;color:#333333;
+}
+
+.video_row .info .description{
+	font-size:13px;line-height:17px;
+}
+
+.video_row .uploader_info{
+	width:230px;float:left;font-size:14px;padding-top:12px;margin-left:50px; color:#999;
+}
+
+.video_row .uploader_info .sep{
+	margin:0 5px;
 }
 
 .playlist_sortable_highlight{
@@ -2269,7 +2314,7 @@ input.date{
 }
 
 .author_top_bar .user_image img{
-	float:left;margin:0;border-radius:50%;vetical-align:middle;padding:0;border:0;
+	float:left;margin:0;vetical-align:middle;padding:0;border:0;
 }
 
 .author_top_bar .user_text{

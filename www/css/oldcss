@@ -1,3 +1,18 @@
+.playlist_bar_outer .view_all_videos{
+	/*
+	cursor:pointer;
+	margin:8px 10px 0 0; color:#fff;
+    background: none repeat scroll 0 0 #232323;
+    border: 1px solid #000000;
+    border-radius: 3px 3px 3px 3px;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.8);
+    background: none repeat scroll 0 0 #232323;
+    box-shadow: 0 1px 0 rgba(101, 101, 101, 0.1) inset;
+    color: rgba(255, 255, 255, 0.8);
+	padding:5px; font-size:11px;
+	*/
+}
+
 
 .btn-dark{
 	background-color: #474949;
