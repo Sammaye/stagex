@@ -11,6 +11,7 @@ class UserMenu extends \glue\Widget{
 	
 	function render(){ 
 		?><div class='user_side_menu'>
+		<?php if(glue::auth()->check(array('@'))){  ?>
 			<div>
 			<ul>
 			<li><a href='<?php echo glue::http()->url('/stream/news') ?>' <?php echo $this->tab == "news_feed" ? "class='selected'" : "" ?>>News Feed</a></li>
@@ -43,6 +44,8 @@ class UserMenu extends \glue\Widget{
 			<li><a href='<?php echo glue::http()->url('/user/logout') ?>'>Logout</a></li>
 			</ul>
 			</div>
+		<?php }else 
+			echo "&nbsp;" ?>
 		</div><?php 
 	}
 }

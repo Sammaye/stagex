@@ -71,10 +71,10 @@ $this->beginPage() ?>
 				<?php app\widgets\UserMenu::widget(array('tab'=>$this->tab)) ?>
 				<div class='profile_page grid-col-41'>
 				
-				<div class='top' style='position:relative; min-height:125px;'>
-					<div class='user_image' style='position:absolute;width:125px;height:125px;top:0;left:0;'><img src="<?php echo $user->getAvatar(125, 125); ?>" alt='thumbnail' style='border-radius:5px;'/></div>
-					<div class='user_about' style='margin-left:140px;min-height:95px;'>
-						<h1 class='username' style='margin-top:0;'><?php echo $user->getUsername() ?></h1>
+				<div class='top'>
+					<div class='user_image'><img src="<?php echo $user->getAvatar(125, 125); ?>" alt='thumbnail'/></div>
+					<div class='user_about'>
+						<h1 class='username'><?php echo $user->getUsername() ?></h1>
 						<div class='expandable_small'>
 							<div class='mini_about'><?php echo substr(htmlspecialchars($user->about), 0, 80); if($user->about): echo '...'; endif; echo html::a(array('href' => '#', 'text' => 'About this user', 'class' => 'expand_user_about')) ?></div>
 							<div class='full_about' style='display:none;'>
@@ -83,7 +83,7 @@ $this->beginPage() ?>
 								<?php } ?>
 	
 								<?php if(count($user->external_links)>0){ ?>
-								<div style='margin-bottom:15px;'>
+								<div class="profile_url_list">
 									<?php $urls = array_chunk(is_array($user->external_links) ? $user->external_links : array(), 3); ?>
 									<?php for($i = 0, $size= count($urls); $i < $size; $i++){ ?>
 										<ul class='user_profile_url_list'>
@@ -108,12 +108,12 @@ $this->beginPage() ?>
 								<div class='shrink_about'><?php echo html::a(array('href' => '#', 'text' => 'Show Less', 'class' => 'shrink_user_about'))?></div>
 							</div>
 						</div>
-						<div class="subscribe_widget" data-user_id="<?php echo $user->_id ?>" style='margin:10px 0 0 0;'>
+						<div class="subscribe_widget" data-user_id="<?php echo $user->_id ?>">
 							<?php if(glue::session()->authed&&!glue::auth()->check(array('^'=>$user))){ ?>
 							<?php if(app\models\Follower::isSubscribed($user->_id)){ ?>
-							<button type="button" class='unsubscribe button btn btn-error' style='margin-right:15px;'>Unsubscribe</button>
+							<button type="button" class='unsubscribe button btn btn-error'>Unsubscribe</button>
 							<?php }else{ ?>
-							<button type="button" class='subscribe btn btn-primary button' style='margin-right:15px;'>Subscribe</button>
+							<button type="button" class='subscribe btn btn-primary button'>Subscribe</button>
 							<?php } ?>
 							<?php } ?>			
 							<span class="follower_count text-muted"><?php echo $user->totalFollowers ?> Subscribers</span>

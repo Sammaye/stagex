@@ -1919,12 +1919,40 @@ input.date{
 	margin:0 auto;padding:40px 0;
 }
 
-.edit_playlist_body .left_menu{
-	width:145px; float:left;margin-right:15px;
+.edit_playlist_body .subscribe_to_playlist{
+	float:left;	
+}
+
+.edit_playlist_body .subscribe_to_playlist .btn{
+	float:left;border-radius:4px 0 0 4px;
+}
+
+.edit_playlist_body .subscriber_count{
+	float:left;display:block;border:1px solid #eeeeee;font-size:14px;color:#999;padding:6px 10px;border-radius:0 4px 4px 0;
+}
+
+.edit_playlist_body .share_area{
+	margin:0px 0 0 0;float:right;
 }
 
 .share_area .share_network_btn{
 	margin-top:1px;
+}
+
+.share_area label{
+	float:left;padding-top:6px;margin-right:10px;
+}
+
+.share_area .fb_btn{
+	background:url(/images/social_icons.png) no-repeat 0 0; width:32px; height:32px; display:block; float:left;
+}
+
+.share_area .twt_btn{
+	background:url(/images/social_icons.png) no-repeat -32px 0; width:32px; height:32px; display:block; float:left;
+}
+
+.share_area .google_btn{
+	background:url(/images/social_icons.png) no-repeat -64px 0; width:32px; height:32px; display:block; float:left;
 }
 
 .share_network_btn + .share_network_btn{
@@ -2195,12 +2223,24 @@ input.date{
 	color:#999999; margin:0 0 0 10px;
 }
 
+.user_notifications_body .notification_item{
+	border-top:1px solid #eee;
+}
+
+.user_notifications_body .notification_item:first-child{
+	border:0;
+}
+
 .notification_item{
 	padding:10px 0;line-height:21px;
 }
 
 .notification_item .sent_date{
-	color:#999999; margin:0 0 0 10px;
+	color:#999999; margin:0 10px 0 0;
+}
+
+.notification_item .sep{
+	color:#999999; margin:0 20px;
 }
 
 .video_row .thumbnail{
@@ -2262,6 +2302,38 @@ input.date{
 
 .profile_page{
 	margin-bottom:250px;
+}
+
+.profile_page .top{
+	position:relative; min-height:125px;
+}
+
+.profile_page .subscribe_widget .btn{
+	margin-right:15px;
+}
+
+.profile_page .subscribe_widget{
+	margin:10px 0 0 0;
+}
+
+.profile_page .user_image{
+	position:absolute;width:125px;height:125px;top:0;left:0;
+}
+
+.profile_page .user_image img{
+	border-radius:5px;
+}
+
+.profile_page .user_about{
+	margin-left:140px;min-height:95px;
+}
+
+.profile_page .user_about .username{
+	margin-top:0;
+}
+
+.profile_page .user_about .url_list{
+	margin-bottom:15px;
 }
 
 .profile_page .user_profile_main_nav{

@@ -176,7 +176,7 @@ $this->js('edit', "
 	<img alt='thumbnail' class="thumbnail" src="<?php echo $model->author->getAvatar(30, 30); ?>"/>
 	</div>
 	<div class="user_text">
-	<a href="<?php echo glue::http()->url('/user/view', array('id' => $model->author->_id)) ?>" class="h3"><?php echo $model->author->getUsername() ?></a><span class="sep h3">/</span><a href="" class="h3">Playlists</a>
+	<a href="<?php echo glue::http()->url('/user/view', array('id' => $model->author->_id)) ?>" class="h3"><?php echo $model->author->getUsername() ?></a><span class="sep h3">/</span><a href="<?php echo glue::http()->url('/user/viewPlaylists', array('id' => $model->author->_id)) ?>" class="h3">Playlists</a>
 	</div>
 	<div class='right'>
 	<div class="subscribe_widget" data-user_id="<?php echo $model->author->_id ?>">
@@ -195,33 +195,27 @@ $this->js('edit', "
 <?php } ?>
 
 <div class="grid-container main_playlist_body">
-	<div class="left_menu">
-		<?php if(glue::auth()->check(array('@'))) 
-			app\widgets\UserMenu::widget(array('tab'=>'playlists')); 
-		else
-			echo '&nbsp;';
-		?>
-	</div>
-	<div style='float:left;width:820px;'>
+	<?php app\widgets\UserMenu::widget(array('tab'=>'playlists')); ?> 
+	<div class='grid-col-41'>
 	
 	<h1><?php echo $model->title ?></h1>
 	
 	<div class="clearfix">
 	<?php if(!glue::auth()->check(array('^'=>$model))&&glue::auth()->check(array('@'))){ ?>
-	<div style='float:left;' class="clearfix subscribe_to_playlist" data-id="<?php echo $model->_id ?>">
+	<div class="clearfix subscribe_to_playlist" data-id="<?php echo $model->_id ?>">
 		<?php if(!$model->user_is_subscribed(glue::user())){ ?>
-		<button class="btn btn-success btn_subscribe" type="button" style='float:left;border-radius:4px 0 0 4px;'>Subscribe to Playlist</button>
+		<button class="btn btn-success btn_subscribe" type="button">Subscribe to Playlist</button>
 		<?php }else{ ?>
-		<button class="btn btn-error btn_unsubscribe" type="button" style='float:left;border-radius:4px 0 0 4px;'>Unsubscribe</button>
+		<button class="btn btn-error btn_unsubscribe" type="button">Unsubscribe</button>
 		<?php } ?>
-		<span class="subscriber_count" style='float:left;display:block;border:1px solid #eeeeee;font-size:14px;color:#999;padding:6px 10px;border-radius:0 4px 4px 0;'><?php echo $model->followers ?></span>
+		<span class="subscriber_count"><?php echo $model->followers ?></span>
 	</div>
 	<?php } ?>
-	<div style='margin:0px 0 0 0;float:right;' class="share_area col-25 clearfix">
-		<label style='float:left;padding-top:6px;margin-right:10px;'>Share</label>
-		<a rel='new_window' class="share_network_btn" style='background:url(/images/social_icons.png) no-repeat 0 0; width:32px; height:32px; display:block; float:left;' href="http://www.facebook.com/sharer.php?u=<?php echo urlencode(glue::http()->url("/playlist/view", array("id"=>$model->_id))) ?>"></a>
-		<a rel='new_window' class="share_network_btn" style='background:url(/images/social_icons.png) no-repeat -32px 0; width:32px; height:32px; display:block; float:left;' href="http://twitter.com/share?url=<?php echo urlencode(glue::http()->url("/playlist/view", array("id"=>$model->_id))) ?>"></a>
-		<a rel="new_window" class="share_network_btn" style='background:url(/images/social_icons.png) no-repeat -64px 0; width:32px; height:32px; display:block; float:left;' href="https://plus.google.com/u/0/share?url=<?php echo urlencode(glue::http()->url("/playlist/view", array("id"=>$model->_id))) ?>"></a>
+	<div class="share_area col-25 clearfix">
+		<label>Share</label>
+		<a rel='new_window' class="share_network_btn fb_btn" href="http://www.facebook.com/sharer.php?u=<?php echo urlencode(glue::http()->url("/playlist/view", array("id"=>$model->_id))) ?>"></a>
+		<a rel='new_window' class="share_network_btn twt_btn" href="http://twitter.com/share?url=<?php echo urlencode(glue::http()->url("/playlist/view", array("id"=>$model->_id))) ?>"></a>
+		<a rel="new_window" class="share_network_btn google_btn" href="https://plus.google.com/u/0/share?url=<?php echo urlencode(glue::http()->url("/playlist/view", array("id"=>$model->_id))) ?>"></a>
 		<input type="text" value="<?php echo glue::http()->url('/playlist/view', array('id' => $model->_id)) ?>" class="form-control select_all_onfoc col-25"/>
 	</div>
 	</div>	
