@@ -697,6 +697,25 @@ class userController extends \glue\Controller{
 		echo json_encode($suggestions);
 		exit();
 	}
+	
+	public function action_ajaxsearch(){
+		if(!glue::http()->isAjax())
+			glue::trigger('404');
+
+		$term=glue::http()->param('query');
+		$limit=glue::http()->param('limit');
+		$users=app\models\User::model()->find(array('username'=>new MongoRegex("/$term/")))->limit($limit);		
+		
+		$suggestions=array();
+		foreach($users as $user)
+			$suggestions[]=array(
+				'_id' => $user->_id,
+				'username'=>$user->username
+			);
+		echo json_encode(array('users' => $suggestions));
+		exit();		
+
+	}
 
 	function action_manage(){
 		$this->render('manage');

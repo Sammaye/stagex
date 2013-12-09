@@ -35,11 +35,48 @@ class videoresponseController extends \glue\Controller{
 		$this->title = 'View All Responses for '.$video->title.' - StageX';
 		$this->layout='user_section';
 		
+		$query=array();
+		if($filter_type=glue::http()->param('filter-type')){
+			if($filter_type=='text')
+				$query['type']='text';
+			if($filter_type=='video')
+				$query['type']='video';
+		}
+		
+		if(($keywords=glue::http()->param('filter-keywords'))&&strlen(trim($keywords))>0){
+			$keywords=preg_split('/\s/', trim($keywords));
+			$formed_keywords=array();
+			foreach($keywords as $k)
+				$formed_keywords[]=new MongoRegex("/$k/");
+			$query['content']=array('$in' => $formed_keywords);
+		}
+		
+		if($from_date=glue::http()->param('from_date'))
+			$query['created']['$gte']=new MongoDate(strtotime(str_replace('/','-',$from_date)));
+		if($to_date=glue::http()->param('to_date'))
+			$query['created']['$lt']=new MongoDate(strtotime(str_replace('/','-',$to_date.' +1 day')));		
+		
+		$usernames_string='';
+		if($usernames=glue::http()->param('filter-username')){
+			$usernames=preg_split('/,/',$usernames);
+			foreach($usernames as $k=>$v){
+				$usernames[$k]=new MongoId($v);
+			}
+			$query['userId'] = array('$in'=>$usernames);
+			$users=iterator_to_array(app\models\User::model()->find(array('_id'=>array('$in'=>$usernames))));
+			
+			// Once again just to formulate the users
+			foreach($usernames as $k => $v){
+				$usernames_string.=(string)$v.':'.$users[(string)$v]->getUsername().',';
+			}
+			$usernames_string=rtrim($usernames_string,',');
+		}
+		
 		$now = new MongoDate();
 		$_SESSION['lastCommentPull'] = serialize($now);
-		echo $this->render('response/all', array('model' => $video, 'pending' => false, 'comments' => glue::auth()->check(array("^"=>$video)) ? 
-			app\models\VideoResponse::model()->find(array('videoId'=>$video->_id))->sort(array('created'=>-1)) :
-			app\models\VideoResponse::model()->public()->find(array('videoId'=>$video->_id))->sort(array('created'=>-1))
+		echo $this->render('response/all', array('model' => $video, 'pending' => false, 'username_filter_string' => $usernames_string, 'comments' => glue::auth()->check(array("^"=>$video)) ? 
+			app\models\VideoResponse::model()->find(array_merge(array('videoId'=>$video->_id),$query))->sort(array('created'=>-1)) :
+			app\models\VideoResponse::model()->public()->find(array_merge(array('videoId'=>$video->_id),$query))->sort(array('created'=>-1))
 		)); 
 	}
 	
@@ -51,6 +88,43 @@ class videoresponseController extends \glue\Controller{
 		$this->title = 'Moderate Responses for '.$video->title.' - StageX';
 		$this->layout='user_section';
 		
+		$query=array();
+		if($filter_type=glue::http()->param('filter-type')){
+			if($filter_type=='text')
+				$query['type']='text';
+			if($filter_type=='video')
+				$query['type']='video';
+		}
+		
+		if(($keywords=glue::http()->param('filter-keywords'))&&strlen(trim($keywords))>0){
+			$keywords=preg_split('/\s/', trim($keywords));
+			$formed_keywords=array();
+			foreach($keywords as $k)
+				$formed_keywords[]=new MongoRegex("/$k/");
+			$query['content']=array('$in' => $formed_keywords);
+		}
+		
+		if($from_date=glue::http()->param('from_date'))
+			$query['created']['$gte']=new MongoDate(strtotime(str_replace('/','-',$from_date)));
+		if($to_date=glue::http()->param('to_date'))
+			$query['created']['$lt']=new MongoDate(strtotime(str_replace('/','-',$to_date.' +1 day')));
+		
+		$usernames_string='';
+		if($usernames=glue::http()->param('filter-username')){
+			$usernames=preg_split('/,/',$usernames);
+			foreach($usernames as $k=>$v){
+				$usernames[$k]=new MongoId($v);
+			}
+			$query['userId'] = array('$in'=>$usernames);
+			$users=iterator_to_array(app\models\User::model()->find(array('_id'=>array('$in'=>$usernames))));
+				
+			// Once again just to formulate the users
+			foreach($usernames as $k => $v){
+				$usernames_string.=(string)$v.':'.$users[(string)$v]->getUsername().',';
+			}
+			$usernames_string=rtrim($usernames_string,',');
+		}		
+		
 		$now = new MongoDate();
 		$_SESSION['lastCommentPull'] = serialize($now);
 		echo $this->render('response/all', array('model' => $video, 'pending' => true, 'comments' => 
@@ -60,40 +134,31 @@ class videoresponseController extends \glue\Controller{
 
 	public function action_thread(){
 
-		$this->pageTitle = 'View Response Thread - StageX';
-		$orig_comment = VideoResponse::model()->findOne(array('_id' => new MongoId($_GET['id'])));
+		$this->title = 'View Response Thread - StageX';
+		$this->layout='user_section';
+		
+		$comment = VideoResponse::model()->findOne(array('_id' => new MongoId(glue::http()->param('id'))));
+		if(
+			!glue::auth()->check(array('viewable'=>$comment)) || 
+			!glue::auth()->check(array('viewable'=>$comment->video))
+		)
+			glue::trigger('404');
 
-		if(!$orig_comment){
-			$this->render('responses/thread_deleted');
-			exit();
-		}
-		$video = $orig_comment->in_reply;
-
-		if(!$video)
-			glue::route('error/notfound');
-
-		if(!glue::roles()->checkRoles(array('deletedView' => $video))){
-			$this->render('videos/deleted', array('video'=>$video));
-			exit();
-		}
-
-		$path = $orig_comment->path;
+		$path = $comment->path;
 		$path_segs = explode(',', $path);
 
-		if(glue::roles()->checkRoles(array('^' => $video))){
+		if(glue::auth()->check(array('^' => $comment->video))){
 			$thread_parent = VideoResponse::model()->findOne(array('_id' => new MongoId($path_segs[0]), 'deleted' => 0));
 			$thread = VideoResponse::model()->find(array('path' => new MongoRegex('/'.$path_segs[0].',/'), 'deleted' => 0))->sort(array('ts' => -1));
 		}else{
-			$thread_parent = VideoResponse::model()->findOne(array('_id' => new MongoId($path_segs[0]), 'approved' => true, 'deleted' => 0));
-			$thread = VideoResponse::model()->find(array('path' => new MongoRegex('/'.$path_segs[0].',/'), 'approved' => true, 'deleted' => 0))->sort(array('ts' => -1));
+			$thread_parent = VideoResponse::model()->public()->findOne(array('_id' => new MongoId($path_segs[0]), 'deleted' => 0));
+			$thread = VideoResponse::model()->public()->find(array('path' => new MongoRegex('/'.$path_segs[0].',/'), 'deleted' => 0))->sort(array('ts' => -1));
 		}
 
-		if(!$thread_parent){
-			$this->render('responses/thread_deleted');
-			exit();
-		}
+		if(!glue::auth()->check(array('viewable' => $thread_parent)))
+			glue::trigger('404');
 
-		$this->render('responses/thread', array('thread_parent' => $thread_parent, 'thread' => $thread, 'video' => $video));
+		echo $this->render('response/thread', array('thread_parent' => $thread_parent, 'thread' => $thread, 'video' => $comment->video));
 	}
 
 	public function action_add(){
@@ -169,16 +234,15 @@ class videoresponseController extends \glue\Controller{
 	}
 
 	public function action_like(){
-		$this->pageTitle = 'Like Video Response - StageX';
-		if(!glue::http()->isAjax())
-			glue::route('error/notfound');
+		if(!glue::auth()->check('ajax'))
+			glue::trigger('404');
 
 		$comment = VideoResponse::model()->findOne(array("_id"=>new MongoId($_GET['id'])));
 
 		if($comment){
 
-			if(!(bool)$comment->video->voteable_comments)
-				GJSON::kill('Comment voting has currently been disabled on this video');
+			if(!(bool)$comment->video->voteableComments)
+				$this->json_error('Comment voting has currently been disabled on this video');
 
 			$comment->like();
 			echo json_encode(array("success"=>true));
@@ -188,16 +252,15 @@ class videoresponseController extends \glue\Controller{
 	}
 
 	public function action_unlike(){
-		$this->pageTitle = 'Unlike Video Response - StageX';
-		if(!glue::http()->isAjax())
-			glue::route('error/notfound');
+		if(!glue::auth()->check('ajax'))
+			glue::trigger('404');
 
 		$comment = VideoResponse::model()->findOne(array("_id"=>new MongoId($_GET['id'])));
 
 		if($comment){
 
-			if(!(bool)$comment->video->voteable_comments)
-				GJSON::kill('Comment voting has currently been disabled on this video');
+			if(!(bool)$comment->video->voteableComments)
+				$this->json_error('Comment voting has currently been disabled on this video');
 
 			$comment->unlike();
 			echo json_encode(array("success"=>true));
@@ -247,13 +310,14 @@ class videoresponseController extends \glue\Controller{
 		// * approved=false - Displays only unapproved comments
 		//
 		// At the moment the approved sort is only availble to admins of the video but in time it might be available to normal users too.
-		$this->pageTitle = 'Get Video Responses - StageX';
 
 		if(!glue::http()->isAjax())
-			glue::route('error/notfound');
+			gkue::trigger('404');
+		
+		extract(glue::http()->param(array('user_id', 'id', 'sort', 'mode', 'pagesize', 'page')));
 
 		if($_POST['refresh'] == 1){
-			$_SESSION['last_comment_pull'] = serialize(new MongoDate());
+			$_SESSION['LastCommentPull'] = serialize(new MongoDate());
 		}
 
 		ob_start();
@@ -261,21 +325,21 @@ class videoresponseController extends \glue\Controller{
 			$template = ob_get_contents();
 		ob_end_clean();
 
-		$video = Video::model()->findOne(array("_id"=>new MongoId($_POST['id'])));
-		if(glue::roles()->checkRoles(array('^' => $video))){
+		$video = Video::model()->findOne(array("_id"=>new MongoId($id)));
+		if(glue::auth()->check(array('^' => $video))){
 
 			if(isset($_POST['user_id'])){
-				$query = array('vid' => $video->_id, 'deleted' => 0, 'user_id' => $_POST['user_id'],
-					'ts' => array('$lte' => unserialize($_SESSION['last_comment_pull'])));
+				$query = array('videoId' => $video->_id, 'deleted' => 0, 'userId' => $user_id,
+					'created' => array('$lte' => unserialize($_SESSION['LastCommentPull'])));
 			}else{
 				$query = array('$or' => array(
-					array('vid' => $video->_id),
-					array('user_id' => glue::session()->user->_id, 'vid' => $video->_id)
-				), 'deleted' => 0, 'ts' => array('$lte' => unserialize($_SESSION['last_comment_pull'])));
+					array('videoId' => $video->_id),
+					array('userId' => glue::user()->_id, 'videoId' => $video->_id)
+				), 'deleted' => 0, 'created' => array('$lte' => unserialize($_SESSION['LastCommentPull'])));
 			}
 
-			if(isset($_POST['sort'])){
-				switch($_POST['sort']){
+			if(isset($sort)){
+				switch($sort){
 					case "approved":
 						$query['approved'] = true;
 						break;
@@ -288,8 +352,8 @@ class videoresponseController extends \glue\Controller{
 				}
 			}
 
-			if(isset($_POST['mode'])){
-				switch($_POST['mode']){
+			if(isset($mode)){
+				switch($mode){
 					case "admin":
 						$mode = 'admin';
 						break;
@@ -299,28 +363,33 @@ class videoresponseController extends \glue\Controller{
 				}
 			}
 
-			$comments = VideoResponse::model()->find($query)->sort(array('ts' => -1));
+			$comments = VideoResponse::model()->find($query)->sort(array('created' => -1));
 		}else{
 			$query = array('$or' => array(
-				array('vid' => $video->_id, 'approved' => true),
-				array('user_id' => glue::session()->user->_id, 'vid' => $video->_id)
-			), 'deleted' => 0, 'ts' => array('$lte' => unserialize($_SESSION['last_comment_pull'])));
+				array('videoId' => $video->_id, 'approved' => true),
+				array('userId' => glue::user()->_id, 'vid' => $video->_id)
+			), 'deleted' => 0, 'ts' => array('$lte' => unserialize($_SESSION['LastCommentPull'])));
 
-			if(isset($_POST['user_id'])) $query['user_id'] = $_POST['user_id'];
+			if(isset($_POST['userId'])) $query['userId'] = $_POST['userId'];
 
 			$comments = VideoResponse::model()->find($query)->sort(array('ts' => -1));
 		}
-
-		$this->widget('glue/widgets/GListView.php', array(
-				'pageSize'	 => isset($_POST['responses_per_page']) && $_POST['responses_per_page'] > 0 ? $_POST['responses_per_page'] : 10,
-				'page' 		 => isset($_GET['page']) ? $_GET['page'] : 1,
-				"cursor"	 => $comments,
-				'template' 	 => $template,
-				'data' 		 => array('mode' => $mode),
-				'enableAjaxPagination' => true,
-				'itemView' => 'responses/_response.php',
-				'pagerCssClass' => 'grid_list_pager'
+		
+		ob_start();
+		glue\widgets\ListView::widget(array(
+		'pageSize'	 => 1,
+		'page' 		 => $page?:1,
+		"cursor"	 => $comments,
+		'template' 	 => $template,
+		'data' 		 => array('mode' => $mode),
+		'enableAjaxPagination' => true,
+		'itemView' => 'response/_response.php',
+		'pagerCssClass' => 'grid_list_pager'
 		));
+		$html=ob_get_contents();
+		ob_end_clean();		
+
+		echo json_encode(array('success' => true, 'html' => $html));
 	}
 
 	/**

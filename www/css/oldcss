@@ -1,3 +1,10 @@
+
+.dropdown-menu .divider{
+	border-top: 1px solid #EBEBEB;
+    margin-bottom: 6px;
+    margin-top: 6px;
+}
+
 .playlist_bar_outer .view_all_videos{
 	/*
 	cursor:pointer;

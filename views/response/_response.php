@@ -13,7 +13,7 @@ if($item->type == "text"){ ?>
 	
 	<div class="content" style='<?php if(glue::auth()->check(array('^' => $item->video)) && $mode == 'admin'){ echo "margin-left:15px;"; } ?>float:left;'>
 	<a style='font-size:14px;font-weight:bold;line-height:20px;' href='<?php echo glue::http()->url('/user/view', array('id' => strval($item->author->_id))) ?>' class='author'><?php echo $item->author->getUsername() ?></a>
-	<span style='color:#999999;font-size:11px;margin-left:15px;line-height:20px;'><?php echo $item->ago($item->created) ?></span>
+	<span class="date_created"><?php echo $item->ago($item->created) ?></span>
 	<div class='response_content' style='line-height:20px;'>
 		<?php if($item->thread_parent instanceof app\models\VideoResponse): 
 			echo \html::a(array('href'=>glue::http()->url('/user/view', array('id' => strval($item->thread_parent->author->_id))),'text'=>"@".$item->thread_parent->author->getUsername()));
@@ -33,14 +33,14 @@ if($item->type == "text"){ ?>
 		<span class="btn_approved" style="<?php if(!$item->approved) echo "display:none;"; ?>">
 		<?php if($item->video->voteableComments): ?>
 			<span class="response_likes footer_block">
-		 	<?php if($item->currentUserLikes()): ?><a href='#' class='btn_unlike'>Unlike</a><?php else: ?><a href='#' class='btn_like'>Like</a><?php endif; ?>
+		 	<?php if($item->currentUserLikes()): ?><a href='#' class='btn_unlike active'>Unlike</a><?php else: ?><a href='#' class='btn_like'>Like</a><?php endif; ?>
 			<span class='likes'><?php if($item->likes > 0): echo "+".$item->likes; endif ?></span>
 			</span>
 		<?php endif; ?>
 		<?php if($item->video->allowTextComments && !glue::auth()->check(array('^' => $item))){ ?><a href='#' class='btn_reply footer_block'>Reply</a><?php } ?>
 		</span>	
 		<?php if(!$item->approved): ?><span class='btn_pending footer_block' style='color:#C09853;'>Pending 
-			<?php if(glue::auth()->check(array('^' => $item->video))): ?><a href="#" class="btn_approve">Approve</a><?php endif; ?></span><?php endif; ?>
+			<?php if(glue::auth()->check(array('^' => $item->video))): ?><a href="#" class="btn_approve" style='margin-left:10px;'>Approve</a><?php endif; ?></span><?php endif; ?>
 
 		<?php if(glue::auth()->check(array('^' => $item)) || glue::auth()->check(array('^' => $item->video))){ ?>
 			<a href='#' class='btn_delete footer_block'>Delete</a>

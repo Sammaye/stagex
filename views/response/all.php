@@ -2,7 +2,10 @@
 use glue\Html;
 
 $this->jsFile('/js/jdropdown.js');
+$this->jsFile('/js/select2/select2.js');
+$this->cssFile('/js/select2/select2.css');
 $this->js('admin', "
+		$('.dropdown-group').jdropdown();
 	$('.grey_sticky_toolbar .block-alert').summarise()
 	$(function(){
 		$( '#from' ).datepicker({
@@ -75,41 +78,78 @@ $this->js('admin', "
 				$('.grey_sticky_toolbar .block-alert').summarise('set', 'error','The responses you selected could not be approved');
 			}
 		}, 'json');			
-	});		
+	});
+
+	function reset_checkboxes(){
+		$('.selectAll_input').prop('checked',true).trigger('click');
+	}		
+		
+	$('#filter-username').select2({
+		placeholder: 'Search upto 5 usernames',
+		minimumInputLength: 3,
+		maximumSelectionSize: 5,
+		width:400,
+		multiple: true,
+		ajax: { // instead of writing the function to execute the request we use Select2's convenient helper
+			url: '".glue::http()->url('/user/ajaxsearch')."',
+			dataType: 'json',
+			data: function (term, page) {
+				return {
+					term: term, // search term
+					limit: 10,
+				};
+			},
+			results: function (data, page) {
+				$(data.users).each(function(i){
+					data.users[i]={id:this._id['\$id'],text:this.username};
+				});
+		console.log(data);
+				return {results: data.users};
+			}
+		},
+        initSelection: function(element, callback) {
+            var data = [];
+			var new_value='';
+            $((element.val()||'').split(',')).each(function(i) {
+                var item = this.split(':');
+                data.push({
+                    id: item[0],
+                    text: item[1]
+                });
+				new_value=item[0]+',';
+            });
+            $(element).val(new_value.replace(/,+$/,''));
+            callback(data);
+        }		
+	});
 ") ?>
 
 <div class='list_responses_body'>
-	<h1 style='margin:0 0 20px 0;'>Responses to <a href='<?php echo glue::http()->url('/video/watch', array('id' => $model->_id)) ?>'><?php echo html::encode($model->title) ?></a></h1>
-	<div class="tabs-nav videos_nav_top">
-		<ul>
-			<li><a href="<?php echo glue::http()->url('/videoresponse/list',array('id'=>$model->_id)) ?>" <?php if($pending===false) echo 'class="selected"'; ?>>Approved <span class="badge"><?php echo $model->totalResponses ?></span></a></li>
-			<li><a href="<?php echo glue::http()->url('/videoresponse/pending',array('id'=>$model->_id)) ?>" <?php if($pending) echo 'class="selected"'; ?>>Pending <span class="badge"><?php echo '2' ?></span></a></li>
+	<h3 style='margin:0 0 20px 0;'>Responses to <a href='<?php echo glue::http()->url('/video/watch', array('id' => $model->_id)) ?>'><?php echo html::encode($model->title) ?></a></h3>
+	
+	<?php //echo $this->renderPartial('response/_selector',array('model'=>$model)); ?>
+	
+	<?php if(glue::auth()->check(array('^'=>$model))){ ?>
+	<div class="videos_nav_top">
+		<ul class="nav nav-tabs">
+			<li <?php if($pending===false) echo 'class="active"'; ?>><a href="<?php echo glue::http()->url('/videoresponse/list',array('id'=>$model->_id)) ?>">Approved</a></li>
+			<li <?php if($pending) echo 'class="active"'; ?>><a href="<?php echo glue::http()->url('/videoresponse/pending',array('id'=>$model->_id)) ?>">Pending 
+			<span class="badge"><?php echo $model->getRelated('responses',true,array('videoId'=>$model->_id,'approved'=>false))->count() ?></span></a></li>
 		</ul>
-	</div>	
+	</div>		
+	<?php } ?>
 
 	<div class="advanced_filter_header">   
-    	<div class='search'>
+    	<div class='search clearfix'>
 		<?php $form = Html::form(array('method' => 'get')); ?>
-			<?php app\widgets\Jqautocomplete::widget(array(
-					'attribute' => 'query',
-					'value' => urldecode(htmlspecialchars(isset($_GET['query']) ? $_GET['query'] : '')),
-					'placeholder' => 'Enter author name to search by',
-					'options' => array(
-						'appendTo' => '#user_results',
-						'source' => '/user/searchSuggestions',
-						'minLength' => 2,
-					),
-					'renderItem' => "
-						return $( '<li></li>' )
-							.data( 'item.autocomplete', item )
-							.append( '<a class=\'content\'><span>' + item.label + '</span></div></a>' )
-							.appendTo( ul );
-			"))  ?>
-			<input type="text" id="from" class="date" name="from_date" placeholder="Enter start date" value="<?php echo htmlspecialchars(glue::http()->param('from_date',null)) ?>"/> <span class="sep">-</span> 
-			<input type="text" id="to" class="date" name="to_date" placeholder="Enter end date" value="<?php echo htmlspecialchars(glue::http()->param('to_date',null)) ?>"/>	<button class="btn">Search</button>
+			<?php echo $form->hiddenField('id',$model->_id) ?>
+			<div style='margin-bottom:10px;'><?php echo html::textfield('filter-keywords',htmlspecialchars(glue::http()->param('filter-keywords',null)),array('placeholder'=>'Enter keywords to search by', 'autocomplete'=>'off', 'class'=>'search form-control', 'style' => 'width:790px; display:block; float:none;')) ?></div>
+			<div style='float:left; width:400px; margin-right:50px;'><input type="hidden" id="filter-username" name="filter-username" style='float:left;' value="<?php echo $username_filter_string ?>"/></div>
+			<input type="text" id="from" class="date form-control" name="from_date" placeholder="Enter start date" value="<?php echo htmlspecialchars(glue::http()->param('from_date',null)) ?>"/> <span class="sep">-</span> 
+			<input type="text" id="to" class="date form-control" name="to_date" placeholder="Enter end date" value="<?php echo htmlspecialchars(glue::http()->param('to_date',null)) ?>"/>	<button class="btn btn-default">Search</button>
 			<?php $form->end() ?>
 		</div>		
-    </div>	
+    </div>		
 
 	<?php ob_start(); ?>
 		<div class='stickytoolbar-placeholder grey_sticky_toolbar'>
@@ -118,12 +158,32 @@ $this->js('admin', "
 					<?php if(glue::auth()->check(array('^' => $model))): ?>
 					<div class='checkbox_button checkbox_input'><?php echo Html::checkbox('selectAll', 1, 0, array('class' => 'selectAll_input')) ?></div>
 					<button class='btn btn-success selected_actions btn_approve'>Approve</button>
-					<button class='btn-grey selected_actions btn_delete'>Delete</button>
+					<button class='btn-error btn selected_actions btn_delete'>Delete</button>
 					<?php endif; ?>
-					<a href="<?php echo glue::http()->url(array("sort"=>'created','order'=>'-1')) ?>">Newest</a>
-					<a href="<?php echo glue::http()->url(array("sort"=>'likes','order'=>'-1')) ?>">Most Liked</a>
-					<a href="<?php echo glue::http()->url(array("filter"=>'type','filter_value'=>'text')) ?>">Text (<?php echo $model->totalTextResponses ?>)</a>
-					<a href="<?php echo glue::http()->url(array("filter"=>'type','filter_value'=>'video')) ?>">Video (<?php echo $model->totalVideoResponses ?>)</a>
+					<div class="dropdown-group btn_sort">
+						<button class='btn btn-white dropdown-anchor'>Sort<?php
+						if(glue::http()->param('sorton')=='created'){
+							if(glue::http()->param('orderby')==-1)
+								echo ': Newest';
+							elseif(glue::http()->param('orderby')==1)
+								echo ": Oldest";
+						}elseif(glue::http()->param('sorton')=='likes'){
+							if(glue::http()->param('orderby')==-1)
+								echo ': Liked';
+							elseif(glue::http()->param('orderby')==1)
+								echo ": Disliked";
+						}
+						?> <span class="caret"></span></button>
+						<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+						<li role="presentation"><a role="menuitem" tabindex="-1" href="<?php echo glue::http()->url(array('sorton'=>'created','orderby'=>-1)) ?>">Newest</a></li>
+						<li role="presentation"><a role="menuitem" tabindex="-1" href="<?php echo glue::http()->url(array('sorton'=>'created','orderby'=>1)) ?>">Oldest</a></li>
+						<li role="presentation"><a role="menuitem" tabindex="-1" href="<?php echo glue::http()->url(array('sorton'=>'likes','orderby'=>-1)) ?>">Liked</a></li>
+						<li role="presentation"><a role="menuitem" tabindex="-1" href="<?php echo glue::http()->url(array('sorton'=>'likes','orderby'=>1)) ?>">Disliked</a></li>
+						</ul>
+				</div>
+				<a class="btn btn-link btn_sort <?php echo glue::http()->param('filter-type')=='video'?'active':'' ?>" href="<?php echo glue::http()->url(array('filter-type'=>'video')) ?>">Video</a>
+				<a class="btn btn-link btn_sort <?php echo glue::http()->param('filter-type')=='text'?'active':'' ?>" href="<?php echo glue::http()->url(array('filter-type'=>'text')) ?>">Text</a>
+				<a class="btn btn-link btn_sort" href="<?php echo glue::http()->url(array('filter-type'=>'all')) ?>">All</a>
 				</div>
 				<div class="alert block-alert"></div>
 			</div>
@@ -138,7 +198,7 @@ $this->js('admin', "
 		'html' => $html
 	)); ?>
 	<div style='margin:20px 0 0;'> 
-	<?php echo $this->renderPartial('response/list', array('model' => $model, 'mode' => 'admin', 'comments' => $comments, 'pageSize' => 30, 'hideSelector' => $pending?true:false)) ?>
+	<?php echo $this->renderPartial('response/list', array('model' => $model, 'mode' => 'admin', 'comments' => $comments, 'pageSize' => 30)) ?>
 	</div>
 </div>
 

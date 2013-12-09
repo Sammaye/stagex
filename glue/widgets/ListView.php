@@ -74,13 +74,13 @@ class ListView extends \glue\Widget{
 	}
 
 	function sortFromParams(){
-
+		
 		if($this->currentSortAttribute === null)
 			return; // Do not process sort if none was provided
 
-		if(!isset($this->sortableAttributes[$this->currentSortAttribute]))
+		if(!array_key_exists($this->currentSortAttribute,$this->sortableAttributes))
 			return; // Do not process sort
-
+		
 		$sortableAttribute = $this->sortableAttributes[$this->currentSortAttribute];
 
 		if(is_array($sortableAttribute) && isset($sortableAttribute['sort'])){
@@ -164,7 +164,10 @@ class ListView extends \glue\Widget{
 		    for ($i = $start; $i <= $end && $i <= $this->maxPage; $i++){
 
 		        if($i==$this->page) {
-		        	$ret .= '<li class="active" data-page="'.$i.'" style="margin-right:6px;"><a href="'.$this->getUrl(array('page' => $i)).'">'.$i.'</a></li>';
+		        	if($this->enableAjaxPagination){
+		        		$ret .= '<li class="active" data-page="'.$i.'" style="margin-right:6px;"><a href="#page_'.$i.'">'.$i.'</a></li>';
+		        	}else
+		        		$ret .= '<li class="active" data-page="'.$i.'" style="margin-right:6px;"><a href="'.$this->getUrl(array('page' => $i)).'">'.$i.'</a></li>';
 		        } else {
 		        	if($this->enableAjaxPagination){
 		            	$ret .= '<li><a href="#page_'.($i).'">'.$i.'</a></li>';

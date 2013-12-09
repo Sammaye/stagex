@@ -142,7 +142,7 @@ class VideoResponse extends \glue\db\Document{
 
 	function getThread(){
 		/** $secondLevel = $this->Db()->find(array("path"=>new MongoRegex("/^".$path.",[^,]*,[^,]*$/")))->sort(array("seq"=>1)); // Second Level **/
-		return self::model()->find(array("path"=>new MongoRegex("/^".$this->path.",[^,]*$/")))->sort(array("ts"=>1)); // First Level
+		return self::model()->find(array("path"=>new \MongoRegex("/^".$this->path.",[^,]*$/")))->sort(array("ts"=>1)); // First Level
 	}
 
 	function beforeSave(){
@@ -235,7 +235,7 @@ class VideoResponse extends \glue\db\Document{
 	function like(){
 		glue::db()->videoresponse_likes->update(
 		array("userId"=>glue::user()->_id, "responseId"=>$this->_id),
-		array("userId"=>glue::user()->_id, "responseId"=>$this->_id, "weight"=>"+1", 'videoId' => $this->videoId, "ts" => new MongoDate()),
+		array("userId"=>glue::user()->_id, "responseId"=>$this->_id, "weight"=>"+1", 'videoId' => $this->videoId, "ts" => new \MongoDate()),
 		array("upsert"=>true)
 		);
 

@@ -135,7 +135,7 @@ Version: @@ver@@ Timestamp: @@timestamp@@
 
     background: #fff;
     color: #000;
-    border: 1px solid #aaa;
+    border: 1px solid #ccc;
     border-top: 0;
 
     -webkit-border-radius: 0 0 4px 4px;
@@ -149,7 +149,7 @@ Version: @@ver@@ Timestamp: @@timestamp@@
 
 .select2-drop.select2-drop-above {
     margin-top: 1px;
-    border-top: 1px solid #aaa;
+    border-top: 1px solid #ccc;
     border-bottom: 0;
 
     -webkit-border-radius: 4px 4px 0 0;
@@ -169,7 +169,7 @@ Version: @@ver@@ Timestamp: @@timestamp@@
     right: 0;
     top: 0;
 
-    border-left: 1px solid #aaa;
+    border-left: 1px solid #ccc;
     -webkit-border-radius: 0 4px 4px 0;
        -moz-border-radius: 0 4px 4px 0;
             border-radius: 0 4px 4px 0;
@@ -433,17 +433,22 @@ disabled look for disabled choices in the results dropdown
     padding: 0;
     position: relative;
 
-    border: 1px solid #aaa;
+    border: 1px solid #ccc;
+    border-radius:3px;
     cursor: text;
     overflow: hidden;
 
     background-color: #fff;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;
+    height:30px;
+    /*
     background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(1%, #eeeeee), color-stop(15%, #ffffff));
     background-image: -webkit-linear-gradient(top, #eeeeee 1%, #ffffff 15%);
     background-image: -moz-linear-gradient(top, #eeeeee 1%, #ffffff 15%);
     background-image: -o-linear-gradient(top, #eeeeee 1%, #ffffff 15%);
     background-image: -ms-linear-gradient(top, #eeeeee 1%, #ffffff 15%);
     background-image: linear-gradient(top, #eeeeee 1%, #ffffff 15%);
+    */
 }
 
 .select2-locked {
@@ -478,7 +483,7 @@ disabled look for disabled choices in the results dropdown
 
     font-family: sans-serif;
     font-size: 100%;
-    color: #666;
+    color: #555;
     outline: 0;
     border: 0;
     -webkit-box-shadow: none;
@@ -492,7 +497,7 @@ disabled look for disabled choices in the results dropdown
 }
 
 .select2-default {
-    color: #999 !important;
+    color: #c8c8c8 !important;
 }
 
 .select2-container-multi .select2-choices .select2-search-choice {

@@ -23,7 +23,7 @@ $video_stats = $model->getStatistics_dateRange(mktime(0, 0, 0, date("m"), date("
 ?>
 <div class='video_analytics_body'>
 	<div class='video_stats_body grid_block alpha'>
-		<h1>Statistics for <a href='<?php echo glue::http()->url('/video/watch', array('id' => $model->_id)) ?>'><?php echo html::encode($model->title) ?></a></h1>
+		<h2 class="head">Statistics for <a href='<?php echo glue::http()->url('/video/watch', array('id' => $model->_id)) ?>'><?php echo html::encode($model->title) ?></a></h2>
 		<div class="overview">
 			<div class="head">Overview:</div>
 			<div class="stats_block stats_block_first"><?php echo $model->views ?> views</div>
@@ -37,9 +37,9 @@ $video_stats = $model->getStatistics_dateRange(mktime(0, 0, 0, date("m"), date("
 		<div class="clear"></div>
 		<div class='stats_filter_bar'>
 			<label for="from">Date range:</label>
-			<input type="text" id="from" name="from" value='<?php echo date("d/m/Y") ?>'/><span class="sep">-</span>
-			<input type="text" id="to" name="to" value='<?php echo date('d/m/Y') ?>'/>
-			<input type="button" class="btn apply_range" value="Apply"/>
+			<input type="text" id="from" name="from" class="form-control col-5" value='<?php echo date("d/m/Y") ?>'/><span class="sep">-</span>
+			<input type="text" id="to" name="to" class="form-control col-5" value='<?php echo date('d/m/Y') ?>'/>
+			<input type="button" class="btn btn-white apply_range" value="Apply"/>
 		</div>
 		<div id="chartdiv" style='height:250px; width:780px; margin-left:5px;'>
 			<?php app\widgets\highcharts::widget(array(

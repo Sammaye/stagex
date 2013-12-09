@@ -248,7 +248,7 @@ $this->js('edit', "
 			</div>
 			<button type="button" class='delete_video btn btn-error'>Delete</button>
 			<a href='<?php echo glue::http()->url('/video/analytics', array('id' => $model->_id)) ?>' class='btn btn-link'>Analytics</a>
-			<a href='<?php echo glue::http()->url('/videoresponse/list', array('id' => $model->_id)) ?>' class='btn btn-link'>Responses (2 pending)</a>
+			<a href='<?php echo glue::http()->url('/videoresponse/list', array('id' => $model->_id)) ?>' class='btn btn-link'>Responses (<?php echo $model->getRelated('responses',true,array('videoId'=>$model->_id,'approved'=>false))->count() ?> pending)</a>
 		</div>
 		<div class="edit_panes">
 			<?php $form = html::activeForm(array('action' => '')) ?>

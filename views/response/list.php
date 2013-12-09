@@ -24,7 +24,7 @@ glue::$controller->js('response_selector', "
 		$.post('/videoresponse/add', { 'content': textarea.val(), 'video_id': '".strval($model->_id)."', type: 'text', mode: mode}, function(data){
 			if(!data.success){
 				$('.video_response_selector .alert').summarise('set','error',{
-					message: 'Your reply could not be posted because:',
+					message: '<p>Your reply could not be posted because:</p>',
 					list: data.messages
 				});
 			}else{
@@ -48,7 +48,7 @@ glue::$controller->js('response_selector', "
 				$('.video_response_list .list').prepend(data.html);
 			}else
 				$('.video_response_selector .alert').summarise('set','error',{
-					message: 'Your reply could not be posted because:',
+					message: '<p>Your reply could not be posted because:</p>',
 					list: data.messages
 				});
 		}, 'json');
@@ -63,24 +63,24 @@ glue::$controller->js('list', "
 		$('.reply_comment_content').autosize();
 	});
 
-	$(document).on('click', '.video_response_item .like', function(event){
+	$(document).on('click', '.response .btn_like', function(event){
 		event.preventDefault();
 		var el = $(this);
 
-		$.getJSON('/videoresponse/like', { id: el.parents('.video_response_item').data().id }, function(data){
+		$.getJSON('/videoresponse/like', { id: el.parents('.response').data().id }, function(data){
 			if(data.success){
-				el.html('Unlike').removeClass('like').addClass('unlike');
+				el.html('Unlike').removeClass('btn_like').addClass('btn_unlike');
 			}
 		});
 	});
 
-	$(document).on('click', '.video_response_item .unlike', function(event){
+	$(document).on('click', '.response .btn_unlike', function(event){
 		event.preventDefault();
 		var el = $(this);
 
-		$.getJSON('/videoresponse/unlike', { id: el.parents('.video_response_item').data().id }, function(data){
+		$.getJSON('/videoresponse/unlike', { id: el.parents('.response').data().id }, function(data){
 			if(data.success){
-				el.html('Like').removeClass('unlike').addClass('like');
+				el.html('Like').removeClass('btn_unlike').addClass('btn_like');
 			}
 		});
 	});
@@ -136,7 +136,7 @@ glue::$controller->js('list', "
 				item.find('.reply').css({ 'display':'none' });
 				item.after($(data.html).addClass('thread_comment'));
 			}else{
-				item.find('.reply .alert').summarise('set','error',{message:'Your reply could not be posted because:', list:data.messages});
+				item.find('.reply .alert').summarise('set','error',{message:'<p>Your reply could not be posted because:</p>', list:data.messages});
 			}
 		}, 'json');
 	});
@@ -157,39 +157,6 @@ glue::$controller->js('list', "
 		}
 	});
 
-	// Paging
-	$(document).on('click', '.video_response_list .list .GListView_Pager a', function(event){
-		event.preventDefault();
-		refresh_video_response_list($(this).attr('href').replace(/#page_/, ''));
-	});
-
-	$(document).on('click', '.new_comments_notifier a', function(event){
-		event.preventDefault();
-		refresh_video_response_list(1, 1);
-		$(this).parents('.new_comments_notifier').css({ 'display': 'none' });
-	});
-
-	function refresh_video_response_list(page, refresh){
-		if(page == null){
-			page = 1;
-		}else if(page == 'current'){
-			if($('.video_response_list .list .GListView_Pager div.active').length > 0){
-				page = $('.video_response_list .list .GListView_Pager div.active').data().page
-			}
-		}
-		if(refresh == null) refresh = 0;
-
-		var sort = $('.video_response_list').data('sort') == null ? '' : $('.video_response_list').data('sort'),
-			mode = $('.video_response_list').data('mode') == null ? '' : $('.video_response_list').data('mode'),
-			responses_per_page = $('.video_response_list').data('responses_per_page') == null ? '' : $('.video_response_list').data('responses_per_page');
-
-		$('.video_response_list .list').load('/videoresponse/get_comments', { id: '".strval($model->_id)."', page: page, sort: sort, mode: mode,
-			responses_per_page: responses_per_page, refresh: refresh }, function(data){
-
-			$('.reply_comment_content').autosize();
-		});
-	}
-
 	function get_comments_by_epoch(){
 		$.getJSON('/videoresponse/getNew', {'id': '".strval($model->_id)."'}, function(data){
 			if(data.success){
@@ -208,57 +175,51 @@ glue::$controller->js('list', "
 "); // All Response list related stuff gets shoved into here
 
 if(isset($ajaxPagination)&&$ajaxPagination){
+	glue::$controller->js('paging', "
+		// Paging
+		$(document).on('click', '.video_response_list .list .ListView_Pager a', function(event){
+			event.preventDefault();
+			refresh_video_response_list($(this).attr('href').replace(/#page_/, ''));
+		});
 	
+		$(document).on('click', '.new_comments_notifier a', function(event){
+			event.preventDefault();
+			refresh_video_response_list(1, 1);
+			$(this).parents('.new_comments_notifier').css({ 'display': 'none' });
+		});
+	
+		function refresh_video_response_list(page, refresh){
+			if(page == null){
+				page = 1;
+			}else if(page == 'current'){
+				if($('.video_response_list .list .ListView_Pager li.active').length > 0){
+					page = $('.video_response_list .list .ListView_Pager li.active').data().page
+				}
+			}
+			if(refresh == null) refresh = 0;
+	
+			var sort = $('.video_response_list').data('sort') == null ? '' : $('.video_response_list').data('sort'),
+				mode = $('.video_response_list').data('mode') == null ? '' : $('.video_response_list').data('mode'),
+				responses_per_page = $('.video_response_list').data('responses_per_page') == null ? '' : $('.video_response_list').data('responses_per_page');
+	
+			$.post('/videoresponse/getmore', { id: '".strval($model->_id)."', page: page, sort: sort, mode: mode,
+				responses_per_page: responses_per_page, refresh: refresh }, function(data){
+	
+				if(data.success){
+					$('.video_response_list .list').html(data.html);
+					$('.reply_comment_content').autosize();
+				}
+			}, 'json');
+		}
+	");
 }
+
+if(!isset($hideSelector)||!$hideSelector)
+echo $this->renderPartial('response/_selector',array('model'=>$model));
 
 ?>
 
-<div class='video_response_selector' style='margin:10px 0 30px 0;'>
-	<div class='alert' style='display:none;'></div>
-	<?php if(($model->allowTextComments || $model->allowVideoComments) && glue::auth()->check(array('@')) && (!isset($hideSelector)||$hideSelector===false)){ ?>
-		<ul class="tabs">
-			<li>Respond with:</li>
-			<?php if($model->allowTextComments): ?><li><a href="#" id="text_response_tab" class="response_tab text_response_tab selected">Comment</a></li><?php endif ?>
-			<?php if($model->allowVideoComments): ?><li><a href="#" id="video_response_tab" class="response_tab video_response_tab">Video</a></li><?php endif ?>
-		</ul>
-		<?php if($model->allowTextComments){ ?>
-			<div class='response_pane text_response_content'>
-				<div><?php app\widgets\autoresizetextarea::widget(array(
-					'attribute' => 'text_comment_content', 'class' => 'text_comment_content'
-				)) ?></div><input type="button" value="Post Response" class="btn-success post_response"/>
-			</div>
-		<?php } ?>
 
-		<?php if($model->allowVideoComments){ ?>
-			<div class='response_pane video_response_content' style='display:none;'>
-					<?php app\widgets\Jqautocomplete::widget(array(
-						'attribute' => 'videoResponseSearch',
-						'value' => '',
-						'placeholder' => 'Search for a video you uploaded by title here',
-						'options' => array(
-							'appendTo' => '#videoResponse_results',
-							'source' => '/videoresponse/response_suggestions',
-							'minLength' => 2,
-							'select' => "js:function(event, ui){
-								$( '.videoResponseSearch' ).val( ui.item.label );
-								$( '#video_response_id' ).val( ui.item._id );
-								return false;
-							}"
-						),
-						'renderItem' => "
-							return $( '<li></li>' )
-								.data( 'item.autocomplete', item )
-								.append( '<a class=\'content\'><img alt=\'thumbnail\' src=\''+ item.image_src +'\'/><span>' + item.label + '</span><div class=\'clearer\'></div></a>' )
-								.appendTo( ul );"
-					)) ?>
-					<input type='hidden' id='video_response_id' name='id'/>
-					<input type="button" value="Post Response" class="btn-success post_response"/>
-					<p class='light' style='margin:10px 0 0;'>Don't see your video there? <?php echo html::a(array('href' => 'http://upload.stagex.co.uk/video/upload', 'text' => 'Upload more videos'))?></p>
-			</div>
-		<?php } ?>
-		<div class="clear"></div>
-	<?php } ?>
-</div>
 <div class="video_response_list" data-sort='<?php echo isset($sort) ? $sort : '' ?>' data-mode='<?php echo isset($mode) ? $mode : '' ?>'
 	data-responses_per_page='<?php echo isset($pageSize) ? $pageSize : '' ?>' data-video_id='<?php echo $model->_id ?>'>
 	<div class="new_comments_notifier"><a href="#"></a></div>
@@ -269,9 +230,10 @@ if(isset($ajaxPagination)&&$ajaxPagination){
 		ob_end_clean();
 		
 		glue\widgets\ListView::widget(array(
-				'pageSize'	 => $pageSize,
+				'pageSize'	 => 1,
 				"cursor"	 => $comments,
 				'template' 	 => $template,
+				'sortableAttributes' => array('likes'=>null,'created'=>null),
 				'data' 		 => array('mode' => isset($mode) ? $mode : ''),
 				'enableAjaxPagination' => $ajaxPagination?:false,				
 				'itemView' => 'response/_response.php',
