@@ -66,7 +66,7 @@ class Bootstrap extends \glue\Component{
 		if($s3->doesObjectExist($this->bucket, $real_name)){
 			return $response = $s3->getObject(array(
 				'Bucket' => $this->bucket,
-				'key' => $real_name	
+				'Key' => $real_name	
 			));
 		}else{
 			return null;

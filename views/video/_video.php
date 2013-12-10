@@ -7,10 +7,6 @@
 	<div class='checkbox_col'><div class="checkbox_input" style=''><?php echo html::checkbox('video_id[]', strval(isset($custid) ? $custid : $item->_id), 0) ?></div></div>
 	<div class='thumbnail' style='position:relative;float:left;'><a href="/video/watch?id=<?php echo strval($item->_id) ?>" >
 		<img alt='<?php echo Html::encode($item->title) ?>' src="<?php echo $item->getImage(138, 77) ?>"/></a>
-		<?php if($item->state == 'finished'): ?>
-		<div class='duration'><span><?php echo $item->get_time_string() ?></span></div>
-		<a class='add_to_playlist' href='#'><img alt='Add to Playlist' src='/images/add_tooltip.png'/></a>
-		<?php endif ?>
 	</div>
 	<div class='info'>
 		<h3 class='title'><a href="/video/watch?id=<?php echo strval($item->_id) ?>"><?php echo $item->title ?></a></h3>
@@ -40,6 +36,7 @@
 		
 		<div class='infocons'>
 	
+			<span style='color:#999999; display:block; float:left; margin-top:25px; margin-right:10px;'><?php echo $item->get_time_string() ?></span>
 			<span class='listing'>
 				<?php if($item->isUnlisted()){ ?>
 					<img alt='Unlisted' src='/images/unlisted_icon.png'/>

@@ -1,17 +1,11 @@
 <?php
-/**
- * DOCUMENT ROOT Constant
- *
- * Defines the root of the website.
- * This saves us from having to use insecure header
- * variables to understand where the root is.
- */
-define('ROOT', dirname(__FILE__));
 
 /** Include the main point of entry */
-include ROOT."/glue/glue.php";
+include "glue/glue.php";
 
 /** Run the framework */
-Glue::setConfigFile('application/core/config.php');
-Glue::run();
+$config=require 'config/config.php';
+$url = $_SERVER['argv'][1];
+unset($_SERVER['argv'][0],$_SERVER['argv'][1]);
+glue::run(isset($url) ? $url : null,$config);
 /** EOF **/

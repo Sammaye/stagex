@@ -44,25 +44,27 @@ class VideoController extends \glue\Controller{
 		// This function will be run every minute
 		
 		// If there are no videos awaiting transcoding then don't ping SQS this minute
-		if(!glue::db()->videos->findOne(array('state' => 'transcoding')))
+		//var_dump(glue::db()->video->findOne(array('state' => 'transcoding')));
+		if(!glue::db()->video->findOne(array('state' => 'transcoding')))
 			glue::end();
 		
 		$sqs = glue::aws()->get('sqs');
 		
 		// Otherwise lets do 10 SQS messages
 		for($i = 0; $i < 10; $i++){ // Lets do ten messages a minute
-		
 			try{
 				$resp = glue::aws()->receiveEncodingMessage();
-				if(!$resp['messages']||empty($resp['messages']))
+				$messages=$resp->getpath('Messages');
+				
+				if(!$messages||empty($messages))
 					continue;
 			}catch(Aws\Sqs\Exception $e){
 				continue;
 			}
-			
-			foreach($resp['messages']  as $sqsMessage){
+//			echo "here";
+			foreach($messages  as $sqsMessage){
 				
-				if(!$message=json_decode($sqsMessage['body']))
+				if(!$message=json_decode($sqsMessage['Body']))
 					continue; // Empty message sent to us, how rude!!
 				
 				$job = glue::db()->encoding_jobs->findOne(array('jobId' => $message->id));
@@ -72,41 +74,24 @@ class VideoController extends \glue\Controller{
 						'complete' => false
 					); // If there isn't a job lets init one
 				
-				if(isset($job['complete'])){
-					/*
-					 * We have a rogue message on the loose so let's double check they are all deleted
-					*/
-					if($job['complete']){
-						//var_dump($job['img_receipt_handle']);
-						//var_dump($job['mp4_receipt_handle']);
-						//var_dump($job['ogg_receipt_handle']);
-				
-						$response = $sqs->deleteMessage(array('QueueUrl' => glue::aws()->output_queue, 'ReceiptHandle'=>$job['img_receipt_handle']));
-						$sqs->deleteMessage(array('QueueUrl' => glue::aws()->output_queue, 'ReceiptHandle'=>$job['mp4_receipt_handle']));
-						$sqs->deleteMessage(array('QueueUrl' => glue::aws()->output_queue, 'ReceiptHandle'=>$job['ogg_receipt_handle']));
-						//var_dump($response->isOK());						
-						continue;
-					}
-				}else{
-					$job['complete'] = false;
-				}				
+
+							
 				
 				if($message->output_format == 'img'){
 					if($message->success){
 						$job['image'] = $message->url;
-			
 						$obj = glue::aws()->S3GetObject(pathinfo($job['image'], PATHINFO_BASENAME));
 						if($obj != null){
-							$thumb = PhpThumbFactory::create($obj->body, array(), true); // This will need some on spot caching soon
+							$thumb = PhpThumbFactory::create($obj->getpath('Body'), array(), true); // This will need some on spot caching soon
 							$thumb->adaptiveResize(800, 600);
-							$job['image_src'] = new MongoBinData($thumb->getImageAsString());
+							$job['image_src'] = new MongoBinData($thumb->getImageAsString(),2);
 							$job['img_state'] = 'finished';
 						} // Don't we have a problem if it is null???
 					}else{
 						$job['img_state'] = 'failed';
 						$job['errors'][] = 'img: '.$message->reason;
 					}
-					$job['img_receipt_handle'] = (string)$sqsMessage->ReceiptHandle;
+					$job['img_receipt_handle'] = (string)$sqsMessage['ReceiptHandle'];
 				}elseif($message->output_format == 'mp4'){
 					if($message->success){
 						$job['mp4_url'] = $message->url;
@@ -115,7 +100,7 @@ class VideoController extends \glue\Controller{
 						$job['mp4_state'] = 'failed';
 						$job['errors'][] = 'mp4: '.$message->reason;
 					}
-					$job['mp4_receipt_handle'] = (string)$sqsMessage->ReceiptHandle;
+					$job['mp4_receipt_handle'] = (string)$sqsMessage['ReceiptHandle'];
 				}elseif($message->output_format == 'ogv'){
 					if($message->success){
 						$job['ogg_url'] = $message->url;
@@ -124,7 +109,7 @@ class VideoController extends \glue\Controller{
 						$job['ogg_state'] = 'failed';
 						$job['errors'][] = 'ogg: '.$message->reason;
 					}
-					$job['ogg_receipt_handle'] = (string)$sqsMessage->ReceiptHandle;
+					$job['ogg_receipt_handle'] = (string)$sqsMessage['ReceiptHandle'];
 				}
 				if($message->success) // Lets add the duration
 					$job['duration'] = $message->duration;
@@ -140,10 +125,11 @@ class VideoController extends \glue\Controller{
 				if($job['ogg_state'] == 'failed' || $job['mp4_state'] == 'failed' || $job['img_state'] == 'failed'){
 					app\models\Video::model()->updateAll(array('jobId' => $message->id), array('$set' => array('state' => 'failed', 'encoding_state_reason' => $job['errors'])));
 		
+					/*
 					$response = $sqs->deleteMessage(array('QueueUrl'=>glue::aws()->output_queue,  'ReceiptHandle'=>$job['img_receipt_handle']));
 					$response = $sqs->deleteMessage(array('QueueUrl'=>glue::aws()->output_queue,  'ReceiptHandle'=>$job['mp4_receipt_handle']));
 					$response = $sqs->deleteMessage(array('QueueUrl'=>glue::aws()->output_queue,  'ReceiptHandle'=>$job['ogg_receipt_handle']));					
-		
+					*/
 					$videos = app\models\Video::model()->find(array('jobId' => $message->id));
 					foreach($videos as $k => $video){
 						if($video->author->emailEncodingResult){
@@ -164,11 +150,11 @@ class VideoController extends \glue\Controller{
 						$video->state = 'finished';
 						//$video->imageSrc = $job['image_src']; // technically I should not need this but I will leave it commented out atm
 						$video->setImage($job['image_src']->bin);
-						$video->save();
+						var_dump($video->save());
 
 						// Send it all over the internet!!
 						app\models\Stream::videoUpload($video->author->_id, $video->_id);
-						if($user->autoshareUploads)
+						if($video->author->autoshareUploads)
 							app\models\AutoPublishQueue::add_to_qeue(app\models\AutoPublishQueue::UPLOAD, $video->author->_id, $video->_id);					
 						if($video->isPublic())
 							glue::sitemap()->addUrl(glue::http()->url('/video/watch', array('id' => $video->_id)), 'hourly', '1.0');						
@@ -179,9 +165,11 @@ class VideoController extends \glue\Controller{
 					//var_dump($job['img_receipt_handle']);
 					//var_dump($job['mp4_receipt_handle']);
 					//var_dump($job['ogg_receipt_handle']);
+					/*
 					$response = $sqs->deleteMessage(array('QueueUrl'=>glue::aws()->output_queue,  'ReceiptHandle'=>$job['img_receipt_handle']));
 					$response = $sqs->deleteMessage(array('QueueUrl'=>glue::aws()->output_queue,  'ReceiptHandle'=>$job['mp4_receipt_handle']));
 					$response = $sqs->deleteMessage(array('QueueUrl'=>glue::aws()->output_queue,  'ReceiptHandle'=>$job['ogg_receipt_handle']));
+					*/
 					//var_dump($response->isOK());
 				}
 			}

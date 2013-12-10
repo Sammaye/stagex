@@ -255,7 +255,7 @@ class userController extends \glue\Controller{
 			$sphinx->filter('listing',array(1, 2), true);
 		}
 		echo $this->render('view_videos', array('user' => $user, 'page' => 'videos', 
-				'sphinx' => $sphinx, 'sphinx_cursor' => $sphinx->query('main','Video')));
+				'sphinx' => $sphinx, 'sphinx_cursor' => $sphinx->query('main','app\models\Video')));
 	}
 
 	function action_viewPlaylists(){

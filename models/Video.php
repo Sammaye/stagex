@@ -361,18 +361,15 @@ class Video extends \glue\Db\Document{
 	function afterSave(){
 
 		if($this->state == 'finished'){ // Only put it into the search index if it's done
-
-			if($this->getIsNewRecord()){
-				$query = "INSERT INTO documents (_id,uid,deleted,listing,title,description,category,tags,author_name,duration,views,rating,type,adult,date_uploaded)
-							VALUES(:_id,:uid,:deleted,:listing,:title,:description,:cat,:tags,:author_name,:duration,:views,:rating,:type,:adult,now())";
-			}else{
-				$query = "UPDATE documents SET _id = :_id, uid = :uid, deleted = :deleted, listing = :listing, title = :title, description = :description, category = :cat,
-						tags = :tags, author_name = :author_name, duration = :duration, views = :views, rating = :rating, type = :type, adult = :adult WHERE _id = :_id";
-			}
+			
+			$query = "INSERT INTO documents (_id,uid,deleted,listing,title,description,category,tags,author_name,duration,views,rating,type,adult,date_uploaded)
+				VALUES(:_id,:uid,:deleted,:listing,:title,:description,:cat,:tags,:author_name,:duration,:views,:rating,:type,:adult,now()) ON DUPLICATE KEY UPDATE 
+			uid = :uid, deleted = :deleted, listing = :listing, title = :title, description = :description, category = :cat,
+			tags = :tags, author_name = :author_name, duration = :duration, views = :views, rating = :rating, type = :type, adult = :adult";
 
 			glue::mysql()->query($query, array(
 				":_id" => strval($this->_id),
-				":uid" => strval($this->user_id),
+				":uid" => strval($this->userId),
 				":deleted" => $this->deleted,
 				":listing" => $this->listing,
 				":title" => $this->title,

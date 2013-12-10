@@ -323,7 +323,7 @@ $this->js('edit', "
 				?><div class='status-message'>Hold on, we're processing...</div><?php
 			}else{
 				app\widgets\videoPlayer::widget(array(
-					"mp4"=>$model->mp4, "ogg"=>$model->ogg, "width"=>825, "height"=>464
+					"mp4"=>$model->mp4, "ogg"=>$model->ogg, "width"=>823, "height"=>463
 				));
 			} ?>
 		</div>

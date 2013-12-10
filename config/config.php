@@ -374,7 +374,10 @@ return array(
 		 * Certain error cases
 		 */
 		'404' => function(){
-			glue::route('error/notfound');
+			if(php_sapi_name() == 'cli'){
+				print 'That action/controller was not found';
+			}else
+				glue::route('error/notfound');
 		},
 		'403' => function(){
 			glue::route('error/forbidden');
@@ -388,7 +391,7 @@ return array(
 		 */
 		'beforeRequest' => function(){},
 		'afterRequest' => function(){
-			if(!glue::http()->isAjax()){
+			if(!glue::http()->isAjax()&&php_sapi_name() != 'cli'){
 				$size = memory_get_peak_usage(true);
 				$unit=array('','KB','MB','GB','TB','PB');
 				echo '<div class="clear"></div>';
