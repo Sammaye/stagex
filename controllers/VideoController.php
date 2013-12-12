@@ -20,42 +20,7 @@ class videoController extends glue\Controller{
 	}
 
 	public function action_index(){
-		$this->title = 'Browse All Videos - StageX';
-		
-		extract(glue::http()->param(array(
-			'sort', 'time', 'duration', 'cat', 'page'=>1
-		),null));
-		$sphinx = Video::model()->search()->page($page);
-
-		$categories = Video::model()->categories();
-		if(isset($categories[$cat])){
-			$row = $categories[$cat];
-			
-			$sphinx->filter('category', array($row[1]));
-			$this->title = 'Browse '.$row[0].' videos - StageX';
-		}else
-			$cat = null;
-
-		if($time=='today')
-			$sphinx->filterRange('date_uploaded', time()-24*60*60, time());
-			//mktime(0, 0, 0, date('n'), date('j'), date('Y'))
-		elseif($time=='week')
-			$sphinx->filterRange('date_uploaded', strtotime('7 days ago'), time());
-		elseif($time=='month')
-			$sphinx->filterRange('date_uploaded', mktime(0, 0, 0, date('n'), 1, date('Y')), time());
-
-		if($sort=='views')
-			$sphinx->sort(SPH_SORT_ATTR_DESC, "views");
-		elseif($sort=='rating')
-			$sphinx->sort(SPH_SORT_ATTR_DESC, "rating");
-		else
-			$sphinx->sort(SPH_SORT_ATTR_DESC, "date_uploaded");
-
-		if($duration=='ltthree')
-			$sphinx->filterRange('duration', 1, 240000);
-		elseif($duration=='gtthree')
-			$sphinx->filterRange('duration', 240000, 23456789911122000000);
-		$this->render('videos/browse', array('sphinx' => $sphinx, 'filter' => $filter, 'sort' => $sort, 'time' => $time, 'duration' => $duration, 'cat' => $cat));
+		glue::runAction('user/videos');
 	}
 
 	function action_upload(){

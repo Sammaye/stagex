@@ -23,7 +23,7 @@ class Menu extends \glue\Widget{
 	</div>
   </form>
   <div class="navbar-nav">
-    <a href="<?php echo Glue::http()->url("/video") ?>">Browse</a>
+    <a href="<?php echo Glue::http()->url("/search", array('filter_trype' => 'video', 'filter_time' => 'month', 'orderby' => 'rating')) ?>">Browse</a>
   </div>
   <?php } ?>
 
