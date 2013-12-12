@@ -2512,7 +2512,7 @@ input.date{
 }
 
 .playlist_box_item{
-	display:inline-block;
+	display:inline-block; width:184px;
 }
 
 .playlist_box_item .large_image{
@@ -2521,6 +2521,18 @@ input.date{
 
 .playlist_box_item .small_images{
 	float:left; width:44px;
+}
+
+.playlist_box_item .caption{
+	overflow:hidden; height:81px;
+}
+
+.playlist_box_item .caption h5{
+	height:31px;
+}
+
+.playlist_box_item.first_item{
+	margin-left:0;
 }
 
 .user_playlist_subscription_item .listing{
@@ -2638,4 +2650,16 @@ input.date{
 
 .user_ext_item .about{
 	font-size:13px;
+}
+
+.video_tile_item{
+	width:180px; margin-left:20px;
+}
+
+.video_tile_item .video_thumbnail{
+	width:180px; height:101px;
+}
+
+.profile_videos_body .video_list{
+	margin-top:15px;
 }

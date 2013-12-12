@@ -46,7 +46,7 @@ glue::$controller->js('page',"
 			'pageSize'	 => 20,
 			'page' 		 => isset($_GET['page']) ? $_GET['page'] : 1,
 			"cursor"	 => $sphinx_cursor,
-			'itemView' 	 => 'video/_video.php',
+			'itemView' 	 => 'video/_video_tile.php',
 			));
 		}else{ ?>
 			<div class='no_results_found'>No public videos were found</div>

@@ -5,7 +5,7 @@
 	if(!isset($show_checkbox)) $show_checkbox = false;
 	if(!isset($show_watched_status)) $show_watched_status = false;
 	
-	if(!isset($model)||!$model){
+	if(!isset($model)||!$model||$model->deleted){
 		$model=new app\models\Video();
 		$model->title='[Deleted]';
 	}

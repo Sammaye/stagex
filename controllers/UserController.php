@@ -254,6 +254,21 @@ class userController extends \glue\Controller{
 		if(!glue::user()->equals($user)){
 			$sphinx->filter('listing',array(1, 2), true);
 		}
+		
+		$from_time=strtotime(str_replace('/','-',glue::http()->param('from_date')));
+		$to_time=strtotime(str_replace('/','-',glue::http()->param('to_date')));
+		
+		if($from_time>0||$to_time>0){
+			if($from_time>0&&$to_time<=0)
+				$sphinx->filterRange('date_uploaded', $from_time, 23456789911122000000);
+			if($to_time>0&&$from_time<=0)
+				$sphinx->filterRange('date_uploaded', 0, $to_time);
+			if(date('d',$to_time)===date('d',$from_time)){
+				$sphinx->filterRange('date_uploaded', mktime(0, 0, 0, date('n', $from_time), date('d', $from_time), date('Y', $from_time)), 
+						mktime(0, 0, 0, date('n', $from_time), date('d', $from_time)+1, date('Y', $from_time)));
+			}elseif($from_time>0&&$to_time>0)
+				$sphinx->filterRange('date_uploaded', $from_time, $to_time);
+		}
 		echo $this->render('view_videos', array('user' => $user, 'page' => 'videos', 
 				'sphinx' => $sphinx, 'sphinx_cursor' => $sphinx->query('main','app\models\Video')));
 	}

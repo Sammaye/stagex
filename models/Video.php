@@ -365,7 +365,7 @@ class Video extends \glue\Db\Document{
 			$query = "INSERT INTO documents (_id,uid,deleted,listing,title,description,category,tags,author_name,duration,views,rating,type,adult,date_uploaded)
 				VALUES(:_id,:uid,:deleted,:listing,:title,:description,:cat,:tags,:author_name,:duration,:views,:rating,:type,:adult,now()) ON DUPLICATE KEY UPDATE 
 			uid = :uid, deleted = :deleted, listing = :listing, title = :title, description = :description, category = :cat,
-			tags = :tags, author_name = :author_name, duration = :duration, views = :views, rating = :rating, type = :type, adult = :adult";
+			tags = :tags, author_name = :author_name, duration = :duration, views = :views, rating = :rating, type = :type, adult = :adult, date_uploaded = FROM_UNIXTIME(:created)";
 
 			glue::mysql()->query($query, array(
 				":_id" => strval($this->_id),
@@ -382,6 +382,7 @@ class Video extends \glue\Db\Document{
 				":type" => "video",
 				":adult" => $this->mature,
 				":author_name" => $this->author->username,
+				":created" => $this->created->sec
 			));
 		}
 		return true;

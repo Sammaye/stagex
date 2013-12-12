@@ -190,7 +190,7 @@ class Playlist extends \glue\db\Document{
 			VALUES (:_id, :uid, :listing, :title, :description, null, :author_name, :type, :videos, now()) ON DUPLICATE KEY UPDATE uid = :uid,
 			deleted = :deleted, listing = :listing, title = :title, description = :description, author_name = :author_name, videos = :videos", array(
 			":_id" => strval($this->_id),
-			":uid" => strval($this->user_id),
+			":uid" => strval($this->userId),
 			":deleted" => $this->deleted,			
 			":listing" => $this->listing,
 			":title" => $this->title,

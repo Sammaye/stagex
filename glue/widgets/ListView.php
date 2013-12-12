@@ -191,53 +191,6 @@ class ListView extends \glue\Widget{
 	    $ret .= "</div>";
 	    return $ret;
 	}
-	
-	function __renderPagerOld(){
-	
-		//$this->maxPage = 10;
-	
-		$start = $this->page - 5 > 0 ? $this->page - 5 : 1;
-		$end = $this->page + 5 <= $this->maxPage ? $this->page + 5 : $this->maxPage;
-		$ret = "";
-	
-		$ret .= "<div class='ListView_Pager {$this->pagerCssClass}'>";
-	
-		if($this->page != 1 && $this->maxPage > 1) {
-			if($this->enableAjaxPagination){
-				$ret .= '<div class="control"><a href="#page_'.($this->page-1).'">Previous</a></div>';
-			}else{
-				$ret .= '<div class="control"><a href="'.$this->getUrl(array('page' => $this->page-1)).'">Previous</a></div>';
-			}
-		}
-	
-		if($this->maxPage > 1){
-			$ret .= '<ul>';
-			for ($i = $start; $i <= $end && $i <= $this->maxPage; $i++){
-	
-				if($i==$this->page) {
-					$ret .= '<li><div class="active" data-page="'.$i.'" style="margin-right:6px;"><span>'.$i.'</span></div></li>';
-				} else {
-					if($this->enableAjaxPagination){
-						$ret .= '<li><a style="margin-right:6px;" href="#page_'.($i).'"><span>'.$i.'</span></a></li>';
-					}else{
-						$ret .= '<li><a style="margin-right:6px;" href="'.$this->getUrl(array('page' => $i)).'"><span>'.$i.'</span></a></li>';
-					}
-				}
-			}
-			$ret .= '</ul>';
-		}
-	
-		if($this->page < $this->maxPage) {
-			if($this->enableAjaxPagination){
-				$ret .= '<div class="control"><a href="#page_'.($this->page+1).'">Next</a></div>';
-			}else{
-				$ret .= '<div class="control"><a href="'.$this->getUrl(array('page' => $this->page+1)).'">Next</a></div>';
-			}
-		}
-	
-		$ret .= "</div>";
-		return $ret;
-	}	
 
 	function __renderItems(){
 		$i = 0;
