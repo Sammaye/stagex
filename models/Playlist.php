@@ -68,7 +68,7 @@ class Playlist extends \glue\db\Document{
 		return $video->getImage(138, 77);
 	}
 
-	function get4Pics($large_width=null,$large_height=null){
+	function get4Pics($large_width=124,$large_height=69,$small_width=44,$small_height=26){
 		$pics = array(); $i = 0;
 
 		if(count($this->videos) > 0){
@@ -79,18 +79,18 @@ class Playlist extends \glue\db\Document{
 					$video = new Video;
 
 				if($i==0){
-					$pics[] = $video->getImage(isset($large_width)?$large_width:124, isset($large_height)?$large_height:69);
+					$pics[] = $video->getImage($large_width, $large_height);
 				}else{
-					$pics[] = $video->getImage(44, 26);
+					$pics[] = $video->getImage($small_width, $small_height);
 				}
 			}
 		}
 
 		for($i; $i < 4; $i++){
 			if($i==0)
-				$pics[] = '/image/video?id=&w=124&h=69';
+				$pics[] = "/image/video?id=&w=$large_width&h=$large_height";
 			else
-				$pics[] = '/image/video?id=&w=44&h=26';
+				$pics[] = "/image/video?id=&w=$small_width&h=$small_height";
 		}
 
 		return $pics;

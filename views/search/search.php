@@ -136,8 +136,6 @@ $this->js('page', "
 		</ul>
 	</div>		
 	<?php } ?>
-	
-
 	</div>
 	<div class="search_body">
 	<?php
@@ -147,11 +145,11 @@ $this->js('page', "
 				continue;
 	
 			if($model instanceof app\models\Video){
-				echo $this->renderPartial('video/_video_ext', array('model' => $model));
+				echo $this->renderPartial('video/_video_ext', array('model' => $model, 'extra_classes' => 'site_search_item'));
 			}elseif($model instanceof app\models\User){
-				echo $this->renderPartial('user/_user_ext', array('model' => $model));
+				echo $this->renderPartial('user/_user_ext', array('model' => $model, 'extra_classes' => 'site_search_item'));
 			}elseif($model instanceof app\models\Playlist){
-				echo $this->renderPartial('playlist/_playlist_ext', array('model' => $model));
+				echo $this->renderPartial('playlist/_playlist_ext', array('model' => $model, 'extra_classes' => 'site_search_item'));
 			}
 		}
 	}else{ ?>

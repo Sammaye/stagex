@@ -952,6 +952,10 @@ input.date{
 	color:#999;
 }
 
+.video .info .uploader .author{
+	margin:0 10px;
+}
+
 .video .info .uploader .sep{
 	margin:0 5px;
 }
@@ -2366,6 +2370,50 @@ input.date{
 	display:inline; border-radius:3px;
 }
 
+.playlist_ext_item .thumbnails{
+	width:138px; height:77px; float:left;
+}
+
+.playlist_ext_item .thumbnails img{
+	border-radius:3px; 
+}
+
+.playlist_ext_item img.tr{
+	width:67px; height:38; float:left;
+}
+
+.playlist_ext_item img.tl{
+	width:67px; height:38; float:left; margin-left:2px;
+}
+
+.playlist_ext_item img.br{
+	width:67px; height:38; margin-top:2px; float:left;
+}
+
+.playlist_ext_item img.bl{
+	width:67px; height:38; margin-top:2px; float:left; margin-left:2px;
+}
+
+.playlist_ext_item .playlist_item_right{
+	margin-left:148px;
+}
+
+.playlist_ext_item h3{
+	margin:0; font-size:18px; line-height:25px;
+}
+
+.playlist_ext_item .detail{
+	color:#999999; font-size:12px;
+}
+
+.playlist_ext_item .detail .author{
+	margin:0 10px;
+}
+
+.playlist_ext_item .description{
+	font-size:13px;
+}
+
 .profile_page{
 	margin-bottom:250px;
 }
@@ -2554,4 +2602,40 @@ input.date{
 
 .site_search_page .alert-warning{
 	margin:20px 0 0;
+}
+
+.site_search_page .search_body .site_search_item{
+	border-top:1px solid #eee; padding:10px;
+}
+
+.site_search_page .search_body .site_search_item:first-child{
+	border-top:0;
+}
+
+.user_ext_item .thumbnail{
+	float:left; border:0; padding:0;
+}
+
+.user_ext_item .thumbnail img{
+	width:80px; height:80px; border-radius:5px;
+}
+
+.user_ext_item .user_ext_right{
+	margin-left:90px;
+}
+
+.user_ext_item .username{
+	margin:0; line-height:25px; font-size:18px;
+}
+
+.user_ext_item .detail{
+	font-size:12px; color:#999;
+}
+
+.user_ext_item .detail .videos{
+	margin:0 10px;
+}
+
+.user_ext_item .about{
+	font-size:13px;
 }

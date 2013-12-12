@@ -311,25 +311,20 @@ class User extends \glue\User{
 				glue::mailer()->mail($this->email, array('no-reply@stagex.co.uk', 'StageX'), 'Welcome to StageX',
 					"user/register.php", array( "username"=>$this->username, "email"=>$this->email ));
 			}
-
-			glue::mysql()->query("INSERT INTO documents (_id, uid, listing, title, description, tags, author_name, type, date_uploaded)
-								VALUES (:_id, null, :listing, :title, null, null, null, :type, now())", array(
-				":_id" => strval($this->_id),
-				":listing" => $this->listing,
-				":title" => $this->username,
-				":type" => "user",
-			));
-
 			glue::sitemap()->addUrl(glue::http()->url('/user/view', array('id' => $this->_id)), 'hourly', '1.0');
-		}else{
-			glue::mysql()->query("UPDATE documents SET _id=:_id, deleted=:deleted, listing=:listing, title=:title, type=:type WHERE _id=:_id", array(
-				":_id" => strval($this->_id),
-				":deleted" => $this->deleted,
-				":listing" => $this->listing,
-				":title" => $this->username,
-				":type" => "user",
-			));
 		}
+		
+		glue::mysql()->query("
+			INSERT INTO documents (_id, uid, listing, title, description, tags, author_name, type, date_uploaded)
+			VALUES (:_id, null, :listing, :title, null, null, null, :type, now()) ON DUPLICATE KEY UPDATE deleted=:deleted, listing=:listing, title=:title, type=:type", 
+			array(
+			":_id" => strval($this->_id),
+			":deleted" => $this->deleted,
+			":listing" => $this->listing,
+			":title" => $this->username,
+			":type" => "user",
+			)
+		);		
 
 		if($this->deleted){
 			glue::mysql()->query("UPDATE documents SET deleted=1 WHERE _id=:_id", array(

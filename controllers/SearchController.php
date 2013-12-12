@@ -22,7 +22,7 @@ class searchController extends glue\Controller{
 		->filter('deleted', array(1), true)
 		->page(glue::http()->param('page',1))
 		->setIteratorCallback(function($doc){
-			var_dump($doc);
+			//var_dump($doc);
 			if($doc['type']==='video')
 				return app\models\Video::model()->findOne(array('_id'=>new MongoId($doc['_id'])));
 			if($doc['type']==='playlist')
