@@ -167,7 +167,7 @@ class Stream extends \glue\db\Document{
 	static function videoUpload($user_id, $video_id){
 		$status = new static;
 		$status->user_id = $user_id;
-		$status->item_id = $video_id;
+		$status->video_id = $video_id;
 		$status->type = Stream::VIDEO_UPLOAD;
 		$status->save();
 	}

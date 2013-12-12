@@ -11,7 +11,7 @@ class StreamController extends glue\Controller{
 
 	public function authRules(){
 		return array(
-			array('allow', 'actions' => array('get_stream'), 'users' => array('*')),
+			array('allow', 'actions' => array('getStream'), 'users' => array('*')),
 			array("allow", "users"=>array("@*")),
 			array("deny", "users"=>array("*")),
 		);
@@ -36,7 +36,7 @@ class StreamController extends glue\Controller{
 				array('type' => array('$nin' => array(Stream::WALL_POST))),
 				array('comment_user' => array('$in' => $subscriptions))
 			)
-		))->sort(array('ts' => -1))->limit(20);
+		))->sort(array('created' => -1))->limit(20);
 		echo $this->render('stream/news_feed', array('stream' => $stream, 'subscriptions' => $subscriptions));
 	}
 
@@ -131,8 +131,6 @@ class StreamController extends glue\Controller{
 	}
 
 	function action_getStream(){
-		$this->title = 'Get Stream - StageX';
-
 		if(!glue::http()->isAjax())
 			glue::trigger('404');
 
@@ -141,9 +139,11 @@ class StreamController extends glue\Controller{
 		),null));
 		
 		if($user)
-			$user = User::model()->findOne(array('_id' => new MongoId($user)));
-		elseif(!$user && !glue::session()->authed)
+			$user = app\models\User::model()->findOne(array('_id' => new MongoId($user)));
+		elseif(!$user&&!$news) // If I am not searching for news I don't need a user
 			$this->json_error(self::UNKNOWN);
+		elseif($news&&!glue::session()->authed) // If they want news they need to be logged in to get it
+			$this->json_error(self::LOGIN);		
 			
 		if($ts && !preg_match( '/^[1-9][0-9]*$/', $ts ))
 			$this->json_error('No last stream item could be found');
@@ -154,6 +154,12 @@ class StreamController extends glue\Controller{
 			$stream = $this->load_news_stream($ts, $filter);
 
 		$html = '';
+		
+		if(glue::session()->authed&&glue::auth()->check(array('^' => $user))){
+			$hide_del=false;
+		}
+		$hide_del=true;
+		
 		if($stream->count() > 0){
 			foreach($stream as $k => $item)
 				$html.=$this->renderPartial('stream/streamitem', array('item' => $item, 'hideDelete' => $hide_del));
@@ -192,32 +198,14 @@ class StreamController extends glue\Controller{
 	}
 
 	function load_news_stream($_ts = null, $_id = null){
-		$subscription_model = new Subscription();
+		$subscription_model = new app\models\Follower();
 		$subscriptions = $subscription_model->getAll_ids();
 
 		$_ts_sec = array();
 		if($_ts)
-			$_ts_sec = array('ts' => array('$lt' => new MongoDate($_ts)));
-
-		$_filter_a = array();
-		if($filter){
-			switch($filter){
-				case "watched":
-					$_filter_a = array('type' => array('$nin' => array(Stream::VIDEO_WATCHED)));
-					break;
-				case "liked":
-					$_filter_a = array('type' => array('$nin' => array(Stream::VIDEO_RATE), 'like' => 1));
-					break;
-				case "actions":
-					$_filter_a = array('type' => array('$nin' => array(Stream::WALL_POST)));
-					break;
-				case "comments":
-					$_filter_a = array('type' => Stream::WALL_POST);
-					break;
-			}
-		}
+			$ts_filter = array('created' => array('$lt' => new MongoDate($_ts)));
 
 		return Stream::model()->find(array_merge(array('user_id' => array('$in' => $subscriptions),
-			'type' => array('$nin' => array(Stream::WALL_POST))), $_ts_sec, $_filter_a))->sort(array('ts' => -1))->limit(20);
+			'type' => array('$nin' => array(Stream::WALL_POST))), $ts_filter))->sort(array('created' => -1))->limit(20);
 	}
 }

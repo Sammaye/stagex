@@ -21,12 +21,13 @@
 				' %3$s '.($item->approved == false ? 'which require moderation' : ''),
 				$item->get_usernames_caption(), $item->totalResponses,
 				html::a(array('href' => glue::http()->url('/video/watch', array('id' => $item->video->_id)), 'text' => $item->video->title)));
-			?><span class="sep">-</span><a href='<?php echo glue::http()->url('/videoresponse/view_all', array('id' => strval($item->video->_id))) ?>'>Manage responses</a>
+			?><span class="sep">-</span><a href='<?php echo glue::http()->url('/videoresponse/list', array('id' => strval($item->video->_id))) ?>'>Manage responses</a>
 		<?php }elseif($item->type == app\models\Notification::VIDEO_COMMENT_REPLY){ ?>
+			<span class='sent_date'><?php echo $item->getDateTime() ?></span>
 			<?php echo sprintf('%1$s '.($item->totalResponses > count($item->from_users) ? 'made %2$s responses to a comment you made on' :
 				'responded to a comment you made on').' %3$s', $item->get_usernames_caption(), $item->totalResponses,
 				html::a(array('href' => array('/video/watch', 'id' => $item->video->_id), 'text' => $item->video->title)));
-				?><span class='sent_date'><?php echo $item->getDateTime() ?></span>
+				?>
 			<?php
 			$matches = array();
 			if($item->response){
@@ -37,7 +38,7 @@
 				<span class='sent_date'><?php echo $item->getDateTime() ?></span><?php echo sprintf('%1$s has approved '.($item->totalResponses > 1 ? 'the %2$s responses you made on' : 'the response you made on').' %3$s',
 					$item->get_usernames_caption(), $item->totalResponses,
 					html::a(array('href' => glue::http()->url('/video/watch', array('id' => $item->video->_id)), 'text' => $item->video->title)));
-				?><span class="sep">-</span><a href='<?php echo glue::http()->url('/videoresponse/view_all', array('id' => strval($item->video->_id))) ?>'>View Comments</a>
+				?><span class="sep">-</span><a href='<?php echo glue::http()->url('/videoresponse/list', array('id' => strval($item->video->_id))) ?>'>View Comments</a>
 		<?php }elseif($item->type == app\models\Notification::WALL_POST){ ?>
 			<span class='sent_date'><?php echo $item->getDateTime() ?></span><?php echo sprintf('%1$s has posted '.($item->totalResponses > count($item->from_users) ? '%2$s comments' :
 				'a comment').' on your stream', $item->get_usernames_caption(), $item->totalResponses); ?>

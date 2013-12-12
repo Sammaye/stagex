@@ -2475,6 +2475,11 @@ input.date{
 	margin-top:10px;
 }
 
+.user_section_main_content .load_more,
+.profile_page .load_more{
+	display:block; padding:20px 0; text-align:center; background:#f1f1f1;
+}
+
 .homepage_body .feature_list{
 	margin-bottom:20px;
 }

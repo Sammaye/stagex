@@ -17,11 +17,11 @@ glue::$controller->js('dfgfdgfdgv', "
 	$(document).on('click', '.load_more', function(event){
 		event.preventDefault();
 		var last_ts = $('.list .streamitem').last().data('ts'),
-			filter = $('.list').data('sort');
-		$.getJSON('/stream/getStream', {ts: last_ts, filter: filter }, function(data){
+			filter = $('.user_profile_main_nav a.selected').data('filter');
+		$.getJSON('/stream/getStream', {ts: last_ts, filter: filter, user: '".$user->_id."' }, function(data){
 			if(data.success)
 				$('.list').append(data.html);
-			else if(data.noneleft)
+			else if(data.remaining<=0)
 				$('.load_more').html(data.message);
 		});
 	});
@@ -31,7 +31,7 @@ glue::$controller->js('dfgfdgfdgv', "
 		$('.simple-nav a').not($(this)).removeClass('selected');
 		$(this).addClass('selected');
 
-		$.getJSON('/stream/getStream', { filter: $(this).data('filter') }, function(data){
+		$.getJSON('/stream/getStream', { filter: $(this).data('filter'), user: '".$user->_id."' }, function(data){
 			if(data.success){
 				$('.list').html(data.html);
 				$('.load_more').html('Load more stream');

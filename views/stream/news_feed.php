@@ -1,23 +1,21 @@
 <?php
-$this->jsFile('jquery-expander', "/js/jquery-expander.js");
+$this->JsFile("/js/jquery.expander.js");
 
-$this->js('page_js', "
-	$(function(){
-		$('.expandable').expander({slicePoint: 200});
+$this->js('page', "
+	$('.expandable').expander({slicePoint: 200});
 
-		$(document).on('click', '.load_more', function(event){
-			event.preventDefault();
-			var last_ts = $('.list .streamitem').last().data('ts'),
-				filter = $('.list').data('sort');
-			$.getJSON('/stream/get_stream', {ts: last_ts, news: 1 }, function(data){
-				if(data.success){
-					$('.list').append(data.html);
-				}else{
-					if(data.noneleft){
-						$('.load_more').html(data.messages[0]);
-					}
-				}
-			});
+	$(document).on('click', '.load_more', function(event){
+		event.preventDefault();
+		var last_ts = $('#news_content .streamitem').last().data('ts'),
+			filter = $('.list').data('sort');
+		$.getJSON('/stream/getStream', {ts: last_ts, news: 1 }, function(data){
+			if(data.success){
+				$('#news_content').append(data.html);
+			}
+		
+			if(data.remaining<=0){
+				$('.load_more').html(data.message);
+			}		
 		});
 	});
 ");
