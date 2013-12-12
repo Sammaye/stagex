@@ -10,11 +10,11 @@ if(!isset($extra_classes)) $extra_classes = '';
 ?>
 <div class="thumbnail playlist_box_item">
 	<div class="clearfix">
-	<?php $pics = $model->get4Pics(138,77); $large_pic = $pics[0]; ?>
-	<img src="<?php echo $large_pic ?>" alt="<?php echo $model->title ?>" class="large_image">
-	<div class='small_images'>
-		<?php for($i = 1; $i < count($pics); $i++){ ?><img alt="<?php echo $model->title ?>" src='<?php echo $pics[$i] ?>'/><?php } ?>
-	</div>
+	<?php $pics = $model->get4Pics(124,69,124,69); ?>
+	<img alt='thumbnail' src='<?php echo $pics[0] ?>' class='tr'/>
+	<img alt='thumbnail' src='<?php echo $pics[1] ?>' class='tl'/>
+	<img alt='thumbnail' src='<?php echo $pics[2] ?>' class='br'/>
+	<img alt='thumbnail' src='<?php echo $pics[3] ?>' class='bl'/>
 	</div>
     <div class="caption">
     <h5><a href="<?php echo glue::http()->url('/playlist/view',array('id'=>$model->_id)) ?>"><?php echo $model->title ?></a></h5>

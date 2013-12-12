@@ -2509,7 +2509,7 @@ input.date{
 }
 
 .profile_playlists_body .list_contents .thumbnail{
-	margin-left:15px;
+	margin-left:20px;
 }
 
 .profile_playlists_body .list_contents .thumbnail:first-child{
@@ -2517,15 +2517,27 @@ input.date{
 }
 
 .playlist_box_item{
-	display:inline-block; width:184px;
+	display:inline-block; width:180px; margin-left:20px;
 }
 
-.playlist_box_item .large_image{
-	float:left;width:140px;height:78px;
+.playlist_box_item img{
+	border-radius:3px; 
 }
 
-.playlist_box_item .small_images{
-	float:left; width:44px;
+.playlist_box_item img.tr{
+	width:89px; height:50px; float:left;
+}
+
+.playlist_box_item img.tl{
+	width:89px; height:50px; float:left; margin-left:2px;
+}
+
+.playlist_box_item img.br{
+	width:89px; height:50px; margin-top:2px; float:left;
+}
+
+.playlist_box_item img.bl{
+	width:89px; height:50px; margin-top:2px; float:left; margin-left:2px;
 }
 
 .playlist_box_item .caption{

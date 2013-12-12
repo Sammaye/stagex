@@ -178,6 +178,7 @@ class User extends \glue\User{
 				singleSignOn, emailLogins, autoplayVideos, useDivx, canUpload, banned', 'boolean', 'allowNull'=>true),
 
 		array('username', 'string', 'max'=>20, 'message' => 'Please enter a max of 20 characters for your username'),
+		array('username', 'regex', 'pattern' => '/^[a-zA-Z0-9_]+$/', 'message' => 'Your username can only contain letters, numbers and underscores (_)'),
 		array('name', 'string', 'max' => 150, 'message' => 'You can only write 150 characters for your name.'),
 		array('about', 'string', 'max' => 1500, 'message' => 'You can only write 1500 characters for your bio.'),
 		array('gender', 'in', 'range'=>array("m", "f"), 'message' => 'You must enter a valid gender'),
