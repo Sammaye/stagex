@@ -15,17 +15,17 @@ class Menu extends \glue\Widget{
   <div class="navbar-header">
     <a class="navbar-brand" href="<?php echo glue::http()->url('/') ?>"><img src="/images/main_logo.png" alt="StageX"/></a>
   </div>
-
-  <form class="navbar-form navbar-left">
+	<?php if(glue::http()->path()!=='search'){ ?>
+  <form class="navbar-form navbar-left" action="<?php echo glue::http()->url('/search') ?>">
 	<div class="form-search">
-		<input type="text" class="form-search-input"/>
+		<input type="text" name="query" class="form-search-input"/>
 		<button type="submit" class="btn btn-primary"><span>&nbsp;</span></button>
 	</div>
   </form>
-
   <div class="navbar-nav">
     <a href="<?php echo Glue::http()->url("/video") ?>">Browse</a>
   </div>
+  <?php } ?>
 
 	<div class="navbar-right">
 	  <div class="navbar-nav">

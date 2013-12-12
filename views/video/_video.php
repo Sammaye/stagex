@@ -36,7 +36,7 @@
 		
 		<div class='infocons'>
 	
-			<span style='color:#999999; display:block; float:left; margin-top:25px; margin-right:10px;'><?php echo $item->get_time_string() ?></span>
+			<span class="length"><?php echo $item->get_time_string() ?></span>
 			<span class='listing'>
 				<?php if($item->isUnlisted()){ ?>
 					<img alt='Unlisted' src='/images/unlisted_icon.png'/>

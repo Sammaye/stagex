@@ -1,271 +1,170 @@
 <?php
 
 // Canonical URL
-if($filter == 'videos'){
-	$this->addHeadTag("<link rel='canonical' href='".Glue::url()->create('/search', array('filter' => 'videos'))."' />");
-}elseif($filter == 'playlists'){
-	$this->addHeadTag("<link rel='canonical' href='".Glue::url()->create('/search', array('filter' => 'playlists'))."' />");
-}elseif($filter == 'users'){
-	$this->addHeadTag("<link rel='canonical' href='".Glue::url()->create('/search', array('filter' => 'users'))."' />");
+if($filter_type == 'video'){
+	$this->linkTag(array('rel' => 'canonical', 'href' => glue::http()->url('/search', array('filter' => 'video'))));
+}elseif($filter_type == 'playlist'){
+	$this->linkTag(array('rel' => 'canonical', 'href' => glue::http()->url('/search', array('filter' => 'playlist'))));
+}elseif($filter_type == 'user'){
+	$this->linkTag(array('rel' => 'canonical', 'href' => glue::http()->url('/search', array('filter' => 'user'))));
 }else{
-	$this->addHeadTag("<link rel='canonical' href='".Glue::url()->create('/search')."' />");
+	$this->linkTag(array('rel' => 'canonical', 'href' => glue::http()->url('/search')));
 }
 
+$this->JsFile("/js/jquery.expander.js");
+$this->JsFile('/js/jdropdown.js');
 
-glue::clientScript()->addJsFile('jquery-expander', "/js/jquery-expander.js");
-glue::clientScript()->addJsFile('playlist_dropdown', '/js/playlist_dropdown.js');
-glue::clientScript()->addJsFile('j-dropdown', '/js/jdropdown.js');
-
-ob_start(); ?>
-	<div class='white_shaded_dropdown actions_menu sort_menu'>
-		<div class='item' data-url='<?php echo glue::url()->create(array('sort' => 'relevance')) ?>'>Sorted by Revelance</div>
-		<div class='item' data-url='<?php echo glue::url()->create(array('filter' => 'videos', 'sort' => 'upload_date')) ?>'>Sorted by Upload Date</div>
-		<div class='item' data-url='<?php echo glue::url()->create(array('filter' => 'videos', 'sort' => 'views')) ?>'>Sorted by Views</div>
-		<div class='item' data-url='<?php echo glue::url()->create(array('filter' => 'videos', 'sort' => 'rating')) ?>'>Sorted by Rating</div>
-	</div><?php
-	$sort_menu = ob_get_contents();
-ob_end_clean();
-
-ob_start(); ?>
-	<div class='white_shaded_dropdown actions_menu duration_menu'>
-		<div class='item' data-url='<?php echo glue::url()->create(array('filter' => 'videos', 'duration' => 'all')) ?>'>Show all Videos</div>
-		<div class='item' data-url='<?php echo glue::url()->create(array('filter' => 'videos', 'duration' => 'ltthree')) ?>'>Show short videos</div>
-		<div class='item' data-url='<?php echo glue::url()->create(array('filter' => 'videos', 'duration' => 'gtthree')) ?>'>Show long videos</div>
-	</div><?php
-	$duration_html = ob_get_contents();
-ob_end_clean();
-
-ob_start(); ?>
-	<div class='white_shaded_dropdown actions_menu time_menu'>
-		<div class='item' data-url='<?php echo glue::url()->create(array('time' => 'all')) ?>'>Show all time</div>
-		<div class='item' data-url='<?php echo glue::url()->create(array('time' => 'today')) ?>'>Show today</div>
-		<div class='item' data-url='<?php echo glue::url()->create(array('time' => 'week')) ?>'>Show this week</div>
-		<div class='item' data-url='<?php echo glue::url()->create(array('time' => 'month')) ?>'>Show this month</div>
-	</div><?php
-	$time_html = ob_get_contents();
-ob_end_clean();
-
-glue::clientScript()->addJsScript('sortChange', "
-	$(function(){
-		$.playlist_dropdown({
-			'singleadd_selector': '.playlist_button'
-		});
-
-		$('.expandable').expander({slicePoint: 120});
-
-		$('#mainSearchSort').change(function(){
-			//console.log('location', window.location);
-			var params = location.search,
-				parts = params.substr(1, params.length).split('&'),
-				edited = false;
-
-			for(var i=0; i<parts.length; i++){
-				if(parts[i].match(/sort=/i)){
-					parts[i] = 'sort='+$(this).find(':selected').val();
-					edited = true;
-				}
-			}
-
-			if(!edited){
-				parts[parts.length] = 'sort='+$(this).find(':selected').val();
-			}
-
-			//console.log('parts', '/search?'+parts.join('&'));
-			window.location = '/search?'+parts.join('&');
-		});
-
-		$('body').append($(".GClientScript::encode($sort_menu)."));
-		$('.sort_actions').jdropdown({
-			'orientation': 'over',
-			'menu_div': '.sort_menu',
-			'item': '.sort_menu .item'
-		});
-
-		$('body').append($(".GClientScript::encode($duration_html)."));
-		$('.duration_actions').jdropdown({
-			'orientation': 'over',
-			'menu_div': '.duration_menu',
-			'item': '.duration_menu .item'
-		});
-
-		$('body').append($(".GClientScript::encode($time_html)."));
-		$('.time_actions').jdropdown({
-			'orientation': 'over',
-			'menu_div': '.time_menu',
-			'item': '.time_menu .item'
-		});
-
-		$(document).on('jdropdown.selectItem', '.actions_menu .item', function(e, event){
-		     //event.preventDefault();
-			//$('.selected_filter').html($(this).data('caption'));
-			window.location = $(this).data('url');
-		});
-	});
+$this->js('page', "
+	$('.expandable').expander({slicePoint: 120});
+	$('.dropdown-group').jdropdown();
 ") ?>
-<div class='body' style='margin-bottom:250px;'>
 <div class='search_main_head'>
-	<div class='head'>Search Results for <?php echo strlen(strip_whitespace(glue::http()->param('mainSearch'))) > 0 ? glue::http()->param('mainSearch') : 'everything'  ?></div>
-	<div class='total_found'><?php echo $sphinx->total_found > 0 ? $sphinx->total_found.' results' : 'None found' ?></div>
-</div>
-<div class='search_filter_bar'>
-	<div class='search_filter_bar_inner'>
-
-		<div class='search_text_filter_bar'>
-			<?php if($filter == 'all' || !$filter): ?>
-				<span class='search_text_filt'>Everything</span>
-			<?php else: ?>
-				<a class='active' href='<?php echo Glue::url()->create('/search', array('filter' => 'all', 'mainSearch' => glue::http()->param('mainSearch'))) ?>'>Everything</a>
-			<?php endif; ?>
-				<span class='divider'>|</span>
-			<?php if($filter == 'videos'): ?>
-				<span class='search_text_filt'>Videos</span>
-			<?php else: ?>
-				<a class='active' href='<?php echo Glue::url()->create('/search', array('filter' => 'videos', 'mainSearch' => glue::http()->param('mainSearch'))) ?>'>Videos</a>
-			<?php endif; ?>
-				<span class='divider'>|</span>
-			<?php if($filter == 'playlists'): ?>
-				<span class='search_text_filt'>Playlists</span>
-			<?php else: ?>
-				<a class='active' href='<?php echo Glue::url()->create('/search', array('filter' => 'playlists', 'mainSearch' => glue::http()->param('mainSearch'))) ?>'>Playlists</a>
-			<?php endif; ?>
-				<span class='divider'>|</span>
-			<?php if($filter == 'users'): ?>
-				<span class='search_text_filt'>Users</span>
-			<?php else: ?>
-				<a class='active' href='<?php echo Glue::url()->create('/search', array('filter' => 'users', 'mainSearch' =>glue::http()->param('mainSearch'))) ?>'>Users</a>
-			<?php endif; ?>
-		</div>
-		<div class='grey_css_button time_actions float_right'>
-			<?php if($time_show == 'all' || !$time_show){ ?>
-				Showing all time
-			<?php }elseif($time_show == 'today'){ ?>
-				Showing today
-			<?php }elseif($time_show == 'week'){ ?>
-				Showing this week
-			<?php }elseif($time_show == 'month'){ ?>
-				Showing this month
-			<?php } ?>
-		</div>
-		<?php if($filter == 'videos' || $filter == 'all' || !$filter){ ?>
-			<div class='grey_css_button duration_actions float_right'>
-				<?php if($duration == 'all' || !$duration){ ?>
-					Showing all lengths
-				<?php }elseif($duration == 'ltthree'){ ?>
-					Showing short videos
-				<?php }elseif($duration == 'gtthree'){ ?>
-					Showing long videos
-				<?php } ?>
-			</div>
-			<div class='grey_css_button sort_actions float_right'>
-				<?php if($sort == 'relevance' || !$sort){ ?>
-					Sorted by Revelance
-				<?php }elseif($sort == 'upload_date'){ ?>
-					Sorted by Upload Date
-				<?php }elseif($sort == 'views'){ ?>
-					Sorted by Views
-				<?php }elseif($sort == 'rating'){ ?>
-					Sorted by Rating
-				<?php } ?>
-			</div>
-		<?php } ?>
-		<div class='float_right safe_search'><a href='<?php echo glue::url()->create('/user/settings') ?>'>
-			<?php if(glue::session()->user->safe_srch == "S" || !glue::session()->authed){ ?>
-				Safe Search On
-			<?php }else{ ?>
-				Safe Search Off
-			<?php } ?></a>
-		</div>
+<div class="grid-container">
+	<div style='padding:30px 0 30px 160px;'>
+	<div class="form-search-lg help_search_large">
+		<?php $form = html::form(array('action' => '/search', 'method' => 'get')); ?>
+		<?php echo $form->textField('query', glue::http()->param('query'), array('class' => 'form-search-input', 'placeholder' => 'Search StageX')) ?>			
+		<button type="submit" class="btn btn-primary btn-search-icon"><span>&nbsp;</span></button>
+		<?php $form->end() ?>
+	</div>
+	<div class='text-muted'><?php echo $sphinx->totalFound ?> results found 
+	<a class="" style='display:inline; margin-left:15px;' href='<?php echo glue::http()->url('/user/settings') ?>'>
+		<?php if(glue::user()->safeSearch || !glue::auth()->check(array('authed'))){ ?>
+			Safe Search On
+		<?php }else{ ?>
+			Safe Search Off
+		<?php } ?></a>	
+	</div>
 	</div>
 </div>
-<div class="container_16 search_body" style='width:970px;'>
-	<div class="grid_12 alpha alpha result_list" style='width:650px;'>
-		<?php
-		if(count($sphinx->matches) > 0){
-			foreach($sphinx->matches as $k => $model){
+</div>
+<div class='grid-container site_search_page' style='margin-bottom:250px;'>
+	<?php app\widgets\UserMenu::widget(); ?> 
+	<div class='grid-col-41'>
 
-				if(!$model)
-					continue;
+	<div class='search_filter_bar clearfix'>
 
-				if($model instanceof Video){
-					?>
-					<div class='video_item video_search_item' data-id='<?php echo $model->_id ?>'>
-						<div class='video_thumbnail_pane'>
-							<a href="<?php echo Glue::url()->create("/video/watch", array("id"=>$model->_id)) ?>" ><img alt='thumbnail' src="<?php echo $model->getImage(138, 77) ?>"/></a>
-								<div class='duration_hover'><span><?php echo $model->get_time_string() ?></span></div>
-								<?php if(glue::roles()->checkRoles(array('@'))): ?><a class='playlist_button' href='#'><img alt='add to' src='/images/add_tooltip.png'/></a><?php endif; ?>
-						</div>
-						<div class='details'>
-							<h3 class='title'><a href="<?php echo Glue::url()->create("/video/watch", array("id"=>$model->_id)) ?>"><?php echo $model->title ?></a></h3>
-							<?php if($model->author): ?>
-								<div class='info'>
-									Uploaded by <a href="<?php echo glue::url()->create('/user/view', array('id' => strval($model->author->_id))) ?>"><?php echo $model->author->getUsername() ?></a> <span style='color:#ebebeb; margin:0 5px;'>|</span> <?php echo $model->views ?> views
-								</div>
-							<?php endif; ?>
-							<div class='expandable'><?php echo $model->description ?></div>
-						</div>
-						<div class="clear"></div>
-					</div>
-					<?php
-				}elseif($model instanceof User){
-					?>
-					<div class='user_search_item'>
-						<div class='user_image'><a href="/user/view?id=<?php echo strval($model->_id) ?>" ><img alt='thumbnail' src="<?php echo $model->getAvatar(55, 55) ?>"/></a></div>
-						<div class='details'>
-							<div class='title'><a href="/user/view?id=<?php echo strval($model->_id) ?>"><?php echo $model->getUsername() ?></a></div>
-							<div class='info'><?php echo $model->total_subscribers ?> subscribers <span class='divider'>|</span> <?php echo $model->total_uploads ?> videos <span class='divider'>|</span> <?php echo $model->total_playlists ?> playlists</div>
-							<div class='about'><?php echo substr($model->about, 0, 60) ?></div>
-						</div>
-						<div class="clear"></div>
-					</div>
-					<?php
-				}elseif($model instanceof Playlist){ ?>
-					<div class='playlist_item search_playlist_item playlist_search_item'>
-						<div class='thumb_block'>
-							<?php
-								$pics = $model->get4Pics();
-								$large_pic = $pics[0];
-							?>
-							<img alt='thumbnail' src='<?php echo $large_pic ?>' class='large_pic'/>
-							<?php for($i = 1; $i < count($pics); $i++){ ?>
-								<img alt='thumbnail' src='<?php echo $pics[$i] ?>' class='smaller <?php if($i==3) echo 'last' ?>'/>
-							<?php } ?>
-						</div>
-						<div class='details'>
-							<div class='title'><a href='<?php echo glue::url()->create('/playlist/view', array('id' => strval($model->_id))) ?>'><?php echo $model->title ?></a></div>
-							<div class='info'>
-								<div class='videos'><?php echo count($model->videos) ?><div>videos</div></div>
-								<?php if($model->author): ?>
-									<div class='compiled_user'><span class='divider'>|</span>Compiled by <a href="<?php echo glue::url()->create('/user/view', array('id' => strval($model->author->_id))) ?>"><?php echo $model->author->getUsername() ?></a></div>
-								<?php endif; ?>
-							</div>
-							<div class='expandable'><?php echo $model->description ?></div>
-						</div>
-						<div class='clearer'></div>
-					</div>
-				<?php }
+	<div class="dropdown-group">
+	<button class='btn btn-white dropdown-anchor'>Type<?php
+		if($filter_type==='video'){
+			echo ': Video';
+		}elseif($filter_type==='playlist')
+			echo ": Playlist";
+		elseif($filter_type==='user')
+			echo ": User";
+		else
+			echo ": All";
+		?> <span class="caret"></span></button>
+		<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+		<li role="presentation"><a role="menuitem" tabindex="-1" href="<?php echo glue::http()->url(array('filter_type'=>'all')) ?>">All</a></li>
+		<li role="presentation"><a role="menuitem" tabindex="-1" href="<?php echo glue::http()->url(array('filter_type'=>'video')) ?>">Video</a></li>
+		<li role="presentation"><a role="menuitem" tabindex="-1" href="<?php echo glue::http()->url(array('filter_type'=>'playlist')) ?>">Playlist</a></li>
+		<li role="presentation"><a role="menuitem" tabindex="-1" href="<?php echo glue::http()->url(array('filter_type'=>'user')) ?>">User</a></li>
+		</ul>
+	</div>		
 
+	<div class="dropdown-group">
+	<button class='btn btn-white dropdown-anchor'>Time<?php
+		if($filter_time==='today'){
+			echo ': Today';
+		}elseif($filter_time==='week')
+			echo ": Week";
+		elseif($filter_time==='month')
+			echo ": Month";
+		else
+			echo ": All";
+		?> <span class="caret"></span></button>
+		<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+		<li role="presentation"><a role="menuitem" tabindex="-1" href="<?php echo glue::http()->url(array('filter_time'=>'all')) ?>">All</a></li>
+		<li role="presentation"><a role="menuitem" tabindex="-1" href="<?php echo glue::http()->url(array('filter_time'=>'today')) ?>">Today</a></li>
+		<li role="presentation"><a role="menuitem" tabindex="-1" href="<?php echo glue::http()->url(array('filter_time'=>'week')) ?>">Week</a></li>
+		<li role="presentation"><a role="menuitem" tabindex="-1" href="<?php echo glue::http()->url(array('filter_time'=>'month')) ?>">Month</a></li>
+		</ul>
+	</div>		
+
+	<?php if($filter_type == 'video' || $filter_type == 'all'){ ?>
+	<div class="dropdown-group">
+	<button class='btn btn-white dropdown-anchor'>Category<?php
+	
+		$categories=app\models\Video::model()->categories('selectBox');
+	
+		if(array_key_exists($filter_category, $categories))
+			echo ': '.$categories[$filter_category];
+		else
+			echo ": All";
+		?> <span class="caret"></span></button>
+		<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+		<li role="presentation"><a role="menuitem" tabindex="-1" href="<?php echo glue::http()->url(array('filter_category'=>'all')) ?>">All</a></li>
+		<?php foreach($categories as $id => $cat){ ?>
+		<li role="presentation"><a role="menuitem" tabindex="-1" href="<?php echo glue::http()->url(array('filter_category'=>$id, 'filter_type' => 'video')) ?>"><?php echo $cat ?></a></li>
+		<?php } ?>
+		</ul>
+	</div>	
+	
+	<div class="dropdown-group">
+	<button class='btn btn-white dropdown-anchor'>Length<?php
+		if($filter_duration==='short'){
+			echo ': Short';
+		}elseif($filter_duration==='long')
+			echo ": Long";
+		else
+			echo ": All";
+		?> <span class="caret"></span></button>
+		<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+		<li role="presentation"><a role="menuitem" tabindex="-1" href="<?php echo glue::http()->url(array('filter_duration'=>'all', 'filter_type' => 'video')) ?>">All</a></li>
+		<li role="presentation"><a role="menuitem" tabindex="-1" href="<?php echo glue::http()->url(array('filter_duration'=>'short', 'filter_type' => 'video')) ?>">Short</a></li>
+		<li role="presentation"><a role="menuitem" tabindex="-1" href="<?php echo glue::http()->url(array('filter_duration'=>'long', 'filter_type' => 'video')) ?>">Long</a></li>
+		</ul>
+	</div>		
+
+	<div class="dropdown-group">
+	<button class='btn btn-white dropdown-anchor'>Sort<?php
+		if($orderby==='upload_date'){
+			echo ': Upload Date';
+		}elseif($orderby==='views')
+			echo ": Viewed";
+		elseif($orderby==='rating')
+			echo ": Liked";
+		else
+			echo ": Relevance";
+		?> <span class="caret"></span></button>
+		<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+		<li role="presentation"><a role="menuitem" tabindex="-1" href="<?php echo glue::http()->url(array('orderby'=>'relevance')) ?>">Relevance</a></li>
+		<li role="presentation"><a role="menuitem" tabindex="-1" href="<?php echo glue::http()->url(array('orderby'=>'upload_date', 'filter_type' => 'video')) ?>">Upload Date</a></li>
+		<li role="presentation"><a role="menuitem" tabindex="-1" href="<?php echo glue::http()->url(array('orderby'=>'views', 'filter_type' => 'video')) ?>">Viewed</a></li>
+		<li role="presentation"><a role="menuitem" tabindex="-1" href="<?php echo glue::http()->url(array('orderby'=>'rating', 'filter_type' => 'video')) ?>">Liked</a></li>
+		</ul>
+	</div>		
+	<?php } ?>
+	
+
+	</div>
+	<div class="search_body">
+	<?php
+	if($sphinx->count() > 0){
+		foreach($sphinx as $k => $model){
+			if(!$model)
+				continue;
+	
+			if($model instanceof app\models\Video){
+				echo $this->renderPartial('video/_video_ext', array('model' => $model));
+			}elseif($model instanceof app\models\User){
+				echo $this->renderPartial('user/_user_ext', array('model' => $model));
+			}elseif($model instanceof app\models\Playlist){
+				echo $this->renderPartial('playlist/_playlist_ext', array('model' => $model));
 			}
-		}else{ ?>
-			<div class="warning_message_curved">
-				<div class="tl"></div><div class="tr"></div><div class="bl"></div><div class="br"></div>
-				<div class="content">
-					<h2>No results found for "<?php echo glue::http()->param('mainSearch') ?>"</h2>
-					<p>Oh noes! You have two choices from here:</p>
-					<ul>
-						<li>Try a less specific search that might wield results or browse our site further.</li>
-						<li>If that fails you can upload the video to this site</li>
-					</ul>
-				</div>
-			</div>
-		<?php } ?>
-
-		<div class='search_pager'><?php echo $sphinx->renderPager('grid_list_pager') ?><div class="clear"></div></div>
+		}
+	}else{ ?>
+	<div class="alert alert-warning">
+		<h4>No results found for "<?php echo glue::http()->param('query') ?>"</h4>
+		<p>Oh noes! You have two choices from here:</p>
+		<ul>
+		<li>Try a less specific search that might wield results or browse our site further.</li>
+		<li>If that fails you can upload the video to this site</li>
+		</ul>
 	</div>
-	<div class="grid_4 omega" style='width:300px;'>
-		<?php $this->widget("application/widgets/Advertising/Ad_box.php", array( "configuration"=>'300_box' )); ?>
-		<div style='margin-top:25px;'>
-			<?php $this->widget("application/widgets/Advertising/Ad_box.php", array( "configuration"=>'300_box' )); ?>
-		</div>
+	<?php } ?>
+	<div class='clearfix'><?php glue\widgets\Pagination::widget(array('totalItems' => $sphinx->totalFound, 'page' => glue::http()->param('page',1))) ?></div>
 	</div>
-</div>
+	</div>
 </div>

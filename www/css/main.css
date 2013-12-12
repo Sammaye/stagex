@@ -898,6 +898,14 @@ input.date{
 	margin:0 0 0 0;
 }
 
+.video .currently_encoding{
+	color:#999;
+}
+
+.video .infocons .length{
+	color:#999999; display:block; float:left; margin-top:25px; margin-right:10px;
+}
+
 .video .checkbox_col{
 	float:left;
 }
@@ -2534,4 +2542,16 @@ input.date{
 
 .thread_parent .main_body{
 	float:left; width:757px;
+}
+
+.search_filter_bar .dropdown-group{
+	margin:5px 15px 5px 0;
+}
+
+.search_filter_bar .btn-link{
+	float:right;
+}
+
+.site_search_page .alert-warning{
+	margin:20px 0 0;
 }

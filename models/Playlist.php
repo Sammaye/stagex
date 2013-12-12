@@ -183,34 +183,22 @@ class Playlist extends \glue\db\Document{
 	function afterSave(){
 		if($this->getIsNewRecord()){
 			$this->author->saveCounters(array('totalPlaylists'=>1));
-
-			glue::mysql()->query("INSERT INTO documents (_id, uid, listing, title, description, tags, author_name, type, videos, date_uploaded)
-				VALUES (:_id, :uid, :listing, :title, :description, null, :author_name, :type, :videos, now())", array(
-				":_id" => strval($this->_id),
-				":uid" => strval($this->user_id),
-				":listing" => $this->listing,
-				":title" => $this->title,
-				":description" => $this->description,
-				":type" => "playlist",
-				":videos" => count($this->videos),
-				":author_name" => glue::user()->username,
-			));
-
 			glue::sitemap()->addUrl(glue::http()->url('/playlist/view', array('id' => $this->_id)), 'hourly', '1.0');
-
-		}else{
-			glue::mysql()->query("UPDATE documents SET uid = :uid, deleted = :deleted, listing = :listing, title = :title, description = :description,
-				author_name = :author_name, videos = :videos WHERE _id = :_id", array(
-				":_id" => strval($this->_id),
-				":uid" => strval($this->userId),
-				":deleted" => $this->deleted,
-				":listing" => $this->listing,
-				":title" => $this->title,
-				":description" => $this->description,
-				":author_name" => glue::user()->username,
-				":videos" => count($this->videos)
-			));
 		}
+		
+		glue::mysql()->query("INSERT INTO documents (_id, uid, listing, title, description, tags, author_name, type, videos, date_uploaded)
+			VALUES (:_id, :uid, :listing, :title, :description, null, :author_name, :type, :videos, now()) ON DUPLICATE KEY UPDATE uid = :uid,
+			deleted = :deleted, listing = :listing, title = :title, description = :description, author_name = :author_name, videos = :videos", array(
+			":_id" => strval($this->_id),
+			":uid" => strval($this->user_id),
+			":deleted" => $this->deleted,			
+			":listing" => $this->listing,
+			":title" => $this->title,
+			":description" => $this->description,
+			":type" => "playlist",
+			":videos" => count($this->videos),
+			":author_name" => glue::user()->username,
+		));		
 		return true;
 	}
 

@@ -1509,6 +1509,7 @@ textarea.form-search-input {
   border-bottom-right-radius: 0;
   border-top-right-radius: 0;
   width: auto;
+  height: 24px;
 }
 .form-search-lg .form-search-input:-moz-placeholder {
   color: #999999;

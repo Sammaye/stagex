@@ -79,9 +79,9 @@ class Controller {
 
 	function linkTag($options,$key=null){
 		if($key===null)
-			$this->linkTags[] = Html::linkTag($content);
+			$this->linkTags[] = Html::linkTag($options);
 		else
-			$this->linkTags[$name] = Html::linkTag($content);
+			$this->linkTags[$name] = Html::linkTag($options);
 	}
 
 	public function render($view, $params = array()){

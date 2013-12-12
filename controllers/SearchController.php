@@ -1,91 +1,91 @@
 <?php
-class searchController extends GController{
+class searchController extends glue\Controller{
 
 	function action_index(){
-		$this->pageTitle = 'Search StageX';
-
-		$filter = isset($_GET['filter']) ? $_GET['filter'] : null;
-		$sort = isset($_GET['sort']) ? $_GET['sort'] : null;
-		$time_show = isset($_GET['time']) ? $_GET['time'] : null;
-		$duration = isset($_GET['duration']) ? $_GET['duration'] : null;
-
-		if($filter != 'videos'){
-			$sort = null;
-			$duration = null;
+		extract(glue::http()->param(array('query', 'filter_type', 'filter_time', 'filter_duration', 'filter_category', 'orderby')));
+		if($filter_type === 'playlist' || $filter_type === 'user' || $filter_type === 'all' /* If all explicitly */){
+			// Omit the normal video searching variables
+			$orderby = null;
+			$filter_duration = null;
 		}
-
-		$sphinx = glue::sphinx()->getSearcher();
-		$sphinx->page = isset($_GET['page']) ? $_GET['page'] : null;
-
-		$sphinx->setFilter('listing', array('2', '3'), true);
-		$sphinx->setFilter('videos', array('0', '1', '2', '3', '4'), true); // Omits small playlists from the main search
-
-		if(glue::session()->user->safe_srch == "S" || !glue::session()->authed){
-			$sphinx->setFilter('adult', array('1'), true);
+		
+		// Now being to render to page after sorting out the GET vars
+		if(strlen(trim($query))<=0)
+			$this->title = 'Search - StageX';
+		else
+			$this->title = 'Search results for '.$query.' - StageX';
+		
+		$sphinx=glue::sphinx()
+		->match(array('title', 'description', 'tags', 'author_name'),$query)
+		->filter('listing',array(1, 2), true)
+		->filter('videos', array('0', '1', '2', '3', '4'), true) // Omits small playlists from the main search
+		->filter('deleted', array(1), true)
+		->page(glue::http()->param('page',1))
+		->setIteratorCallback(function($doc){
+			var_dump($doc);
+			if($doc['type']==='video')
+				return app\models\Video::model()->findOne(array('_id'=>new MongoId($doc['_id'])));
+			if($doc['type']==='playlist')
+				return app\models\Playlist::model()->findOne(array('_id'=>new MongoId($doc['_id'])));
+			if($doc['type']==='user')
+				return app\models\User::model()->findOne(array('_id'=>new MongoId($doc['_id'])));
+		});
+		
+		if(glue::user()->safeSearch || !glue::auth()->check(array('authed'))){
+			$sphinx->filter('adult', array(1), true);
 		}
+		
+		$categories=app\models\Video::model()->categories('selectBox');
+		if(array_key_exists($filter_category, $categories)){
+			$sphinx->filter('category', array($filter_category));
+		}else
+			$filter_category=null;
 
-		switch($time_show){
+		switch($filter_time){
 			case "today":
-				$sphinx->setFilterRange('date_uploaded', time()-24*60*60, time());
+				$sphinx->filterRange('date_uploaded', time()-24*60*60, time());
 				//mktime(0, 0, 0, date('n'), date('j'), date('Y'))
 				break;
 			case "week":
 				//var_dump(strtotime('7 days ago'));
-				$sphinx->setFilterRange('date_uploaded', strtotime('7 days ago'), time());
+				$sphinx->filterRange('date_uploaded', strtotime('7 days ago'), time());
 				break;
 			case "month":
-				$sphinx->setFilterRange('date_uploaded', mktime(0, 0, 0, date('n'), 1, date('Y')), time());
+				$sphinx->filterRange('date_uploaded', mktime(0, 0, 0, date('n'), 1, date('Y')), time());
+				break;
+		}
+		
+		switch($filter_duration){
+			case "short":
+				$sphinx->filterRange('duration', 1, 240000);
+				$filter_type = "video";
+				break;
+			case "long":
+				$sphinx->filterRange('duration', 241000, 23456789911122000000);
+				$filter_type = "video";
+				break;
+		}		
+		
+		switch($orderby){
+			case "upload_date":
+				$sphinx->sort(SPH_SORT_ATTR_DESC, "date_uploaded");
+				$filter_type = "video";
+				break;
+			case "views":
+				$sphinx->sort(SPH_SORT_ATTR_DESC, "views");
+				$filter_type = "video";
+				break;
+			case "rating":
+				$sphinx->sort(SPH_SORT_ATTR_DESC, "rating");
+				$filter_type = "video";
 				break;
 		}
 
-		switch($filter){
-			case "all":
-				$sphinx->query(array('select' => glue::http()->param('mainSearch')), 'main');
-				break;
-			case "videos":
-
-				$this->pageTitle = 'Search Videos - StageX';
-
-				switch($sort){
-					case "upload_date":
-						$filter = "videos";
-						$sphinx->setSortMode(SPH_SORT_ATTR_DESC, "date_uploaded");
-						break;
-					case "views":
-						$sphinx->setSortMode(SPH_SORT_ATTR_DESC, "views");
-						$filter = "videos";
-						break;
-					case "rating":
-						$sphinx->setSortMode(SPH_SORT_ATTR_DESC, "rating");
-						$filter = "videos";
-						break;
-				}
-
-				switch($duration){
-					case "ltthree":
-						$sphinx->setFilterRange('duration', 1, 240000);
-						break;
-					case "gtthree":
-						$sphinx->setFilterRange('duration', 241000, 23456789911122000000);
-						break;
-				}
-
-				$sphinx->query(array('select' => glue::http()->param('mainSearch'), 'where' => array('type' => array('video'))), 'main');
-				break;
-			case "playlists":
-				$this->pageTitle = 'Search Playlists - StageX';
-				$sphinx->query(array('select' => glue::http()->param('mainSearch'), 'where' => array('type' => array('playlist'))), 'main');
-				break;
-			case "users":
-				$this->pageTitle = 'Search Users - StageX';
-				$sphinx->query(array('select' => glue::http()->param('mainSearch'), 'where' => array('type' => array('user'))), 'main');
-				break;
-			default:
-				$sphinx->query(array('select' => glue::http()->param('mainSearch')), 'main');
-				break;
-		}
-
-		$this->render('search/search', array('sphinx' => $sphinx, 'filter' => $filter, 'sort' => $sort, 'time_show' => $time_show, 'duration' => $duration));
+		if($filter_type==='video'||$filter_type==='user'||$filter_type==='playlist')
+			$sphinx->match('type', $filter_type);
+		
+		echo $this->render('search/search', array('sphinx' => $sphinx->query('main'), 'query' => $query, 'filter_type' => $filter_type, 'filter_time' => $filter_time, 
+				'filter_duration' => $filter_duration, 'filter_category' => $filter_category, 'orderby' => $orderby));
 	}
 
 	function action_suggestions(){

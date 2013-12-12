@@ -36,7 +36,7 @@ class Sphinx extends \glue\Component{
 	
 	public function __call($method,$params){
 		if(method_exists($this->sphinx,$method)){
-			return call_user_func_array(array($this->sphinx, $name), $parameters);
+			return call_user_func_array(array($this->sphinx, $method), $parameters);
 		}
 	}
 	
