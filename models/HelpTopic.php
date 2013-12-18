@@ -78,24 +78,17 @@ class HelpTopic extends Help{
 	}
 
 	function afterSave(){
-		if($this->getIsNewRecord()){
-			glue::mysql()->query("INSERT INTO help_documents (_id, title, content, tags, path, type)
-								VALUES (:_id, :title, null, null, :path, :type)", array(
-				":_id" => strval($this->_id),
-				":title" => $this->title,
-				":path" => $this->path,
-				":type" => 'topic',
-			));
-
-			glue::sitemap()->addUrl(glue::http()->url('/help/view', array('title' => $this->normalisedTitle)), 'hourly', '0.5');
-		}else{
-			glue::mysql()->query("UPDATE help_documents SET _id=:_id, title=:title, path=:path, type=:type WHERE _id=:_id", array(
-				":_id" => strval($this->_id),
-				":title" => $this->title,
-				":path" => $this->path,
-				":type" => "topic",
-			));
-		}
+	    glue::elasticSearch()->index(array(
+    	    '_id' => strval($this->_id),
+    	    'type' => 'help',
+    	    'body' => array(
+        	    'title' => $this->title,
+        	    'normalisedTitle' => $this->normalisedTitle,
+        	    'path' => $this->path,
+        	    'resourceType' => 'topic',
+        	    'created' => date('c', $this->created->sec)
+    	    )
+	    ));
 		return true;
 	}
 
@@ -114,9 +107,10 @@ class HelpTopic extends Help{
 
 			foreach($helpItems as $_id => $item){
 				$this->deleteAll(array("_id"=>new \MongoId($_id)));
-				glue::mysql()->query("UPDATE help_documents SET deleted=1 WHERE _id=:_id", array(
-					":_id" => $_id,
-				));
+				glue::elasticSearch()->delete(array(
+    				'id' => $_id,
+    				'type' => 'help'
+				));				
 			}
 		}elseif($method == 'concat'){
 			// Concatenate
@@ -126,17 +120,23 @@ class HelpTopic extends Help{
 			foreach($helpItems as $_id => $item){
 				$infopath = str_replace($this->normalisedTitle.",", '', $item['path']); // Lets just remove this topic form its children
 				$this->updateAll(array("_id"=>new \MongoId($_id)), array("\$set"=>array("path"=>$infopath)));
-				glue::mysql()->query("UPDATE help_documents SET path=:path, deleted=1 WHERE _id=:_id", array(
-					":_id" => $_id,
-					":path" => $infopath
+				glue::elasticSearch()->update(array(
+    				'id' => strval($this->_id),
+    				'type' => 'help',
+    				'body' => array(
+    				    'params' => array(
+    				        'path' => $infopath
+    				    )
+    				)
 				));
 			}
 		}
 
 		parent::delete(); // Now use active record to remove this topic
-		glue::mysql()->query("UPDATE help_documents SET deleted=1 WHERE _id=:_id", array(
-			":_id" => strval($this->_id),
-		));
+		glue::elasticSearch()->delete(array(
+    		'id' => strval($this->_id),
+    		'type' => 'help'
+		));		
 
 		return true;
 	}

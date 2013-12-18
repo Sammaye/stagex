@@ -358,32 +358,30 @@ class Video extends \glue\Db\Document{
 		return true;
 	}
 
-	function afterSave(){
+	function afterSave()
+	{
 
-		if($this->state == 'finished'){ // Only put it into the search index if it's done
-			
-			$query = "INSERT INTO documents (_id,uid,deleted,listing,title,description,category,tags,author_name,duration,views,rating,type,adult,date_uploaded)
-				VALUES(:_id,:uid,:deleted,:listing,:title,:description,:cat,:tags,:author_name,:duration,:views,:rating,:type,:adult,now()) ON DUPLICATE KEY UPDATE 
-			uid = :uid, deleted = :deleted, listing = :listing, title = :title, description = :description, category = :cat,
-			tags = :tags, author_name = :author_name, duration = :duration, views = :views, rating = :rating, type = :type, adult = :adult, date_uploaded = FROM_UNIXTIME(:created)";
-
-			glue::mysql()->query($query, array(
-				":_id" => strval($this->_id),
-				":uid" => strval($this->userId),
-				":deleted" => $this->deleted,
-				":listing" => $this->listing,
-				":title" => $this->title,
-				":description" => $this->description,
-				":cat" => $this->category,
-				":tags" => $this->stringTags,
-				":duration" => $this->duration,
-				":rating" => $this->likes - $this->dislikes,
-				":views" => $this->views,
-				":type" => "video",
-				":adult" => $this->mature,
-				":author_name" => $this->author->username,
-				":created" => $this->created->sec
-			));
+		if($this->state == 'finished') // Only put it into the search index if it's done
+        { 
+		    glue::elasticSearch()->index(array(
+		        'id' => strval($this->_id),
+		        'type' => 'video',
+		        'body' => array(
+		            'title' => $this->title,
+		            'blurb' => $this->description,
+		            'deleted' => $this->deleted,
+		            'listing' => $this->listing,
+		            'category' => $this->category,
+		            'tags' => $this->tags,
+		            'duration' => $this->duration,
+		            'rating' => $this->likes - $this->dislikes,
+		            'views' => $this->views,
+		            'mature' => $this->mature,
+		            'userId' => $this->userId,
+		            'username' => $this->author->getUsername(),
+		            'created' => date('c',$this->created->sec)
+		        )
+		    ));
 		}
 		return true;
 	}

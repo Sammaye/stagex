@@ -76,6 +76,14 @@ var_dump($client->indices()->create(array(
                         'type' => 'string',
                         'analyzer' => 'noStopFilter'
                     ),
+                    'normalisedTitle' => array(
+                        'type' => 'string',
+                        'analyzer' => 'noStopFilter'
+                    ),
+                    'path' => array(
+                        'type' => 'string',
+                        'analyzer' => 'noStopFilter'
+                    ),
                     'username' => array(
                         'type' => 'string',
                         'analyzer' => 'noStopFilter'
@@ -85,7 +93,7 @@ var_dump($client->indices()->create(array(
                         'analyzer' => 'noStopFilter'
                     )
                 )
-            )            
+            )
         )
     )
 )));

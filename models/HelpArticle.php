@@ -83,35 +83,27 @@ class HelpArticle extends \app\models\Help{
 	}
 
 	function afterSave(){
-		//echo "validating";
-		if($this->getIsNewRecord()){
-			glue::mysql()->query("INSERT INTO help_documents (_id, title, content, tags, path, type) VALUES (:_id, :title, :content, :tags, :path, :type)", array(
-				":_id" => strval($this->_id),
-				":title" => $this->title,
-				":content" => $this->content,
-				":tags" => $this->tagString,
-				":path" => $this->path,
-				":type" => 'article'
-			));
-
-			glue::sitemap()->addUrl(glue::http()->url('/help/view', array('title' => $this->normalisedTitle)), 'hourly', '0.5');
-		}else{
-			glue::mysql()->query("UPDATE help_documents SET _id=:_id, title=:title, content=:content, tags=:tags, path=:path, type=:type WHERE _id=:_id", array(
-				":_id" => strval($this->_id),
-				":title" => $this->title,
-				":content" => $this->content,
-				":tags" => $this->tagString,
-				":path" => $this->path,
-				":type" => "article",
-			));
-		}
+	    glue::elasticSearch()->index(array(
+	        '_id' => strval($this->_id),
+	        'type' => 'help',
+	        'body' => array(
+	            'title' => $this->title,
+	            'normalisedTitle' => $this->normalisedTitle,
+	            'blurb' => $this->content,
+	            'tags' => $this->tags,
+	            'path' => $this->path,
+	            'resourceType' => 'article',
+	            'created' => date('c', $this->created->sec)
+	        )
+	    ));
 		return true;
 	}
 
 	function delete(){
-		glue::mysql()->query("UPDATE help_documents SET deleted=1 WHERE _id=:_id", array(
-			":_id" => strval($this->_id),
-		));
+	    glue::elasticSearch()->delete(array(
+	        'id' => strval($this->_id),
+	        'type' => 'help'
+	    ));
 		parent::delete();
 	}
 }
