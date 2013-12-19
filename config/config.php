@@ -297,30 +297,7 @@ return array(
 		),
 
 
-		// Yes some MySQL
-		"mysql"=>array(
-				"host" => "localhost",
-				"user" => "root",
-				"password" => "samill2man",
-				"db" => 'sphinx_index',
-				"class"=>"glue\\components\\mysql\\Record"
-		),
 
-		// Woo Sphinx!
-		"sphinx"=>array(
-				'class' => 'glue\\components\\Sphinx\\Sphinx',
-				"host"=>"localhost",
-				"port"=>9312,
-				'indexes' => array(
-					'main' => array(
-						'delta' => 'main_delta',
-						//'fields' => array( 'title', 'description', 'tags', 'author_name' ),
-					),
-					'help' => array(
-						//'fields' => array( 'title', 'content', 'tags', 'path' ),
-					)
-				)
-		),
 
 		'facebook' => array(
 				'class' => 'glue\\components\\facebook\\Session',
@@ -334,6 +311,12 @@ return array(
 				'consumer_key' => "E1uIs3dzvlrodsj4R3I8w",
 				'secret_key' => "HxbMV2giKXekGI41TXp2A2rJh9P5OroGCSxlEYPogwc",
 				'callback' => "http://stagex.co.uk/autoshare/auth?network=twt"
+		),
+		
+		'elasticSearch' => array(
+		    'class' => 'glue\\components\\Elasticsearch\\Client',
+		    'index' => 'main',
+		    'params' => array()
 		),
 
 		'google' => array(
