@@ -37,7 +37,7 @@ class indexController extends \glue\Controller{
                         )
                 )));
         var_dump($res); //exit();
-        foreach($res['hits']['hits'] as $hit)
+        foreach($res as $hit)
             var_dump($hit);
 
         exit();

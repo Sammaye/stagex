@@ -72,6 +72,16 @@ class HelpTopic extends Help{
 				$this->updateAll(array(
 					"_id"=>new \MongoId($_id)),
 					array("\$set"=>array("path"=>preg_replace("/".$oldPath."/i", $this->path, $item['path']))));
+				
+				glue::elasticSearch()->update(array(
+    				'id' => $_id,
+    				'type' => 'help',
+    				'body' => array(
+    				    'params' => array(
+    				    	'path' => preg_replace("/".$oldPath."/i", $this->path, $item['path'])
+    				    )
+    				)
+				));
 			}
 		}
 		return true;
@@ -79,7 +89,7 @@ class HelpTopic extends Help{
 
 	function afterSave(){
 	    glue::elasticSearch()->index(array(
-    	    '_id' => strval($this->_id),
+    	    'id' => strval($this->_id),
     	    'type' => 'help',
     	    'body' => array(
         	    'title' => $this->title,

@@ -315,17 +315,17 @@ class User extends \glue\User{
 			glue::sitemap()->addUrl(glue::http()->url('/user/view', array('id' => $this->_id)), 'hourly', '1.0');
 		}
 		
-		glue::mysql()->query("
-			INSERT INTO documents (_id, uid, listing, title, description, tags, author_name, type, date_uploaded)
-			VALUES (:_id, null, :listing, :title, null, null, null, :type, now()) ON DUPLICATE KEY UPDATE deleted=:deleted, listing=:listing, title=:title, type=:type", 
-			array(
-			":_id" => strval($this->_id),
-			":deleted" => $this->deleted,
-			":listing" => $this->listing,
-			":title" => $this->username,
-			":type" => "user",
-			)
-		);		
+		glue::elasticSearch()->index(array(
+    		'id' => strval($this->_id),
+    		'type' => 'user',
+    		'body' => array(
+        		'title' => $this->username,
+        		'blurb' => $this->about,
+        		'deleted' => $this->deleted,
+        		'listing' => $this->listing,
+        		'created' => date('c',$this->created->sec)
+    		)
+		));		
 
 		if($this->deleted){
 			glue::mysql()->query("UPDATE documents SET deleted=1 WHERE _id=:_id", array(

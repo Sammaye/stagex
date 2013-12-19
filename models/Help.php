@@ -80,15 +80,36 @@ class Help extends \glue\db\Document{
 	}
 	
 	public function search($keywords=''){
-		$sphinx=glue::sphinx()
-		->match(array('title', 'content', 'tags', 'path'),glue::http()->param('query',$keywords))
-		->filter('deleted', array(1), true);
-		
-		$cursor=$sphinx->query('help');
+	    
+	    $search = array('type' => 'help', 'body' =>
+	        array('query' => array('filtered' => array(
+	            'query' => array()
+	        )))
+	    );
+	    
+	    if(glue::http()->param('query')){
+    	    $search['body']['query']['filtered']['query'] = array('bool' => array(
+    	            'should' => array(
+    	                    array('multi_match' => array(
+    	                            'query' => glue::http()->param('query',null),
+    	                            'fields' => array('title', 'blurb', 'tags', 'normalisedTitle', 'path')
+    	                    )),
+    	            )
+    	    ));
+
+	        $keywords = preg_split('/\s+/', glue::http()->param('query'));
+	        foreach($keywords as $keyword){
+	            $search['body']['query']['filtered']['query']['bool']['should'][]=array('prefix' => array('title' => $keyword));
+	            $search['body']['query']['filtered']['query']['bool']['should'][]=array('prefix' => array('tags' => $keyword));
+	            $search['body']['query']['filtered']['query']['bool']['should'][]=array('prefix' => array('normalisedTitle' => $keyword));
+	        }
+	    }
+	    
+	    $cursor = glue::elasticSearch()->search($search);
 		$cursor->setIteratorCallback(function($doc){
-			if($doc['type']=='article')
+			if($doc['_source']['resourceType']=='article')
 				return HelpArticle::model()->findOne(array('_id'=>new \MongoId($doc['_id'])));
-			elseif($doc['type']=='topic')
+			elseif($doc['_source']['resourceType']=='topic')
 				return HelpTopic::model()->findOne(array('_id'=>new \MongoId($doc['_id'])));
 		});
 		return $cursor;		

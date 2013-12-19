@@ -84,7 +84,7 @@ class HelpArticle extends \app\models\Help{
 
 	function afterSave(){
 	    glue::elasticSearch()->index(array(
-	        '_id' => strval($this->_id),
+	        'id' => strval($this->_id),
 	        'type' => 'help',
 	        'body' => array(
 	            'title' => $this->title,

@@ -186,18 +186,19 @@ class Playlist extends \glue\db\Document{
 			glue::sitemap()->addUrl(glue::http()->url('/playlist/view', array('id' => $this->_id)), 'hourly', '1.0');
 		}
 		
-		glue::mysql()->query("INSERT INTO documents (_id, uid, listing, title, description, tags, author_name, type, videos, date_uploaded)
-			VALUES (:_id, :uid, :listing, :title, :description, null, :author_name, :type, :videos, now()) ON DUPLICATE KEY UPDATE uid = :uid,
-			deleted = :deleted, listing = :listing, title = :title, description = :description, author_name = :author_name, videos = :videos", array(
-			":_id" => strval($this->_id),
-			":uid" => strval($this->userId),
-			":deleted" => $this->deleted,			
-			":listing" => $this->listing,
-			":title" => $this->title,
-			":description" => $this->description,
-			":type" => "playlist",
-			":videos" => count($this->videos),
-			":author_name" => glue::user()->username,
+		glue::elasticSearch()->index(array(
+    		'id' => strval($this->_id),
+    		'type' => 'playlist',
+    		'body' => array(
+        		'title' => $this->title,
+        		'blurb' => $this->description,
+        		'deleted' => $this->deleted,
+        		'listing' => $this->listing,
+        		'videos' => count($this->videos),
+        		'userId' => $this->userId,
+        		'username' => $this->author->getUsername(),
+        		'created' => date('c',$this->created->sec)
+    		)
 		));		
 		return true;
 	}
