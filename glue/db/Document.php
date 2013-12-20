@@ -465,6 +465,23 @@ class Document extends \glue\Model{
 		return false;
 	}
 
+	public function upsert($query){
+	    if(!$this->getIsNewRecord())
+	        throw new Exception('The active record cannot be inserted to database because it is not new.');
+	    if($this->onBeforeSave())
+	    {
+	        $this->trace(__FUNCTION__);
+	
+	        if($this->getCollection()->update($query, $this->getRawDocument(), array_merge(array('upsert' => true), $this->getDb()->getDefaultWriteConcern()))){
+	            $this->onAfterSave();
+	            $this->setIsNewRecord(false);
+	            $this->setScenario('update');
+	            return true;
+	        }
+	    }
+	    return false;
+	}	
+	
 	/**
 	 * Updates this record
 	 * @param array $attributes

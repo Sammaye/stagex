@@ -27,6 +27,6 @@ class Image extends \glue\db\Document{
 			'height'=>$height,
 			'original'=>$original,
 			'created'=>new \MongoDate()
-		),false)->insert();
+		),false)->upsert(array('ref.type' => $ref['type'], 'ref._id' => $ref['_id'], 'width' => $width, 'height' => $height));
 	}
 }

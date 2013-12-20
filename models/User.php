@@ -353,12 +353,14 @@ class User extends \glue\User{
 
 	function setAvatar(){
 
-		$ref=\MongoDBRef::create('user',$this->_id);
+	    $ref=array('type' => 'user', '_id' => $this->_id);
 		$bytes=file_get_contents($this->avatar->tmp_name);
 
 		if(
 			strlen($this->avatar->tmp_name) &&
 			Image::saveAsSize($ref, $bytes, 800, 600, true) &&
+			Image::saveAsSize($ref, $bytes, 30, 30) &&
+			Image::saveAsSize($ref, $bytes, 40, 40) &&
 			Image::saveAsSize($ref, $bytes, 48, 48) &&
 			Image::saveAsSize($ref, $bytes, 55, 55) &&
 			Image::saveAsSize($ref, $bytes, 125, 125)

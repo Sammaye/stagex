@@ -213,15 +213,15 @@ class Video extends \glue\Db\Document{
 	}
 	
 	function setImage($bytes){
-		$ref=\MongoDBRef::create('video',$this->_id);
+		$ref=array('type' => 'video', '_id' => $this->_id);
 		if(
-				$bytes &&
-				Image::saveAsSize($ref, $bytes, 800, 600, true) &&
-				Image::saveAsSize($ref, $bytes, 33, 18) &&
-				Image::saveAsSize($ref, $bytes, 44, 26) &&
-				Image::saveAsSize($ref, $bytes, 124, 69) &&
-				Image::saveAsSize($ref, $bytes, 138, 77) &&
-				Image::saveAsSize($ref, $bytes, 234, 130)
+			$bytes &&
+			Image::saveAsSize($ref, $bytes, 800, 600, true) &&
+			Image::saveAsSize($ref, $bytes, 33, 18) &&
+			Image::saveAsSize($ref, $bytes, 44, 26) &&
+			Image::saveAsSize($ref, $bytes, 124, 69) &&
+			Image::saveAsSize($ref, $bytes, 138, 77) &&
+			Image::saveAsSize($ref, $bytes, 234, 130)
 		){
 			return true;
 		}
