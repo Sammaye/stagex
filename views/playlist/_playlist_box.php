@@ -8,7 +8,7 @@ if(!$model || !$model instanceof \app\models\Playlist || !$model->_id instanceof
 }
 if(!isset($extra_classes)) $extra_classes = '';
 ?>
-<div class="thumbnail playlist_box_item">
+<div class="thumbnail playlist_box_item <?php echo $extra_classes ?> <?php echo $i%4===0?'first':'' ?>">
 	<div class="clearfix">
 	<?php $pics = $model->get4Pics(124,69,124,69); ?>
 	<img alt='thumbnail' src='<?php echo $pics[0] ?>' class='tr'/>

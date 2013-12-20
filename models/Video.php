@@ -377,7 +377,7 @@ class Video extends \glue\Db\Document{
 		            'rating' => $this->likes - $this->dislikes,
 		            'views' => $this->views,
 		            'mature' => $this->mature,
-		            'userId' => $this->userId,
+		            'userId' => strval($this->userId),
 		            'username' => $this->author->getUsername(),
 		            'created' => date('c',$this->created->sec)
 		        )

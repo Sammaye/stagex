@@ -3,8 +3,8 @@
 require '/components/vendor/autoload.php';
 
 $client = new Elasticsearch\Client();
-//$client->indices()->delete(array('index' => 'main')); 
-//exit();
+$client->indices()->delete(array('index' => 'main')); 
+exit();
 
 var_dump($client->indices()->create(array(
     'index' => 'main',
@@ -22,11 +22,15 @@ var_dump($client->indices()->create(array(
             )
         ),
         'mappings' => array(
-            'video' => array(
+            '_default_' => array(
                 'properties' => array(
                     'title' => array(
                         'type' => 'string',
                         'analyzer' => 'noStopFilter'
+                    ),
+                    'userId' => array(
+                        'type' => 'string',
+                        'index' => 'not_analyzed'
                     ),
                     'username' => array(
                         'type' => 'string',
@@ -38,6 +42,7 @@ var_dump($client->indices()->create(array(
                     )
                 )
             ),
+            /*
             'playlist' => array(
                 'properties' => array(
                     'title' => array(
@@ -70,6 +75,7 @@ var_dump($client->indices()->create(array(
                     )
                 )
             ),
+            */
             'help' => array(
                 'properties' => array(
                     'title' => array(

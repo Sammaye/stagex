@@ -185,7 +185,7 @@ class Playlist extends \glue\db\Document{
 			$this->author->saveCounters(array('totalPlaylists'=>1));
 			glue::sitemap()->addUrl(glue::http()->url('/playlist/view', array('id' => $this->_id)), 'hourly', '1.0');
 		}
-		
+		//var_dump(strval($this->userId));
 		glue::elasticSearch()->index(array(
     		'id' => strval($this->_id),
     		'type' => 'playlist',
@@ -195,7 +195,7 @@ class Playlist extends \glue\db\Document{
         		'deleted' => $this->deleted,
         		'listing' => $this->listing,
         		'videos' => count($this->videos),
-        		'userId' => $this->userId,
+        		'userId' => strval($this->userId),
         		'username' => $this->author->getUsername(),
         		'created' => date('c',$this->created->sec)
     		)

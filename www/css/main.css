@@ -2509,10 +2509,10 @@ input.date{
 }
 
 .profile_playlists_body .list_contents .thumbnail{
-	margin-left:20px;
+	margin-left:19px;
 }
 
-.profile_playlists_body .list_contents .thumbnail:first-child{
+.profile_playlists_body .list_contents .thumbnail.first{
 	margin-left:0;
 }
 
