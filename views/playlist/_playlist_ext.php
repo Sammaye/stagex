@@ -32,7 +32,7 @@ if(!$model || !$model->_id instanceof MongoId){
 		<h3 class='title'><a href='<?php echo glue::http()->url('/playlist/view', array('id' => strval($model->_id))) ?>'><?php echo $model->title ?></a></h3>
 		<?php if($model->author){ ?>
 		<div class="detail">
-			<span><?php echo count($model->vieos) ?> videos</span>
+			<span><?php echo count($model->videos) ?> videos</span>
 			<span class="author"><?php echo html::a(array('text' => $model->author->getUsername(), 'href' => array('/user/view','id'=>$model->author->_id))); ?></span>
 			<span class="created"><?php echo date('d M Y', $model->created->sec) ?></span>		
 		</div>		

@@ -2642,7 +2642,7 @@ input.date{
 }
 
 .user_ext_item .thumbnail{
-	float:left; border:0; padding:0;
+	float:left; border:0; padding:0; margin:0;
 }
 
 .user_ext_item .thumbnail img{

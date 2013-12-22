@@ -323,6 +323,8 @@ class User extends \glue\User{
         		'blurb' => $this->about,
         		'deleted' => $this->deleted,
         		'listing' => $this->listing,
+        		'videos' => 10,
+        		'mature' => 0,
         		'created' => date('c',$this->created->sec)
     		)
 		));		

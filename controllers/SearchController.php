@@ -7,6 +7,7 @@ class searchController extends glue\Controller{
 			// Omit the normal video searching variables
 			$orderby = null;
 			$filter_duration = null;
+			$filter_category = null;
 		}
 		
 		// Now being to render to page after sorting out the GET vars
@@ -15,75 +16,81 @@ class searchController extends glue\Controller{
 		else
 			$this->title = 'Search results for '.$query.' - StageX';
 		
-		$sphinx=glue::sphinx()
-		->match(array('title', 'description', 'tags', 'author_name'),$query)
-		->filter('listing',array(1, 2), true)
-		->filter('videos', array('0', '1', '2', '3', '4'), true) // Omits small playlists from the main search
-		->filter('deleted', array(1), true)
-		->page(glue::http()->param('page',1))
-		->setIteratorCallback(function($doc){
-			if($doc['type']==='video')
-				return app\models\Video::model()->findOne(array('_id'=>new MongoId($doc['_id'])));
-			if($doc['type']==='playlist')
-				return app\models\Playlist::model()->findOne(array('_id'=>new MongoId($doc['_id'])));
-			if($doc['type']==='user')
-				return app\models\User::model()->findOne(array('_id'=>new MongoId($doc['_id'])));
-		});
+		$c = new \glue\components\Elasticsearch\Query();
+		$c->filtered = true;
+		if(glue::http()->param('query')){
+			$c->query()->multiPrefix(array('burb', 'title', 'tags', 'username'), glue::http()->param('query'));
+		}
+		$c->filter()->and('term', array('deleted' => 0))
+			->and('range', array('listing' => array('lt' => 1)))
+			->and('range', array('videos' => array('gt' => 4)));
 		
+		$c->page(glue::http()->param('page', 1));
+	
 		if(glue::user()->safeSearch || !glue::auth()->check(array('authed'))){
-			$sphinx->filter('adult', array(1), true);
+			$c->filter()->and('term', array('mature' => 0));
 		}
 		
 		$categories=app\models\Video::model()->categories('selectBox');
 		if(array_key_exists($filter_category, $categories)){
-			$sphinx->filter('category', array($filter_category));
+			$c->filter()->and('term', array('category' => $filter_category));
 		}else
 			$filter_category=null;
 
 		switch($filter_time){
 			case "today":
-				$sphinx->filterRange('date_uploaded', time()-24*60*60, time());
-				//mktime(0, 0, 0, date('n'), date('j'), date('Y'))
+				$c->filter()->and('range', array('created' => array('gte' => date('c', time()-24*60*60))));
 				break;
 			case "week":
-				//var_dump(strtotime('7 days ago'));
-				$sphinx->filterRange('date_uploaded', strtotime('7 days ago'), time());
+				$c->filter()->and('range', array('created' => array('gte' => date('c', strtotime('7 days ago')))));
 				break;
 			case "month":
-				$sphinx->filterRange('date_uploaded', mktime(0, 0, 0, date('n'), 1, date('Y')), time());
+				$c->filter()->and('range', array('created' => array('gte' => date('c', mktime(0, 0, 0, date('n'), 1, date('Y'))))));
 				break;
 		}
 		
 		switch($filter_duration){
 			case "short":
-				$sphinx->filterRange('duration', 1, 240000);
+				$c->filter()->and('range', array('duration' => array('gte' => 1, 'lte' => 240000)));
 				$filter_type = "video";
 				break;
 			case "long":
-				$sphinx->filterRange('duration', 241000, 23456789911122000000);
+				$c->filter()->and('range', array('duration' => array('gte' => 241000, 'lte' => 23456789911122000000)));
 				$filter_type = "video";
 				break;
 		}		
 		
 		switch($orderby){
 			case "upload_date":
-				$sphinx->sort(SPH_SORT_ATTR_DESC, "date_uploaded");
+				$c->sort('created', 'desc');
 				$filter_type = "video";
 				break;
 			case "views":
-				$sphinx->sort(SPH_SORT_ATTR_DESC, "views");
+				$c->sort('views', 'desc');
 				$filter_type = "video";
 				break;
 			case "rating":
-				$sphinx->sort(SPH_SORT_ATTR_DESC, "rating");
+				$c->sort('rating', 'desc');
 				$filter_type = "video";
 				break;
 		}
 
 		if($filter_type==='video'||$filter_type==='user'||$filter_type==='playlist')
-			$sphinx->match('type', $filter_type);
+			$c->type = $filter_type;
+		else
+			$c->type = 'video,user,playlist';
 		
-		echo $this->render('search/search', array('sphinx' => $sphinx->query('main'), 'query' => $query, 'filter_type' => $filter_type, 'filter_time' => $filter_time, 
+		$cursor = glue::elasticSearch()->search($c);
+		$cursor->setIteratorCallback(function($doc){
+			if($doc['_type']==='video')
+				return app\models\Video::model()->findOne(array('_id'=>new MongoId($doc['_id'])));
+			if($doc['_type']==='playlist')
+				return app\models\Playlist::model()->findOne(array('_id'=>new MongoId($doc['_id'])));
+			if($doc['_type']==='user')
+				return app\models\User::model()->findOne(array('_id'=>new MongoId($doc['_id'])));
+		});		
+		
+		echo $this->render('search/search', array('sphinx' => $cursor, 'query' => $query, 'filter_type' => $filter_type, 'filter_time' => $filter_time, 
 				'filter_duration' => $filter_duration, 'filter_category' => $filter_category, 'orderby' => $orderby));
 	}
 

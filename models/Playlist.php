@@ -197,6 +197,7 @@ class Playlist extends \glue\db\Document{
         		'videos' => count($this->videos),
         		'userId' => strval($this->userId),
         		'username' => $this->author->getUsername(),
+        		'mature' => 0,
         		'created' => date('c',$this->created->sec)
     		)
 		));		

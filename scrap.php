@@ -36,3 +36,21 @@ if(glue::http()->param('query')){
 		$search['body']['query']['filtered']['query']['bool']['should'][]=array('prefix' => array('username' => $keyword));
 	}
 }
+
+
+
+
+$sphinx=glue::sphinx()
+->match(array('title', 'description', 'tags', 'author_name'),$query)
+->filter('listing',array(1, 2), true)
+->filter('videos', array('0', '1', '2', '3', '4'), true) // Omits small playlists from the main search
+->filter('deleted', array(1), true)
+->page(glue::http()->param('page',1))
+->setIteratorCallback(function($doc){
+	if($doc['type']==='video')
+		return app\models\Video::model()->findOne(array('_id'=>new MongoId($doc['_id'])));
+	if($doc['type']==='playlist')
+		return app\models\Playlist::model()->findOne(array('_id'=>new MongoId($doc['_id'])));
+	if($doc['type']==='user')
+		return app\models\User::model()->findOne(array('_id'=>new MongoId($doc['_id'])));
+});

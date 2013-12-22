@@ -379,6 +379,7 @@ class Video extends \glue\Db\Document{
 		            'mature' => $this->mature,
 		            'userId' => strval($this->userId),
 		            'username' => $this->author->getUsername(),
+		            'videos' => 10,
 		            'created' => date('c',$this->created->sec)
 		        )
 		    ));
