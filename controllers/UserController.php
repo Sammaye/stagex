@@ -243,34 +243,38 @@ class userController extends \glue\Controller{
 		$this->layout='profile_layout';
 		$this->tab='profile';
 		$this->title = $user->getUsername().' - StageX';
-
-		$sphinx=glue::sphinx()
-			->match(array('title', 'description', 'tags', 'author_name'),glue::http()->param('query',''))
-			->match('type','video')
-			->match('uid',strval($user->_id))
-			->sort(SPH_SORT_TIME_SEGMENTS, "date_uploaded")
-			->filter('deleted', array(1), true)
-			->page(glue::http()->param('page',1));	
-		if(!glue::user()->equals($user)){
-			$sphinx->filter('listing',array(1, 2), true);
+		
+		$c = new \glue\components\Elasticsearch\Query();
+		$c->type = 'video';
+		$c->filtered = true;
+		if(glue::http()->param('query')){
+			$c->query()->multiPrefix(array('burb', 'title', 'tags', 'username'), glue::http()->param('query'));
 		}
+		$c->filter()->and('term', array('userId' => strval($user->_id)))
+					->and('term', array('deleted' => 0));
+		if(!glue::user()->equals($user)){
+			$c->filter()->and('range', array('listing' => array('lt' => 1)));
+		}
+		$c->sort('created', 'desc');
+		$c->page(glue::http()->param('page', 1));
 		
 		$from_time=strtotime(str_replace('/','-',glue::http()->param('from_date')));
 		$to_time=strtotime(str_replace('/','-',glue::http()->param('to_date')));
 		
 		if($from_time>0||$to_time>0){
 			if($from_time>0&&$to_time<=0)
-				$sphinx->filterRange('date_uploaded', $from_time, 23456789911122000000);
+				$c->filter()->and('range', array('created' => array('gte' => date('c', $from_time))));
 			if($to_time>0&&$from_time<=0)
-				$sphinx->filterRange('date_uploaded', 0, $to_time);
+				$c->filter()->and('range', array('created' => array('lte' => date('c', $to_time))));
 			if(date('d',$to_time)===date('d',$from_time)){
-				$sphinx->filterRange('date_uploaded', mktime(0, 0, 0, date('n', $from_time), date('d', $from_time), date('Y', $from_time)), 
-						mktime(0, 0, 0, date('n', $from_time), date('d', $from_time)+1, date('Y', $from_time)));
+				$c->filter()->and('range', array('created' => array(
+					'gte' => date('c', mktime(0, 0, 0, date('n', $from_time), date('d', $from_time), date('Y', $from_time))), 
+					'lte' => date('c', mktime(0, 0, 0, date('n', $from_time), date('d', $from_time)+1, date('Y', $from_time))))));
 			}elseif($from_time>0&&$to_time>0)
-				$sphinx->filterRange('date_uploaded', $from_time, $to_time);
+				$c->filter()->and('range', array('created' => array('gte' => date('c', $from_time), 'lte' => date('c', $to_time))));
 		}
 		echo $this->render('view_videos', array('user' => $user, 'page' => 'videos', 
-				'sphinx' => $sphinx, 'sphinx_cursor' => $sphinx->query('main','app\models\Video')));
+			'sphinx_cursor' => $cursor = glue::elasticSearch()->search($c, 'app\models\Video')));
 	}
 
 	function action_viewPlaylists(){
@@ -288,55 +292,21 @@ class userController extends \glue\Controller{
 		$this->tab='profile';
 		$this->title = $user->getUsername().' - StageX';
 		
-		$search = array('type' => 'playlist', 'body' =>
-		        array('query' => array('filtered' => array(
-		                'query' => array(),
-                    'filter' => array(
-                            'and' => array(
-                                array('term' => array(
-                                    'userId' => strval($user->_id),
-                                )),
-                                array('term' => array('deleted' => 0))
-                            )
-                    )
-		        )), 'sort' => array(
-		            array('created' => 'desc')
-		        ))
-		);
-
-		if(!glue::user()->equals($user)){
-		    $search['body']['query']['filtered']['filter']['and'][]=array('range' => array('listing' => array('lt' => 1)));
-		}
-		
+		$c = new \glue\components\Elasticsearch\Query();
+		$c->type = 'playlist';
+		$c->filtered = true;
 		if(glue::http()->param('query')){
-		    $search['body']['query']['filtered']['query'] = array('bool' => array(
-		            'should' => array(
-		                    array('multi_match' => array(
-		                        'query' => glue::http()->param('query',null),
-		                        'fields' => array('title', 'blurb', 'username')
-		                    )),
-		            )
-		    ));
-		
-		    $keywords = preg_split('/\s+/', trim(glue::http()->param('query')));
-		    foreach($keywords as $keyword){
-		        $search['body']['query']['filtered']['query']['bool']['should'][]=array('prefix' => array('title' => $keyword));
-		        $search['body']['query']['filtered']['query']['bool']['should'][]=array('prefix' => array('blurb' => $keyword));
-		        $search['body']['query']['filtered']['query']['bool']['should'][]=array('prefix' => array('username' => $keyword));
-		    }
+			$c->query()->multiPrefix(array('burb', 'title', 'username'), glue::http()->param('query'));
 		}
-		 
-		$cursor = glue::elasticSearch()->search($search, 'app\models\Playlist');
-		/*
-		$sphinx=glue::sphinx()
-		->match(array('title', 'description', 'author_name'),glue::http()->param('query',''))
-		->match('type','playlist')->match('uid',strval($user->_id))
-		->sort(SPH_SORT_TIME_SEGMENTS, "date_uploaded")
-		->filter('deleted', array(1), true)
-		->page(glue::http()->param('page',1));
-		if(!glue::user()->equals($user))
-			$sphinx->filter('listing',array(1, 2), true);		
-*/
+		$c->filter()->and('term', array('userId' => strval($user->_id)))
+					->and('term', array('deleted' => 0));
+		if(!glue::user()->equals($user)){
+			$c->filter()->and('range', array('listing' => array('lt' => 1)));
+		}
+		$c->sort('created', 'desc');
+		$c->page(glue::http()->param('page', 1));
+		
+		$cursor = glue::elasticSearch()->search($c, 'app\models\Playlist');
 		echo $this->render('view_playlists', array('user' => $user, 'page' => 'playlists', 'sphinx' => $cursor));
 	}
 

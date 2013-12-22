@@ -3,7 +3,6 @@
 namespace glue\components\Elasticsearch;
 
 use glue;
-
 use \glue\components\Elasticsearch\Cursor;
 
 require glue::getPath('@glue').'/components/vendor/autoload.php';
@@ -49,6 +48,8 @@ class Client extends \glue\Component{
     
     public function search($body, $className = null)
     {
+    	if ($body instanceof Query)
+    		$body = $body->get();
         return new Cursor($this->client->search(array_merge(array( 'index' =>  $this->getIndex()), $body)), $className);
     }
     

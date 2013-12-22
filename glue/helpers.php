@@ -202,14 +202,14 @@ function dd(&$var, $var_name = NULL, $indent = NULL, $reference = NULL)
 			foreach($keys as $name)
 			{
 				$value = &$avar[$name];
-				do_dump($value, "['$name']", $indent.$do_dump_indent, $reference);
+				dd($value, "['$name']", $indent.$do_dump_indent, $reference);
 			}
 			echo "$indent)<br>";
 		}
 		elseif(is_object($avar))
 		{
 			echo "$indent$var_name <span style='color:#a2a2a2'>$type</span><br>$indent(<br>";
-			foreach($avar as $name=>$value) do_dump($value, "$name", $indent.$do_dump_indent, $reference);
+			foreach($avar as $name=>$value) dd($value, "$name", $indent.$do_dump_indent, $reference);
 			echo "$indent)<br>";
 		}
 		elseif(is_int($avar)) echo "$indent$var_name = <span style='color:#a2a2a2'>$type(".strlen($avar).")</span> $type_color$avar</span><br>";
