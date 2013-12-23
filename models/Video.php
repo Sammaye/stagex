@@ -361,7 +361,7 @@ class Video extends \glue\Db\Document{
 	function afterSave()
 	{
 
-		if($this->state == 'finished') // Only put it into the search index if it's done
+		if($this->state == 'finished' && !$this->deleted) // Only put it into the search index if it's done
         { 
 		    glue::elasticSearch()->index(array(
 		        'id' => strval($this->_id),
