@@ -66,7 +66,7 @@ class imageController extends glue\Controller{
 			        $thumb->adaptiveResize(800, 600);
 			        $video->setImage($thumb->getImageAsString());
 			    }
-			}			
+			}
 		}
 		
 		$thumb = PhpThumbFactory::create($bytes, array(), true); // This will need some on spot caching soon
@@ -75,7 +75,7 @@ class imageController extends glue\Controller{
 		if($insert_cache){
 			Image::saveAsSize(array('type' => 'video', '_id' => new MongoId($file_name)), $thumb->getImageAsString(), $width, $height);
 		}
-		$thumb->show();		
+		$thumb->show();
 	}
 
 	function action_user(){
