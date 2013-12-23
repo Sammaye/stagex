@@ -1,0 +1,79 @@
+label {
+  zoom: 1;
+  *display: inline;  
+}
+
+select {
+    height:auto!important;
+}
+
+.form-control {
+  width:94.5%; // This seems to work best when not using border box sizing which does not work on IE7
+  line-height:@input-line-height-base;
+  height:20px;
+}
+
+.form-group {
+  .clearfix();
+}
+
+.radio-inline,
+.checkbox-inline {
+  zoom: 1;
+  *display: inline;  
+}
+
+  @media (min-width: @screen-sm) {
+    // Inline-block all the things for "inline"
+    .form-group  {
+      zoom: 1;
+      *display: inline;  
+    }
+ }
+ 
+    .form-control {
+      zoom: 1;
+      *display: inline;  
+    } 
+ 
+     .radio,
+    .checkbox {
+      zoom: 1;
+      *display: inline;  
+      
+    }
+    
+    
+// Adds a dedicated search widget for stuff
+
+.form-search{
+    .clearfix();
+    button{
+        float:left;
+        .border-left-radius(0);
+    }
+}
+
+.form-search-input{
+    .form-control;
+    float:left;
+    .border-right-radius(0);
+    width:auto; 
+}
+
+.form-search-lg{
+    .clearfix();
+    .form-search-input{
+        .form-control;
+        .input-lg;
+        float:left;
+        .border-right-radius(0);
+        width:auto; 
+        height:24px;
+    }
+    button{
+        float:left;
+        .btn-lg;
+        .border-left-radius(0);
+    }   
+}

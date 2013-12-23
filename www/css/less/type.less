@@ -47,7 +47,7 @@ cite    { font-style: normal; }
     color: darken(@state-warning-text, 10%);
   }
 }
-.text-error {
+.text-danger {
   color: @state-danger-text;
   &:hover {
     color: darken(@state-danger-text, 10%);
@@ -143,12 +143,6 @@ ol {
   }
 }
 
-ul {
-	list-style:disc;
-	list-style-position:outside;
-	padding:0 0 0 40px;
-}
-
 // List options
 
 // Unstyled keeps list items block level, just removes default browser padding and list-style
@@ -160,9 +154,7 @@ ul {
 .list-inline {
   .list-unstyled();
   > li {
-	  display: inline-block;
-	  zoom: 1;
-	  *display: inline;  
+    display: inline-block;
     padding-left: 5px;
     padding-right: 5px;
   }

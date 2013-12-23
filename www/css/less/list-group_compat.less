@@ -1,0 +1,12 @@
+.list-group-item {
+  *line-height:1.15;
+  
+  &.active,
+  &.active:hover,
+  &.active:focus {
+    // Force color to inherit for custom content
+    .list-group-item-heading {
+      color: @list-group-active-color;
+    }
+  }
+}

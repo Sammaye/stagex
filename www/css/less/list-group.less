@@ -22,7 +22,6 @@
   margin-bottom: -1px;
   background-color: @list-group-bg;
   border: 1px solid @list-group-border;
-  *line-height:1.15;
 
   // Round the first and last items
   &:first-child {
@@ -68,7 +67,7 @@
 
     // Force color to inherit for custom content
     .list-group-item-heading {
-      color: @list-group-active-color;
+      color: inherit;
     }
     .list-group-item-text {
       color: lighten(@list-group-active-bg, 40%);

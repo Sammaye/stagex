@@ -9,15 +9,11 @@
 // Core styles
 .btn {
   display: inline-block;
-  zoom: 1;
-  *display: inline;  
   padding: @padding-base-vertical @padding-base-horizontal;
   margin-bottom: 0; // For input.btn
   font-size: @font-size-base;
   font-weight: @btn-font-weight;
   line-height: @line-height-base;
-  *line-height:1.15;
-  *padding:@padding-base-vertical 0;
   text-align: center;
   vertical-align: middle;
   cursor: pointer;
@@ -55,19 +51,12 @@
 
 }
 
-a.btn{
-	*padding:@padding-base-vertical @padding-base-horizontal;
-}
-
 
 // Alternate buttons
 // --------------------------------------------------
 
 .btn-default {
   .button-variant(@btn-default-color; @btn-default-bg; @btn-default-border);
-}
-.btn-white {
-  .button-variant(@btn-default-color; @btn-white-bg; @btn-default-border);
 }
 .btn-primary {
   .button-variant(@btn-primary-color; @btn-primary-bg; @btn-primary-border);
@@ -77,7 +66,7 @@ a.btn{
   .button-variant(@btn-warning-color; @btn-warning-bg; @btn-warning-border);
 }
 // Danger and error appear as red
-.btn-error {
+.btn-danger {
   .button-variant(@btn-danger-color; @btn-danger-bg; @btn-danger-border);
 }
 // Success appears as green

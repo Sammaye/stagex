@@ -27,8 +27,6 @@ legend {
 
 label {
   display: inline-block;
-  zoom: 1;
-  *display: inline;  
   margin-bottom: 5px;
   font-weight: bold;
 }
@@ -58,10 +56,6 @@ input[type="file"] {
 select[multiple],
 select[size] {
   height: auto;
-}
-
-select {
-	height:auto!important;
 }
 
 // Fix optgroup Firefox bug per https://github.com/twbs/bootstrap/issues/7611
@@ -131,13 +125,11 @@ output {
 
 .form-control {
   display: block;
-  width:94.5%; // This seems to work best when not using border box sizing which does not work on IE7
-  line-height:@input-line-height-base;
-  height:20px;
-  padding:4px 6px;
-  //height: @input-height-base; // Make inputs at least the height of their button counterpart (base line-height + padding + border)
+  width: 100%;
+  height: @input-height-base; // Make inputs at least the height of their button counterpart (base line-height + padding + border)
   padding: @padding-base-vertical @padding-base-horizontal;
   font-size: @font-size-base;
+  line-height: @line-height-base;
   color: @input-color;
   vertical-align: middle;
   background-color: @input-bg;
@@ -175,7 +167,6 @@ output {
 
 .form-group {
   margin-bottom: 15px;
-  .clearfix();
 }
 
 
@@ -214,8 +205,6 @@ output {
 .radio-inline,
 .checkbox-inline {
   display: inline-block;
-  zoom: 1;
-  *display: inline;  
   padding-left: 20px;
   margin-bottom: 0;
   vertical-align: middle;
@@ -313,18 +302,14 @@ input[type="checkbox"],
   @media (min-width: @screen-sm) {
     // Inline-block all the things for "inline"
     .form-group  {
-	  display: inline-block;
-	  zoom: 1;
-	  *display: inline;  
+      display: inline-block;
       margin-bottom: 0;
       vertical-align: middle;
     }
 
     // In navbar-form, allow folks to *not* use `.form-group`
     .form-control {
-	  display: inline-block;
-	  zoom: 1;
-	  *display: inline;  
+      display: inline-block;
     }
 
     // Remove default margin on radios/checkboxes that were used for stacking, and
@@ -332,9 +317,7 @@ input[type="checkbox"],
     // a bug in WebKit: https://github.com/twbs/bootstrap/issues/1969).
     .radio,
     .checkbox {
-	  display: inline-block;
-	  zoom: 1;
-	  *display: inline;  
+      display: inline-block;
       margin-top: 0;
       margin-bottom: 0;
       padding-left: 0;
@@ -377,38 +360,4 @@ input[type="checkbox"],
       text-align: right;
     }
   }
-}
-
-// Adds a dedicated search widget for stuff
-
-.form-search{
-	.clearfix();
-	button{
-		float:left;
-		.border-left-radius(0);
-	}
-}
-
-.form-search-input{
-	.form-control;
-	float:left;
-	.border-right-radius(0);
-	width:auto;	
-}
-
-.form-search-lg{
-	.clearfix();
-	.form-search-input{
-		.form-control;
-		.input-lg;
-		float:left;
-		.border-right-radius(0);
-		width:auto;	
-		height:24px;
-	}
-	button{
-		float:left;
-		.btn-lg;
-		.border-left-radius(0);
-	}	
 }

@@ -1,0 +1,38 @@
+.breadcrumb {
+  > li {
+      display: inline-block;
+      zoom: 1;
+      *display: inline;
+      &+li:before {
+        content: ""; // Unicode space added since inline-block means non-collapsing white-space
+        padding:0;
+      }      
+      > .divider {
+        padding: 0 5px;
+        color: @breadcrumb-color;
+      }
+
+  }
+}
+
+.breadcrumb-header{
+    ol{
+      list-style: none;
+      margin:0;
+      > li {
+          display: inline-block;
+          zoom: 1;
+          *display: inline;
+          > .divider {
+            padding: 0 5px;
+            color: @breadcrumb-color;
+          }
+      }
+    }
+    h1{
+        margin:0;
+    }
+    h1.jumbo{
+        font-size: (@font-size-base * 4.5);
+    }
+}

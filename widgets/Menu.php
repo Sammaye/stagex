@@ -9,26 +9,26 @@ class Menu extends \glue\Widget{
 
 	function render(){ ?>
 	
-<div class="navbar navbar-default navbar-fixed-top">
+<div class="menubar">
   <!-- Brand and toggle get grouped for better mobile display -->
   <div class="grid-container">
-  <div class="navbar-header">
-    <a class="navbar-brand" href="<?php echo glue::http()->url('/') ?>"><img src="/images/main_logo.png" alt="StageX"/></a>
+  <div class="menubar-header">
+    <a class="menubar-brand" href="<?php echo glue::http()->url('/') ?>"><img src="/images/main_logo.png" alt="StageX"/></a>
   </div>
 	<?php if(glue::http()->path()!=='search'){ ?>
-  <form class="navbar-form navbar-left" action="<?php echo glue::http()->url('/search') ?>">
+  <form class="menubar-form" action="<?php echo glue::http()->url('/search') ?>">
 	<div class="form-search">
 		<input type="text" name="query" class="form-search-input"/>
 		<button type="submit" class="btn btn-primary"><span>&nbsp;</span></button>
 	</div>
   </form>
-  <div class="navbar-nav">
+  <div class="menubar-nav">
     <a href="<?php echo Glue::http()->url("/search", array('filter_trype' => 'video', 'filter_time' => 'month', 'orderby' => 'rating')) ?>">Browse</a>
   </div>
   <?php } ?>
 
-	<div class="navbar-right">
-	  <div class="navbar-nav">
+	<div class="menubar-right">
+	  <div class="menubar-nav">
 		<?php if(glue::session()->authed){ ?>
 		<?php $newNotifications = \app\models\Notification::getNewCount_Notifications(); ?>
 	  	<a href="/stream/notifications" class="notification <?php if($newNotifications > 0): echo "new_notifications"; endif; ?>">

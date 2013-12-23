@@ -1,0 +1,38 @@
+.nav {
+  > li {
+    > a {
+      //position: relative;
+    }
+ }
+}
+
+// Underlined Navs
+// all the rage atm
+// -------------------------
+.nav-underlined{
+    > li {
+        float:left;  
+        
+        // Actual tabs (as links)
+        > a {
+          line-height: @line-height-base;
+          border-bottom: 3px solid transparent;
+          &:hover {
+            border-color: @nav-tabs-link-hover-border-color @nav-tabs-link-hover-border-color @nav-tabs-border-color;
+          }
+        }
+
+        // Active state, and it's :hover to override normal :hover
+        &.active > a {
+          &,
+          &:hover,
+          &:focus {
+            color: @nav-tabs-active-link-hover-color;
+            font-weight:bold;
+            border-bottom-color: @nav-undrlnd-active-border;
+            background: @nav-undrlnd-active-bg;
+            cursor: default;
+          }
+        }
+    }
+}
