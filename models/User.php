@@ -315,24 +315,25 @@ class User extends \glue\User{
 			glue::sitemap()->addUrl(glue::http()->url('/user/view', array('id' => $this->_id)), 'hourly', '1.0');
 		}
 		
-		glue::elasticSearch()->index(array(
-    		'id' => strval($this->_id),
-    		'type' => 'user',
-    		'body' => array(
-        		'title' => $this->username,
-        		'blurb' => $this->about,
-        		'deleted' => $this->deleted,
-        		'listing' => $this->listing,
-        		'videos' => 10,
-        		'mature' => 0,
-        		'created' => date('c',$this->created->sec)
-    		)
-		));		
-
 		if($this->deleted){
-			glue::mysql()->query("UPDATE documents SET deleted=1 WHERE _id=:_id", array(
-				":_id" => strval($this->_id),
-			));
+			glue::elasticSearch()->delete(array(
+				'id' => strval($this->_id),
+				'type' => 'user'
+			));			
+		}else{
+			glue::elasticSearch()->index(array(
+				'id' => strval($this->_id),
+				'type' => 'user',
+				'body' => array(
+					'title' => $this->username,
+					'blurb' => $this->about,
+					'deleted' => $this->deleted,
+					'listing' => $this->listing,
+					'videos' => 10,
+					'mature' => 0,
+					'created' => date('c',$this->created->sec)
+				)
+			));			
 		}
 
 		if($this->getScenario() == "updatePassword"){

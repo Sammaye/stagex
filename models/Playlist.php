@@ -205,7 +205,10 @@ class Playlist extends \glue\db\Document{
 	}
 
 	function delete(){
-		glue::mysql()->query("UPDATE documents SET deleted = 1 WHERE _id = :id",array(':id'=>strval($this->_id)));
+		glue::elasticSearch()->delete(array(
+			'id' => $this->_id,
+			'type' => 'playlist'
+		));		
 		parent::delete();
 		
 		// @todo fix this

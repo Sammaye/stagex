@@ -382,9 +382,13 @@ class videoController extends glue\Controller{
 			
 			Queue::AddMessage($video->collectionName(),$video->_id,Queue::DELETE);
 		}
-		
 		Video::model()->updateAll(array('_id' => array('$in' => $mongoIds)), array('$set'=>array('deleted'=>1)));
-		glue::mysql()->query('UPDATE documents SET deleted=1 WHERE _id IN :id', array(':id' => $ids));
+		glue::elasticSearch()->deleteByQuery(array(
+			'type' => 'playlist',
+			'body' => array('query' => array(
+				"ids" => array("type" => "playlist", "values" => $ids)
+			))
+		));
 
 		$this->json_success(array('message'=>'The videos you selected were deleted','updated'=>count($ids)));
 	}
@@ -402,7 +406,6 @@ class videoController extends glue\Controller{
 		$video->deleted=0;
 		if($video->save()){
 			$video->author->saveCounters(array('totalUploads'=>1));
-			glue::mysql()->query('UPDATE documents SET deleted=0 WHERE _id = :id', array(':id' => $id));
 			$this->json_success('Video Undeleted');
 		}
 		$this->json_error(self::UNKNOWN);

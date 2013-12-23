@@ -112,8 +112,14 @@ class PlaylistController extends glue\Controller{
 			$mongoIds[]=$playlist->_id;
 		}
 		Playlist::model()->deleteAll(array('_id' => array('$in' => $mongoIds)));
+		glue::elasticSearch()->deleteByQuery(array(
+			'type' => 'playlist',
+				'body' => array('query' => array(
+				"ids" => array("type" => "playlist", "values" => $ids)
+			))
+		));		
+		
 		$playlist->author->saveCounters(array('totalPlaylists'=>-count($mongoIds)),0);
-		glue::mysql()->query('UPDATE documents SET deleted=1 WHERE _id IN :id', array(':id' => $ids));	
 		$this->json_success(array('message'=>'The playlists you selected were deleted','updated'=>count($ids)));
 	}	
 	

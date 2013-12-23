@@ -37,7 +37,12 @@ class IndexController extends \glue\Controller{
 				 * Run a general SQL query deleting all the items from the db.
 				 * Run this before everything else to stop problems in Sphinx.
 				*/
-				glue::mysql()->query('UPDATE documents SET deleted=1 WHERE uid = :_id OR _id = :_id', array(':_id' => strval($obj['object_id'])));
+				glue::elasticSearch()->deleteByQuery(array(
+					'type' => 'playlist,video',
+					'body' => array('query' => array(
+						"term" => array("userId" => strval($obj['object_id']))
+					))
+				));				
 		
 				/**
 				 * Now lets go through the users videos and replaylists
