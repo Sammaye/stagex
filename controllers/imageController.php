@@ -59,7 +59,7 @@ class imageController extends glue\Controller{
 				$bytes = $original_image->bytes->bin; // The file is in the video row let's get EIT!!
 				$insert_cache = true;
 				$resize = true;
-			}elseif($original_image=$video->image){
+			}elseif($original_image=$video->image){ // last resort
 			    $obj = glue::aws()->S3GetObject(pathinfo($original_image, PATHINFO_BASENAME));
 			    if($obj != null){
 			        $thumb = PhpThumbFactory::create($obj->getpath('Body'), array(), true); // This will need some on spot caching soon
