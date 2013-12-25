@@ -181,10 +181,6 @@ class Playlist extends \glue\db\Document{
 	}
 
 	function afterSave(){
-		if($this->getIsNewRecord()){
-			$this->author->saveCounters(array('totalPlaylists'=>1));
-			glue::sitemap()->addUrl(glue::http()->url('/playlist/view', array('id' => $this->_id)), 'hourly', '1.0');
-		}
 		//var_dump(strval($this->userId));
 		glue::elasticSearch()->index(array(
     		'id' => strval($this->_id),

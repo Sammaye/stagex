@@ -162,7 +162,9 @@ $this->js('page', "
 		</ul>
 	</div>
 	<?php } ?>
-	<div class='clearfix'><?php glue\widgets\Pagination::widget(array('totalItems' => $sphinx->totalFound, 'page' => glue::http()->param('page',1))) ?></div>
+	<div class='clearfix'><?php glue\widgets\Pagination::widget(array('totalItems' => $sphinx->totalFound, 'page' => glue::http()->param('page',1), 
+		'data' => array('orderby' => $orderby, 'filter_duration' => $filter_duration, 'filter_category' => $filter_category, 
+		'filter_time' => $filter_time, 'filter_type' => $filter_type, 'query' => glue::http()->param('query')))) ?></div>
 	</div>
 	</div>
 </div>

@@ -8,10 +8,10 @@ if(!$model||!$model->_id instanceof \MongoId||$model->getIsNewRecord()){
 
 ?>
 <div class="user_ext_item clearfix <?php echo isset($extra_classes)?$extra_classes:'' ?>">
-<div class='thumbnail'><a href="<?php echo glue::http()->url('/user/view', array('_id' => $model->_id)) ?>">
+<div class='thumbnail'><a href="<?php echo glue::http()->url('/user/view', array('id' => $model->_id)) ?>">
 <img src="<?php echo $model->getAvatar(125,125) ?>" alt="<?php echo $model->getUsername() ?>"/></a></div>
 <div class="user_ext_right">
-<h3 class="username"><a href="<?php echo glue::http()->url('/user/view', array('_id' => $model->_id)) ?>"><?php echo $model->getUsername() ?></a></h3>
+<h3 class="username"><a href="<?php echo glue::http()->url('/user/view', array('id' => $model->_id)) ?>"><?php echo $model->getUsername() ?></a></h3>
 <div class="detail">
 <?php if(!$model->deleted){ ?>
 	<span><?php echo $model->totalPlaylists ?> playlists</span>

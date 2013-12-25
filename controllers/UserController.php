@@ -727,7 +727,7 @@ class userController extends \glue\Controller{
 		if(!glue::http()->isAjax())
 			glue::trigger('404');
 
-		$term=glue::http()->param('query');
+		$term=glue::http()->param('term');
 		$limit=glue::http()->param('limit');
 		$users=app\models\User::model()->find(array('username'=>new MongoRegex("/$term/")))->limit($limit);		
 		

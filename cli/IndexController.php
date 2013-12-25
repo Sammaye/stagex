@@ -13,62 +13,85 @@ class IndexController extends \glue\Controller{
 		 * If we are deleting a user :'(
 		*/
 		foreach($obj_rows as $k => $obj){
-			if($obj['type'] == 'user'){
+			if($obj['type'] === 'user'){
 		
 				/**
 				 * Lets reove the users subscribers so they no longer recieve notifications
 				 */
-				glue::db()->subscription->remove(array('to_id' => $obj['object_id']), array('safe' => true));
+				$subscribers = glue::db()->follower->find(array('toId' => $obj['id']))->sort(array('created' => -1));
+				$user_ids = array();
+				foreach($subscribers as $k => $v){
+					$user_ids[] = new MongoId($v['fromId']);
+				}
+				glue::db()->user->update(array('_id' => array('$in' => $user_ids)), array('$inc' => array('totalFollowing' => -1)), array('multiple' => true));
+				glue::db()->follower->remove(array('toId' => $obj['id']));
 		
 				/**
 				 * Now lets remove all the users subscriptions and de-$inc the subscribed users so everything stays counting nicely.
 				*/
-				$subscriptions = glue::db()->subscription->find(array('from_id' => $obj['object_id']));
-		
+				$subscriptions = glue::db()->follower->find(array('fromId' => $obj['id']))->sort(array('created' => -1));
 				$user_ids = array();
 				foreach($subscriptions as $k => $v){
-					$user_ids[] = new MongoId($k);
+					$user_ids[] = new MongoId($v['toId']);
 				}
+				glue::db()->user->update(array('_id' => array('$in' => $user_ids)), array('$inc' => array('totalFollowers' => -1)), array('multiple' => true));
+				glue::db()->follower->remove(array('fromId' => $obj['id']));
 		
-				glue::db()->users->update(array('_id' => array('$in' => $user_ids)), array('$inc' => array('subscribers' => -1)), array('safe' => true, 'multiple' => true));
-				glue::db()->subscription->remove(array('from_id' => $obj['object_id']), array('safe' => true));
-		
-				/**
-				 * Run a general SQL query deleting all the items from the db.
-				 * Run this before everything else to stop problems in Sphinx.
-				*/
+				// Clean the search index, we do this first to stop dead results in the index
 				glue::elasticSearch()->deleteByQuery(array(
 					'type' => 'playlist,video',
-					'body' => array('query' => array(
-						"term" => array("userId" => strval($obj['object_id']))
-					))
+					'body' => array("term" => array("userId" => strval($obj['id'])))
 				));				
-		
-				/**
-				 * Now lets go through the users videos and replaylists
-				 *
-				 * Videos are still not completely removed. I need to come up with a way of doing this...
-				*/
-				glue::db()->videos->update(array('user_id' => $obj['object_id']), array('$set' => array('deleted' => 1)), array('safe' => true, 'multiple' => true));
-				glue::db()->playlists->remove(array('user_id' => $obj['object_id']), array('safe' => true));
-		
-				/**
-				 * Now lets delete the responses to these videos
-				 * @var unknown_type
-				*/
-				$videos = glue::db()->videos->find(array('user_id' => $obj['object_id']));
+				
+				// Clean videos
+				
+				// Lets set all videos deleted
+				glue::db()->video->update(array('userId' => $obj['id']), array('$set' => array('deleted' => 1)), array('multiple' => true));
+				
+				$videos = glue::db()->videos->find(array('userId' => $obj['id']))->sort(array('created' => -1));
 				foreach($videos as $k => $vid){
-					glue::db()->image_cache->remove(array('object_id' => $vid['_id']), array('safe' => true));
-					glue::db()->videoresponse->remove(array('vid' => $vid['_id']), array('safe' => true));
-				}
+					glue::db()->image->remove(array('ref._id' => $vid['_id'], 'ref.type' => 'video'));
+					glue::db()->videoresponse->remove(array('vid' => $vid['_id']));
+					
+					glue::db()->videoresponse_likes->remove(array('videoId' => $vid['_id']));
+					
+					// delete the likes, commented out since I am unsure if the user needs 
+					// to remove these themselves, they might think we are being too clever
+					// glue::db()->video_likes->remove(array('item' => $vid['_id']));
+				}				
+				
+				// This is where normally I would delete the video responses that this ouser has made on other 
+				// videos but I will not. I am not deleting any foreign data in this script so that users do not suddenly 
+				// have massive gaping holes in their own content and wonder why they are there, instead it will say that the user is 
+				// removed and the video owner will have to decide to delete the content
+				
+				// Lets remove all playlists
+				glue::db()->playlist->remove(array('userId' => $obj['id']));
+				
+				// Clean the user themselves
+				
+				// remove their notifications
+				glue::db()->notification->remove(array('userId' => $obj['id']));
+				
+				// remove their stream
+				glue::db()->stream->remove(array('user_id' => $obj['id']));
+				
+				// remove their watched history
+				glue::db()->watched_history->remove(array('user_id' => $obj['id']));
+				
+				// remove their playlist subscriptions
+				glue::db()->playlist_subscription->remove(array('user_id' => $obj['id']));
 		
-				/**
-				 * Lastely lets delete the stream and notifications for the user
-				 */
-				glue::db()->notification->remove(array('user_id' => $obj['object_id']), array('safe' => true));
-				glue::db()->stream->remove(array('$or'=> array(array('user_id' => $obj['object_id']), array('posted_by_id' => $obj['object_id']))), array('safe' => true));
-		
-				glue::db()->image_cache->remove(array('object_id' => $obj['object_id']), array('safe' => true));
+				// remove their avatar
+				glue::db()->image->remove(array('ref._id' => $obj['id'], 'ref.type' => 'user'));
+				
+				// remove them
+				// glue::db()->user->rmeove(array('_id' => $obj['id']));
+				
+				// Update their email address instead
+				glue::db()->user->update(array('_id' => $obj['id']), array('$set' => array('email' => null, 'username' => '[Deleted]')));
+				
+				print 'deleted user with _id: ' . $obj['id'] . "\n";
 			}
 			glue::db()->delete_queue->remove(array('_id' => $obj['_id'])); // Now lets clear up the deletion queue!
 		}		

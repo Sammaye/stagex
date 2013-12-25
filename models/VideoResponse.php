@@ -188,13 +188,12 @@ class VideoResponse extends \glue\db\Document{
 			}			
 
 			if(!glue::auth()->check(array('^' => $this->video))){
-
 				if($this->video->author->emailVideoResponses){
 					glue::mailer()->mail($this->video->author->email, array('no-reply@stagex.co.uk', 'StageX'), 'Someone replied to one of you videos on StageX',
 					"videos/new_comment.php", array( 'username' => $this->video->author->username, 'approved' => $this->approved,
 					'comment' => $this, 'from' => $this->author, 'video' => $this->video ));
 				}
-				\app\models\Notification::newVideoResponse($this->video->user_id, $this->video->_id, $this->approved);
+				\app\models\Notification::newVideoResponse($this->video->userId, $this->video->_id, $this->approved);
 			}
 			if($this->threadParentId && $this->approved){
 				if($this->thread_parent->author->emailVideoResponses){

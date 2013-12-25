@@ -2,6 +2,12 @@
 if(!isset($view)) $view = '';
 if(!isset($mode)) $mode = null;
 
+if(!glue::auth()->check(array('viewable' => $item))){
+	$item->author = new app\models\User;
+	$item->author->username = '[Deleted]';
+	$item->content = '[Deleted]';
+}
+
 if($item->type == "text"){ ?>
 <div class='response video_text_response_item <?php if($view == 'thread' && (count(preg_split('/,/', $item->path)) > 1)): echo " thread_comment"; endif; ?>'
 	data-id='<?php echo $item->_id ?>' style='margin-bottom:15px;'>

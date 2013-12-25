@@ -205,6 +205,8 @@ class Notification extends \glue\db\Document{
 		foreach($this->fromUsers as $user){
 
 			$user = User::model()->findOne(array('_id' => $this->fromUsers[$i]));
+
+			
 			if($users_count > 1 && $i == $users_count-1){
 				$caption .=  " and <a href='".glue::http()->url('/user/view', array('id' => strval($user->_id)))."'>@{$user->getUsername()}</a>";
 			}elseif($users_count > 1 && $i != 0){

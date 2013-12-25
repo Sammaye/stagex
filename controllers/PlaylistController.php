@@ -47,8 +47,12 @@ class PlaylistController extends glue\Controller{
 		$model = new Playlist();
 		if(isset($_POST['Playlist'])){
 			$model->attributes=$_POST['Playlist'];
-			if($model->validate()&&$model->save())
+			if($model->validate()&&$model->save()){
+				$model->author->saveCounters(array('totalPlaylists'=>1));
+				glue::sitemap()->addUrl(glue::http()->url('/playlist/view', array('id' => $model->_id)), 'hourly', '1.0');
+								
 				$this->json_success(array('message' => 'Playlist created', '_id' => strval($model->_id)));
+			}
 		}
 		$this->json_error(array('message'=>'Playlist could not be created because:','messages'=>$model->getErrors()));
 	}
@@ -114,9 +118,9 @@ class PlaylistController extends glue\Controller{
 		Playlist::model()->deleteAll(array('_id' => array('$in' => $mongoIds)));
 		glue::elasticSearch()->deleteByQuery(array(
 			'type' => 'playlist',
-				'body' => array('query' => array(
-				"ids" => array("type" => "playlist", "values" => $ids)
-			))
+			'body' => array(
+				"ids" => array("values" => $ids)
+			)
 		));		
 		
 		$playlist->author->saveCounters(array('totalPlaylists'=>-count($mongoIds)),0);

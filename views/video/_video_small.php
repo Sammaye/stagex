@@ -9,10 +9,6 @@ if(!isset($model)||!$model){
 		
 	<div class='thumbnail' style='position:relative;float:left;'><a href="/video/watch?id=<?php echo strval($model->_id) ?>" >
 		<img alt='<?php echo Html::encode($model->title) ?>' src="<?php echo $model->getImage(88, 49) ?>"/></a>
-		<?php if($model->state == 'finished'): ?>
-		<div class='duration'><span><?php echo $model->get_time_string() ?></span></div>
-		<?php if(!isset($hideQueueButton)||$hideQueueButton)?><a class='add_to_queue' href='#'><img alt='Add to Queue' src='/images/add_tooltip.png'/></a>
-		<?php endif ?>
 	</div>		
 	<div class='info'>
 		<h3 class='title' style='font-size:14px;line-height:17px;margin-bottom:5px;'><a href="/video/watch?id=<?php echo strval($model->_id) ?>"><?php echo $model->title ?></a></h3>

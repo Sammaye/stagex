@@ -1,7 +1,8 @@
 <?php 
-if(!($model=app\models\Playlist::model()->findOne(array('_id' => $item['playlist_id'])))){
+if(!($model=app\models\Playlist::model()->findOne(array('_id' => $item['playlist_id'])))||!glue::auth()->check(array('viewable' => $model))){
 	$model=new app\models\Playlist();
 	$model->title='Playlist Unavailable';
+	$model->deleted=1;
 }
 ?>
 
@@ -17,6 +18,7 @@ if(!($model=app\models\Playlist::model()->findOne(array('_id' => $item['playlist
 		<?php if($model->description){ ?>
 			<div class='expandable description'><?php echo nl2br(htmlspecialchars($model->description)) ?></div>
 		<?php } ?>
+		<?php if(!$model->deleted){ ?>
 		<div class="created">
 			<?php echo date('d F Y', $model->created->sec) ?>
 			<?php if($model->author){
@@ -30,12 +32,15 @@ if(!($model=app\models\Playlist::model()->findOne(array('_id' => $item['playlist
 				<?php } ?>
 			</span>			
 		</div>	
+		<?php } ?>
 	</div>
+	<?php if(!$model->deleted){ ?>
 	<div class='video_count'>
 		<?php echo count($model->videos) ?> videos
 	</div>
 	<div class="infocons">
 		<button type="button" class="btn btn-success btn_subscribe">Subscribe</button>
 	</div>
+	<?php } ?>
 	<div class='clear'></div>
 </div>

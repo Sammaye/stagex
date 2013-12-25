@@ -8,13 +8,13 @@ if(!$item->playlist || !glue::auth()->check(array('viewable'=>$item->playlist)))
 	$item->playlist=new app\models\Playlist;
 	$item->playlist->title='[Not Available]';
 }
-if(!$item->status_sender || !glue::auth()->check(array('viewable'=>$item->status_sender))){
+if(!$item->status_sender /*|| !glue::auth()->check(array('viewable'=>$item->status_sender))*/){
 	$item->status_sender=new app\models\User;
-	$item->status_sender->username='[Unknown]';
+	$item->status_sender->username='[Deleted]';
 }
-if(!$item->subscribed_user || !glue::auth()->check(array('viewable'=>$item->subscribed_user))){
+if(!$item->subscribed_user /*|| !glue::auth()->check(array('viewable'=>$item->subscribed_user))*/){
 	$item->subscribed_user=new app\models\User;
-	$item->subscribed_user->username='[Unknown]';
+	$item->subscribed_user->username='[Deleted]';
 }
 ?>
 <div data-id='<?php echo $item->_id ?>' data-ts='<?php echo $item->getTs($item->created) ?>' class='streamitem' style='border-bottom:1px solid #e5e5e5;padding:20px 0;'
@@ -41,7 +41,8 @@ if(!$item->subscribed_user || !glue::auth()->check(array('viewable'=>$item->subs
 			?><span class='sent_date'><?php echo $item->getDateTime() ?></span>
 		</div>
 		<div class='stream_media_item' style='margin-bottom:15px;'><?php echo $this->renderPartial('video/_video_small', array('model' => $item->video)) ?></div>
-		<div><a href="">View responses</a></div>
+		<div><a href="<?php echo glue::http()->url('/videoresponse/list', array('id' => $item->video->_id, 'sorton' => 'created', 'orderby' => -1, 
+				'filter-username' => $item->status_sender->_id)) ?>">View responses</a></div>
 	<?php elseif($item->type == Stream::VIDEO_RATE):
 		?><div class='stream_item_head'><?php
 		if($item->like == 1){

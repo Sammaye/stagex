@@ -384,10 +384,10 @@ class videoController extends glue\Controller{
 		}
 		Video::model()->updateAll(array('_id' => array('$in' => $mongoIds)), array('$set'=>array('deleted'=>1)));
 		glue::elasticSearch()->deleteByQuery(array(
-			'type' => 'playlist',
-			'body' => array('query' => array(
-				"ids" => array("type" => "playlist", "values" => $ids)
-			))
+			'type' => 'video',
+			'body' => array(
+				"ids" => array("values" => $ids)
+			)
 		));
 
 		$this->json_success(array('message'=>'The videos you selected were deleted','updated'=>count($ids)));

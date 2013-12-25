@@ -204,7 +204,7 @@ return array(
 				'deleted' => function($item){
 					if(!$item
 						||$item->deleted
-						||($item->author instanceof User&&$item->author->deleted))
+						||($item->author instanceof app\models\User&&$item->author->deleted))
 						return false;
 					return true;
 				},

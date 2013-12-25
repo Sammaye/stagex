@@ -2,6 +2,8 @@
 
 namespace glue\widgets;
 
+use glue;
+
 class Pagination extends \glue\Widget{
 	
 	public $page=1;
@@ -9,20 +11,22 @@ class Pagination extends \glue\Widget{
 	public $totalItems;
 	public $maxPage;
 	
+	public $data;
+	
 	public $enableAjaxPagination=false;
 	public $pagerCssClass='';
 	
 	public function init(){
-		if($this->totalItems>0)
-			$this->maxPage=$this->totalItems/$this->pageSize;
-		if($this->page>$this->maxPage)
-			$this->page=$this->maxPage;
+
 	}
 	
 	public function render(){
+		if($this->totalItems>0)
+			$this->maxPage=ceil($this->totalItems/$this->pageSize);
+		if($this->page>$this->maxPage)
+			$this->page=$this->maxPage;		
 		
 		//$this->maxPage = 10;
-		
 		$start = $this->page - 5 > 0 ? $this->page - 5 : 1;
 		$end = $this->page + 5 <= $this->maxPage ? $this->page + 5 : $this->maxPage;
 		$ret = "";
@@ -38,7 +42,7 @@ class Pagination extends \glue\Widget{
 					$ret .= '<li class="control"><a href="'.$this->getUrl(array('page' => $this->page-1)).'">Previous</a></li>';
 				}
 			}
-		
+
 			for ($i = $start; $i <= $end && $i <= $this->maxPage; $i++){
 				if($i==$this->page) {
 					if($this->enableAjaxPagination){
@@ -67,4 +71,14 @@ class Pagination extends \glue\Widget{
 		$ret .= "</div>";
 		echo $ret;		
 	}
+	
+	function getUrl($morph = array()){
+		return glue::http()->url(array_merge($this->data,
+			array(
+				//"mode"=>urlencode($this->mode),
+				"pagesize"=>$this->pageSize,
+				"page"=>$this->page
+			), $morph
+		));
+	}	
 }
