@@ -62,7 +62,7 @@ class Glue
 	public static function run($url = null,$config=array())
 	{
 		spl_autoload_register(array('glue','autoload'));
-		self::registerErrorHandlers();
+		//self::registerErrorHandlers();
 		
 		if(func_num_args() > 2){
 			$args = func_get_args();

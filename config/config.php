@@ -13,7 +13,7 @@ return array(
 	//'www' => 'stagex-local.co.uk',
 
 	// This switches the debug mode
-	"debug" => false,
+	"debug" => true,
         
     'timezone' => 'UTC',
     'locale' => 'en_GB.UTF8',

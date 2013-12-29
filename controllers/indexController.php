@@ -1,19 +1,25 @@
 <?php
 
-class indexController extends \glue\Controller{
+class indexController extends \glue\Controller
+{
+	public function behaviours()
+	{
+		return array(
+			'auth' => array(
+				'class' => 'glue\Auth',
+				'rules' => array(
+					//array('allow', 'users' => array('*')),
+					array("deny", "users"=>array("*")),
+				)
+			)
+		);
+	}
 
-    public function authRules(){
-        return array(
-                array('allow', 'users' => array('*')),
-                array("deny", "users"=>array("*")),
-        );
-    }
-
-    public function action_index(){
+    public function action_index()
+    {
         $this->title = "Welcome to the StageX Beta";
         if(glue::auth()->check('@')){
-        	//echo "here"; var_dump(glue::controller()); exit();
-            glue::route('stream/news');
+            glue::runAction('stream/news');
         }else{
             echo $this->render('/index');
         }

@@ -2,10 +2,10 @@
 
 namespace glue;
 
-use glue,
-	\glue\Html;
+use Glue;
+use \glue\Html;
 
-class Controller {
+class Controller extends Component{
 
 	const HEAD = 1;
 	const BODY_BEGIN = 2;
@@ -43,7 +43,7 @@ class Controller {
 
 	function authRules(){ return array(); }
 
-	public function __construct(){
+	public function init(){
 		$this->title = $this->title ?: glue::$name;
 		if(glue::$description!==null)
 			$this->metaTag('description', glue::$description);
@@ -318,12 +318,13 @@ class Controller {
 		return glue::http()->url($path, $params, $host, $scheme);
 	}
 	
-	public function beforeAction()
+	public function beforeAction($controller, $action)
 	{
-		return true;
+		return $this->trigger('beforeAction', array($controller, $action));
 	}
 	
-	public function afterAction()
+	public function afterAction($controller, $action)
 	{
+		return $this->trigger('afterAction', array($controller, $action));
 	}
 }
