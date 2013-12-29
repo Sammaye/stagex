@@ -13,13 +13,6 @@ class Auth extends \glue\Component{
 
 	private $controller;
 
-	function init(){
-		glue::setEvents(array(
-			'beforeAction' => 'beforeAction'
-		),$this);
-		parent::init();
-	}
-
 	function beforeAction($controller,$action){
 		if(is_callable(array($controller, $action))){
 			$this->controller=$controller;

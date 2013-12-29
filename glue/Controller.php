@@ -50,6 +50,14 @@ class Controller {
 		if(glue::$keywords!==null)
 			$this->metaTag('keywords', glue::$keywords);
 	}
+	
+	function run($action){
+		if($this->beforeAction($this, $action)){
+			$this->action=$action; // We set this so we know what action in that controller is being run
+			call_user_func_array(array($this,$action),array());
+		}
+		$this->afterAction($this, $action);
+	}	
 
 	function cssFile($map, $path=null, $media = null){
 		if($path===null)
@@ -308,5 +316,14 @@ class Controller {
 	
 	function createUrl($path = '/', $params = array(), $host = '/', $scheme = 'http'){
 		return glue::http()->url($path, $params, $host, $scheme);
+	}
+	
+	public function beforeAction()
+	{
+		return true;
+	}
+	
+	public function afterAction()
+	{
 	}
 }

@@ -5,8 +5,6 @@
  * This file denotes the configuration for most parts of the framework
  */
 
-date_default_timezone_set('UTC');
-
 return array(
 
 	// App name // Can be used as title at times
@@ -15,7 +13,10 @@ return array(
 	//'www' => 'stagex-local.co.uk',
 
 	// This switches the debug mode
-	"DEBUG" => true,
+	"debug" => false,
+        
+    'timezone' => 'UTC',
+    'locale' => 'en_GB.UTF8',
 
 	"description" => 'StageX is a video site. Share, enjoy, laugh, cry and remember the good times in life with video.',
 	"keywords" => 'video, sharing, social, watch, free, upload',
@@ -288,17 +289,14 @@ return array(
 
 			"emails" => array("sam.millman@googlemail.com"),
 
-			"action" => "index/error",
+			"action" => "error",
 
 			'log' => false,
 			'logger' => function($exception){
 				return true;
 			}
 		),
-
-
-
-
+		
 		'facebook' => array(
 				'class' => 'glue\\components\\facebook\\Session',
 				'appId' => '455165987850786',
@@ -408,7 +406,7 @@ return array(
 		'@app' => dirname(__DIR__),
 
 		// These are not required but are here to show you how it is done
-		'@controllers' => 'controllers',
+		//'@controllers' => 'controllers',
 		'@models' => 'models', // Models are added to global scope
 	),
 
@@ -419,25 +417,5 @@ return array(
 	'aliases' => array(
 		"html"					=> "glue\\Html",
 		"Collection"			=> "glue\\Collection",
-
-		/**
-		 * Core utils
-		 */
-		"DateTime"				=> "glue\\util\\DateTime",
-		"Crypt"					=> "glue\\util\\Crypt",
-		"JSON"					=> "glue\\util\\JSON",
-		"JSMin" 				=> "glue\\util\\JSMin",
-
-		"Validation"			=> "glue\\Validation",
-
-		/**
-		 * Core Widgets
-		 */
-		"GridView"				=> "glue\\widgets\\GridView",
-		"ListView"				=> "glue\\widgets\\ListView",
 	)
 );
-
-// LinkedIn
-//$consumer_key = "WP7tjwrppK5R7i_dRON8mv8lch5Yt2cXqKTMZll1zM16I1PISLc32Kc-e9EqkLiD",
-//$consumer_secret = "cP4hc4-t9qdqnpCj2l9kTCEmhL9u63hCTdkJ8VBZxKPauHmDe48o1VhcB9lAbeP2",

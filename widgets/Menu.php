@@ -7,7 +7,7 @@ use glue,
 
 class Menu extends \glue\Widget{
 
-	function render(){ ?>
+	function render(){ //var_dump(glue::user()); ?>
 	
 <div class="menubar">
   <!-- Brand and toggle get grouped for better mobile display -->

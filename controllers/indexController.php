@@ -12,6 +12,7 @@ class indexController extends \glue\Controller{
     public function action_index(){
         $this->title = "Welcome to the StageX Beta";
         if(glue::auth()->check('@')){
+        	//echo "here"; var_dump(glue::controller()); exit();
             glue::route('stream/news');
         }else{
             echo $this->render('/index');
