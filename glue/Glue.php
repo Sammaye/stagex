@@ -33,7 +33,7 @@ class Glue
 			'class' => '\\glue\\Session'
 		),
 		'errorHandler' => array(
-			'class' => '\\glue\\ErrorHandler',
+			'class' => '\\glue\\ErrorHandler'
 		),
 		'http' => array(
 			'class' => '\\glue\\Http'
@@ -124,8 +124,6 @@ class Glue
 				}
 			}
 		}
-		
-		
 		
 		// Check the root path of the application
 		if(self::getPath('@app') === null){

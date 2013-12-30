@@ -110,9 +110,9 @@ class Component{
 		if(is_array($this->_events) && isset($this->_events[$event])){
 			foreach($this->_events[$event] as $i => $f){
 				if(is_array($f)){
-					$event_success=call_user_func_array($f,$data)&&$event_success;
+					$event_success = call_user_func_array($f, $data) && $event_success;
 				}else{
-					$event_success=$f()&&$event_success;
+					$event_success = $f() && $event_success;
 				}
 			}
 		}
@@ -127,20 +127,21 @@ class Component{
 	function off($event, $handler = null)
 	{
 		if(isset($this->_events[$name])){
-			if($handler===null){
+			if($handler === null){
 				$this->_events[$name] = array();
 			}else{
 				$removed=false;
 				foreach($this->_events[$name] as $i => $f){
-					if($f===$handler){
+					if($f === $handler){
 						unset($this->_events[$name][$i]);
 						$removed=true;
 						break; // If I have removed it, I don't need to carry on removing it
 					}
 				}
 
-				if($removed)
+				if($removed){
 					$this->_events[$name] = array_values($this->_events[$name]);
+				}
 				return $removed;
 			}
 		}

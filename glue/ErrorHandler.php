@@ -244,8 +244,8 @@ class ErrorHandler extends Component
 			<body>
 				<div class="error">
 				<h1>Boom!!! StageX just blew up!</h1>
-				<p>Normally this would show you some video goodness on StageX however an error we that we just could not fix rose up to steal the day!</p> 
-				<p>This might have been temporary and are encouraged to try and refresh this page.</p>
+				<p>Normally this would show you some video goodness on StageX however an error we that just could not be fixed rose up to steal the day!</p> 
+				<p>This might have been temporary and you are encouraged to try and refresh this page.</p>
 				</div>
 			</body>
 		</html>

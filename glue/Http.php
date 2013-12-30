@@ -2,28 +2,38 @@
 
 namespace glue;
 
-use glue;
+use Glue;
+use \glue\Component;
 
-class Http{
+class Http extends Component
+{
+	private $_scriptUrl;
+	private $_baseUrl;
+	private $_pathInfo;
+	private $_argv = array();
 
-	public $csrf_token_name = 'GCSRF_TOKEN';
-	public $enableCsrfValidation = true;
-	public $csrf_error = false;
-	
-	private $scriptUrl;
-	private $baseUrl;
-	private $pathInfo;
-	private $argv = array();	
-
-	function userAgent(){
+	function userAgent()
+	{
 		return isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : null;
 	}
+	
+	function browser($userAgent = null)
+	{
+		return get_browser($userAgent ? $userAgent : $this->userAgent());
+	}	
+	
+	function referrer()
+	{
+		return isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : null;
+	}	
 
-	function userHost(){
+	function userHost()
+	{
 		return isset($_SERVER['REMOTE_HOST']) ? $_SERVER['REMOTE_HOST'] : null;
 	}
 
-	function userIp(){
+	function userIp()
+	{
 		if(isset($_SERVER['HTTP_CF_CONNECTING_IP'])){
 			return $_SERVER['HTTP_CF_CONNECTING_IP'];  // If from cloudflare lets switch it all
 		}else{
@@ -31,55 +41,69 @@ class Http{
 		}
 	}
 
-	function userPort(){
+	function userPort()
+	{
 		return isset($_SERVER['REMOTE_PORT']) ? $_SERVER['REMOTE_PORT'] : null;
 	}
-
-	function get_browser($user_agent = null){
-		return get_browser($user_agent ? $user_agent : $this->userAgent());
+	
+	public function name()
+	{
+		return $_SERVER['SERVER_NAME'];
+	}
+	
+	public function port()
+	{
+		return $_SERVER['SERVER_PORT'];
+	}
+	
+	public function securePort()
+	{
+		return $this->isSecureConnection() ? $this->port() : '443';
 	}
 
-	function isSecureConnection(){
-		return $_SERVER['SERVER_PORT'] == '443';
+	public function isSecureConnection()
+	{
+		return isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] === 'on' || $_SERVER['HTTPS'] == 1)
+			|| isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https';
 	}
 
-	function scheme(){
-		return isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == '443' ? 'https' : 'http';
+	public function scheme()
+	{
+		return $this->isSecureConnection() ? 'https' : 'http';
 	}
 
-	function host(){
+	public function host()
+	{
 		if(php_sapi_name() == 'cli'){
 			return isset(glue::$www) ? glue::$www : 'cli';
 		}
-		if(isset(glue::$www)&&glue::$www!==null)
+		if(isset(glue::$www) && glue::$www !== null)
 			return glue::$www;
 		return isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME'];
 	}
 
-	function hostInfo($scheme=''){
+	function hostInfo($scheme='')
+	{
 		return $this->scheme().'://'.$this->host();
 	}
 
-	function baseUrl($absolute = false){
-		if($this->baseUrl === null){
-			$this->baseUrl = rtrim(dirname($this->scriptUrl()),'\\/');
+	function baseUrl($absolute = false)
+	{
+		if($this->_baseUrl === null){
+			$this->_baseUrl = rtrim(dirname($this->scriptUrl()),'\\/');
 		}
 		//var_dump($this->hostInfo()); exit();
-		return $absolute ? $this->hostInfo().$this->baseUrl : $this->baseUrl;
+		return $absolute ? $this->hostInfo().$this->_baseUrl : $this->_baseUrl;
 	}
 
-	function referrer(){
-		return isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : null;
-	}
-
-	function requestUri(){
+	function requestUri()
+	{
 		return isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : null;
 	}
 
 	public function path()
 	{
-	    if($this->pathInfo===null)
-	    {
+	    if($this->_pathInfo===null){
 	        $pathInfo=$this->requestUri();
 
 	        if(($pos=strpos($pathInfo,'?'))!==false)
@@ -88,66 +112,99 @@ class Http{
 	        $pathInfo=$this->decodePathInfo($pathInfo);
 	        $scriptUrl=$this->scriptUrl();
 	        $baseUrl=$this->baseUrl();
-	        if(strpos($pathInfo,$scriptUrl)===0){
+	        if(strpos($pathInfo,$scriptUrl) === 0){
 	            $pathInfo=substr($pathInfo,strlen($scriptUrl));
-	        }else if($baseUrl==='' || strpos($pathInfo,$baseUrl)===0)
+	        }elseif($baseUrl==='' || strpos($pathInfo,$baseUrl) === 0){
 	            $pathInfo=substr($pathInfo,strlen($baseUrl));
-	        else if(strpos($_SERVER['PHP_SELF'],$scriptUrl)===0)
+	        }elseif(strpos($_SERVER['PHP_SELF'],$scriptUrl) === 0){
 	            $pathInfo=substr($_SERVER['PHP_SELF'],strlen($scriptUrl));
-
-	        $this->pathInfo=trim($pathInfo,'/');
+	        }
+	        $this->_pathInfo=trim($pathInfo,'/');
 	    }
-	    return $this->pathInfo;
+	    return $this->_pathInfo;
 	}
 
-	function isAjax(){
+	public function method()
+	{
+		return isset($_SERVER['REQUEST_METHOD']) ? strtoupper($_SERVER['REQUEST_METHOD']) : 'GET';
+	}
+	
+	public function isHead()
+	{
+		return $this->method() === 'HEAD';
+	}
+	
+	public function isOptions()
+	{
+		return $this->method() === 'OPTIONS';
+	}	
+	
+	public function isGet()
+	{
+		return $this->method() === 'GET';
+	}	
+
+	public function isPost()
+	{
+		return $this->method() === 'POST';
+	}
+	
+	public function isPut()
+	{
+		return $this->method() === 'PUT';
+	}	
+
+	public function isDelete()
+	{
+		return $this->method() === 'DELETE';
+	}
+	
+	public function isPatch()
+	{
+		return $this->method() === 'PATCH';
+	}
+	
+	public function isAjax()
+	{
 		return (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH']=="XMLHttpRequest");
 	}
 
-	function requestType(){
-		if($this->isGet()){
-			return "GET";
-		}elseif($this->isPost()){
-			return "POST";
-		}
-		return null;
-	}
-
-	function isPost(){
-		return $_SERVER['REQUEST_METHOD'] === 'POST';
-	}
-
-	function isGet(){
-		return $_SERVER['REQUEST_METHOD'] === 'GET';
-	}
-
-	function scriptUrl(){
-	    if($this->scriptUrl===null)
-	    {
+	public function isFlash()
+	{
+		return isset($_SERVER['HTTP_USER_AGENT']) &&
+			(stripos($_SERVER['HTTP_USER_AGENT'], 'Shockwave') !== false || stripos($_SERVER['HTTP_USER_AGENT'], 'Flash') !== false);
+	}	
+	
+	function scriptUrl()
+	{
+	    if($this->_scriptUrl===null){
 	        $scriptName = basename($_SERVER['SCRIPT_FILENAME']);
-	        if(basename($_SERVER['SCRIPT_NAME']) === $scriptName)
-	            $this->scriptUrl = $_SERVER['SCRIPT_NAME'];
-	        else if(basename($_SERVER['PHP_SELF']) === $scriptName)
-	            $this->scriptUrl = $_SERVER['PHP_SELF'];
-	        else if(isset($_SERVER['ORIG_SCRIPT_NAME']) && basename($_SERVER['ORIG_SCRIPT_NAME']) === $scriptName)
-	            $this->scriptUrl = $_SERVER['ORIG_SCRIPT_NAME'];
-	        else if(($pos=strpos($_SERVER['PHP_SELF'],'/'.$scriptName)) !== false)
-	            $this->scriptUrl = substr($_SERVER['SCRIPT_NAME'],0,$pos).'/'.$scriptName;
-	        else if(isset($_SERVER['DOCUMENT_ROOT']) && strpos($_SERVER['SCRIPT_FILENAME'],$_SERVER['DOCUMENT_ROOT']) === 0)
-	            $this->scriptUrl = str_replace('\\','/',str_replace($_SERVER['DOCUMENT_ROOT'],'',$_SERVER['SCRIPT_FILENAME']));
+	        if(basename($_SERVER['SCRIPT_NAME']) === $scriptName){
+	            $this->_scriptUrl = $_SERVER['SCRIPT_NAME'];
+	        }elseif(basename($_SERVER['PHP_SELF']) === $scriptName){
+	            $this->_scriptUrl = $_SERVER['PHP_SELF'];
+	        }elseif(isset($_SERVER['ORIG_SCRIPT_NAME']) && basename($_SERVER['ORIG_SCRIPT_NAME']) === $scriptName){
+	            $this->_scriptUrl = $_SERVER['ORIG_SCRIPT_NAME'];
+	        }elseif(($pos=strpos($_SERVER['PHP_SELF'],'/'.$scriptName)) !== false){
+	            $this->_scriptUrl = substr($_SERVER['SCRIPT_NAME'],0,$pos).'/'.$scriptName;
+	        }elseif(isset($_SERVER['DOCUMENT_ROOT']) && strpos($_SERVER['SCRIPT_FILENAME'],$_SERVER['DOCUMENT_ROOT']) === 0){
+	            $this->_scriptUrl = str_replace('\\','/',str_replace($_SERVER['DOCUMENT_ROOT'],'',$_SERVER['SCRIPT_FILENAME']));
+	        }
 	    }
-	    return $this->scriptUrl;
+	    return $this->_scriptUrl;
 	}
 
-	public function param($attributes, $default_val = null){
+	public function param($attributes, $default_val = null)
+	{
 		if(!is_array($attributes)){
 			$val = $default_val;
-			if(isset($_POST[$attributes]))
-			$val = $_POST[$attributes];
+			if(isset($_POST[$attributes])){
+				$val = $_POST[$attributes];
+			}
 
-			if(isset($_GET[$attributes]))
-			$val = $_GET[$attributes];
-
+			if(isset($_GET[$attributes])){
+				$val = $_GET[$attributes];
+			}
 			return $val;
 		}else{
 			$ar = array();
@@ -162,20 +219,21 @@ class Http{
 					$key=$v;
 				}
 
-				if(isset($_POST[$key]))
+				if(isset($_POST[$key])){
 					$val = $_POST[$key];
+				}
 
-				if(isset($_GET[$key]))
+				if(isset($_GET[$key])){
 					$val = $_GET[$key];
-
+				}
 				$ar[$key] = $val;
 			}
 			return $ar;
 		}
 	}
 
-	function url($path = '/', $params = array(), $host = '/', $scheme = 'http'){
-
+	function url($path = '/', $params = array(), $host = '/', $scheme = 'http')
+	{
 		if($host === null){
 			$host=$this->baseUrl();
 		}else if($host == '/'){
@@ -212,7 +270,8 @@ class Http{
 		return $host.$path.(count($params) > 0 ? '?'.$this->serialise($params) : '').($fragment ? '#'.$fragment : '');
 	}
 	
-	public function serialise($params = null,$array=false){
+	public function serialise($params = null,$array=false)
+	{
 		$ar = array();
 		if(empty($params)){
 			$params = $_GET;
@@ -221,21 +280,25 @@ class Http{
 	
 		foreach($params as $field => $value){
 			if(is_array($value)){
-				foreach($value as $f=>$v)
+				foreach($value as $f=>$v){
 					$ar[] = $field.'[]='.$value;
-			}else
+				}
+			}else{
 				$ar[] = $field.'='.$value;
+			}
 		}
 		return $array?$ar:implode('&amp;', $ar);
 	}	
 
-	function redirect($url, $attr = array(), $host='/'){
+	function redirect($url, $attr = array(), $host='/')
+	{
 		header("Location: ".$this->url($url, $attr, $host));
 		exit();
 	}
 
 	// There is no setHeader function, that smells like code buff
-	function headers($headers){
+	function headers($headers)
+	{
 		foreach($headers as $key => $value){
 			header($key.': '.$vlaue);
 		}
@@ -248,7 +311,8 @@ class Http{
 	 * 
 	 * If you want a more accurate version please use `get_browser()`.
 	 */
-	function getMajorBrowserName(){
+	function getMajorBrowserName()
+	{
 		$u_agent = $_SERVER['HTTP_USER_AGENT'];
 		$u_brows_key = 'u';
 		if(preg_match('/MSIE/i',$u_agent)){
@@ -267,23 +331,29 @@ class Http{
 		return $u_brows_key;
 	}
 
-	public function getNormalisedReferer(){
+	public function getNormalisedReferer()
+	{
 		if(isset($_SERVER['HTTP_REFERER'])){
 			$referer = parse_url($_SERVER['HTTP_REFERER'], PHP_URL_HOST);
 		}else{
 			$referer = 'Direct Entry';
 		}
 
-		if($referer === false)
+		if($referer === false){
 			return null;
-		if(strlen($referer) > 0)
+		}
+		if(strlen($referer) > 0){
 			return $referer;
+		}
 		return null;
 	}
 
-	function is_search_bot($bot_string){
+	function is_search_bot($bot_string)
+	{
 		// TODO detect by browser
-		if(strlen($bot_string) <= 0) return true;
+		if(strlen($bot_string) <= 0){ 
+			return true;
+		}
 
 		$spam_array = array(
 			"^Java",
@@ -352,26 +422,6 @@ class Http{
 		return false;
 	}
 
-	function setCsrfToken(){
-		$_SESSION[$this->csrf_token_name] = md5(glue\util\Crypt::generate_new_pass());
-	}
-
-	function getCsrfToken(){
-		if(!isset($_SESSION[$this->csrf_token_name])) $this->setCsrfToken();
-		return $_SESSION[$this->csrf_token_name];
-	}
-
-	function validateCsrfToken($value = null){
-		if($this->isPost() && $this->enableCsrfValidation){
-			$session_token = isset($_SESSION[$this->csrf_token_name]) ? $_SESSION[$this->csrf_token_name] : '';
-			$POST_token = isset($_POST[$this->csrf_token_name]) ? $_POST[$this->csrf_token_name] : $value;
-
-			$valid = $session_token===$POST_token;
-			$this->csrf_error = $valid ? false : true;
-			return $valid;
-		}
-	}
-
 	protected function decodePathInfo($pathInfo)
 	{
 	    $pathInfo = urldecode($pathInfo);
@@ -387,18 +437,17 @@ class Http{
 	     | \xF0[\x90-\xBF][\x80-\xBF]{2}      # planes 1-3
 	     | [\xF1-\xF3][\x80-\xBF]{3}          # planes 4-15
 	     | \xF4[\x80-\x8F][\x80-\xBF]{2}      # plane 16
-	    )*$%xs', $pathInfo))
-	    {
+	    )*$%xs', $pathInfo)){
 	        return $pathInfo;
-	    }
-	    else
-	    {
+	    }else{
 	        return utf8_encode($pathInfo);
 	    }
 	}
 
-	function getArg($f){
-		return isset($this->argv[$f]) ? $this->argv[$f] : null;
+	function arg($f)
+	{
+		$this->parseArgs($_SERVER['argv']);
+		return isset($this->_argv[$f]) ? $this->_argv[$f] : null;
 	}
 
     /**
@@ -410,15 +459,15 @@ class Http{
      *                      #78651 function getArgs($args) by B Crawford, 22-Oct-2007
      * @usage               $args = CommandLine::parseArgs($_SERVER['argv']);
      */
-	function parseArgs($argv){
-
+	function parseArgs($argv)
+	{
 		array_shift($argv);
 		$out                            = array();
 
-		foreach ($argv as $arg){
+		foreach($argv as $arg){
 
 			// --foo --bar=baz
-			if (substr($arg,0,2) == '--'){
+			if(substr($arg,0,2) == '--'){
 				$eqPos                  = strpos($arg,'=');
 
 				// --foo
@@ -435,16 +484,16 @@ class Http{
 				}
 			}
 			// -k=value -abc
-			else if (substr($arg,0,1) == '-'){
+			elseif(substr($arg,0,1) == '-'){
 
 				// -k=value
-				if (substr($arg,2,1) == '='){
+				if(substr($arg,2,1) == '='){
 					$key                = substr($arg,1,1);
 					$value              = substr($arg,3);
 					$out[$key]          = $value;
 				}
 				// -abc
-				else {
+				else{
 					$chars              = str_split(substr($arg,1));
 					foreach ($chars as $char){
 						$key            = $char;
@@ -454,12 +503,12 @@ class Http{
 				}
 			}
 			// plain-arg
-			else {
+			else{
 				$value                  = $arg;
 				$out[]                  = $value;
 			}
 		}
-		$this->argv = array_merge($this->argv, $out);
+		$this->_argv = array_merge($this->_argv, $out);
 		return $out;
 	}
 }
