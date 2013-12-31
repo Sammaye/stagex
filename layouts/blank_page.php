@@ -4,7 +4,7 @@ use \glue\Html;
 
 $this->beginPage() ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html xmlns:fb="http://www.facebook.com/2008/fbml">
+<html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<meta http-equiv="content-language" content="en"/>
@@ -14,16 +14,19 @@ $this->beginPage() ?>
 		<title><?php echo Html::encode($this->title) ?></title>
 
 		<?php
-			echo Html::jsFile('/js/jquery.js')."\n";
-			echo Html::jsFile('/js/jquery-ui.js')."\n";
-
-			echo Html::jsFile('/js/bootstrap.js')."\n";
-			echo Html::jsFile('/js/common.js')."\n";
-
-			echo Html::cssFile("/css/bootstrap.css")."\n";
-			echo Html::cssFile("/css/main.css")."\n";
-			echo Html::cssFile("/css/jquery-ui/jquery-ui.css")."\n";
+			$this->jsFile(array(
+				'/js/jquery.js',
+				'/js/jquery-ui.js',
+				'/js/bootstrap.js',
+				'/js/common.js',
+			), self::HEAD);
 			
+			$this->cssFile(array(
+				'/css/bootstrap.css',
+				'/css/jquery-ui/jquery-ui.css',
+				'/css/main.css'
+			));	
+
 			$this->js('ga_script', "var _gaq = _gaq || [];
 			  _gaq.push(['_setAccount', 'UA-31049834-1']);
 			  _gaq.push(['_trackPageview']);
@@ -45,8 +48,7 @@ $this->beginPage() ?>
 	</head>
 	<body>
 		<?php $this->beginBody() ?>
-			<?php app\widgets\Menu::widget() ?>
-		
+			<?php app\widgets\Menu::run() ?>
 			<?php echo $content ?>
 			<div id="mainSearch_results"></div>
 		<?php $this->endBody() ?>

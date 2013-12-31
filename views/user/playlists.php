@@ -109,7 +109,7 @@ $this->js('new_playlist', "
 	<div class="header">
     		<div class='search form-search'>
 			<?php $form = Html::form(array('method' => 'get')); ?>
-				<?php app\widgets\Jqautocomplete::widget(array(
+				<?php app\widgets\Jqautocomplete::run(array(
 					'attribute' => 'query',
 					'value' => urldecode(htmlspecialchars(isset($_GET['query']) ? $_GET['query'] : '')),
 					'placeholder' => 'Search Playlists',
@@ -197,7 +197,7 @@ $this->js('new_playlist', "
 		</div>
 		<?php $html = ob_get_contents();
 	ob_end_clean();
-	app\widgets\stickytoolbar::widget(array(
+	app\widgets\stickytoolbar::run(array(
 		"element" => '.grey_sticky_toolbar',
 		"options" => array(
 			'onFixedClass' => 'grey_sticky_bar-fixed'
@@ -206,7 +206,7 @@ $this->js('new_playlist', "
 	)); ?>
 	<div class='playlist_list'>
 	<?php if($playlist_rows->count() > 0){
-		glue\widgets\ListView::widget(array(
+		glue\widgets\ListView::run(array(
 			'pageSize'	 => 20,
 			'page' 		 => glue::http()->param('page',1),
 			"cursor"	 => $playlist_rows,

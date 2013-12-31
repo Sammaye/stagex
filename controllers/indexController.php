@@ -8,7 +8,7 @@ class indexController extends \glue\Controller
 			'auth' => array(
 				'class' => 'glue\Auth',
 				'rules' => array(
-					//array('allow', 'users' => array('*')),
+					array('allow', 'users' => array('*')),
 					array("deny", "users"=>array("*")),
 				)
 			)

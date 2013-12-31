@@ -53,7 +53,7 @@ glue::$controller->js('dfg', "
 		</ul>
 		<?php if($model->allowTextComments){ ?>
 			<div class='response_pane text_response_content'>
-				<div><?php app\widgets\autoresizetextarea::widget(array(
+				<div><?php app\widgets\autoresizetextarea::run(array(
 					'attribute' => 'text_comment_content', 'class' => 'text_comment_content form-control'
 				)) ?></div><input type="button" value="Post Response" class="btn btn-success post_response" style='margin-top:10px;'/>
 			</div>

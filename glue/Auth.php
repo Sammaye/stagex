@@ -10,6 +10,8 @@ class Auth extends Behaviour
     public $shortcuts;
     public $filters;
     public $responses;
+    
+    public $rules;
 
     public function events()
     {
@@ -22,7 +24,7 @@ class Auth extends Behaviour
     {
         if(is_callable(array($controller, $action))){
             $this->controller=$controller;
-            if($this->parseControllerRights($controller->authRules(), preg_replace('/'.glue::$actionPrefix.'/', '', $action))){
+            if(glue::auth()->parseControllerRights($this->rules, preg_replace('/'.glue::$actionPrefix.'/', '', $action))){
                 return true;
             }else{
                 glue::trigger('403');
@@ -81,7 +83,7 @@ class Auth extends Behaviour
      * @param unknown_type $controllerPermissions
      * @param unknown_type $action
      */
-    protected function parseControllerRights($controllerPermissions, $action)
+    public function parseControllerRights($controllerPermissions, $action)
     {
         foreach($controllerPermissions as $permission){
 

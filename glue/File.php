@@ -1,7 +1,7 @@
 <?php
 namespace glue;
 
-use \glue\Exception;
+use Glue;
 
 /**
  * This represents any kind of file, including uploaded ones

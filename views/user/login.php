@@ -26,7 +26,7 @@
 				<div class='captcha noninput_row'>
 					<p class='small'><b>Please note:</b> Since you have unsuccessfully logged in 3 times now you must also fill in the captcha to prove you are human.</p>
 					<?php
-					app\widgets\reCaptcha\recaptcha::widget(array(
+					app\widgets\reCaptcha\recaptcha::run(array(
 						"public_key"=>"6LfCNb0SAAAAAF4EZ2hV_4JCxbY3lfq0ren11EfM",
 						"errors"=>$model->captchaError
 					)) 

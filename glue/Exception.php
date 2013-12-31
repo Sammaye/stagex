@@ -1,4 +1,6 @@
 <?php
 namespace glue;
 
-class Exception extends \Exception{}
+class Exception extends \Exception
+{
+}

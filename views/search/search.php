@@ -39,7 +39,7 @@ $this->js('page', "
 </div>
 </div>
 <div class='grid-container site_search_page' style='margin-bottom:250px;'>
-	<?php app\widgets\UserMenu::widget(); ?> 
+	<?php app\widgets\UserMenu::run(); ?> 
 	<div class='grid-col-41'>
 
 	<div class='search_filter_bar clearfix'>
@@ -162,7 +162,7 @@ $this->js('page', "
 		</ul>
 	</div>
 	<?php } ?>
-	<div class='clearfix'><?php glue\widgets\Pagination::widget(array('totalItems' => $sphinx->totalFound, 'page' => glue::http()->param('page',1), 
+	<div class='clearfix'><?php glue\widgets\Pagination::run(array('totalItems' => $sphinx->totalFound, 'page' => glue::http()->param('page',1), 
 		'data' => array('orderby' => $orderby, 'filter_duration' => $filter_duration, 'filter_category' => $filter_category, 
 		'filter_time' => $filter_time, 'filter_type' => $filter_type, 'query' => glue::http()->param('query')))) ?></div>
 	</div>

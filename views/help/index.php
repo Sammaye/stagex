@@ -2,7 +2,7 @@
 	<h1 class="hero">Support</h1>
     <div class='search hero-search'>
 		<?php $form = html::form(array('action' => '/help/search', 'method' => 'get')); ?><div class="search_input">
-			<?php app\widgets\Jqautocomplete::widget(array(
+			<?php app\widgets\Jqautocomplete::run(array(
 				'attribute' => 'query',
 				'options' => array(
 					'appendTo' => '#help_search_results',

@@ -42,7 +42,7 @@ glue::$controller->js('page',"
 	<div class='video_list'>
 		<?php
 		if($sphinx_cursor->totalFound> 0){
-			glue\widgets\ListView::widget(array(
+			glue\widgets\ListView::run(array(
 			'pageSize'	 => 20,
 			'page' 		 => isset($_GET['page']) ? $_GET['page'] : 1,
 			"cursor"	 => $sphinx_cursor,

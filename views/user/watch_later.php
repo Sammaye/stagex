@@ -90,7 +90,7 @@
 		</div>	
 	<?php $html = ob_get_contents();
 	ob_end_clean();
-	app\widgets\stickytoolbar::widget(array(
+	app\widgets\stickytoolbar::run(array(
 		"element" => '.grey_sticky_bar',
 		"options" => array(
 			'onFixedClass' => 'grey_sticky_bar-fixed'

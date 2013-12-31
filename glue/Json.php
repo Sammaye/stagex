@@ -2,13 +2,14 @@
 
 namespace glue;
 
-class json{
-
+class Json
+{
 	const DENIED = 1;
 	const LOGIN = 2;
 	const UNKNOWN = 3;
 
-	static function success($params){
+	public static function success($params)
+	{
 		if(is_string($params)){
 			return json_encode(array('success' => true, 'message' => array($params)));
 		}else{
@@ -18,10 +19,11 @@ class json{
 			echo $json;
 			exit(0);
 		}
-		return $json;		
+		return $json;
 	}
 
-	static function error($params){
+	public static function error($params)
+	{
 		switch(true){
 			case $params == self::DENIED:
 				return json_encode(array('success' => false, 'message' => array('Action not Permitted')));

@@ -55,6 +55,12 @@ class Component{
 	function init()
 	{
 	}
+	
+	function getName(){
+		$class=get_class($this);
+		$parts=explode('\\',$class);
+		return end($parts);
+	}	
 
 	/**
 	 * Checks to see if a method exists. This will search all behaviours as well to see if a method exists

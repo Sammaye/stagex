@@ -90,7 +90,7 @@ glue::$controller->js('thread', "
 			</div>
 			<div class='reply'>
 				<div class="form-group">
-				<?php app\widgets\autoresizetextarea::widget(array(
+				<?php app\widgets\autoresizetextarea::run(array(
 				'attribute' => 'reply_comment_content', 'class' => 'reply_coment_content form-control grid-col-35'
 				)) ?>					
 				</div>

@@ -4,9 +4,10 @@ namespace glue;
 
 use Glue;
 use \glue\Html;
+use \glue\Json;
 
-class Controller extends Component{
-
+class Controller extends Component
+{
 	const HEAD = 1;
 	const BODY_BEGIN = 2;
 	const BODY_END = 3;
@@ -15,9 +16,9 @@ class Controller extends Component{
 	const LOGIN = 2;
 	const UNKNOWN = 3;
 
-	public $tpl_head = '<![CDATA[GLUE-BLOCK-HEAD]]>';
-	public $tpl_body_begin = '<![CDATA[GLUE-BLOCK-BODY]]>';
-	public $tpl_body_end = '<![CDATA[GLUE-BLOCK-BODY_END]]>';
+	public $tplHead = '<![CDATA[GLUE-BLOCK-HEAD]]>';
+	public $tplBodyBegin = '<![CDATA[GLUE-BLOCK-BODY]]>';
+	public $tplBodyEnd = '<![CDATA[GLUE-BLOCK-BODY_END]]>';
 
 	public $defaultAction = 'index';
 	public $layout = "blank_page";
@@ -29,29 +30,26 @@ class Controller extends Component{
 	public $metaTags;
 	public $linkTags;
 
-	public $jsFiles;
-	public $js;
-
-	public $cssFiles;
 	public $css;
+	public $cssFiles;
 	
-	function getName(){
-		$class=get_class($this);
-		$parts=explode('\\',$class);
-		return end($parts);
-	}
+	public $js;
+	public $jsFiles;
 
-	function authRules(){ return array(); }
-
-	public function init(){
+	public function init()
+	{
 		$this->title = $this->title ?: glue::$name;
-		if(glue::$description!==null)
+		if(glue::$description !== null){
 			$this->metaTag('description', glue::$description);
-		if(glue::$keywords!==null)
+		}
+		if(glue::$keywords !== null){
 			$this->metaTag('keywords', glue::$keywords);
+		}
+		parent::init();
 	}
 	
-	function run($action){
+	public function run($action)
+	{
 		if($this->beforeAction($this, $action)){
 			$this->action=$action; // We set this so we know what action in that controller is being run
 			call_user_func_array(array($this,$action),array());
@@ -59,97 +57,108 @@ class Controller extends Component{
 		$this->afterAction($this, $action);
 	}	
 
-	function cssFile($map, $path=null, $media = null){
-		if($path===null)
-		$this->cssFiles[basename($map,'.css')] = Html::cssFile($map,$media);
-		else
-		$this->cssFiles[$map] = Html::cssFile($path, $media);
-	}
-
-	function css($map, $script, $media = null){
-		$this->css[$map] = Html::css($media, $script);
-	}
-
-	function jsFile($map, $path=null, $POS = self::HEAD){
-		if($path===null)
-			$this->jsFiles[$POS][basename($map,'.js')] = Html::jsFile($map);
-		else
-			$this->jsFiles[$POS][$map] = Html::jsFile($path);
-	}
-
-	function js($map, $script, $POS = self::BODY_END){
-		$this->js[$POS][$map] = $script;
-	}
-
-	function metaTag($name, $html){
-		$this->metaTags[$name] = Html::metaTag($html,array('name'=>$name));
-	}
-
-	function linkTag($options,$key=null){
-		if($key===null)
-			$this->linkTags[] = Html::linkTag($options);
-		else
-			$this->linkTags[$name] = Html::linkTag($options);
-	}
-
-	public function render($view, $params = array()){
-		$viewFile = $this->getViewPath($view);
-		$content = $this->renderFile($viewFile, $params);
-		$layoutFile = $this->getLayoutPath($this->layout);
-		if ($layoutFile !== false) {
-			return $this->renderFile($layoutFile, array_merge($params,array('content'=>$content)));
-		} else {
-			return $content;
+	public function cssFile($map, $path = null, $media = null)
+	{
+		if(is_array($map)){
+				
+			$path = is_null($path) ? $media : $path;
+			foreach($map as $k => $v){
+				if(is_numeric($k)){
+					$this->cssFile($v, null, $path);
+				}else{
+					$this->cssFile($k, $v, $path);
+				}
+			}
+			
+		}else{		
+			if($path === null){
+				$this->cssFiles[basename($map,'.css')] = Html::cssFile($map,$media);
+			}else{
+				$this->cssFiles[$map] = Html::cssFile($path, $media);
+			}
 		}
 	}
 
-	public function renderPartial($view, $params = array()){
-		$viewFile = $this->getViewPath($view);
-		return $this->renderFile($viewFile, $params, $this);
+	public function css($map, $script, $media = null)
+	{
+		$this->css[$map] = Html::css($media, $script);
 	}
 
-	public function renderFile($_file_, $_params_ = array()){
-		ob_start();
-		ob_implicit_flush(false);
-		extract($_params_, EXTR_OVERWRITE);
-		require($_file_);
-		return ob_get_clean();
+	public function jsFile($map, $path = null, $pos = self::BODY_END)
+	{
+		if(is_array($map)){
+			
+			$path = is_null($path) ? $pos : $path;
+			foreach($map as $k => $v){
+				if(is_numeric($k)){
+					$this->jsFile($v, null, $path);
+				}else{
+					$this->jsFile($k, $v, $path);
+				}
+			}
+			
+		}else{
+			if($path === null){
+				$this->jsFiles[$pos][basename($map,'.js')] = Html::jsFile($map);
+			}else{
+				$this->jsFiles[$pos][$map] = Html::jsFile($path);
+			}
+		}
 	}
 
+	public function js($map, $script, $pos = self::BODY_END)
+	{
+		$this->js[$pos][$map] = $script;
+	}
+
+	public function metaTag($name, $html)
+	{
+		$this->metaTags[$name] = Html::metaTag($html,array('name'=>$name));
+	}
+
+	public function linkTag($options,$key=null)
+	{
+		if($key === null){
+			$this->linkTags[] = Html::linkTag($options);
+		}else{
+			$this->linkTags[$name] = Html::linkTag($options);
+		}
+	}
+	
 	/**
 	 * Marks the beginning of an HTML page.
 	 */
 	public function beginPage(){
 		ob_start();
 		ob_implicit_flush(false);
-		glue::trigger('beforeRender');
+		$this->beforeRender($this, $this->action);
 	}
-
+	
 	public function head(){
-		echo $this->tpl_head;
+		echo $this->tplHead;
 	}
-
+	
 	public function beginBody(){
-		echo $this->tpl_body_begin;
+		echo $this->tplBodyBegin;
 	}
-
+	
 	public function endBody(){
-		echo $this->tpl_body_end;
+		echo $this->tplBodyEnd;
 	}
-
+	
 	/**
 	 * Marks the ending of an HTML page.
 	 */
 	public function endPage(){
-		glue::trigger('afterRender');
-
+		$this->afterRender($this, $this->action);
+	
 		$content = ob_get_clean();
 		echo strtr($content, array(
-			$this->tpl_head => $this->renderHeadHtml(),
-			$this->tpl_body_begin => $this->renderBodyBeginHtml(),
-			$this->tpl_body_end => $this->renderBodyEndHtml(),
+				$this->tplHead => $this->renderHeadHtml(),
+				$this->tplBodyBegin => $this->renderBodyBeginHtml(),
+				$this->tplBodyEnd => $this->renderBodyEndHtml(),
 		));
-
+	
 		unset(
 				$this->metaTags,
 				$this->linkTags,
@@ -188,7 +197,7 @@ class Controller extends Component{
 		}
 		return empty($lines) ? '' : implode("\n", $lines) . "\n";
 	}
-
+	
 	/**
 	 * Renders the content to be inserted at the beginning of the body section.
 	 * The content is rendered using the registered JS code blocks and files.
@@ -205,7 +214,7 @@ class Controller extends Component{
 		}
 		return empty($lines) ? '' : implode("\n", $lines) . "\n";
 	}
-
+	
 	/**
 	 * Renders the content to be inserted at the end of the body section.
 	 * The content is rendered using the registered JS code blocks and files.
@@ -221,10 +230,37 @@ class Controller extends Component{
 			$lines[] = Html::js(implode("\n", $this->js[self::BODY_END]));
 		}
 		return empty($lines) ? '' : implode("\n", $lines) . "\n";
+	}	
+
+	public function render($view, $params = array())
+	{
+		$viewFile = $this->getViewPath($view);
+		$content = $this->renderFile($viewFile, $params);
+		$layoutFile = $this->getLayoutPath($this->layout);
+		if($layoutFile !== false){
+			return $this->renderFile($layoutFile, array_merge($params, array('content'=>$content)));
+		}else{
+			return $content;
+		}
 	}
 
-	function getViewPath($path){
+	public function renderPartial($view, $params = array())
+	{
+		$viewFile = $this->getViewPath($view);
+		return $this->renderFile($viewFile, $params, $this);
+	}
 
+	public function renderFile($_file_, $_params_ = array())
+	{
+		ob_start();
+		ob_implicit_flush(false);
+		extract($_params_, EXTR_OVERWRITE);
+		require($_file_);
+		return ob_get_clean();
+	}
+	
+	public function getViewPath($path)
+	{
 		$path = strlen(pathinfo($path, PATHINFO_EXTENSION)) <= 0 ? $path.'.php' : $path;
 
 		if(strpos($path, '../') === 0){
@@ -241,12 +277,12 @@ class Controller extends Component{
 
 			// Then lets attempt to get the cwd from the controller. If the controller is not set we use siteController as default. This can occur for cronjobs
 			return str_replace('/', DIRECTORY_SEPARATOR, glue::getPath('@app').'/views/'.str_replace('Controller', '',
-					glue::$controller instanceof \glue\Controller ? get_class(glue::$controller) : 'siteController').'/'.$path);
+					glue::controller() instanceof \glue\Controller ? get_class(glue::$controller) : 'siteController').'/'.$path);
 		}
 	}
 
-	function getLayoutPath($path){
-
+	public function getLayoutPath($path)
+	{
 		$path = strlen(pathinfo($path, PATHINFO_EXTENSION)) <= 0 ? $path.'.php' : $path;
 
 		if(mb_substr($path, 0, 1) == '/'){
@@ -262,7 +298,8 @@ class Controller extends Component{
 		}
 	}
 
-	function json_success($params,$exit=true){
+	public function json_success($params,$exit=true)
+	{
 
 		$json='';
 		if(is_string($params)){
@@ -278,7 +315,8 @@ class Controller extends Component{
 		return $json;
 	}
 
-	function json_error($params,$exit=true){
+	public function json_error($params,$exit=true)
+	{
 		$json='';
 		switch(true){
 			case $params == self::DENIED:
@@ -306,15 +344,8 @@ class Controller extends Component{
 		return $json;
 	}
 
-	function compressCSS($buffer) {
-		/* remove comments */
-		$buffer = preg_replace('!/\*[^*]*\*+([^/][^*]*\*+)*/!', '', $buffer);
-		/* remove tabs, spaces, newlines, etc. */
-		$buffer = preg_replace('/(?:\s\s+|\n|\t)/', '', $buffer);
-		return $buffer;
-	}
-	
-	function createUrl($path = '/', $params = array(), $host = '/', $scheme = 'http'){
+	function createUrl($path = '/', $params = array(), $host = '/', $scheme = 'http')
+	{
 		return glue::http()->url($path, $params, $host, $scheme);
 	}
 	
@@ -327,4 +358,14 @@ class Controller extends Component{
 	{
 		return $this->trigger('afterAction', array($controller, $action));
 	}
+	
+	public function beforeRender($controller, $action)
+	{
+		return $this->trigger('beforeRender', array($controller, $action));
+	}
+	
+	public function afterRender($controller, $action)
+	{
+		return $this->trigger('afterRender', array($controller, $action));
+	}	
 }

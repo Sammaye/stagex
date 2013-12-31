@@ -1,19 +1,26 @@
 <?php
 namespace glue\util;
 
-class DateTime{
+class DateTime
+{
 	function ago($datefrom,$dateto=-1)
 	{
 		// Defaults and assume if 0 is passed in that
 		// its an error rather than the epoch
 
-		if($datefrom instanceof \MongoDate)
+		if($datefrom instanceof \MongoDate){
 			$datefrom = $datefrom->sec;
-		if($dateto instanceof \MongoDate)
+		}
+		if($dateto instanceof \MongoDate){
 			$dateto=$dateto->sec;
+		}
 
-		if($datefrom==0) { return "A long time ago"; }
-		if($dateto==-1) { $dateto = time(); }
+		if($datefrom==0){ 
+			return "A long time ago"; 
+		}
+		if($dateto==-1){ 
+			$dateto = time(); 
+		}
 
 		// Make the entered date into Unix timestamp from MySQL datetime field
 
@@ -32,8 +39,7 @@ class DateTime{
 		// returned is 1, be sure to return the singular
 		// of the unit, e.g. 'day' rather 'days'
 
-		switch(true)
-		{
+		switch(true){
 			// If difference is less than 60 seconds,
 			// seconds is a good interval of choice
 			case(strtotime('-1 min', $dateto) < $datefrom):
@@ -56,8 +62,7 @@ class DateTime{
 				// days is a good interval
 			case(strtotime('-1 week', $dateto) < $datefrom):
 				$day_difference = 1;
-				while (strtotime('-'.$day_difference.' day', $dateto) >= $datefrom)
-				{
+				while (strtotime('-'.$day_difference.' day', $dateto) >= $datefrom){
 					$day_difference++;
 				}
 
@@ -68,8 +73,7 @@ class DateTime{
 				// weeks is a good interval
 			case(strtotime('-1 month', $dateto) < $datefrom):
 				$week_difference = 1;
-				while (strtotime('-'.$week_difference.' week', $dateto) >= $datefrom)
-				{
+				while (strtotime('-'.$week_difference.' week', $dateto) >= $datefrom){
 					$week_difference++;
 				}
 
@@ -83,8 +87,7 @@ class DateTime{
 				// the 'incorrect' value for a day
 			case(strtotime('-1 year', $dateto) < $datefrom):
 				$months_difference = 1;
-				while (strtotime('-'.$months_difference.' month', $dateto) >= $datefrom)
-				{
+				while (strtotime('-'.$months_difference.' month', $dateto) >= $datefrom){
 					$months_difference++;
 				}
 
@@ -100,8 +103,7 @@ class DateTime{
 				// a year has gone by
 			case(strtotime('-1 year', $dateto) >= $datefrom):
 				$year_difference = 1;
-				while (strtotime('-'.$year_difference.' year', $dateto) >= $datefrom)
-				{
+				while (strtotime('-'.$year_difference.' year', $dateto) >= $datefrom){
 					$year_difference++;
 				}
 
@@ -113,7 +115,8 @@ class DateTime{
 		return $res;
 	}
 
-	static function getMonthsOfYear(){
+	static function getMonthsOfYear()
+	{
 		$months = array(
 		1 => 'January',
 		2 => 'February',
@@ -132,7 +135,8 @@ class DateTime{
 		return $months;
 	}
 
-	static function getDaysOfMonth(){
+	static function getDaysOfMonth()
+	{
 		$ret = array();
 		$days = range(1, 32);
 
@@ -142,7 +146,8 @@ class DateTime{
 		return $ret;
 	}
 
-	static function getYearRange($start = 0, $end = 100){
+	static function getYearRange($start = 0, $end = 100)
+	{
 		$data = Array();
 
 		$thisYear = $start == 0 ? date('Y') : $start;

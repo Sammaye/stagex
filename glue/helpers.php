@@ -153,6 +153,14 @@ function js_quote($js,$forUrl=false)
 	return strtr($js,array("\t"=>'\t',"\n"=>'\n',"\r"=>'\r','"'=>'\"','\''=>'\\\'','\\'=>'\\\\','</'=>'<\/'));
 }
 
+function compressCSS($buffer) {
+	/* remove comments */
+	$buffer = preg_replace('!/\*[^*]*\*+([^/][^*]*\*+)*/!', '', $buffer);
+	/* remove tabs, spaces, newlines, etc. */
+	$buffer = preg_replace('/(?:\s\s+|\n|\t)/', '', $buffer);
+	return $buffer;
+}
+
 /**
  * var_dump replacement which houses it own self contained HTML and can act on more complex variables
  *

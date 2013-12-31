@@ -1,30 +1,39 @@
+<?php
+
+use \glue\Html;
+
+$this->beginPage() ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html xmlns:fb="http://www.facebook.com/2008/fbml">
+<html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<meta http-equiv="content-language" content="en"/>
 
-		<meta name="description" content="<?php echo $this->pageDescription ?>" />
-		<meta name="keywords" content="<?php echo $this->pageKeywords ?>" />
-
 		<link rel="shortcut icon" href="/images/favicon.ico" />
-
 		<title><?php echo $this->pageTitle ?></title>
 
 		<?php
-			glue::clientScript()->addCoreJsFile('jqueryui', '/js/jquery-ui.js');
-			glue::clientScript()->addCoreJsFile('jquery', '/js/jquery.js');
+		$this->jsFile(array(
+			'/js/jquery.js',
+			'/js/jquery-ui.js',
+			'/js/bootstrap.js',
+			'/js/common.js',
+		), self::HEAD);
+			
+		$this->cssFile(array(
+			'/css/bootstrap.css',
+			'/css/jquery-ui/jquery-ui.css',
+			'/css/main.css'
+		));
 
-			glue::clientScript()->addJsFile('facebox', "/js/facebox.js");
-			glue::clientScript()->addJsFile("common", '/js/common.js');
-
-			glue::clientScript()->addCoreCSSFile('reset', "/css/reset.css");
-			glue::clientScript()->addCoreCSSFile('960', "/css/960.css");
-			glue::clientScript()->addCoreCSSFile('main', "/css/main.css");
-			glue::clientScript()->addCoreCSSFile('springhare', "/css/springhare.css");
+		$this->head();
 		?>
 	</head>
 
-	<body class='all_black'><?php echo $page ?></body>
-
+	<body class='all_black'>
+	<?php $this->beginBody();
+		echo $content;
+	$this->endBody() ?>
+	</body>
 </html>
+<?php $this->endPage() ?>

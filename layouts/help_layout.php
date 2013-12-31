@@ -4,7 +4,7 @@ use \glue\Html;
 
 $this->beginPage() ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html xmlns:fb="http://www.facebook.com/2008/fbml">
+<html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<meta http-equiv="content-language" content="en"/>
@@ -14,37 +14,25 @@ $this->beginPage() ?>
 		<title><?php echo Html::encode($this->title) ?></title>
 
 		<?php
-			echo Html::jsFile('/js/jquery.js')."\n";
-			echo Html::jsFile('/js/jquery-ui.js')."\n";
-			echo Html::jsFile('/js/bootstrap.js')."\n";
-			echo Html::jsFile('/js/common.js')."\n";
-
-			echo Html::cssFile("/css/bootstrap.css")."\n";
-			echo Html::cssFile("/css/main.css")."\n";
-
-			$this->js('ga_script', "var _gaq = _gaq || [];
-			  _gaq.push(['_setAccount', 'UA-31049834-1']);
-			  _gaq.push(['_trackPageview']);
-
-			  (function() {
-			    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-			    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-			    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-		  	})();", self::HEAD);
-
-			$this->js('gplus_one', "(function() {
-		    	var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
-		    	po.src = 'https://apis.google.com/js/plusone.js';
-		    	var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
-		  	})();");
-
-			$this->head();
+		$this->jsFile(array(
+			'/js/jquery.js',
+			'/js/jquery-ui.js',
+			'/js/bootstrap.js',
+			'/js/common.js',
+		), self::HEAD);
+			
+		$this->cssFile(array(
+			'/css/bootstrap.css',
+			'/css/jquery-ui/jquery-ui.css',
+			'/css/main.css'
+		));		
+		$this->head();
 		?>
 	</head>
 	
 	<body>
 		<?php $this->beginBody() ?>
-			<?php app\widgets\Menu::widget(); ?>
+			<?php app\widgets\Menu::run(); ?>
 		<div class="help_page help_layout">
 		<div class='head'>
 			<div class="left">
@@ -59,7 +47,7 @@ $this->beginPage() ?>
 			
     		<div class='search form-search'>
 			<?php $form = Html::form(array('method' => 'get', 'action'=>glue::http()->url('/help/search'))); ?>
-				<?php app\widgets\Jqautocomplete::widget(array(
+				<?php app\widgets\Jqautocomplete::run(array(
 					'attribute' => 'query',
 					'value' => urldecode(htmlspecialchars(isset($_GET['query']) ? $_GET['query'] : '')),
 					'placeholder' => 'Search Help',
@@ -102,3 +90,4 @@ $this->beginPage() ?>
 		<?php $this->endBody() ?>
 	</body>	
 </html>
+<?php $this->endPage() ?>
