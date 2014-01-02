@@ -91,12 +91,12 @@ class Model extends Component
 		$this->_validated = $validated;
 	}
 
-	function getValid()
+	public function getValid()
 	{
 		return $this->_valid;
 	}
 
-	function setValid($valid)
+	public function setValid($valid)
 	{
 		$this->_valid = $valid;
 	}
@@ -205,7 +205,7 @@ class Model extends Component
 	 * If you want to set the full object from scratch use this
 	 * @param $a
 	 */
-	function setAttributes($a, $safeOnly = true)
+	public function setAttributes($a, $safeOnly = true)
 	{
 		$scenario = $this->getScenario();
 		$attributes = array_flip($safeOnly ? $this->scenarioAttributeNames() : $this->attributeNames());
@@ -247,7 +247,7 @@ class Model extends Component
 	 * if it is set
 	 * @param $field
 	 */
-	function getFirstError($field = null)
+	public function getFirstError($field = null)
 	{
 		$errors = $this->getErrors();
 	
@@ -268,7 +268,7 @@ class Model extends Component
 	 * @param string $field
 	 * @param string $message
 	 */
-	function setError($field, $message = null)
+	public function setError($field, $message = null)
 	{
 		if(!$message){
 			$this->_messages[] = $field;
@@ -293,7 +293,7 @@ class Model extends Component
 						if(isset($this->_codes[$fd]) && array_key_exists($vr, array_flip($this->_codes[$fd]))){
 							$match = true;
 						}
-					}	
+					}
 					if($match){
 						$mapped_errors['global'] = $v;
 					}
@@ -321,17 +321,17 @@ class Model extends Component
 		return $this->_codes;
 	}	
 	
-	function setErrorCode($field, $validator)
+	public function setErrorCode($field, $validator)
 	{
 		$this->_codes[$field][] = $validator;
 	}
 
-	function setAttributeErrors($attribute, $errors)
+	public function setAttributeErrors($attribute, $errors)
 	{
 		$this->_messages[$attribute] = $errors;
 	}
 	
-	function setAttributeCodes()
+	public function setAttributeCodes()
 	{
 		$this->_codes[$field] = $codes;
 	}
@@ -341,7 +341,7 @@ class Model extends Component
 	 * then it will clear the errors for only one field.
 	 * @param string $field
 	 */
-	function clearErrors($field = null)
+	public function clearErrors($field = null)
 	{
 		if($field===null){
 			$this->_messages=array();
@@ -357,7 +357,8 @@ class Model extends Component
 	 * Validates the model while running the beforeValidate and afterValidate events of the model.
 	 * @param boolean $runEvents Whether or not to run the events of the model
 	 */
-	public function validate($runEvents = true){
+	public function validate($runEvents = true)
+	{
 		$data = $this->getAttributes();
 		$this->clearErrors();
 		$this->setValidated(false);
@@ -385,7 +386,7 @@ class Model extends Component
 	 * @param $rule The rule in array form
 	 * @param $document The document in array form
 	 */
-	function validateRule($rule)
+	public function validateRule($rule)
 	{
 		// Now lets get the pieces of this rule
 		$scope = isset($rule[0]) ? preg_split('/[\s]*[,][\s]*/', $rule[0]) : null;
@@ -455,22 +456,22 @@ class Model extends Component
 	/**
 	 * EVENTS
 	 */
-	function raise($event){
+	public function raise($event){
 		if(method_exists($this,$event)){
 			$f = $this->$event();
 		}
 		return isset($f) ? $this->trigger($event) && $f : $this->trigger($event);
 	}
 	
-	function onAfterConstruct(){
+	public function onAfterConstruct(){
 		$this->raise('afterConstruct');
 	}
 	
-	function onBeforeValidate(){
+	public function onBeforeValidate(){
 		return $this->raise('beforeValidate');
 	}
 	
-	function onAfterValidate(){
+	public function onAfterValidate(){
 		return $this->raise('afterValidate');
 	}
 
