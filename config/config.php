@@ -30,9 +30,7 @@ return array(
 
 	// load startup components. These components will be loaded at the start and always required before execution of any script.
 	// Good for binding things like logs and auth modules etc to before controller actions
-	'startUp' => array(
-		'auth'
-	),
+	'preload' => array(),
 
 	// This part houses all of the configuration settings for framework components
 	'components' => array(
@@ -54,8 +52,7 @@ return array(
 		// MongoDB configuration settings
 		"db"=>array(
 			"class"=>"glue\db\Client",
-			"server"=>"mongodb://localhost:27017",
-			"db" => "stagex",
+			"dsn"=>"mongodb://localhost:27017/stagex",
 
 			/**
 			 * These are indexes that are used in MongoDB indexed by collection name.
@@ -333,10 +330,6 @@ return array(
 			'output_queue' => 'https://us-west-2.queue.amazonaws.com/663341881510/stagex-outputsQueue'
 		),
 
-		'purifier' => array(
-				'class' => 'glue/plugins/purifier/purify.php'
-		),
-
 		'mailer' => array(
 				'class' => 'glue\\components\\phpmailer\\mailer'
 		),
@@ -407,7 +400,7 @@ return array(
 
 		// These are not required but are here to show you how it is done
 		//'@controllers' => 'controllers',
-		'@models' => 'models', // Models are added to global scope
+		'@models' => 'models'
 	),
 
 	/**
