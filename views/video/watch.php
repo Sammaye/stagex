@@ -307,7 +307,7 @@ $this->js('edit', "
 	<div class="main_body grid-container clearfix">
 	<div class="left_menu">
 		<?php if(glue::auth()->check(array('@'))) 
-			app\widgets\UserMenu::run(); 
+			echo app\widgets\UserMenu::run(); 
 		else
 			echo '&nbsp;';
 		?>

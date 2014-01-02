@@ -32,7 +32,7 @@ $this->beginPage() ?>
 	
 	<body>
 		<?php $this->beginBody() ?>
-			<?php app\widgets\Menu::run(); ?>
+			<?php echo app\widgets\Menu::run(); ?>
 		<div class="help_page help_layout">
 		<div class='head'>
 			<div class="left">

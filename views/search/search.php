@@ -39,7 +39,7 @@ $this->js('page', "
 </div>
 </div>
 <div class='grid-container site_search_page' style='margin-bottom:250px;'>
-	<?php app\widgets\UserMenu::run(); ?> 
+	<?php echo app\widgets\UserMenu::run(); ?> 
 	<div class='grid-col-41'>
 
 	<div class='search_filter_bar clearfix'>

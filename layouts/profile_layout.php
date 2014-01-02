@@ -69,7 +69,7 @@ $this->beginPage() ?>
 	</head>
 	<body>
 		<?php $this->beginBody() ?>
-			<?php app\widgets\Menu::run(); ?>
+			<?php echo app\widgets\Menu::run(); ?>
 			<div class='userbody grid-container'>
 				<?php app\widgets\UserMenu::run(array('tab'=>$this->tab)) ?>
 				<div class='profile_page grid-col-41'>
