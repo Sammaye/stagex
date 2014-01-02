@@ -225,9 +225,9 @@ class User extends \glue\User{
 
 	function validateBirthday($field, $params = array()){
 		$filled_size = count(array_filter(array(
-			\glue\Validation::isEmpty($this->birthDay) ? null : $this->birthDay,
-			\glue\Validation::isEmpty($this->birthMonth) ? null : $this->birthMonth,
-			\glue\Validation::isEmpty($this->birthYear) ? null : $this->birthYear,
+			$this->isEmpty($this->birthDay) ? null : $this->birthDay,
+			$this->isEmpty($this->birthMonth) ? null : $this->birthMonth,
+			$this->isEmpty($this->birthYear) ? null : $this->birthYear,
 		)));
 
 		if($filled_size != 3 && $filled_size > 0){
@@ -283,7 +283,7 @@ class User extends \glue\User{
 			$this->password = Crypt::blowfish_hash($this->password);
 		}
 
-		if(!\glue\Validation::isEmpty($this->newEmail) && $this->newEmail!==$this->email){
+		if(!$this->isEmpty($this->newEmail) && $this->newEmail!==$this->email){
 			$this->setScenario('updateEmail'); // This is so we get some response in the controller about what happened
 			$hash = hash("sha256", Crypt::generate_new_pass().(substr(md5(uniqid(rand(), true)), 0, 32)));
 
