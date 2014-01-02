@@ -3,57 +3,47 @@
 namespace glue\widgets;
 
 use glue;
+use \glue\Widget;
+use \glue\Pagination;
 
 /**
- * GListView Widget
+ * listview Widget
  *
  * This is a more relaxed version of a pure grid view.
  * It allows for custom view files for each item in the table giving a more fluid output than grids.
- *
- * @author Sam Millman
  */
-class ListView extends \glue\Widget{
-
-	public $id; // The id of the widget, mostly used for AJAX and JQuery stuff
-
+class ListView extends Widget
+{
 	public $cursor;
-
-	/**
-	 * @example array('upload_date' => 'Upload Date', 'duration', 'user_id' => array('sort' => 1 //ASC / -1 //DESC, 'label' => 'User'))
-	 */
-	public $sortableAttributes;
 
 	/**
 	 * @example array('upload_date' => -1)
 	 */
 	public $sort; // This will either be current sort from $_GET or default sort
+	/**
+	 * @example array('upload_date' => 'Upload Date', 'duration', 'user_id' => array('sort' => 1 //ASC / -1 //DESC, 'label' => 'User'))
+	 */
+	public $sortableAttributes;
+	public $sortParam = 'sorton';
+	public $orderParam = 'orderby';
+	public $sorterCssClass;
+	
+	public $pagination = array();
 
 	public $enableSorting = true;
 	public $enablePagination = true;
-
-	public $enableAjaxPagination = false;
-	public $ajaxData; // Additional Ajax GET Data
-	public $ajaxUrl; // The URL for Ajax Paging
 
 	/**
 	 * Additional data to be passed to the view when rendering
 	 */
 	public $data=array();
 
-	public $template = '<div class="list_contents">{items}<div class="list_pagination">{pager}<div class="clear"></div></div></div>';
+	public $template = '<div class="list_contents">{items}{pager}</div>';
 	public $itemView;
 	
 	public $callback;
 
-	public $page = 1;
-	public $pageSize = 20;
-	public $maxPage; // Max number of available pages
-
-	public $sorterCssClass;
-	public $pagerCssClass;
-
 	protected $itemCount = 0;
-	protected $pageItemCount = 0; // This is the amount of items really on the page
 
 	/**
 	 * These two are normally taken from the $_GET and won't be set on fresh run of this widget
@@ -61,199 +51,108 @@ class ListView extends \glue\Widget{
 	protected $currentSortAttribute;
 	protected $currentSortOrder;
 
-	function pages(){
-		return $this->maxPage;
-	}
-
-	function init(){
-		$this->pageSize = glue::http()->param('pagesize') > 0 ? glue::http()->param('pagesize') : 20;
-		$this->page = glue::http()->param('page') > 0 ? glue::http()->param('page') : 1;
-
-		$this->currentSortAttribute = glue::http()->param('sorton');
-		$this->currentSortOrder = glue::http()->param('orderby');
-	}
-
-	function sortFromParams(){
-		
-		if($this->currentSortAttribute === null)
-			return; // Do not process sort if none was provided
-
-		if(!array_key_exists($this->currentSortAttribute,$this->sortableAttributes))
-			return; // Do not process sort
-		
-		$sortableAttribute = $this->sortableAttributes[$this->currentSortAttribute];
-
-		if(is_array($sortableAttribute) && isset($sortableAttribute['sort'])){
-			// Then check if this sort is allowed
-			$order = $this->currentSortOrder != $sortableAttribute['sort'] ? $sortableAttribute['sort'] : $this->currentSortOrder;
-		}else{
-			$order = $this->currentSortOrder == '-1' ? -1 : 1; // By default make it ASC
+	function sort()
+	{
+		if($this->sort){
+			if(is_string($this->sort)){
+				$this->currentSortAttribute = $this->sort;
+				$this->currentSortOrder = 1;
+			}elseif(is_array($this->sort)){
+				list($field, $sort) = $this->sort;
+				$this->currentSortAttribute = $field;
+				$this->currentSortOrder = $sort;
+			}
 		}
+		
+		if($paramSort = glue::http()->param($this->sortParam))
+			$this->currentSortAttribute = $paramSort;
+		if($paramOrder = glue::http()->param($this->orderParam))
+			$this->currentSortOrder = $paramOrder;	
 
-		$this->cursor->sort(array($this->currentSortAttribute => $order));
+		if($this->currentSortAttribute === null)
+			return; // Do not process sort if none was provided		
+
+		foreach($this->sortableAttributes as $k => $v){
+			if(is_numeric($k) && $v == $this->currentSortAttribute){
+				if($this->currentSortOrder == 1 || $this->currentSortOrder == -1)
+					$this->cursor->sort(array($this->currentSortAttribute => $this->currentSortOrder));
+				else
+					$this->cursor->sort(array($this->currentSortAttribute => 1)); // Default ASC
+				break;
+			}elseif($k == $this->currentSortAttribute){
+				$sortableAttribute = $this->sortableAttributes[$k];
+				if(is_array($sortableAttribute)){
+					// Then check if this sort is allowed
+					
+					$sort = array_key_exists('sort', $sortableAttribute) ? $sortableAttribute['sort'] : $sortableAttribute;
+					if(is_string($sort)){
+						$order = $this->currentSortOrder == $sort ? $sort : 1;
+					}elseif(in_array($this->currentSortOrder, $sort)){
+						$order = $sort;	
+					}else{
+						$order = 1;
+					}
+				}else{
+					$order = is_string($sortableAttribute) && $this->currentSortOrder == $sortableAttribute ? $sortableAttribute : 1; // By default make it ASC
+				}
+				
+				$this->cursor->sort(array($this->currentSortAttribute => $order));		
+				break;		
+			}
+		}
 	}
 
-	function render(){
-
-		//if(!$this->cursor instanceof \glue\db\Cursor)
-			//trigger_error("You must supply a Cursor for the cursor param of the ListView widget");
-//var_dump($this->cursor); exit();
+	function render()
+	{
 		$this->itemCount = $this->cursor->count();
 
-		if($this->enableSorting){
-
-			if($this->currentSortAttribute!==null){
-				$this->sortFromParams();
-			}elseif(is_array($this->sort)){
-				foreach($this->sort as $field => $sort){
-					$this->currentSortAttribute = $field;
-					$this->currentSortOrder = $sort;
-					break; // @todo add multifield support
-				}
-				$this->cursor->sort($this->sort);
-			}
-			// ELSE do not sort
-		}
+		if($this->enableSorting)
+			$this->sort();
 
 		// Get the current page
 		if($this->enablePagination){
-			// Double check current page and make amendmants if needed
-			$this->maxPage = ceil($this->itemCount / $this->pageSize) < 1 ? 1 : ceil(($this->itemCount) / $this->pageSize);
-			if($this->page < 0 || $this->maxPage < 0){
-				$this->maxPage = 1;
-				$this->page = 1;
-			}
-
-			if($this->page > $this->maxPage) $this->page = $this->maxPage;
-			$this->cursor->skip(($this->page-1)*$this->pageSize)->limit($this->pageSize);
-
-			$pager = $this->__renderPager();
-			$html = preg_replace("/{pager}/", $pager, $this->template);
+			$pager = Pagination::start(array_merge($pagination, array(
+				'itemCount' => $this->itemCount,
+				'params' => array_merge($this->params, array(
+					$this->sortParam => $this->currentSortAttribute,
+					$this->orderParam => $this->currentSortOrder
+				))
+			)));			
+			$this->cursor->skip($pager->getSkip())->limit($pager->getLimit());
+			$html = preg_replace("/{pager}/", $pager->render(), $this->template);
 		}
 
 		ob_start();
-			$this->__renderItems();
-			$items = ob_get_contents();
+		$i = 0;
+		
+		$data = $this->data;
+		$data['i'] = $i;
+
+		foreach($this->cursor as $_id => $item){
+			$fn=$this->callback;
+			$data['item'] = $item;
+			
+			if((is_string($fn) && function_exists($fn)) || (is_object($fn) && ($fn instanceof \Closure))){
+				$fn($i,$item,$this->itemView);
+			}else{
+				if(is_string($this->itemView)){ // Is it a file location?
+					echo glue::controller()->renderPartial($this->itemView, $data);
+				}
+			}
+			$i++;
+		}
+		$items = ob_get_contents();
 		ob_end_clean();
 
 		$html = preg_replace("/{items}/", $items, $html);
 		echo $html;
 	}
 
- 	function __renderPager(){
-
- 		//$this->maxPage = 10;
-
-		$start = $this->page - 5 > 0 ? $this->page - 5 : 1;
-		$end = $this->page + 5 <= $this->maxPage ? $this->page + 5 : $this->maxPage;
-		$ret = "";
-
-		$ret .= "<div class='ListView_Pager {$this->pagerCssClass}'>";
-
-	    if($this->maxPage > 1){
-	    	$ret .= '<ul class="pagination">';
-	    	
-	    	if($this->page != 1 && $this->maxPage > 1) {
-	    		if($this->enableAjaxPagination){
-	    			$ret .= '<li class="control"><a href="#page_'.($this->page-1).'">Previous</a></li>';
-	    		}else{
-	    			$ret .= '<li class="control"><a href="'.$this->getUrl(array('page' => $this->page-1)).'">Previous</a></li>';
-	    		}
-	    	}	    	
-	    	
-		    for ($i = $start; $i <= $end && $i <= $this->maxPage; $i++){
-
-		        if($i==$this->page) {
-		        	if($this->enableAjaxPagination){
-		        		$ret .= '<li class="active" data-page="'.$i.'" style="margin-right:6px;"><a href="#page_'.$i.'">'.$i.'</a></li>';
-		        	}else
-		        		$ret .= '<li class="active" data-page="'.$i.'" style="margin-right:6px;"><a href="'.$this->getUrl(array('page' => $i)).'">'.$i.'</a></li>';
-		        } else {
-		        	if($this->enableAjaxPagination){
-		            	$ret .= '<li><a href="#page_'.($i).'">'.$i.'</a></li>';
-		        	}else{
-		            	$ret .= '<li><a href="'.$this->getUrl(array('page' => $i)).'">'.$i.'</a></li>';
-		        	}
-		        }
-		    }
-		    
-		    if($this->page < $this->maxPage) {
-		    	if($this->enableAjaxPagination){
-		    		$ret .= '<li class="control"><a href="#page_'.($this->page+1).'">Next</a></li>';
-		    	}else{
-		    		$ret .= '<li class="control"><a href="'.$this->getUrl(array('page' => $this->page+1)).'">Next</a></li>';
-		    	}
-		    }		    
-		    
-		    $ret .= '</ul>';
-	    }
-
-	    $ret .= "</div>";
-	    return $ret;
+	function createUrl($morph = array())
+	{
+		return glue::http()->url(array_merge($this->data, array(
+			$this->sortParam => $this->currentSortAttribute,
+			$this->orderParam => $this->currentSortOrder
+		), $morph));
 	}
-
-	function __renderItems(){
-		$i = 0;
-
-		if($this->data){
-			foreach($this->data as $k=>$v){
-				$$k = $v;
-			}
-		}
-
-		foreach($this->cursor as $_id => $item){
-			//for($j=0;$j<5;$j++){
-			
-			$fn=$this->callback;
-			if((is_string($fn) && function_exists($fn)) || (is_object($fn) && ($fn instanceof \Closure))){
-				$fn($i,$item,$this->itemView);
-			}else{
-				if(is_string($this->itemView)){ // Is it a file location?
-					ob_start();
-						include $this->getView($this->itemView);
-						$html = ob_get_contents();
-					ob_end_clean();
-					echo $html;
-				}
-			}
-			$i++;
-			//}
-		}
-	}
-
-	function getUrl($morph = array()){
-		return glue::http()->url(array_merge($this->data, array_merge(
-			array(
-				//"mode"=>urlencode($this->mode),
-				"pagesize"=>$this->pageSize,
-				"page"=>$this->page,
-				"sorton"=>$this->currentSortAttribute,
-				"orderby"=>$this->currentSortOrder
-			), $morph
-		)));
-	}
-
-	function getView($path){
-
-		$path = strlen(pathinfo($path, PATHINFO_EXTENSION)) <= 0 ? $path.'.php' : $path;
-
-		if(mb_substr($path, 0, 1) == '/'){
-
-			// Then this should go from doc root
-			return str_replace('/', DIRECTORY_SEPARATOR, glue::getPath('@app').$path);
-
-		}elseif(strpos($path, '/')!==false){
-
-			// Then this should go from views root (/application/views) because we have something like user/edit.php
-			return str_replace('/', DIRECTORY_SEPARATOR, glue::getPath('@app').'/views/'.$path);
-
-		}else{
-
-			// Then lets attempt to get the cwd from the controller. If the controller is not set we use siteController as default. This can occur for cronjobs
-			return str_replace('/', DIRECTORY_SEPARATOR, glue::getPath('@app').'/views/'.str_replace('controller', '',
-					strtolower(isset(glue::$action['controller']) ? glue::$action['controller'] : 'indexController')).'/'.$path);
-		}
-	}
-
-	function end(){}
 }

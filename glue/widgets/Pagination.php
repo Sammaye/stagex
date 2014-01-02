@@ -2,83 +2,151 @@
 
 namespace glue\widgets;
 
-use glue;
+use \glue\Widget;
 
-class Pagination extends \glue\Widget{
+class Pagination extends Widget
+{	
+	public $pageParam = 'page';
+	public $sizeParam = 'pagesize';
 	
-	public $page=1;
-	public $pageSize=20;
-	public $totalItems;
-	public $maxPage;
-	
-	public $data;
-	
-	public $enableAjaxPagination=false;
-	public $pagerCssClass='';
-	
-	public function init(){
+	public $params = array(); // Additional URL vars
+		
+	public $pageSize;
+	public $itemCount;
 
+	public $enableAjaxPagination = false;
+	public $cssClass = '';
+	
+	public $validatePage = false;
+	
+	public $previousCaption = 'Previous';
+	public $nextCaption = 'Next';
+	
+	public $pageRange = 5;
+	
+	private $_page;
+	private $_pageCount;
+	
+	public function getPageSize()
+	{
+		if($this->_pageSize === null){
+			$this->_pageSize = glue::http()->param($this->sizeParam);
+			if($_pageSize <= 0){
+				$this->_pageSize = 20;
+			}
+		}
 	}
 	
-	public function render(){
-		if($this->totalItems>0)
-			$this->maxPage=ceil($this->totalItems/$this->pageSize);
-		if($this->page>$this->maxPage)
-			$this->page=$this->maxPage;		
+	public function getPageCount($refresh = false)
+	{
+		if($refresh || $this->_pageCount === null){
+			$this->_pageCount = (int)$this->_itemCount / $this->pageSize;
+		}
+		return $this->_pageCount;
+	}
+	
+	public function setPageCount($count)
+	{
+		$this->_pageCount = $count;
+	}
+	
+	public function getPage($refresh = false)
+	{
+		if($refresh || $this->_page === null){
+			if($page = glue::http()->param($this->pageParam)){
+				$this->_page = $page;
+				if($this->validatePage && $page > $this->getPageCount()){
+						$this->_page = $this->getPageCount();
+				}
+				if($page <= 0){
+					$this->_page = 1;
+				}
+			}else{
+				$this->_page = 1;
+			}
+		}
+		return $this->_page;
+	}
+	
+	public function setPage($page)
+	{
+		$this->_page = $page;
+	}
+	
+	public function render()
+	{
+		if($this->getPageSize() < 1)
+			return; // Infinite
 		
-		//$this->maxPage = 10;
-		$start = $this->page - 5 > 0 ? $this->page - 5 : 1;
-		$end = $this->page + 5 <= $this->maxPage ? $this->page + 5 : $this->maxPage;
+		$page = $this->getPage();
+		$pageCount = $this->getPageCount();
+		
+		$start = $page - $this->pageRange > 0 ? $page - $this->pageRange : 1;
+		$end = ($page + $this->pageRange) <= $pageCount ? $page + $this->pageRange : $pageCount;
 		$ret = "";
 		
-		$ret .= "<div class='ListView_Pager {$this->pagerCssClass}'>";
+		$ret .= "<div class='pagination_widget {$this->cssClass}'>";
 		
-		if($this->maxPage > 1){
+		if($pageCount > 1){
 			$ret .= '<ul class="pagination">';
-			if($this->page != 1 && $this->maxPage > 1) {
+			if($page != 1 && $pageCount > 1) {
 				if($this->enableAjaxPagination){
-					$ret .= '<li class="control"><a href="#page_'.($this->page-1).'">Previous</a></li>';
+					$ret .= '<li class="control"><a href="#page_'.($page-1).'">'.$this->previousCaption.'</a></li>';
 				}else{
-					$ret .= '<li class="control"><a href="'.$this->getUrl(array('page' => $this->page-1)).'">Previous</a></li>';
+					$ret .= '<li class="control"><a href="'.$this->createUrl(array($this->pageParam => $page-1)).'">'.$this->previousCaption.'</a></li>';
 				}
 			}
-
-			for ($i = $start; $i <= $end && $i <= $this->maxPage; $i++){
-				if($i==$this->page) {
+		
+			for ($i = $start; $i <= $end && $i <= $pageCount; $i++){
+				if($i==$page) {
 					if($this->enableAjaxPagination){
-						$ret .= '<li class="active" data-page="'.$i.'" style="margin-right:6px;"><a href="#page_'.$i.'">'.$i.'</a></li>';
+						$ret .= '<li class="active" data-page="'.$i.'"><a href="#page_'.$i.'">'.$i.'</a></li>';
 					}else
-						$ret .= '<li class="active" data-page="'.$i.'" style="margin-right:6px;"><a href="'.$this->getUrl(array('page' => $i)).'">'.$i.'</a></li>';
+						$ret .= '<li class="active" data-page="'.$i.'"><a href="'.$this->createUrl(array($this->pageParam => $i)).'">'.$i.'</a></li>';
 				} else {
 					if($this->enableAjaxPagination){
 						$ret .= '<li><a href="#page_'.($i).'">'.$i.'</a></li>';
 					}else{
-						$ret .= '<li><a href="'.$this->getUrl(array('page' => $i)).'">'.$i.'</a></li>';
+						$ret .= '<li><a href="'.$this->createUrl(array($this->pageParam => $i)).'">'.$i.'</a></li>';
 					}
 				}
 			}
 		
-			if($this->page < $this->maxPage) {
+			if($page < $pageCount) {
 				if($this->enableAjaxPagination){
-					$ret .= '<li class="control"><a href="#page_'.($this->page+1).'">Next</a></li>';
+					$ret .= '<li class="control"><a href="#page_'.($this->page+1).'">'.$this->nextCaption.'</a></li>';
 				}else{
-					$ret .= '<li class="control"><a href="'.$this->getUrl(array('page' => $this->page+1)).'">Next</a></li>';
+					$ret .= '<li class="control"><a href="'.$this->createUrl(array($this->pageParam => $this->page+1)).'">'.$this->nextCaption.'</a></li>';
 				}
 			}
 			$ret .= '</ul>';
 		}
 		
 		$ret .= "</div>";
-		echo $ret;		
+		return $ret;		
 	}
 	
-	function getUrl($morph = array()){
-		return glue::http()->url(array_merge($this->data,
-			array(
-				//"mode"=>urlencode($this->mode),
-				"pagesize"=>$this->pageSize,
-				"page"=>$this->page
-			), $morph
-		));
+	function createUrl($morph = array())
+	{
+		return glue::http()->url(array_merge($this->params, array(
+			$this->sizeParam => $this->getPageCount(),
+			$this->pageParam =>$this->getPage(),
+		), $morph));
 	}	
-}
+	
+	function getSkip()
+	{
+		if($this->getPageSize() > 1){
+			return ($this->getPage() - 1) * $this->getPageSize();
+		}
+		return 0;
+	}
+	
+	function getLimit()
+	{
+		if($this->getPageSize() > 1){
+			return $this->getPageSize();
+		}
+		return null;
+	}
+} 
