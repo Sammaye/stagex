@@ -35,8 +35,8 @@ class highcharts extends \glue\Widget{
 		
 		list($name,$id)=$this->getAttributeNameId();
 		
-		glue::$controller->jsFile('/js/highplot/js/highcharts.js');
-		glue::$controller->js('highcharts.'.$id, "
+		glue::controller()->jsFile('/js/highplot/js/highcharts.js');
+		glue::controller()->js('highcharts.'.$id, "
 		var ".$this->chartName.";
 		$(function(){
 			".$this->chartName."= new Highcharts.Chart({

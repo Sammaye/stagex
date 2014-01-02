@@ -258,7 +258,7 @@ class GridView extends \glue\Widget{
 					'image' => null,
 					'url' => function() use ($doc){
 						return glue::http()->url("/".str_replace("Controller", "",
-							glue::$controller->getName()."/update"), array("id" => $doc->_id));
+							glue::controller()->getName()."/update"), array("id" => $doc->_id));
 					},
 					'visible' => null
 				),
@@ -267,7 +267,7 @@ class GridView extends \glue\Widget{
 					'image' => null,
 					'url' => function() use ($doc){
 						return glue::http()->url("/".str_replace("Controller", "",
-							glue::$controller->getName()."/delete"), array("id" => $doc->_id));
+							glue::controller()->getName()."/delete"), array("id" => $doc->_id));
 					},
 					'visible' => null
 				)

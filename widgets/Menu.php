@@ -71,7 +71,7 @@ class Menu extends \glue\Widget{
 									$val = glue::http()->param('term', '');
 								}
 
-								glue::$controller->js('submitsearch_click', "
+								glue::controller()->js('submitsearch_click', "
 									$(function(){
 										$('.submit_search').click(function(event){
 											event.preventDefault();

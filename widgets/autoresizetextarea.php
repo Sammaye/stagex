@@ -18,8 +18,8 @@ class autoresizetextarea extends \glue\Widget{
 			$id = str_replace(' ', '_', $this->attribute);
 		}
 
-		glue::$controller->jsFile("/js/autosize.js");
-		glue::$controller->js('autoresize#'.$this->attribute.'.init', "
+		glue::controller()->jsFile("/js/autosize.js");
+		glue::controller()->js('autoresize#'.$this->attribute.'.init', "
 			$(function(){
 				$('#".$id."').autosize();
 			});

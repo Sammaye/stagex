@@ -2,9 +2,9 @@
 
 $ajaxPagination=isset($ajaxPagination)?$ajaxPagination:false;
 
-glue::$controller->jsFile("/js/autosize.js");
+glue::controller()->jsFile("/js/autosize.js");
 
-glue::$controller->js('response_selector', "
+glue::controller()->js('response_selector', "
 	$('.video_response_selector .alert').summarise();
 		
 	$(document).on('click', '.video_response_selector .response_tab', function(event){
@@ -55,7 +55,7 @@ glue::$controller->js('response_selector', "
 	});
 ");
 
-glue::$controller->js('list', "
+glue::controller()->js('list', "
 	var live_comments_timeout;
 
 	$(function(){
@@ -175,7 +175,7 @@ glue::$controller->js('list', "
 "); // All Response list related stuff gets shoved into here
 
 if(isset($ajaxPagination)&&$ajaxPagination){
-	glue::$controller->js('paging', "
+	glue::controller()->js('paging', "
 		// Paging
 		$(document).on('click', '.video_response_list .list .ListView_Pager a', function(event){
 			event.preventDefault();

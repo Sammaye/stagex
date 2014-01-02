@@ -1,5 +1,5 @@
 <?php 
-glue::$controller->js('page',"
+glue::controller()->js('page',"
 	$(function(){
 		//$('div.expandable').expander({slicePoint: 120});
 		

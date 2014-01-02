@@ -41,11 +41,11 @@ class videoPlayer extends \glue\Widget{
 	}
 
 	function mediaElementPlayer(){
-		glue::$controller->jsFile('/js/MediaElement/mediaelement-and-player.min.js');
-		glue::$controller->cssFile('/js/MediaElement/mediaelementplayer.css');
+		glue::controller()->jsFile('/js/MediaElement/mediaelement-and-player.min.js');
+		glue::controller()->cssFile('/js/MediaElement/mediaelementplayer.css');
 
 		if($this->docDim):
-			glue::$controller->js('play_video', "
+			glue::controller()->js('play_video', "
 				$(function(){
 					$('video').mediaelementplayer({
 						'videoHeight': $(window).height()-5,
@@ -58,7 +58,7 @@ class videoPlayer extends \glue\Widget{
 				});
 			");
 		else:
-			glue::$controller->js('play_video', "
+			glue::controller()->js('play_video', "
 				$(function(){
 					var player  = $('video').mediaelementplayer();
 				});

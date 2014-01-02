@@ -45,7 +45,7 @@ class Jqautocomplete extends \glue\Widget{
 
 			$js .= "});";
 
-			glue::$controller->js('jqauto_complete_'.$this->attribute, $js);
+			glue::controller()->js('jqauto_complete_'.$this->attribute, $js);
 			echo \html::textfield($this->attribute, $this->value ? $this->value : null, array_merge(array('class' => $this->attribute, 'placeholder'=>$this->placeholder),$this->htmlOptions));
 		}
 	}

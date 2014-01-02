@@ -1,9 +1,9 @@
 <?php 
 
-glue::$controller->jsFile('/js/select2/select2.js');
-glue::$controller->cssFile('/js/select2/select2.css');
+glue::controller()->jsFile('/js/select2/select2.js');
+glue::controller()->cssFile('/js/select2/select2.css');
 
-glue::$controller->js('dfg', "
+glue::controller()->js('dfg', "
 	$('#video_response_id').select2({
 		placeholder: 'Select a video',
 		minimumInputLength: 3,

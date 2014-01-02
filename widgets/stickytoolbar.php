@@ -10,8 +10,8 @@ class stickytoolbar extends \glue\Widget{
 	public $html;
 
 	function render(){
-		glue::$controller->jsFile('stickytoolbar', "/js/stickytoolbar.js");
-		glue::$controller->js('stickytoolbar.init.'.$this->element, "
+		glue::controller()->jsFile('stickytoolbar', "/js/stickytoolbar.js");
+		glue::controller()->js('stickytoolbar.init.'.$this->element, "
 			$(function(){
 				$('".$this->element."').stickytoolbar(".js_encode($this->options).");
 			});

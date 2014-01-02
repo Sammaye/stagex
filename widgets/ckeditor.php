@@ -15,8 +15,8 @@ class CKEditor extends \glue\Widget{
 	function render(){
 		list($name, $id) = $this->getAttributeNameId();
 
-		glue::$controller->jsFile('ckeditor', '/js/CKEditor/ckeditor.js');
-		glue::$controller->js('ckeditor_'.$id, "
+		glue::controller()->jsFile('ckeditor', '/js/CKEditor/ckeditor.js');
+		glue::controller()->js('ckeditor_'.$id, "
 			$(function(){
 				CKEDITOR.replace('{$id}',
 				".js_encode($this->formOptions())."

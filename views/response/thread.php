@@ -1,7 +1,7 @@
 <?php
-glue::$controller->jsFile("/js/autosize.js");
+glue::controller()->jsFile("/js/autosize.js");
 
-glue::$controller->js('thread', "
+glue::controller()->js('thread', "
 		
 	$('.video_thread_alert.alert').summarise();
 		
