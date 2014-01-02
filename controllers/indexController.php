@@ -9,7 +9,7 @@ class indexController extends \glue\Controller
 				'class' => 'glue\Auth',
 				'rules' => array(
 					array('allow', 'users' => array('*')),
-					array("deny", "users"=>array("*")),
+					array("deny", "users" => array("*")),
 				)
 			)
 		);
@@ -17,6 +17,7 @@ class indexController extends \glue\Controller
 
     public function action_index()
     {
+    	js_encode(array('d' => 1));
         $this->title = "Welcome to the StageX Beta";
         if(glue::auth()->check('@')){
             glue::runAction('stream/news');

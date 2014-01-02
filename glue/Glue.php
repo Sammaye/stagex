@@ -133,7 +133,7 @@ class Glue
 		// Import the includes
 		if(isset($config['include'])){
 			foreach($config['include'] as $path){
-				self::import($path,true);
+				self::import($path, true);
 			}
 		}
 		
@@ -425,15 +425,18 @@ class Glue
 	 */
 	public static function import($path, $include=false, $op='include')
 	{
-		if (strncmp($path, '@', 1)){
-			$path = '@'.$path;
-		}
-
 		$pos = strpos($path,'/');
-		$filePath= $pos !== false ? self::getPath(substr($path,0,$pos)) . substr($path,$pos) : $path;
+		if($pos !== false){
+			if (strncmp($path, '@', 1)){
+				$path = '@'.$path;
+			}
+			$filePath = self::getPath($path);
+		}else{
+			$filePath = self::getPath('@glue/' . $path);
+		}
 		$className = strtolower(basename($path,'.php'));
 
-		if (!isset(self::$_classes[$className])) {
+		if(!isset(self::$_classes[$className])){
 			self::$_classes[$className] = array(
 				'class' => $className,
 				'name' => $path,
@@ -443,10 +446,9 @@ class Glue
 		}else{
 			$filePath=self::$_classes[$className]['file'];
 		}
-
 		$classInfo = self::$_classes[$className];
 		
-		if($classInfo['included'] && $include){
+		if(!$classInfo['included'] && $include){
 			self::$_classes[$className]['included']=true;
 			switch($op){
 				case "include_once":
