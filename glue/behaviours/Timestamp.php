@@ -2,32 +2,54 @@
 
 namespace glue\behaviours;
 
-class Timestamp extends \glue\Behaviour{
-	function beforeSave(){
+use \glue\Behaviour;
+
+class Timestamp extends Behaviour
+{
+	public function events()
+	{
+		return array(
+			'beforeSave' => 'beforeSave'
+		);
+	}
+	
+	public function beforeSave()
+	{
 		if($this->owner->getIsNewRecord()){
 			$this->owner->created = new \MongoDate();
-		}else
+		}else{
 			$this->owner->updated = new \MongoDate();
+		}
 		return true;
 	}
 
-	function getTs($ts,$format=null){
-		if($ts instanceof \MongoDate)
+	public function getTs($ts,$format=null)
+	{
+		if($ts instanceof \MongoDate){
 			return $format!==null?date('l',$ts->sec):$ts->sec;
-		else
+		}else{
 			return null;
+		}
 	}
 
-	function ago($datefrom,$dateto=-1)
+	public function ago($datefrom,$dateto=-1)
 	{
 		// Defaults and assume if 0 is passed in that
 		// its an error rather than the epoch
 		
-		if($datefrom instanceof \MongoDate) $datefrom=$datefrom->sec;
-		if($dateto instanceof \MongoDate) $dateto=$dateto->sec;
+		if($datefrom instanceof \MongoDate){
+			$datefrom=$datefrom->sec;
+		}
+		if($dateto instanceof \MongoDate){
+			$dateto=$dateto->sec;
+		}
 
-		if($datefrom==0) { return "A long time ago"; }
-		if($dateto==-1) { $dateto = time(); }
+		if($datefrom==0) {
+			return "A long time ago";
+		}
+		if($dateto==-1) {
+			$dateto = time();
+		}
 
 		// Make the entered date into Unix timestamp from MySQL datetime field
 
@@ -46,8 +68,7 @@ class Timestamp extends \glue\Behaviour{
 		// returned is 1, be sure to return the singular
 		// of the unit, e.g. 'day' rather 'days'
 
-		switch(true)
-		{
+		switch(true){
 			// If difference is less than 60 seconds,
 			// seconds is a good interval of choice
 			case(strtotime('-1 min', $dateto) < $datefrom):
@@ -70,8 +91,7 @@ class Timestamp extends \glue\Behaviour{
 				// days is a good interval
 			case(strtotime('-1 week', $dateto) < $datefrom):
 				$day_difference = 1;
-				while (strtotime('-'.$day_difference.' day', $dateto) >= $datefrom)
-				{
+				while (strtotime('-'.$day_difference.' day', $dateto) >= $datefrom){
 					$day_difference++;
 				}
 
@@ -82,8 +102,7 @@ class Timestamp extends \glue\Behaviour{
 				// weeks is a good interval
 			case(strtotime('-1 month', $dateto) < $datefrom):
 				$week_difference = 1;
-				while (strtotime('-'.$week_difference.' week', $dateto) >= $datefrom)
-				{
+				while (strtotime('-'.$week_difference.' week', $dateto) >= $datefrom){
 					$week_difference++;
 				}
 
@@ -97,8 +116,7 @@ class Timestamp extends \glue\Behaviour{
 				// the 'incorrect' value for a day
 			case(strtotime('-1 year', $dateto) < $datefrom):
 				$months_difference = 1;
-				while (strtotime('-'.$months_difference.' month', $dateto) >= $datefrom)
-				{
+				while (strtotime('-'.$months_difference.' month', $dateto) >= $datefrom){
 					$months_difference++;
 				}
 
@@ -114,8 +132,7 @@ class Timestamp extends \glue\Behaviour{
 				// a year has gone by
 			case(strtotime('-1 year', $dateto) >= $datefrom):
 				$year_difference = 1;
-				while (strtotime('-'.$year_difference.' year', $dateto) >= $datefrom)
-				{
+				while (strtotime('-'.$year_difference.' year', $dateto) >= $datefrom){
 					$year_difference++;
 				}
 
