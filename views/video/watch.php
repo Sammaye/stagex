@@ -322,7 +322,7 @@ $this->js('edit', "
 			}elseif($model->state == 'uploading' || $model->isProcessing()){
 				?><div class='status-message'>Hold on, we're processing...</div><?php
 			}else{
-				app\widgets\videoPlayer::run(array(
+				echo app\widgets\videoPlayer::run(array(
 					"mp4"=>$model->mp4, "ogg"=>$model->ogg, "width"=>823, "height"=>463
 				));
 			} ?>
@@ -448,7 +448,7 @@ $this->js('edit', "
 				<div id="chartdiv" style="height:200px;width:800px; position:relative; margin-top:20px;"></div>
 				<?php
 				$video_stats = $model->getStatistics_dateRange(mktime(0, 0, 0, date("m"), date("d")-7, date("Y")), mktime(0, 0, 0, date("m"), date("d"), date("Y")));
-				app\widgets\highCharts::run(array(
+				echo app\widgets\highCharts::run(array(
 					'chartName' => 'video_views_plot',
 					'appendTo' => 'chartdiv',
 					'series' => $video_stats['hits'] //array(array('name'=>'c','data'=>array(array(1,1),array(2,2))))		

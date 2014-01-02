@@ -229,7 +229,7 @@ echo $this->renderPartial('response/_selector',array('model'=>$model));
 		$template = ob_get_contents();
 		ob_end_clean();
 		
-		glue\widgets\ListView::run(array(
+		echo glue\widgets\ListView::run(array(
 				'pageSize'	 => 1,
 				"cursor"	 => $comments,
 				'template' 	 => $template,

@@ -376,7 +376,7 @@ class videoresponseController extends \glue\Controller{
 		}
 		
 		ob_start();
-		glue\widgets\ListView::run(array(
+		echo glue\widgets\ListView::run(array(
 		'pageSize'	 => 1,
 		'page' 		 => $page?:1,
 		"cursor"	 => $comments,

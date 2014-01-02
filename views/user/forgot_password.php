@@ -17,7 +17,7 @@
 
 			<div class="password-Captcha">
 				<?php
-					app\widgets\reCaptcha\recaptcha::run(array(
+					echo app\widgets\reCaptcha\recaptcha::run(array(
 						"public_key"=>"6LfCNb0SAAAAAF4EZ2hV_4JCxbY3lfq0ren11EfM",
 						"errors"=>$model->captchaError)
 					);

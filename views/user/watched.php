@@ -133,7 +133,7 @@ $this->js('watched_page', "
 		</div>	
 	<?php $html = ob_get_contents();
 	ob_end_clean();
-	app\widgets\stickytoolbar::run(array(
+	echo app\widgets\stickytoolbar::run(array(
 		"element" => '.grey_sticky_toolbar',
 		"options" => array(
 			'onFixedClass' => 'grey_sticky_bar-fixed'
@@ -144,7 +144,7 @@ $this->js('watched_page', "
 	<div class='video_list'>
 	
 	<?php if($items->count() > 0){
-		glue\widgets\ListView::run(array(
+		echo glue\widgets\ListView::run(array(
 		'pageSize'	 => 20,
 		'page' 		 => glue::http()->param('page',1),
 		"cursor"	 => $items,

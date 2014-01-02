@@ -47,7 +47,7 @@ $this->beginPage() ?>
 			
     		<div class='search form-search'>
 			<?php $form = Html::form(array('method' => 'get', 'action'=>glue::http()->url('/help/search'))); ?>
-				<?php app\widgets\Jqautocomplete::run(array(
+				<?php echo app\widgets\Jqautocomplete::run(array(
 					'attribute' => 'query',
 					'value' => urldecode(htmlspecialchars(isset($_GET['query']) ? $_GET['query'] : '')),
 					'placeholder' => 'Search Help',

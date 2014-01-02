@@ -195,7 +195,7 @@ $this->js('edit', "
 <?php } ?>
 
 <div class="grid-container main_playlist_body">
-	<?php app\widgets\UserMenu::run(array('tab'=>'playlists')); ?> 
+	<?php echo app\widgets\UserMenu::run(array('tab'=>'playlists')); ?> 
 	<div class='grid-col-41'>
 	
 	<h1><?php echo $model->title ?></h1>
@@ -236,7 +236,7 @@ $this->js('edit', "
 		<?php $html = ob_get_contents();
 	ob_end_clean();
 
-	app\widgets\stickytoolbar::run(array(
+	echo app\widgets\stickytoolbar::run(array(
 		"element" => '.grey_sticky_toolbar',
 		"options" => array(
 			'onFixedClass' => 'grey_sticky_bar-fixed'

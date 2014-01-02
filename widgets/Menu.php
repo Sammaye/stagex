@@ -80,7 +80,7 @@ class Menu extends \glue\Widget{
 									});
 								");
 
-								\app\widgets\Jqautocomplete::run(array(
+								echo \app\widgets\Jqautocomplete::run(array(
 									'attribute' => 'term',
 									'value' => $val,
 									'options' => array(

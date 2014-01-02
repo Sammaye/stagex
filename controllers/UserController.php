@@ -697,7 +697,7 @@ class userController extends \glue\Controller{
 		$users=app\models\Follower::model()->search(glue::user()->_id,$query);
 
 		if(count($users) > 0){
-			glue\widgets\ListView::run(array(
+			echo glue\widgets\ListView::run(array(
 				'pageSize'	 => 20,
 				'page' 		 => $page,
 				"cursor"	 => $query?new Collection($users):$users,

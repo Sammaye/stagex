@@ -130,7 +130,7 @@ $this->js('videos', "
 	<div class="header">
     		<div class='search form-search'>
 			<?php $form = Html::form(array('method' => 'get')); ?>
-				<?php app\widgets\Jqautocomplete::run(array(
+				<?php echo app\widgets\Jqautocomplete::run(array(
 					'attribute' => 'query',
 					'value' => urldecode(htmlspecialchars(isset($_GET['query']) ? $_GET['query'] : '')),
 					'placeholder' => 'Search Uploads',
@@ -308,7 +308,7 @@ $this->js('videos', "
 		<?php $html = ob_get_contents();
 	ob_end_clean();
 
-	app\widgets\stickytoolbar::run(array(
+	echo app\widgets\stickytoolbar::run(array(
 		"element" => '.grey_sticky_toolbar',
 		"options" => array(
 			'onFixedClass' => 'grey_sticky_bar-fixed'
@@ -318,7 +318,7 @@ $this->js('videos', "
 
 	<div class="video_list">
 	<?php if($video_rows->count() > 0){
-		glue\widgets\ListView::run(array(
+		echo glue\widgets\ListView::run(array(
 			'pageSize'	 => 20,
 			'page' 		 => isset($_GET['page']) ? $_GET['page'] : 1,
 			"cursor"	 => $video_rows,

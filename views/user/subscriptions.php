@@ -44,7 +44,7 @@ $this->js('user.unsubscribe', "
     </div>
 	<div class='user_subscription_list'>
 	<?php if(glue::user()->totalFollowing > 0){
-		glue\widgets\ListView::run(array(
+		echo glue\widgets\ListView::run(array(
 			'pageSize'	 => 20,
 			"cursor"	 => app\models\Follower::model()->find(array('fromId'=>glue::user()->_id))->sort(array('username'=>-1)),
 			'itemView' => 'user/_subscription.php',

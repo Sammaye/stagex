@@ -47,7 +47,7 @@ $this->beginPage() ?>
 		<?php $this->beginBody() ?>
 			<?php echo app\widgets\Menu::run(); ?>
 			<div class='grid-container userbody'>
-				<?php app\widgets\UserMenu::run(array('tab'=>$this->tab)) ?>
+				<?php echo app\widgets\UserMenu::run(array('tab'=>$this->tab)) ?>
 				<div class='user_section_main_content grid-col-41' >
 					<?php echo $content ?>
 				</div>

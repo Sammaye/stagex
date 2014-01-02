@@ -71,7 +71,7 @@ $this->beginPage() ?>
 		<?php $this->beginBody() ?>
 			<?php echo app\widgets\Menu::run(); ?>
 			<div class='userbody grid-container'>
-				<?php app\widgets\UserMenu::run(array('tab'=>$this->tab)) ?>
+				<?php echo app\widgets\UserMenu::run(array('tab'=>$this->tab)) ?>
 				<div class='profile_page grid-col-41'>
 				
 				<div class='top'>
