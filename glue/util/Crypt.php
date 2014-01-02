@@ -2,55 +2,54 @@
 
 namespace glue\util;
 
-/**
- * GCrypt Extension for the Glue Framework
- *
- * @author smillman
- *
- * I couldn't be bothered to make this myself so I stole it from some user on stackoverflow. I modified it to be able to accept both blowfish and sha512
- *
- */
-class Crypt{
-
+class Crypt
+{
 	public $rounds;
 	public $mode;
 
-	private $randomState;
+	private $_randomState;
 
-	static function AES_encrypt256($blurb){
+	public static function AES_encrypt256($blurb)
+	{
 	    $iv_size = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB);
 	    $iv = mcrypt_create_iv($iv_size, MCRYPT_RAND);
 	    $key = "S4M__1-L-2_-+M6N__00c=++./..#+";
 	    return mcrypt_encrypt(MCRYPT_RIJNDAEL_256, $key, $blurb, MCRYPT_MODE_ECB, $iv);
 	}
 
-	static function AES_decrypt256($blurb){
+	public static function AES_decrypt256($blurb)
+	{
 	    $iv_size = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB);
 	    $iv = mcrypt_create_iv($iv_size, MCRYPT_RAND);
 	    $key = "S4M__1-L-2_-+M6N__00c=++./..#+";
 	    return trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $key, $blurb, MCRYPT_MODE_ECB, $iv));
 	}
 
-	static function blowfish_hash($input, $rounds = 15){
+	public static function blowfish_hash($input, $rounds = 15)
+	{
 		$o = new \glue\util\Crypt();
 		$o->mode = 'blowfish';
 		$o->rounds = $rounds;
 		return $o->hash($input);
 	}
 
-	static function verify($input, $existingHash) {
+	public static function verify($input, $existingHash)
+	{
 		$hash = crypt($input, $existingHash);
 		return $hash === $existingHash;
 	}
 
-	public function hash($input) {
+	public function hash($input)
+	{
 		$hash = crypt($input, $this->getSalt());
-		if(strlen($hash) > 13)
+		if(strlen($hash) > 13){
 			return $hash;
+		}
 		return false;
 	}
 
-	private function getSalt() {
+	private function getSalt()
+	{
 		if($this->mode == 'sha512'){
 			$salt = sprintf('$6$rounds=%02d$', $this->rounds);
 		}else{
@@ -62,7 +61,8 @@ class Crypt{
 		return $salt;
 	}
 
-	private function getRandomBytes($count) {
+	private function getRandomBytes($count)
+	{
 		$bytes = '';
 
 		if(function_exists('openssl_random_pseudo_bytes') &&
@@ -79,20 +79,20 @@ class Crypt{
 		if(strlen($bytes) < $count) {
 			$bytes = '';
 
-			if($this->randomState === null) {
-				$this->randomState = microtime();
+			if($this->_randomState === null) {
+				$this->_randomState = microtime();
 				if(function_exists('getmypid')) {
-					$this->randomState .= getmypid();
+					$this->_randomState .= getmypid();
 				}
 			}
 
 			for($i = 0; $i < $count; $i += 16) {
-				$this->randomState = md5(microtime() . $this->randomState);
+				$this->_randomState = md5(microtime() . $this->_randomState);
 
 				if (PHP_VERSION >= '5') {
-					$bytes .= md5($this->randomState, true);
+					$bytes .= md5($this->_randomState, true);
 				} else {
-					$bytes .= pack('H*', md5($this->randomState));
+					$bytes .= pack('H*', md5($this->_randomState));
 				}
 			}
 
@@ -102,7 +102,8 @@ class Crypt{
 		return $bytes;
 	}
 
-	private function encodeBytes($input) {
+	private function encodeBytes($input)
+	{
 		// The following is code from the PHP Password Hashing Framework
 		$itoa64 = './ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
@@ -131,8 +132,8 @@ class Crypt{
 		return $output;
 	}
 
-	static function generate_new_pass(){
-
+	public static function generate_new_pass()
+	{
 		$length=9; // Length of the returned password
 		$strength=8; // A strength denominator
 

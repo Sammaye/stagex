@@ -2,39 +2,40 @@
 
 namespace glue;
 
-use \glue\Exception;
+use Glue;
+use \glue\Component;
+use \glue\Collection;
 
-class Model{
+class Model extends Component
+{
+	private $_scenario;
 
-	private $scenario;
+	private $_rules = array();
 
-	private $behaviours = array();
-	private $rules = array();
+	private $_valid = false;
+	private $_validated = false;
 
-	private $validator;
-	private $valid = false;
-	private $validated = false;
-
-	private $error_codes = array();
-	private $error_messages = array();
+	private $_codes = array();
+	private $_messages = array();
 
 	private static $_meta=array();
 
-	public function behaviours(){ return array(); }
-
-	public function rules(){ return array(); }
+	public function rules()
+	{
+		return array();
+	}
 
 	/**
 	 * Will either look for a getter function or will just get
 	 * @param string $name
 	 */
-	public function __get($name){
-		if(method_exists($this,'get'.$name)){
-			return $this->{'get'.$name}();
-		}elseif(property_exists($this,$name))
-			return @$this->$name;
-		else
+	public function __get($name)
+	{
+		if(parent::__get($name) === null && property_exists($this, $name)){
+			return $this->$name;
+		}else{
 			return null;
+		}
 	}
 
 	/**
@@ -42,125 +43,84 @@ class Model{
 	 * @param string $name
 	 * @param mixed $value
 	 */
-	public function __set($name, $value){
-		if(method_exists($this,'set'.$name)){
-			return $this->{'set'.$name}($value);
+	public function __set($name, $value)
+	{
+		if(parent::__set($name, $value) === null){
+			return $this->$name = $value;
 		}
-		return $this->$name=$value;
 	}
 
-	/**
-	 * The constructor, all it does is attach behaviours and fires onAfterConstruct
-	 * @param string $scenario
-	 */
-	function __construct($scenario = 'insert'){
-		foreach($this->behaviours() as $name => $attr){
-			$this->attachBehaviour($name, $attr);
-		}
+
+	public function init()
+	{
 		$this->onAfterConstruct();
-	}
-
-	/**
-	 * Magically you can call any function within a behaviour as though they are part of the
-	 * parent model
-	 * @param string $name
-	 * @param array $parameters
-	 */
-	function __call($name, $parameters){
-		foreach($this->behaviours as $k => $attr){
-			if(isset($attr['obj'])){
-				if(method_exists($attr['obj'], $name)){
-					return call_user_func_array(array($attr['obj'],$name),$parameters); // Call behaviour methods
-				}
-			}
-		}
-		return false;
-	}
-
-	/**
-	 * Checks to see if a method exists. This will search all behaviours as well to see if a method exists
-	 * @param string $f
-	 * @return boolean
-	 */
-	function method_exists($f){
-		if(method_exists($this, $f)){
-			return true;
-		}else{
-			foreach($this->behaviours as $k => $attr){
-				if(isset($attr['obj'])){
-					if(method_exists($attr['obj'], $f)){
-						return true;
-					}
-				}
-			}
-		}
-		return false;
+		parent::init();
 	}
 
 	/**
 	 * Gets the models scenario
 	 */
-	public function getScenario(){
-		return $this->scenario;
+	public function getScenario()
+	{
+		return $this->_scenario;
 	}
 
 	/**
 	 * Sets the models Scenario
 	 * @param string $scenario
 	 */
-	public function setScenario($scenario){
-		$this->scenario = $scenario;
+	public function setScenario($scenario)
+	{
+		$this->_scenario = $scenario;
 	}
 
 	/**
 	 * Gets a boolean value representing whether or not this modle has been validated once
 	 */
-	public function getValidated(){
-		return $this->validated;
+	public function getValidated()
+	{
+		return $this->_validated;
 	}
 
 	/**
 	 * Sets whether or not this model has been validated
 	 * @param boolean $validated
 	 */
-	public function setValidated($validated){
-		$this->validated = $validated;
+	public function setValidated($validated)
+	{
+		$this->_validated = $validated;
 	}
 
-	function getValid(){
-		return $this->valid;
+	function getValid()
+	{
+		return $this->_valid;
 	}
 
-	function setValid($valid){
-		$this->valid=$valid;
-	}
-
-	public function setRule($rule){
-		$this->rules[] = $rule;
-	}
-
-	public function setRules($rules){
-		$this->rules=$rules;
+	function setValid($valid)
+	{
+		$this->_valid = $valid;
 	}
 	
-	public function resetRules(){
-		$this->rules=array();
+	public function setRule($rule)
+	{
+		$this->_rules[] = $rule;
 	}
-
+	
 	/**
 	 * Gets the rules of the model. if not scenario is implied within the parameter it will just get all
 	 * the rules of the model, however, if a scenario is implied within the parameter then it will return only
 	 * rules that shuld run on that scenario
 	 */
-	public function getRules($scenario=null){
+	public function getRules($scenario=null)
+	{
 		$rules = array_merge($this->rules(), $this->rules);
-		if($scenario===null)
+		if($scenario === null){
 			return $rules;
-		else{
-			$srules=array();
+		}else{
+			$srules = array();
 			foreach($rules as $rule){
 				if(isset($rule['on'])){
-					$scenarios=preg_split('/[\s]*[,][\s]*/', $rule['on']);
+					$scenarios = preg_split('/[\s]*[,][\s]*/', $rule['on']);
 					if(array_key_exists($scenario, array_flip($scenarios))){
 						$srules[] = $rule;
 					}
@@ -170,6 +130,16 @@ class Model{
 			}
 			return $srules;
 		}
+	}	
+
+	public function setRules($rules)
+	{
+		$this->_rules = $rules;
+	}
+	
+	public function resetRules()
+	{
+		$this->_rules = array();
 	}
 
 	/**
@@ -179,7 +149,8 @@ class Model{
 	 * It will cache reflections into the meta of the model class.
 	 * @return array
 	 */
-	public function attributeNames(){
+	public function attributeNames()
+	{
 		if(isset(self::$_meta[get_class($this)])){
 			return self::$_meta[get_class($this)];
 		}
@@ -199,57 +170,56 @@ class Model{
 	 * Gets a list of the attribute names currently stored within the rules of the model.
 	 * This method can be overriden to just return an array of names as the values of each element
 	 */
-	public function scenarioAttributeNames(){
+	public function scenarioAttributeNames()
+	{
 		$names=array();
 		foreach($this->getRules($this->getScenario()) as $rule){
 			$fields=preg_split('/[\s]*[,][\s]*/', $rule[0]);
-			foreach($fields as $field)
+			foreach($fields as $field){
 				$names[$field]=true;
+			}
 		}
 		return array_keys($names);
 	}
 
 	/**
+	 * Gets the models attributes
+	 */
+	public function getAttributes($names = null, $scenario = true)
+	{
+		$values = array();
+		if($names === null){
+			if($scenario){
+				$names=$this->scenarioAttributeNames();
+			}else{
+				$names = $this->attributeNames();
+			}
+		}
+		foreach ($names as $name) {
+			$values[$name] = $this->$name;
+		}
+		return $values;
+	}	
+	
+	/**
 	 * If you want to set the full object from scratch use this
 	 * @param $a
 	 */
-	function setAttributes($a,$safeOnly=true){
+	function setAttributes($a, $safeOnly = true){
 		$scenario = $this->getScenario();
 		$attributes = array_flip($safeOnly ? $this->scenarioAttributeNames() : $this->attributeNames());
 		foreach($a as $name=>$value){
 			if($safeOnly){
 				if(isset($attributes[$name])){
-					$this->$name=!is_array($value) && preg_match('/^([0-9]|[1-9]{1}\d+)$/' /* Will only match real integers, unsigned */, $value) > 0
+					$this->$name = !is_array($value) && preg_match('/^([0-9]|[1-9]{1}\d+)$/' /* Will only match real integers, unsigned */, $value) > 0
 						&& (string)$value < '9223372036854775807' ? (int)$value : $value;
 				}
 			}else{
-				$this->$name=!is_array($value) && preg_match('/^([0-9]|[1-9]{1}\d+)$/' /* Will only match real integers, unsigned */, $value) > 0
+				$this->$name = !is_array($value) && preg_match('/^([0-9]|[1-9]{1}\d+)$/' /* Will only match real integers, unsigned */, $value) > 0
 					&& (string)$value < '9223372036854775807' ? (int)$value : $value;
 			}
 		}
 		return $this;
-	}
-
-	/**
-	 * Gets the models attributes
-	 */
-	public function getAttributes($names=null,$scenario=true) {
-
-		$values = array();
-		if ($names === null) {
-			if($scenario)
-				$names=$this->scenarioAttributeNames();
-			else
-				$names = $this->attributeNames();
-		}
-		foreach ($names as $name) {
-			$values[$name] = $this->$name;
-		}
-		//foreach ($except as $name) {
-			//unset($values[$name]);
-		//}
-
-		return $values;
 	}
 
 	/**
@@ -259,12 +229,14 @@ class Model{
 	 * @param boolean $getFirst
 	 * @return array
 	 */
-	function getErrors($field = null, $getFirst = false){
+	public function getErrors($field = null, $getFirst = false)
+	{
 		if($field){
-			if(isset($this->error_messages[$field]))
-				return $getFirst ? $this->error_messages[$field][0] : $this->error_messages[$field];
+			if(isset($this->_messages[$field])){
+				return $getFirst ? $this->_messages[$field][0] : $this->_messages[$field];
+			}
 		}else{
-			return $this->error_messages;
+			return $this->_messages;
 		}
 		return array();
 	}
@@ -291,14 +263,16 @@ class Model{
 	 * then it will clear the errors for only one field.
 	 * @param string $field
 	 */
-	function clearErrors($field=null){
+	function clearErrors($field = null)
+	{
 		if($field===null){
-			$this->error_messages=array();
-			$this->error_codes=array();
-		}elseif(isset($this->error_messages[$field])){
-			unset($this->error_messages[$field]);
-		}elseif(isset($this->error_codes[$field]))
-			unset($this->error_codes[$field]);
+			$this->_messages=array();
+			$this->_codes=array();
+		}elseif(isset($this->_messages[$field])){
+			unset($this->_messages[$field]);
+		}elseif(isset($this->_codes[$field])){
+			unset($this->_codes[$field]);
+		}
 	}
 
 	/**
@@ -313,42 +287,25 @@ class Model{
 		if($runEvents && !$this->onBeforeValidate()){
 			$this->setValidated(true); return false; // NOT VALID
 		}
-
-		if(($validator=$this->getValidator())!==null){
-			$validator->model=$this;
-			$validator->scenario=$this->getScenario();
-			$validator->rules=$this->getRules($validator->scenario);
-			//$valid=true;
-			$valid=$validator->run();
-		}
 		
-		$this->error_codes=\glue\Collection::mergeArray($this->error_codes,$validator->error_codes);
-		$this->error_messages=\glue\Collection::mergeArray($this->error_messages,$validator->error_messages);
+		foreach($this->rules as $k => $rule){
+			$valid=$this->validateRule($rule)&&$valid;
+		}
 
 		$this->setValidated(true);
 		$this->setValid($valid);
 
-		if($runEvents)
+		if($runEvents){
 			$this->onAfterValidate();
-		return $valid;
-	}
-
-	/**
-	 * Either creates or returns the models validator
-	 * @param array $rules
-	 * @return \glue\Validation
-	 */
-	function getValidator(){
-		if($this->validator===null){
-			return $this->validator=new \glue\Validation();
 		}
-		return $this->validator;
+		return $valid;
 	}
 
 	/**
 	 * Cleans the model
 	 */
-	public function clean(){
+	public function clean()
+	{
 		$names=$this->attributeNames();
 		foreach($names as $name)
 			unset($this->$name);
@@ -361,159 +318,476 @@ class Model{
 	/**
 	 * EVENTS
 	 */
+	function raise($event){
+		if(method_exists($this,$event)){
+			$f=$this->$event();
+		}
+		return $this->trigger($event) && $f;
+	}
+	
+	function onAfterConstruct(){
+		$this->raise('afterConstruct');
+	}
+	
+	function onBeforeValidate(){
+		return $this->raise('beforeValidate');
+	}
+	
+	function onAfterValidate(){
+		return $this->raise('afterValidate');
+	}
 
-	function raiseEvent($event){
-		foreach($this->behaviours as $behaviour => $attrs){
-			if(isset($attrs[$event])){ // If event exists
-				call_user_func_array($attrs[$event], array()); // Lets call its
+	/**
+	 * VALIDATORS
+	 */
+	public function isEmpty($value, $trim = false)
+	{
+		return $value===null || $value===array() || $value==='' || $trim && is_scalar($value) && trim($value)==='';
+	}
+	
+	/**
+	 * Field is required
+	 */
+	public function required($field, $value)
+	{
+		if(self::isEmpty($value)){
+			return false;
+		}
+		return true;
+	}
+	
+	/**
+	 * Checks if value entered is equal to 1 or 0, it also allows null values
+	 *
+	 * @param string $field The field to be tested
+	 * @param mixed $value The field value to be tested
+	 * @param array $params The parameters for the validator
+	 */
+	public function boolean($field, $value, $params)
+	{
+		$params = array_merge(array(
+				'allowNull' => false,
+				'falseValue' => 0,
+				'trueValue' => 1
+		), $params);
+	
+		if($params['allowNull'] || self::isEmpty($value))
+			return true;
+	
+		if($value == $params['trueValue'] || ($value == $params['falseValue'] || !$value)){
+			return true;
+		}else{
+			return false;
+		}
+	}
+	
+	/**
+	 * Detects the character length of a certain fields value
+	 *
+	 * @param $field
+	 * @param $value
+	 * @param $params
+	 */
+	public function string($field, $value, $params)
+	{
+		$params = array_merge(array(
+				'allowEmpty' => true,
+				'min' => null,
+				'max' => null,
+				'is' => null,
+				'encoding' => null,
+		), $params);
+	
+		if($params['allowEmpty'] && self::isEmpty($value)){
+			return true;
+		}
+	
+		if(function_exists('mb_strlen') && $params['encoding'])
+			$str_length=mb_strlen($value, $params['encoding'] ? $params['encoding'] : 'UTF-8');
+		else
+			$str_length=strlen($value);
+	
+		if($params['min']){
+			if($params['min'] > $str_length){ // Lower than min required
+				return false;
+			}
+		}
+	
+		if($params['max']){
+			if($params['max'] < $str_length){
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	public function objExist($field, $value, $params)
+	{
+		$params = array_merge(array(
+				'allowEmpty' => true,
+				'class' => null,
+				'condition' => null,
+				'field' => null,
+				'notExist' => false
+		), $params);
+	
+		if($params['allowEmpty'] && self::isEmpty($value))
+			return true;
+	
+		$cName = $params['class'];
+		$condition = isset($params['condition']) ? $params['condition'] : array();
+		$object = $cName::model()->findOne(array_merge(array($params['field']=>$value), $condition));
+	
+		if($params['notExist']){
+			if($object){
+				return false;
+			}else{
+				return true;
+			}
+		}else{
+			if($object){
+				return true;
+			}else{
+				return false;
 			}
 		}
 	}
-
-	function onAfterConstruct(){
-		$this->raiseEvent('onAfterConstruct');
-		return $this->afterConstruct();
-	}
-
-	function onBeforeFind(){
-		$this->raiseEvent('onBeforeFind');
-		return $this->beforeFind();
-	}
-
-	function onAfterFind(){
-		$this->raiseEvent('onAfterFind');
-		return $this->afterFind();
-	}
-
-	function onBeforeValidate(){
-		$this->raiseEvent('onBeforeValidate');
-		return $this->beforeValidate();
-	}
-
-	function onAfterValidate(){
-		$this->raiseEvent('onAfterValidate');
-		return $this->afterValidate();
-	}
-
-	function onBeforeSave(){
-		$this->raiseEvent('onBeforeSave');
-		return $this->beforeSave();
-	}
-
-	function onAfterSave(){
-		$this->raiseEvent('onAfterSave');
-		return $this->afterSave();
-	}
-
-	function onBeforeDelete(){
-		$this->raiseEvent('onBeforeDelete');
-		return $this->beforeDelete();
-	}
-
-	function onAfterDelete(){
-		$this->raiseEvent('onAfterDelete');
-		return $this->afterDelete();
-	}
-
-	function afterConstruct(){ return true; }
-
-	function beforeFind(){ return true; }
-
-	function afterFind(){ return true; }
-
-	function beforeValidate(){ return true; }
-
-	function afterValidate(){ return true; }
-
-	function beforeSave(){ return true; }
-
-	function afterSave(){ return true; }
-
-	function beforeDelete(){ return true; }
-
-	function afterDelete(){ return true; }
-
-	/**
-	 * ATTACH / DETACH FUNCTIONS
-	 *
-	 * These various functions concern themselves with attaching and detaching certain aspects of the model.
-	 * This enables us to be able to build models dynamically and even use the std::Model class to give us anon models to play with
-	 */
-
-	function attachBehaviours($behaviours){
-		if(is_array($behaviours)){
-			foreach($behaviours as $name => $behaviour)
-				$this->attachBehaviour($name, $behaviour);
+	
+	public function in($field, $value, $params)
+	{
+		$params = array_merge(array(
+				'allowEmpty' => true,
+				'range' => array(),
+		), $params);
+	
+		if($params['allowEmpty'] && self::isEmpty($value)){
+			return true;
 		}
-	}
-
-	function attachBehaviour($name, $options = array()){
-
-		if(!isset($options['class']))
-			throw new Exception("There is no class set for {$name} behaviour");
-
-		if(!isset($this->behaviours[$name])){
-			$cname=$options['class'];
-			$behaviour = new $cname;
-			$behaviour->setAttributes($options);
-
-			$this->behaviours[$name] = array(
-				'obj' => $behaviour
-			);
-			$behaviour->attach($this);
+	
+		$found = false;
+		foreach($params['range'] as $match){
+			if($match == $value){
+				$found = true;
+			}
 		}
-	}
-
-	function detachBehaviour($name){
-		$behaviour = $this->behaviours[$name];
-		if(isset($behaviour['obj'])){
-			$behaviour['obj']->detach();
+	
+		if(!$found){
+			return false;
 		}
+		return true;
 	}
-
-	function attachEventHandler($event, $call_array = array()){
-		$class_name = get_class($call_array[0]); // Get the name of the behaviour so we can index it
-		$this->behaviours[$class_name][$event] = $call_array;
-	}
-
-	function detachEventHandler($event, $call_array = array()){
-		$class_name = get_class($call_array[0]); // Get the name of the behaviour so we can index it
-		unset($this->behaviours[$class_name][$event]);
-	}
-}
-
-/**
- * The behaviour class. All models behaviour extend from this one.
- */
-class Behaviour extends \glue\Component{
-
-	public $owner;
-
-	public function events(){
-		return array(
-			'onBeforeFind' => 'beforeFind',
-			'onAfterFind' => 'afterFind',
-			'onBeforeValidate' => 'beforeValidate',
-			'onAfterValidate' => 'afterValidate',
-			'onBeforeSave' => 'beforeSave',
-			'onAfterSave' => 'afterSave',
-			'onBeforeDelete' => 'beforeDelete',
-			'onAfterDelete' => 'afterDelete'
-		);
-	}
-
-	public function attach($owner){
-		$this->owner = $owner;
-		foreach($this->events() as $event => $handler){
-			if(method_exists($this,$handler))
-				$this->owner->attachEventHandler($event, array($this,$handler));
+	
+	public function nin($field, $value, $params)
+	{
+		$params = array_merge(array(
+				'allowEmpty' => true,
+				'range' => array(),
+		), $params);
+	
+		if($params['allowEmpty'] && self::isEmpty($value)){
+			return true;
 		}
-	}
-
-	public function detach(){
-		foreach($this->events() as $event => $handler){
-			$this->owner->detachEventHandler($event, array($this,$handler));
+	
+		$found = false;
+		foreach($params['range'] as $match){
+			if($match == $value){
+				$found = true;
+			}
 		}
-		$this->owner = null;
+	
+		if($found){
+			return false;
+		}
+		return true;
 	}
+	
+	public function regex($field, $value, $params)
+	{
+		$params = array_merge(array(
+				'allowEmpty' => true,
+				'pattern' => null,
+				'nin' => false
+		), $params);
+	
+		if($params['allowEmpty'] && self::isEmpty($value)){
+			return true;
+		}
+	
+		if($params['nin']){
+			if(preg_match($params['pattern'], $value) > 0){
+				return false;
+			}
+		}else{
+			if(preg_match($params['pattern'], $value) <= 0 || preg_match($params['pattern'], $value) === false){
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	public function compare($field, $value, $params)
+	{
+		$params = array_merge(array(
+				'allowEmpty' => true,
+				'with' => true,
+				'field' => null,
+				'operator' => '=',
+		), $params);
+	
+		if($params['allowEmpty'] && self::isEmpty($value)){
+			return true;
+		}
+	
+		$with_val = $params['with'];
+		if($params['field']){
+			$with_val = $this->model->{$params['with']};
+		}
+	
+		switch($params['operator']){
+			case '=':
+			case '==':
+				if($value == $with_val){
+					return true;
+				}
+				break;
+			case '!=':
+				if($value != $with_val){
+					return true;
+				}
+				break;
+			case ">=":
+				if($value >= $with_val){
+					return true;
+				}
+				break;
+			case ">":
+				if($value > $with_val){
+					return true;
+				}
+				break;
+			case "<=":
+				if($value <= $with_val){
+					return true;
+				}
+				break;
+			case "<":
+				if($value < $with_val){
+					return true;
+				}
+				break;
+		}
+		return false;
+	}
+	
+	public function number($field, $value, $params)
+	{
+		$params = array_merge(array(
+				'allowEmpty' => true,
+				'integerOnly' => true,
+				'max' => null,
+				'min' => null,
+				'intPattern' => '/^\s*[+-]?\d+\s*$/',
+				'numPattern' => '/^\s*[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?\s*$/'
+		), $params);
+	
+		//var_dump($vlaue); exit();
+		if($params['allowEmpty'] && self::isEmpty($value)){
+			return true;
+		}
+	
+		if($params['integerOnly']){
+			if(preg_match($params['intPattern'], $value) > 0){
+			}else{
+				return false;
+			}
+		}elseif(preg_match($params['numPattern'], $value) < 0 || !preg_match($params['numPattern'], $value)){
+			return false;
+		}
+	
+		if($params['min']){
+			if($value < $params['min']){
+				return false;
+			}
+		}
+	
+		if($params['max']){
+			if($value > $params['max']){
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	public function url($field, $value, $params)
+	{
+		$params = array_merge(array(
+				'allowEmpty' => true,
+		), $params);
+	
+		if($params['allowEmpty'] && self::isEmpty($value)){
+			return true;
+		}elseif(self::isEmpty($value))
+		return false;
+	
+		$parsed_url = parse_url($value);
+	
+		if(!$parsed_url){
+			return false;
+		}
+	
+		if(isset($parsed_url['scheme'])){
+			if(!isset($parsed_url['host'])){
+				return false;
+			}else{
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public function file($field, $value, $params)
+	{
+		$params = array_merge(array(
+				'allowEmpty' => true,
+				'ext' => null,
+				'size' => null,
+				'type' => null
+		), $params);
+	
+		if($params['allowEmpty'] && self::isEmpty($value)){
+			return true;
+		}
+	
+		$fieldValue = $value;
+	
+		if($fieldValue->error === UPLOAD_ERR_OK){
+			if(isset($params['ext'])){
+				$path = pathinfo($fieldValue->name);
+	
+				$found = false;
+				foreach($params['ext'] as $ext){
+					if($ext == $path['extension'])
+						$found = true;
+				}
+	
+				if(!$found){
+					return false;
+				}
+			}
+	
+			if(isset($params['size'])){
+				if(isset($params['size']['gt'])){
+					if($fieldValue->size < $params['size']['gt']){
+						return false;
+					}
+				}elseif(isset($params['size']['lt'])){
+					if($fieldValue->size > $params['size']['lt']){
+						return false;
+					}
+				}
+			}
+	
+			if(isset($params['type'])){
+				if(preg_match("/".$params['type']."/i", $fieldValue->type) === false || preg_match("/".$params['type']."/i", $fieldValue->type) < 0){
+					return false;
+				}
+			}
+		}else{
+			switch ($fieldValue->error) {
+				case UPLOAD_ERR_INI_SIZE:
+					return false;
+				case UPLOAD_ERR_FORM_SIZE:
+					return false;
+				case UPLOAD_ERR_PARTIAL:
+					return false;
+				case UPLOAD_ERR_NO_FILE:
+					return false;
+				case UPLOAD_ERR_NO_TMP_DIR:
+					return false;
+				case UPLOAD_ERR_CANT_WRITE:
+					return false;
+				case UPLOAD_ERR_EXTENSION:
+					return false;
+				default:
+					return false;
+			}
+		}
+		return true;
+	}
+	
+	public function tokenized($field, $value, $params)
+	{
+		$params = array_merge(array(
+				'allowEmpty' => true,
+				'del' => '/[\s]*[,][\s]*/',
+				'max' => null
+		), $params);
+	
+		if($params['allowEmpty'] && self::isEmpty($value)){
+			return true;
+		}
+	
+		$ex_val = preg_split($params['del'], $value);
+	
+		if(isset($params['max'])){
+			if(count($ex_val) > $params['max']){
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	public function email($field, $value, $params = array())
+	{
+		$params = array_merge(array(
+				'allowEmpty' => true,
+		), $params);
+	
+		if($params['allowEmpty'] && self::isEmpty($value)){
+			return true;
+		}elseif(self::isEmpty($value))
+		return false;
+	
+		if(filter_var($value, FILTER_VALIDATE_EMAIL)){
+			return true;
+		}
+		return false;
+	}
+	
+	public function hash($field, $value, $params = array())
+	{
+		if(glue::http()->validateCsrfToken($value)){
+			return true;
+		}
+		return false;
+	}
+	
+	public function safe($field, $value, $params = array())
+	{
+		return true; // Just do this so the field gets sent through
+	}
+	
+	public function date($field, $value, $params = array())
+	{
+		$params = array_merge(array(
+				'format' => 'd/m/yyyy'
+		), $params);
+	
+		// Lets tokenize the date field
+		$date_parts = preg_split('/[-\/\s]+/', $value); // Accepted deliminators are -, / and space
+	
+		switch($params['format']){
+			case 'd/m/yyyy':
+				if(count($date_parts) != 3){
+					return false;
+				}
+	
+				if(preg_match('/[1-32]/', $date_parts[0]) > 0 && preg_match('/[1-12]/', $date_parts[1]) > 0 && preg_match('/[0-9]{4}/', $date_parts[2]) && $date_parts[2] <= date('Y')){
+					// If date matches formation and is not in the future in this case
+					return true;
+				}
+				break;
+		}
+		return false;
+	}	
 }
