@@ -1,25 +1,29 @@
 <?php
 
+use \glue\Controller;
 use app\models\Help,
 	app\models\HelpTopic,
 	app\models\HelpArticle;
 
-class HelpController extends \glue\Controller{
+class HelpController extends Controller{
 
 	public $selectedTab = '';
 
-	public function authRules(){
+	public function behaviours()
+	{
 		return array(
-//			array("allow",
-//				"actions"=>array( 'view_topics', 'add_topic', 'edit_topic', 'remove_topics', 'view_articles', 'add_article', 'edit_article',
-//					'remove_articles' ),
-//				"users"=>array("@*", '^@')
-//			),
-			array('allow', 'users' => array('*')),
-			array("deny", "users" => array("*")),
-		);
+			'auth' => array(
+				'class' => 'glue\Auth',
+				'rules' => array(
+//					array("allow",
+//						"actions"=>array('view_topics', 'add_topic', 'edit_topic', 'remove_topics', 'view_articles', 'add_article', 'edit_article', 'remove_articles'),
+//						"users"=>array("@*", '^@')
+//					),						
+					array('allow', 'users' => array('*')),
+				)
+			)
+		);		
 	}
-
 
 	function action_index(){
 		$this->title = 'StageX Help Center';

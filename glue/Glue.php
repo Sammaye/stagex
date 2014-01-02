@@ -18,6 +18,7 @@ class Glue
 	public static $www;
 
 	public static $defaultController = 'index';
+	public static $controllerName = '{name}Controller'; 
 	public static $controllerNamespace;
 	public static $actionPrefix = 'action_';
 

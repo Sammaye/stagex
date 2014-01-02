@@ -1,12 +1,11 @@
 <?php
 
+use \glue\Controller;
 use app\models\AutoPublishQueue;
-
 use app\models\Video;
-
 use app\models\Playlist;
 
-class PlaylistController extends glue\Controller{
+class PlaylistController extends Controller{
 
 	public function authRules(){
 		return array(

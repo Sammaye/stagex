@@ -1,27 +1,30 @@
 <?php
 
-class autoshareController extends \glue\Controller{
+use \glue\Controller;
 
+class AutoshareController extends Controller
+{
 	public $user;
 	public $socialUser;
 	public $account;
 
-	public function authRules(){
+	public function behaviours()
+	{
 		return array(
-			array('allow',
-				'users' => array('@*')
-			),
-			array("deny",
-				"users"=>array("*")
-			),
+			'auth' => array(
+				'class' => 'glue\Auth',
+				'rules' => array(
+					array('allow', 'users' => array('@*')),
+					array("deny", "users"=>array("*")),
+				)
+			)
 		);
-	}
+	}	
 
-	/**
-	 * @type GET,POST
-	 * Enter description here ...
-	 */
-	function action_index(){}
+	function action_index()
+	{
+		glue::trigger('404');
+	}
 
 
 	function getConnectedUser(){

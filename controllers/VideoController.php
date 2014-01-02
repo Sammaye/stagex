@@ -1,23 +1,30 @@
 <?php
 
+use \glue\Controller;
 use app\models\Video,
 	app\models\Queue;
 
-class videoController extends glue\Controller{
+class VideoController extends Controller{
 	
 	public $tab;
 	
-	public function authRules(){
+	public function behaviours()
+	{
 		return array(
-			array("allow",
-				"actions"=>array( 'upload', 'addUpload', 'getUploadStatus', 'createUpload', 'saveUpload', 'save',
-					'deleteResponses', 'delete', 'report', 'like', 'dislike', 'analytics', 'getAnalytics', 'undoDelete', 'batchSave' ),
-				"users"=>array("@*")
-			),
-			array('allow', 'actions' => array('index', 'watch', 'embedded')),
-			array("deny", "users"=>array("*")),
+			'auth' => array(
+				'class' => 'glue\Auth',
+				'rules' => array(
+					array("allow",
+						"actions"=>array( 'upload', 'addUpload', 'getUploadStatus', 'createUpload', 'saveUpload', 'save',
+							'deleteResponses', 'delete', 'report', 'like', 'dislike', 'analytics', 'getAnalytics', 'undoDelete', 'batchSave' ),
+						"users"=>array("@*")
+					),
+					array('allow', 'actions' => array('index', 'watch', 'embedded')),
+					array("deny", "users"=>array("*")),
+				)
+			)
 		);
-	}
+	}	
 
 	public function action_index(){
 		glue::runAction('user/videos');

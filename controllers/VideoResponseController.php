@@ -1,20 +1,27 @@
 <?php
 
+use \glue\Controller;
 use app\models\VideoResponse,
 	app\models\Video;
 
-class videoresponseController extends \glue\Controller{
-
-	public function authRules(){
+class VideoResponseController extends Controller
+{
+	public function behaviours()
+	{
 		return array(
-			array('allow',
-				'actions' => array('getMore', 'getNew', 'index', 'list', 'thread'),
-				'users' => array('*')
-			),
-			array( 'allow', 'users' => array('@*') ),
-			array( 'deny', 'users' => array('*') ),
+			'auth' => array(
+				'class' => 'glue\Auth',
+				'rules' => array(
+					array('allow',
+						'actions' => array('getMore', 'getNew', 'index', 'list', 'thread'),
+						'users' => array('*')
+					),
+					array('allow', 'users' => array('@*')),
+					array('deny', 'users' => array('*')),
+				)
+			)
 		);
-	}
+	}	
 	
 	public $tab;
 

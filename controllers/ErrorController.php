@@ -1,7 +1,22 @@
 <?php
-class errorController extends \glue\Controller{
+
+use \glue\Controller;
+
+class ErrorController extends Controller{
 
 	public $layout = "blank_page";
+	
+	public function behaviours()
+	{
+		return array(
+			'auth' => array(
+			'class' => 'glue\Auth',
+				'rules' => array(
+					array('allow', 'users' => array('*'))
+				)
+			)
+		);
+	}	
 
 	function action_index(){
 		$this->title = 'Error - StageX';

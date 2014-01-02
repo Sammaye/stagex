@@ -1,5 +1,20 @@
 <?php
-class searchController extends glue\Controller{
+
+use \glue\Controller;
+
+class SearchController extends Controller
+{
+	public function behaviours()
+	{
+		return array(
+			'auth' => array(
+				'class' => 'glue\Auth',
+				'rules' => array(
+					array('allow', 'users' => array('*'))
+				)
+			)
+		);
+	}	
 
 	function action_index(){
 		extract(glue::http()->param(array('query', 'filter_type', 'filter_time', 'filter_duration', 'filter_category', 'orderby')));

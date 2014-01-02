@@ -1,21 +1,28 @@
 <?php
 
+use \glue\Controller;
 use app\models\Follower,
 	app\models\Stream,
 	app\models\Notification;
 
-class StreamController extends glue\Controller{
+class StreamController extends Controller{
 
 	public $layout = 'user_section';
 	public $subtab;
 
-	public function authRules(){
+	public function behaviours()
+	{
 		return array(
-			array('allow', 'actions' => array('getStream'), 'users' => array('*')),
-			array("allow", "users"=>array("@*")),
-			array("deny", "users"=>array("*")),
+			'auth' => array(
+				'class' => 'glue\Auth',
+				'rules' => array(
+					array('allow', 'actions' => array('getStream'), 'users' => array('*')),
+					array("allow", "users"=>array("@*")),
+					array("deny", "users"=>array("*")),
+				)
+			)
 		);
-	}
+	}	
 
 	public function action_index(){
 		$this->title = 'Your Stream - StageX';

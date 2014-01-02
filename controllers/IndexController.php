@@ -1,6 +1,8 @@
 <?php
 
-class indexController extends \glue\Controller
+use \glue\Controller;
+
+class IndexController extends Controller
 {
 	public function behaviours()
 	{

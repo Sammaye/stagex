@@ -1,12 +1,26 @@
 <?php
 include_once glue::getPath('@glue').'/components/phpthumb/ThumbLib.inc.php';
 
+use \glue\Controller;
+
 use app\models\User,
 	app\models\Video,
 	app\models\Image;
 
-class imageController extends glue\Controller{
-
+class ImageController extends Controller{
+	
+	public function behaviours()
+	{
+		return array(
+			'auth' => array(
+				'class' => 'glue\Auth',
+				'rules' => array(
+					array('allow', 'users' => array('*')),
+				)				
+			)
+		);
+	}
+	
 	public $avatar_sizes = array(
 		array(30, 30),
 		array(40, 40),

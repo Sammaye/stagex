@@ -1,5 +1,6 @@
 <?php
 
+use \glue\Controller;
 use glue\Html,
 	app\models\loginForm,
 	app\models\User,
@@ -7,21 +8,27 @@ use glue\Html,
 	app\models\Video,
 	app\models\Playlist;
 
-class userController extends \glue\Controller{
+class UserController extends Controller{
 
 	public $defaultAction='videos';
 	public $title = 'Your Stuff - StageX';
 
 	public $tab = "settings";
 
-	public function authRules(){
+	public function behaviours()
+	{
 		return array(
-			array('allow',
-				'actions' => array('create', 'login', 'view', 'recover', 'viewVideos', 'viewPlaylists', 'fbLogin', 'googleLogin'),
-				'users' => array('*')
-			),
-			array('allow', 'actions' => '*', 'users' => array('@*')),
-			array("deny", "users"=>array("*")),
+			'auth' => array(
+				'class' => 'glue\Auth',
+				'rules' => array(
+					array('allow',
+						'actions' => array('create', 'login', 'view', 'recover', 'viewVideos', 'viewPlaylists', 'fbLogin', 'googleLogin'),
+						'users' => array('*')
+					),
+					array('allow', 'actions' => '*', 'users' => array('@*')),
+					array("deny", "users"=>array("*"))
+				)
+			)
 		);
 	}
 
