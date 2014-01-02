@@ -59,7 +59,7 @@ class Glue
 	 *
 	 * @param string $url This is the url defined within the address bar which translates down to $_GET['url']
 	 */
-	public static function run($url = null,$config=array())
+	public static function run($url = null, $config = array())
 	{
 		spl_autoload_register(array('glue','autoload'));
 		//self::registerErrorHandlers();
@@ -157,12 +157,13 @@ class Glue
 	 * Routes a url segment to a controller and displays that controller action
 	 * @param string $route
 	 */
-	public static function route($route = null, $runEvents=true)
+	public static function route($route = null, $runEvents = true)
 	{
 		self::trigger('beforeRequest');
 		if(self::runAction($route) === false){
 			self::trigger('404');
 		}
+		self::trigger('afterRequest');
 		exit(0);
 	}
 
@@ -423,7 +424,7 @@ class Glue
 	 * @param boolean $include
 	 * @param string $op The include opeation to perform (include,include_once,require,require_once)
 	 */
-	public static function import($path, $include=false, $op='include')
+	public static function import($path, $include = false, $op = 'include')
 	{
 		$pos = strpos($path,'/');
 		if($pos !== false){
