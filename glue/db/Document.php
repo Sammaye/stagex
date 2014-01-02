@@ -2,10 +2,10 @@
 
 namespace glue\db;
 
-use glue,
-	\glue\Exception;
+use Glue;
+use \glue\Model;
 
-class Document extends \glue\Model{
+class Document extends Model{
 
 	private $_related=array();
 	private $_partial=false;
@@ -40,7 +40,10 @@ class Document extends \glue\Model{
 	 *
 	 * @return An array of scopes
 	 */
-	public function scopes(){ return array(); }
+	public static function scopes()
+	{
+		return array();
+	}
 
 	/**
 	 * Sets the default scope
@@ -56,35 +59,26 @@ class Document extends \glue\Model{
 	 *
 	 * @return an array which represents a single scope within the scope() function
 	 */
-	public function defaultScope(){ return array(); }
+	public static function defaultScope()
+	{
+		return array();
+	}
 
-	public function attributeLabels(){ return array(); }
-
-	public function relations(){ return array(); }
-
-	/**
-	 * (non-PHPdoc)
-	 * @see yii/framework/CComponent::__get()
-	 */
-	public function __get($name){
-
-		if(isset($this->_attributes[$name]))
+	public function __get($name)
+	{
+		if(isset($this->_attributes[$name])){
 			return $this->_attributes[$name];
-		elseif(isset($this->_related[$name]))
+		}elseif(isset($this->_related[$name])){
 			return $this->_related[$name];
-		elseif(array_key_exists($name, $this->relations()))
+		}elseif(array_key_exists($name, $this->relations())){
 			return $this->_related[$name]=$this->getRelated($name);
-		else{
+		}else{
 			return parent::__get($name);
 		}
 	}
 
-	/**
-	 * (non-PHPdoc)
-	 * @see CComponent::__set()
-	 */
-	public function __set($name,$value){
-
+	public function __set($name,$value)
+	{
 		if(isset($this->_related[$name]) || array_key_exists($name, $this->relations()))
 			return $this->_related[$name]=$value;
 		elseif(method_exists($this,'set'.$name))
@@ -98,28 +92,32 @@ class Document extends \glue\Model{
 	 * (non-PHPdoc)
 	 * @see CComponent::__isset()
 	 */
-	public function __isset($name){
-		if(isset($this->_attributes[$name]))
+	public function __isset($name)
+	{
+		if(isset($this->_attributes[$name])){
 			return true;
-		elseif(isset($this->_related[$name]))
+		}elseif(isset($this->_related[$name])){
 			return true;
-		elseif(array_key_exists($name, $this->relations()))
+		}elseif(array_key_exists($name, $this->relations())){
 			return $this->getRelated($name)!==null;
-		elseif(property_exists($this,$name))
+		}elseif(property_exists($this,$name)){
 			return true;
+		}
 	}
 
 	/**
 	 * (non-PHPdoc)
 	 * @see CComponent::__unset()
 	 */
-	public function __unset($name){
-		if(isset($this->_attributes[$name]))
+	public function __unset($name)
+	{
+		if(isset($this->_attributes[$name])){
 			unset($this->_attributes[$name]);
-		elseif(isset($this->_related[$name]))
+		}elseif(isset($this->_related[$name])){
 			unset($this->_related[$name]);
-		elseif(property_exists($this,$name))
+		}elseif(property_exists($this,$name)){
 			unset($this->$name);
+		}
 	}
 
 	/**
@@ -135,16 +133,13 @@ class Document extends \glue\Model{
 		// will set the cache of our fields if needed
 		$this->attributeNames();
 
-		if($scenario===null) // internally used by populateRecord() and model()
-			return;
+		if($scenario!==null){ // internally used by populateRecord() and model()
+			$this->setScenario($scenario);
+			$this->setIsNewRecord(true);
+		}
 
-		$this->setScenario($scenario);
-		$this->setIsNewRecord(true);
-
-		$this->init();
-
-		$this->attachBehaviours($this->behaviours());
-		$this->afterConstruct();
+		$this->onAfterConstruct();
+		parent::__construct();
 	}
 
 	/**
@@ -187,18 +182,23 @@ class Document extends \glue\Model{
 	 *
 	 * return 'users';
 	 */
-	function collectionName(){}
+	function collectionName()
+	{
+	}
 
-	function primaryKey(){
+	function primaryKey()
+	{
 		return '_id';
 	}
 
 	/**
 	 * Returns the value of the primary key
 	 */
-	public function getPrimaryKey($value=null){
-		if($value===null)
+	public function getPrimaryKey($value=null)
+	{
+		if($value===null){
 			$value=$this->{$this->primaryKey()};
+		}
 		return $value instanceof \MongoId ? $value : new \MongoId($value);
 	}
 
@@ -209,7 +209,8 @@ class Document extends \glue\Model{
 	 * Defaults to false, but it will be set to true if the instance is created using
 	 * the new operator.
 	 */
-	public function getIsNewRecord(){
+	public function getIsNewRecord()
+	{
 		return $this->_new;
 	}
 
@@ -218,14 +219,16 @@ class Document extends \glue\Model{
 	 * @param boolean $value whether the record is new and should be inserted when calling {@link save}.
 	 * @see getIsNewRecord
 	 */
-	public function setIsNewRecord($value){
+	public function setIsNewRecord($value)
+	{
 		$this->_new=$value;
 	}
 
 	/**
 	 * Gets a list of the projected fields for the model
 	 */
-	public function getProjectedFields(){
+	public function getProjectedFields()
+	{
 		return $this->_projected_fields;
 	}
 
@@ -233,7 +236,8 @@ class Document extends \glue\Model{
 	 * Sets the projected fields of the model
 	 * @param array $a
 	 */
-	public function setProjectedFields($a){
+	public function setProjectedFields($a)
+	{
 		$this->_projected_fields=$a;
 	}
 
@@ -242,39 +246,14 @@ class Document extends \glue\Model{
 	 * @param string $name
 	 * @param mixed $value
 	 */
-	public function setAttribute($name,$value){
-		if(property_exists($this,$name))
-			$this->$name=$value;
-		else//if(isset($this->_attributes[$name]))
-			$this->_attributes[$name]=$value;
-		//else return false;
-		return true;
-	}
-
-	/**
-	 * Returns the static model of the specified AR class.
-	 * The model returned is a static instance of the AR class.
-	 * It is provided for invoking class-level methods (something similar to static class methods.)
-	 *
-	 * EVERY derived AR class must override this method as follows,
-	 * <pre>
-	 * public static function model($className=__CLASS__)
-	 * {
-	 *     return parent::model($className);
-	 * }
-	 * </pre>
-	 *
-	 * @param string $className active record class name.
-	 * @return EMongoDocument active record model instance.
-	 */
-	public static function model($className=__CLASS__){
-		if(isset(self::$_models[$className]))
-			return self::$_models[$className];
-		else{
-			$model=self::$_models[$className]=new $className(null);
-			$model->attachBehaviours($model->behaviours());
-			return $model;
+	public function setAttribute($name, $value)
+	{
+		if(property_exists($this, $name)){
+			$this->$name = $value;
+		}else{
+			$this->_attributes[$name] = $value;
 		}
+		return true;
 	}
 
 	/**
@@ -285,40 +264,6 @@ class Document extends \glue\Model{
 		$class=get_class($this);
 		$model=new $class(null);
 		return $model;
-	}
-
-	/**
-	 * Returns the text label for the specified attribute.
-	 * This method overrides the parent implementation by supporting
-	 * returning the label defined in relational object.
-	 * In particular, if the attribute name is in the form of "post.author.name",
-	 * then this method will derive the label from the "author" relation's "name" attribute.
-	 * @param string $attribute the attribute name
-	 * @return string the attribute label
-	 * @see generateAttributeLabel
-	 */
-	public function getAttributeLabel($attribute)
-	{
-		$labels=$this->attributeLabels();
-		if(isset($labels[$attribute]))
-			return $labels[$attribute];
-		elseif(strpos($attribute,'.')!==false)
-		{
-			$segs=explode('.',$attribute);
-			$name=array_pop($segs);
-			$model=$this;
-			foreach($segs as $seg)
-			{
-				$relations=$model->relations();
-				if(isset($relations[$seg]))
-					$model=\glue\db\Document::model($relations[$seg][1]);
-				else
-					break;
-			}
-			return $model->getAttributeLabel($name);
-		}
-		else
-			return $this->generateAttributeLabel($attribute);
 	}
 
 	/**
@@ -743,8 +688,8 @@ class Document extends \glue\Model{
 
 		// Form the where clause
 		$where = $params;
-		if(isset($relation['where'])) $where = array_merge($relation['where'], $params);
-
+		if(isset($relation['where'])&&!$params) $where = array_merge($relation['where'], $params);
+		
 		// Find out what the pk is and what kind of condition I should apply to it
 		if (is_array($pk)) {
 			//It is an array of references
@@ -754,31 +699,36 @@ class Document extends \glue\Model{
 					$row = $this->populateReference($singleReference, $cname);
 					if ($row) array_push($result, $row);
 				}
-				return $result;
+				return $this->_related[$name]=$result;
 			}
 			// It is an array of _ids
 			$clause = array_merge($where, array($fkey=>array('$in' => $pk)));
 		}elseif($pk instanceof MongoDBRef){
-
+		
 			// I should probably just return it here
 			// otherwise I will continue on
-			return $this->populateReference($pk, $cname);
-
+			return $this->_related[$name]=$this->populateReference($pk, $cname);
+		
 		}else{
-
+		
 			// It is just one _id
 			$clause = array_merge($where, array($fkey=>$pk));
 		}
-
-		$o = $cname::model();
+		
+		$o = $cname::model($cname);
 		if($relation[0]==='one'){
-
+		
 			// Lets find it and return it
-			$cursor = $o->findOne($clause);
+			return $this->_related[$name] = $o->findOne($clause);
 		}elseif($relation[0]==='many'){
-
+		
 			// Lets find them and return them
-			$cursor = $o->find($clause);
+			$cursor = $o->find($clause)
+			->sort(isset($relation['sort'])?$relation['sort']:array())
+			->skip(isset($relation['skip'])?$relation['skip']:null)
+			->limit(isset($relation['limit'])?$relation['limit']:null);
+			if(isset($relation['cache']) && $relation['cache']===true)
+				return $this->_related[$name]=iterator_to_array($cursor);
 		}
 		return $cursor;
 	}
@@ -847,26 +797,6 @@ class Document extends \glue\Model{
 	public function aggregate($pipeline){
 		$this->trace(__FUNCTION__);
 		return $this->getDb()->aggregate($this->collectionName(),$pipeline);
-	}
-
-	/**
-	 * A distinct helper on the model, this is not the same as the aggregation framework
-	 * distinct
-	 * @link http://docs.mongodb.org/manual/reference/command/distinct/
-	 * @param string $key
-	 * @param array $query
-	 */
-	public function distinct($key, $query = array()){
-		$this->trace(__FUNCTION__);
-		$c=$this->getDbCriteria();
-		if(is_array($c) && isset($c['condition']) && !empty($c['condition']))
-			$query=\glue\Collection::mergeArray($query, $c['condition']);
-
-		return $this->getDb()->command(array(
-			'distinct' => $this->collectionName(),
-			'key' => $key,
-			'query' => $query
-		));
 	}
 
 	/**

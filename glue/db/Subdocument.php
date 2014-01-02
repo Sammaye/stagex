@@ -2,24 +2,26 @@
 
 namespace glue\db;
 
-use glue\Model;
-use glue\Exception;
+use \glue\Validator;
+use \glue\Model;
+use \glue\Exception;
 
-class Subdocument extends \glue\Validator{
-	
+class Subdocument extends Validator
+{
 	public $class;
 	public $type;
 	public $rules;
 	public $scenario;
 	public $preserveKeys=true;
 
-	public function validateAttribute($object, $attribute, $value){
-
-		if(!$this->type)
+	public function validateAttribute($object, $attribute, $value)
+	{
+		if(!$this->type){
 			throw new Exception('You must supply a subdocument type of either "many" or "one" in order to validate subdocuments');
-
-		if(!$this->class && !$this->rules)
+		}
+		if(!$this->class && !$this->rules){
 			throw new Exception('You must supply either some rules to validate by or a class name to use');
+		}
 
 		// Lets judge what class we are using
 		// If we are using a pre-defined class then lets just get on with it otherwise
@@ -27,7 +29,7 @@ class Subdocument extends \glue\Validator{
 		if($this->class){
 			$c = new $this->class;
 		}else{
-			$c=new Model();
+			$c = new Model();
 			$c->setRules($this->rules);
 		}
 		
@@ -47,25 +49,35 @@ class Subdocument extends \glue\Validator{
 
 				foreach($object->$attribute as $index=>$row){
 					$c->clean();
-					if($this->preserveKeys)
+					if($this->preserveKeys){
 						$val = $fieldValue[$index] = $row instanceof $c ? $row->getAttributes(null,true) : $row;
-					else
+					}else{
 						$val = $fieldValue[] = $row instanceof $c ? $row->getAttributes(null,true) : $row;
+					}
 					$c->setAttributes($val);
 					if(!$c->validate()){
-						if($this->preserveKeys)
+						if($this->preserveKeys){
 							$fieldErrors[$index] = $c->getErrors();
-						else
+						}else{
 							$fieldErrors[] = $c->getErrors();
+						}
+					}
+					
+					// Lets get the field value again to apply filters etc
+					if($this->preserveKeys){
+						$newFieldValue[$index] = $c->getRawDocument();
+					}else{
+						$newFieldValue[] = $c->getRawDocument();
 					}
 				}
 
-				if(sizeof($fieldErrors)>0){
+				if(sizeof($fieldErrors) > 0){
 					$valid=false;
-					if($this->message!==null)
-						$object->setError($attribute,$this->message);
-					else
+					if($this->message !== null){
+						$object->setError($attribute, $this->message);
+					}else{
 						$object->setAttributeErrors($attribute, $fieldErrors);
+					}
 				}
 
 				// Strip the models etc from the field value
@@ -84,15 +96,18 @@ class Subdocument extends \glue\Validator{
 					$object->setAttributeErrors($attribute, $c->getErrors());
 				}
 			}
+			
+			// Lets get the field value again to apply filters etc
+			$fieldValue = $c->getRawDocument();			
 
 			// Strip the models etc from the field value
-			//$object->$attribute = $fieldValue;
 			$object->$attribute = $fieldValue instanceof $c ? $row->getAttributes(null,true) : $fieldValue;
 		}
 		
-		if($valid)
+		if($valid){
 			return true;
-		else
+		}else{
 			return false;
+		}
 	}
 }
