@@ -8,9 +8,10 @@ use \glue\Model;
 
 class Validation extends Component
 {
-	public static function validate($rules)
+	public static function validate($attributes, $rules)
 	{
 		$model = new Model;
+		$model->setAttributes($attributes);
 		$model->setRules($rules);
 		$model->validate(false);
 		return $model->getValid();
