@@ -16,7 +16,8 @@ class SearchController extends Controller
 		);
 	}	
 
-	function action_index(){
+	function action_index()
+	{
 		extract(glue::http()->param(array('query', 'filter_type', 'filter_time', 'filter_duration', 'filter_category', 'orderby')));
 		if($filter_type === 'playlist' || $filter_type === 'user' || $filter_type === 'all' /* If all explicitly */){
 			// Omit the normal video searching variables
@@ -109,7 +110,8 @@ class SearchController extends Controller
 				'filter_duration' => $filter_duration, 'filter_category' => $filter_category, 'orderby' => $orderby));
 	}
 
-	function action_suggestions(){
+	function action_suggestions()
+	{
 		$this->pageTitle = 'Suggest Searches - StageX';
 		if(!glue::http()->isAjax()){
 			glue::route('error/notfound');

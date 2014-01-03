@@ -1,12 +1,12 @@
 <?php
 
 use \glue\Controller;
-use app\models\Follower,
-	app\models\Stream,
-	app\models\Notification;
+use app\models\Follower;
+use app\models\Stream;
+use app\models\Notification;
 
-class StreamController extends Controller{
-
+class StreamController extends Controller
+{
 	public $layout = 'user_section';
 	public $subtab;
 
@@ -24,14 +24,16 @@ class StreamController extends Controller{
 		);
 	}	
 
-	public function action_index(){
+	public function action_index()
+	{
 		$this->title = 'Your Stream - StageX';
 
 		$this->tab = 'stream';
 		echo $this->render('stream/view', array('cursor' => $this->load_single_stream()));
 	}
 
-	public function action_news(){
+	public function action_news()
+	{
 		$this->pageTitle = 'Recent News - StageX';
 
 		$this->tab = 'news_feed';
@@ -47,7 +49,8 @@ class StreamController extends Controller{
 		echo $this->render('stream/news_feed', array('stream' => $stream, 'subscriptions' => $subscriptions));
 	}
 
-	public function action_notifications(){
+	public function action_notifications()
+	{
 		$this->title = 'Notifications - StageX';
 
 		app\models\User::model()->updateAll(array('_id'=>glue::user()->_id),array('$set'=>array('lastNotificationPull'=>new MongoDate())));
@@ -56,7 +59,8 @@ class StreamController extends Controller{
 		echo $this->render('stream/notifications');
 	}
 
-	public function action_share(){
+	public function action_share()
+	{
 		$this->pageTitle = 'Share - StageX';
 
 		if(!glue::http()->isAjax()){
@@ -93,7 +97,8 @@ class StreamController extends Controller{
 		}
 	}
 
-	public function action_add_comment(){
+	public function action_add_comment()
+	{
 		$this->pageTitle = 'Add Comment - StageX';
 
 		if(!glue::http()->isAjax()){
@@ -122,7 +127,8 @@ class StreamController extends Controller{
 		}
 	}
 
-	public function action_delete(){
+	public function action_delete()
+	{
 		if(!glue::auth()->check('ajax','post'))
 			glue::trigger('404');
 		
@@ -137,7 +143,8 @@ class StreamController extends Controller{
 		$this->json_success(array('message'=>'Stream items were deleted','updated'=>count($mongoIds)));
 	}
 
-	function action_getStream(){
+	function action_getStream()
+	{
 		if(!glue::http()->isAjax())
 			glue::trigger('404');
 
@@ -175,8 +182,8 @@ class StreamController extends Controller{
 			$this->json_error(array('remaining'=>0,'initMessage'=>'No stream could be found','message'=>'There are no more stream items to load'));
 	}
 
-	function load_single_stream($_ts = null, $user = null, $filter = null){
-
+	function load_single_stream($_ts = null, $user = null, $filter = null)
+	{
 		$_ts_sec = array();
 		if($_ts)
 			$_ts_sec = array('created' => array('$lt' => new MongoDate($_ts)));
@@ -204,7 +211,8 @@ class StreamController extends Controller{
 		), $_ts_sec, $_filter_a))->sort(array('created' => -1))->limit(20);
 	}
 
-	function load_news_stream($_ts = null, $_id = null){
+	function load_news_stream($_ts = null, $_id = null)
+	{
 		$subscription_model = new app\models\Follower();
 		$subscriptions = $subscription_model->getAll_ids();
 

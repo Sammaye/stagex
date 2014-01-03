@@ -1,12 +1,12 @@
 <?php
 
 use \glue\Controller;
-use app\models\Help,
-	app\models\HelpTopic,
-	app\models\HelpArticle;
+use app\models\Help;
+use app\models\HelpTopic;
+use app\models\HelpArticle;
 
-class HelpController extends Controller{
-
+class HelpController extends Controller
+{
 	public $selectedTab = '';
 
 	public function behaviours()
@@ -25,12 +25,14 @@ class HelpController extends Controller{
 		);		
 	}
 
-	function action_index(){
+	function action_index()
+	{
 		$this->title = 'StageX Help Center';
 		echo $this->render("help/index");
 	}
 
-	function action_view(){
+	function action_view()
+	{
 		$this->title = 'Help Content Not Found - StageX';
 		$this->layout = "help_layout";
 
@@ -54,19 +56,22 @@ class HelpController extends Controller{
 		}
 	}
 
-	function action_search(){
+	function action_search()
+	{
 		$this->title = 'Search StageX Help';
 		echo $this->render("help/search", array( "sphinx" => Help::model()->search() ));
 	}
 
-	function action_viewTopics(){
+	function action_viewTopics()
+	{
 		$this->title = 'View Help Topics - StageX';
 
 		// Will list all help articles. But only for admins
 		echo $this->render('help/list_topics', array('items' => app\models\HelpTopic::model()->fts(array('title', 'path'), glue::http()->param('query', ''), array('type' => 'topic'))) );
 	}
 
-	function action_addTopic(){
+	function action_addTopic()
+	{
 		$this->title = 'Add Help Topic - StageX';
 		$model = new HelpTopic();
 
@@ -80,7 +85,8 @@ class HelpController extends Controller{
 		echo $this->render('help/manage_topic', array( 'model' => $model ));
 	}
 
-	function action_editTopic(){
+	function action_editTopic()
+	{
 		$this->title = 'Edit Help Topic - StageX';
 		$model = HelpTopic::model()->findOne(array('_id' => new MongoId($_GET['id'])));
 
@@ -93,7 +99,8 @@ class HelpController extends Controller{
 		echo $this->render('help/manage_topic', array( 'model' => $model ));
 	}
 
-	function action_deleteTopic(){
+	function action_deleteTopic()
+	{
 		$this->title = 'Remove Help Topics - StageX';
 		if(!glue::http()->isAjax())
 			glue::trigger('404');
@@ -111,7 +118,8 @@ class HelpController extends Controller{
 		$this->json_success('The topic you selected was removed');
 	}
 
-	function action_viewArticles(){
+	function action_viewArticles()
+	{
 		$this->title = 'View Help Articles - StageX';
 
 		// Will list all help articles. But only for admins
@@ -119,7 +127,8 @@ class HelpController extends Controller{
 			'items' => HelpArticle::model()->fts(array('title', 'content', 'path'), glue::http()->param('query', ''), array('type' => 'article'))) );
 	}
 
-	function action_addArticle(){
+	function action_addArticle()
+	{
 		$this->title = 'Add New Help Article - StageX';
 
 		$model = new HelpArticle;
@@ -135,7 +144,8 @@ class HelpController extends Controller{
 		));
 	}
 
-	function action_editArticle(){
+	function action_editArticle()
+	{
 		$this->title = 'Edit Help Article - StageX';
 
 		$model = HelpArticle::model()->findOne(array('_id' => new MongoId($_GET['id'])));
@@ -152,7 +162,8 @@ class HelpController extends Controller{
 		));
 	}
 
-	function action_deleteArticle(){
+	function action_deleteArticle()
+	{
 		$this->title = 'Remove Help Article - StageX';
 
 		if(!glue::http()->isAjax())
@@ -166,7 +177,8 @@ class HelpController extends Controller{
 		$this->json_success('The article you select was deleted');
 	}
 
-	function action_suggestions(){
+	function action_suggestions()
+	{
 		$this->title = 'Suggest Help Pages - StageX';
 		if(!glue::http()->isAjax())
 			glue::trigger('404');

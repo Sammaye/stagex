@@ -5,27 +5,35 @@ use app\models\AutoPublishQueue;
 use app\models\Video;
 use app\models\Playlist;
 
-class PlaylistController extends Controller{
-
-	public function authRules(){
+class PlaylistController extends Controller
+{
+	public $tab='playlists';
+	
+	public function behaviours()
+	{
 		return array(
-			array("allow",
-				"actions"=>array('create', 'edit', 'save', 'delete', 'batchDelete', 'addVideo', 'get_menu', 'batchSave', 'deleteVideo', 'ajaxsearch',
-						'clear', 'subscribe', 'unsubscribe'),
-				"users"=>array("@*")
-			),
-			array('allow', 'actions' => array('index', 'view', 'renderBar')),
-			array("deny", "users"=>array("*")),
+			'auth' => array(
+				'class' => 'glue\Auth',
+				'rules' => array(
+					array("allow",
+						"actions"=>array('create', 'edit', 'save', 'delete', 'batchDelete', 'addVideo', 'get_menu', 'batchSave', 'deleteVideo', 'ajaxsearch',
+							'clear', 'subscribe', 'unsubscribe'),
+						"users"=>array("@*")
+					),
+					array('allow', 'actions' => array('index', 'view', 'renderBar')),
+					array("deny", "users"=>array("*")),
+				)
+			)
 		);
 	}
-	
-	public $tab='playlists';
 
-	public function action_index(){
+	public function action_index()
+	{
 		$this->action_view();
 	}
 
-	public function action_view(){
+	public function action_view()
+	{
 		$playlist = Playlist::model()->findOne(array('_id' => new MongoId(glue::http()->param('id')), 'deleted' => array('$ne' => 1)));
 
 		if(!glue::auth()->check(array('viewable' => $playlist))){
@@ -39,7 +47,8 @@ class PlaylistController extends Controller{
 		}
 	}
 
-	public function action_create(){
+	public function action_create()
+	{
 		if(!glue::auth()->check('ajax','post'))
 			glue::trigger('404');
 
@@ -56,7 +65,8 @@ class PlaylistController extends Controller{
 		$this->json_error(array('message'=>'Playlist could not be created because:','messages'=>$model->getErrors()));
 	}
 
-	public function action_save(){
+	public function action_save()
+	{
 		if(!glue::auth()->check('ajax','post'))
 			glue::trigger('404');
 		
@@ -85,7 +95,8 @@ class PlaylistController extends Controller{
 			$this->json_error(self::UNKNOWN);
 	}
 
-	function action_delete(){
+	function action_delete()
+	{
 		if(!glue::auth()->check('ajax','post'))
 			glue::trigger('404');
 		if(!($playlist = Playlist::model()->findOne(array('_id' => new MongoId(glue::http()->param('id','')), 'title' => array('$ne' => 'Watch Later')))))
@@ -96,7 +107,8 @@ class PlaylistController extends Controller{
 		$this->json_success('The playlist was deleted');
 	}
 
-	function action_batchDelete(){
+	function action_batchDelete()
+	{
 		if(!glue::auth()->check('ajax','post'))
 			glue::trigger('404');
 		$ids = glue::http()->param('ids',null);
@@ -126,7 +138,8 @@ class PlaylistController extends Controller{
 		$this->json_success(array('message'=>'The playlists you selected were deleted','updated'=>count($ids)));
 	}	
 	
-	function action_batchSave(){
+	function action_batchSave()
+	{
 		if(!glue::auth()->check('ajax','post'))
 			glue::trigger('404');
 		if(isset($_POST['Playlist'])&&($ids=glue::http()->param('ids',null))!==null){
@@ -144,7 +157,8 @@ class PlaylistController extends Controller{
 		$this->json_error(self::UNKNOWN);		
 	}
 
-	public function action_addVideo(){
+	public function action_addVideo()
+	{
 		$this->title = 'Add Video To Playlist - StageX';
 		if(!glue::http()->isAjax())
 			glue::trigger('404');
@@ -177,7 +191,8 @@ class PlaylistController extends Controller{
 			$this->json_error('The video you selected was not added because of an unknown error.');
 	}
 
-	function action_deleteVideo(){
+	function action_deleteVideo()
+	{
 		if(!glue::http()->isAjax())
 			glue::trigger('404');
 
@@ -209,7 +224,8 @@ class PlaylistController extends Controller{
 		$this->json_success('Videos removed');
 	}
 	
-	function action_clear(){
+	function action_clear()
+	{
 		if(!glue::auth()->check('ajax','post'))
 			glue::trigger('404');
 		if(!($playlist = Playlist::model()->findOne(array('_id' => new MongoId(glue::http()->param('id',''))))))
@@ -221,7 +237,8 @@ class PlaylistController extends Controller{
 		$this->json_success('The playlist was cleared');
 	}	
 	
-	function action_subscribe(){
+	function action_subscribe()
+	{
 		if(glue::auth()->check('ajax','post')){
 				
 			if(
@@ -245,7 +262,8 @@ class PlaylistController extends Controller{
 			glue::trigger('404');		
 	}
 	
-	function action_unsubscribe(){
+	function action_unsubscribe()
+	{
 		if(glue::auth()->check('ajax','post')){
 			if(
 				($id=glue::http()->param('id',null))===null ||
@@ -263,7 +281,8 @@ class PlaylistController extends Controller{
 			glue::trigger('404');		
 	}
 	
-	function action_ajaxsearch(){
+	function action_ajaxsearch()
+	{
 		if(!glue::http()->isAjax())
 			glue::trigger('404');
 		$term=glue::http()->param('term',null);
@@ -278,7 +297,8 @@ class PlaylistController extends Controller{
 		$this->json_success(array('results'=>$res));
 	}	
 
-	function action_renderBar(){
+	function action_renderBar()
+	{
 		if(!glue::http()->isAjax())
 			glue::trigger('404');
 		$video_ids = array();

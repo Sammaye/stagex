@@ -1,11 +1,13 @@
 <?php
 
 use \glue\Controller;
-use app\models\VideoResponse,
-	app\models\Video;
+use app\models\VideoResponse;
+use app\models\Video;
 
 class VideoResponseController extends Controller
 {
+	public $tab;
+	
 	public function behaviours()
 	{
 		return array(
@@ -22,17 +24,17 @@ class VideoResponseController extends Controller
 			)
 		);
 	}	
-	
-	public $tab;
 
 	/**
 	 * This is the method by which all video responses for a given video are displayed at once
 	 */
-	public function action_index(){
+	public function action_index()
+	{
 		glue::trigger('404');
 	}
 
-	public function action_list(){
+	public function action_list()
+	{
 		$video = Video::model()->findOne(array('_id' => new MongoId(glue::http()->param('id',''))));
 		if(!glue::auth()->check(array('viewable' => $video))){
 			echo $this->render('video/deleted');
@@ -87,7 +89,8 @@ class VideoResponseController extends Controller
 		)); 
 	}
 	
-	public function action_pending(){
+	public function action_pending()
+	{
 		$video = Video::model()->findOne(array('_id' => new MongoId(glue::http()->param('id',''))));
 		if(!glue::auth()->check(array('^' => $video)))
 			glue::trigger('404');
@@ -139,8 +142,8 @@ class VideoResponseController extends Controller
 		));		
 	}
 
-	public function action_thread(){
-
+	public function action_thread()
+	{
 		$this->title = 'View Response Thread - StageX';
 		$this->layout='user_section';
 		
@@ -168,7 +171,8 @@ class VideoResponseController extends Controller
 		echo $this->render('response/thread', array('thread_parent' => $thread_parent, 'thread' => $thread, 'video' => $comment->video));
 	}
 
-	public function action_add(){
+	public function action_add()
+	{
 		$this->title = 'Add Video Response - StageX';
 		if(!glue::auth()->check('ajax','post'))
 			glue::trigger('404');
@@ -216,7 +220,8 @@ class VideoResponseController extends Controller
 		}
 	}
 
-	public function action_approve(){
+	public function action_approve()
+	{
 		if(!glue::auth()->check('ajax','post'))
 			glue::trigger('404');
 		extract(glue::http()->param(array('video_id','ids')),null);
@@ -240,7 +245,8 @@ class VideoResponseController extends Controller
 				'failed' => count($mongoIds)-$row_count));		
 	}
 
-	public function action_like(){
+	public function action_like()
+	{
 		if(!glue::auth()->check('ajax'))
 			glue::trigger('404');
 
@@ -258,7 +264,8 @@ class VideoResponseController extends Controller
 		}
 	}
 
-	public function action_unlike(){
+	public function action_unlike()
+	{
 		if(!glue::auth()->check('ajax'))
 			glue::trigger('404');
 
@@ -276,7 +283,8 @@ class VideoResponseController extends Controller
 		}
 	}
 
-	public function action_delete(){
+	public function action_delete()
+	{
 		$this->title = 'Remove Responses - StageX';
 		if(!glue::auth()->check('ajax','post'))
 			glue::trigger('404');
@@ -310,7 +318,8 @@ class VideoResponseController extends Controller
 			'failed' => count($mongoIds)-$row_count));
 	}
 
-	function action_getmore(){
+	function action_getmore()
+	{
 		// Potential sort options:
 		// * user_id - Displays all comments only by that user
 		// * approved=true - Displays only approved comments
@@ -403,7 +412,8 @@ class VideoResponseController extends Controller
 	 * For the minute gettting live comments will refresh the list and filters and sorts. I am not sure whether I wish
 	 * to keep it this way or make it keep the filters and sorts.
 	 */
-	function action_getNew(){
+	function action_getNew()
+	{
 		if(!glue::http()->isAjax())
 			glue::trigger('404');
 
@@ -421,7 +431,8 @@ class VideoResponseController extends Controller
 		$this->json_success(array('number_comments'=>$comments->count()));
 	}
 
-	function action_videosuggestions(){
+	function action_videosuggestions()
+	{
 		$this->pageTitle = 'Suggest Responses - StageX';
 
 		if(!glue::http()->isAjax())

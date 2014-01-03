@@ -27,7 +27,8 @@ class AutoshareController extends Controller
 	}
 
 
-	function getConnectedUser(){
+	function getConnectedUser()
+	{
 		$this->user = $this->loadModel();
 
 		switch($_GET['network']){
@@ -44,7 +45,8 @@ class AutoshareController extends Controller
 		}
 	}
 
-	function action_status(){
+	function action_status()
+	{
 		$this->title = 'Autoshare - StageX';
 		$this->getConnectedUser();
 
@@ -84,7 +86,8 @@ class AutoshareController extends Controller
 		}
 	}
 
-	function action_connect(){
+	function action_connect()
+	{
 		$this->title = 'Autoshare - StageX';
 		$this->getConnectedUser();
 
@@ -106,8 +109,8 @@ class AutoshareController extends Controller
 		}
 	}
 
-	function action_auth(){
-
+	function action_auth()
+	{
 		$this->getConnectedUser(); ?>
 		<html>
 			<head><title><?php echo "Authorise Connected Account" ?></title></head>
@@ -138,7 +141,8 @@ class AutoshareController extends Controller
 		</html>
 	<?php }
 
-	function action_disconnect(){
+	function action_disconnect()
+	{
 		$this->getConnectedUser(); ?>
 		<html>
 			<head><title><?php echo "Remove Connected Account" ?></title></head>
@@ -164,7 +168,8 @@ class AutoshareController extends Controller
 		</html>
 	<?php }
 
-	function loadModel(){
+	function loadModel()
+	{
 		$user = app\models\User::model()->findOne(array("_id"=>glue::user()->_id));
 		return $user;
 	}

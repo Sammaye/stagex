@@ -2,13 +2,12 @@
 include_once glue::getPath('@glue').'/components/phpthumb/ThumbLib.inc.php';
 
 use \glue\Controller;
+use app\models\User;
+use app\models\Video;
+use app\models\Image;
 
-use app\models\User,
-	app\models\Video,
-	app\models\Image;
-
-class ImageController extends Controller{
-	
+class ImageController extends Controller
+{
 	public function behaviours()
 	{
 		return array(
@@ -38,11 +37,13 @@ class ImageController extends Controller{
 		array(234, 130)
 	);
 
-	function action_index(){
+	function action_index()
+	{
 		glue::trigger('404');
 	}
 
-	function action_video(){
+	function action_video()
+	{
 		$this->title = 'Video Image - StageX';
 
 		$file_name = glue::http()->param('file',null);
@@ -92,7 +93,8 @@ class ImageController extends Controller{
 		$thumb->show();
 	}
 
-	function action_user(){
+	function action_user()
+	{
 		$this->title = 'User Avatar - StageX';
 
 		$file_name = glue::http()->param('file',null);
