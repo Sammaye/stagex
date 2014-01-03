@@ -2,9 +2,12 @@
 
 include_once glue::getPath('@glue').'/components/phpthumb/ThumbLib.inc.php';
 
-class VideoController extends \glue\Controller{
-	
-	function action_submitEncodingJob(){
+use \glue\Controller;
+
+class VideoController extends Controller
+{
+	function action_submitEncodingJob()
+	{
 		$jobs = iterator_to_array(glue::db()->encoding_jobs->find(array('state' => 'pending'))->sort(array('ts' => -1))->limit(100));
 		
 		$ids=array();
@@ -39,8 +42,8 @@ class VideoController extends \glue\Controller{
 		}		
 	}
 	
-	function action_consumeEncodingOutput(){
-		
+	function action_consumeEncodingOutput()
+	{
 		// This function will be run every minute
 		
 		// If there are no videos awaiting transcoding then don't ping SQS this minute

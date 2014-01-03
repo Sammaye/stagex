@@ -1,13 +1,15 @@
 <?php
 
-use app\models\AutoPublishQueue,
-	app\models\User,
-	app\models\Video,
-	app\models\Playlist;
+use \glue\Controller;
+use app\models\AutoPublishQueue;
+use app\models\User;
+use app\models\Video;
+use app\models\Playlist;
 
-class UserController extends \glue\Controller{
-	
-	function action_publishStream(){
+class UserController extends Controller
+{
+	function action_publishStream()
+	{
 		// Get all jobs which are in progress or done
 		$cursor=AutoPublishQueue::model()->findAll(array('processing' => 0, 'done' => 0))->sort(array('ts' => -1))->limit(100);
 		
@@ -129,7 +131,8 @@ class UserController extends \glue\Controller{
 		AutoPublishQueue::model()->deleteAll(array('_id' => array('$in' => $_ids)));		
 	}
 	
-	function action_resetUploadBandwith(){
+	function action_resetUploadBandwith()
+	{
 		$user=app\models\User::model()->find(array('nextBandwidthTopup' => array('$lt' => time())));
 		foreach($users as $k => $v)
 			$user->reset_upload_bandwidth();		
