@@ -52,7 +52,7 @@ class AutoPublishQueue extends \glue\db\Document{
 	}
 
 	static function add_to_qeue($type, $user_id, $video_id = null, $playlist_id = null, $text = null){
-		$oldDoc = AutoPublishQueue::model()->findOne(array('type' => $type, 'userId' => $user_id, 'videoId' => $video_id, 'playlistId' => $playlist_id, 'text' => $text));
+		$oldDoc = AutoPublishQueue::findOne(array('type' => $type, 'userId' => $user_id, 'videoId' => $video_id, 'playlistId' => $playlist_id, 'text' => $text));
 
 		// If oldDoc is filled then we dont do shit else lets add this as something that needs syncing
 		// This will help prevent duplicate items on the users feed which, let's face it, is a pain in the ass

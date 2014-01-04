@@ -461,7 +461,7 @@ class User extends \glue\User{
 	function watchLaterPlaylist(){
 		if(
 			$this->watchLater===null && 
-			($playlist=Playlist::model()->findOne(array('title' => 'Watch Later', 'userId' => glue::user()->_id)))!==null
+			($playlist=Playlist::findOne(array('title' => 'Watch Later', 'userId' => glue::user()->_id)))!==null
 		)
 			$this->watchLater=$playlist;
 		elseif($this->watchLater===null)

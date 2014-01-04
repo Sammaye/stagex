@@ -106,7 +106,7 @@
 			foreach($model->videos as $k => $item){
 				$_id_array[] = $item['_id'];
 			}
-			$videos = app\models\Video::model()->find(array('_id' => array('$in' => $_id_array)));
+			$videos = app\models\Video::find(array('_id' => array('$in' => $_id_array)));
 
 			foreach($videos as $k => $item){
 				if($item instanceof app\models\Video){

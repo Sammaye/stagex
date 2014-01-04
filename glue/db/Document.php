@@ -273,7 +273,7 @@ class Document extends Model
 			throw new Exception('The active record cannot be inserted because it is not new.');
 		}
 		
-		if(!$runValidation || $this->validate($attributes)){
+		if($runValidation && !$this->validate($attributes)){
 			return false;
 		}
 		
@@ -307,7 +307,7 @@ class Document extends Model
 			throw new Exception('The active record cannot be updated because it has no primary key.');
 		}		
 		
-		if(!$runValidation || $this->validate($attributes)){
+		if($runValidation && !$this->validate($attributes)){
 			return false;
 		}		
 		
@@ -343,7 +343,7 @@ class Document extends Model
 		$this->trace(__FUNCTION__);
 		if($this->onBeforeDelete()){
 			$response = static::deleteAll($this->{$this->primaryKey()});
-			$this->afterDelete();
+			$this->onAfterDelete();
 			return $response;
 		}else{
 			return false;
@@ -546,7 +546,7 @@ class Document extends Model
 
     public function onBeforeSave()
     {
-    	$this->raise('beforeSave');
+    	return $this->raise('beforeSave');
     }
     
     public function onAfterSave()

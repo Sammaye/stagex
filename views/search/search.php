@@ -86,7 +86,7 @@ $this->js('page', "
 	<div class="dropdown-group">
 	<button class='btn btn-white dropdown-anchor'>Category<?php
 	
-		$categories=app\models\Video::model()->categories('selectBox');
+		$categories=app\models\Video::categories('selectBox');
 	
 		if(array_key_exists($filter_category, $categories))
 			echo ': '.$categories[$filter_category];

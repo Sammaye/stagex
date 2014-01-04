@@ -72,14 +72,14 @@ class VideoResponse extends \glue\db\Document{
 	}
 
 	public static function findAllComments($video, $ts_query = array()){
-		return self::model()->find(array('videoId' => $video->_id, 'created' => $ts_query));
+		return self::find(array('videoId' => $video->_id, 'created' => $ts_query));
 	}
 
 	public static function findPublicComments($video,  $ts_query = array(), $showOnlyModerated = false){
 		if($showOnlyModerated){
-			return self::model()->moderated()->find(array('videoId' => $video->_id));
+			return self::moderated()->find(array('videoId' => $video->_id));
 		}else{
-			return self::model()->public()->find(array('videoId' => $video->_id, 'created' => $ts_query));
+			return self::public()->find(array('videoId' => $video->_id, 'created' => $ts_query));
 		}
 	}
 
@@ -133,7 +133,7 @@ class VideoResponse extends \glue\db\Document{
 	}
 
 	function check_already_reply($field, $value, $params = array()){
-		return !self::model()->findOne(array('replyVideoId' => $value, 'videoId' => $this->videoId));
+		return !self::findOne(array('replyVideoId' => $value, 'videoId' => $this->videoId));
 	}
 
 	function check_same_video($field, $value, $params = array()){
@@ -142,7 +142,7 @@ class VideoResponse extends \glue\db\Document{
 
 	function getThread(){
 		/** $secondLevel = $this->Db()->find(array("path"=>new MongoRegex("/^".$path.",[^,]*,[^,]*$/")))->sort(array("seq"=>1)); // Second Level **/
-		return self::model()->find(array("path"=>new \MongoRegex("/^".$this->path.",[^,]*$/")))->sort(array("ts"=>1)); // First Level
+		return self::find(array("path"=>new \MongoRegex("/^".$this->path.",[^,]*$/")))->sort(array("ts"=>1)); // First Level
 	}
 
 	function beforeSave(){

@@ -48,7 +48,7 @@ class Cursor implements \Iterator, \Countable{
 			if((is_string($fn) && function_exists($fn)) || (is_object($fn) && $fn instanceof \Closure))
 				return $fn($c,$this->className);
 			elseif($this->className)
-				return $className::model()->findOne(array('_id' => new \MongoId($c['_id'])));
+				return $className::findOne(array('_id' => new \MongoId($c['_id'])));
 			else 
 				return (Object)$c;
 		}else

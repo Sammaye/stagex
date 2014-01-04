@@ -47,7 +47,7 @@ class SearchController extends Controller
 			$c->filter()->and('term', array('mature' => 0));
 		}
 		
-		$categories=app\models\Video::model()->categories('selectBox');
+		$categories=app\models\Video::categories('selectBox');
 		if(array_key_exists($filter_category, $categories)){
 			$c->filter()->and('term', array('category' => $filter_category));
 		}else
@@ -99,11 +99,11 @@ class SearchController extends Controller
 		$cursor = glue::elasticSearch()->search($c);
 		$cursor->setIteratorCallback(function($doc){
 			if($doc['_type']==='video')
-				return app\models\Video::model()->findOne(array('_id'=>new MongoId($doc['_id'])));
+				return app\models\Video::findOne(array('_id'=>new MongoId($doc['_id'])));
 			if($doc['_type']==='playlist')
-				return app\models\Playlist::model()->findOne(array('_id'=>new MongoId($doc['_id'])));
+				return app\models\Playlist::findOne(array('_id'=>new MongoId($doc['_id'])));
 			if($doc['_type']==='user')
-				return app\models\User::model()->findOne(array('_id'=>new MongoId($doc['_id'])));
+				return app\models\User::findOne(array('_id'=>new MongoId($doc['_id'])));
 		});		
 		
 		echo $this->render('search/search', array('sphinx' => $cursor, 'query' => $query, 'filter_type' => $filter_type, 'filter_time' => $filter_time, 

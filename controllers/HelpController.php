@@ -36,7 +36,7 @@ class HelpController extends Controller
 		$this->title = 'Help Content Not Found - StageX';
 		$this->layout = "help_layout";
 
-		$item = Help::model()->findOne(array('normalisedTitle' => glue::http()->param('title')));
+		$item = Help::findOne(array('normalisedTitle' => glue::http()->param('title')));
 
 		if(!$item){
 			echo $this->render('help/notfound');
@@ -59,7 +59,7 @@ class HelpController extends Controller
 	function action_search()
 	{
 		$this->title = 'Search StageX Help';
-		echo $this->render("help/search", array( "sphinx" => Help::model()->search() ));
+		echo $this->render("help/search", array( "sphinx" => Help::search() ));
 	}
 
 	function action_viewTopics()
@@ -67,7 +67,7 @@ class HelpController extends Controller
 		$this->title = 'View Help Topics - StageX';
 
 		// Will list all help articles. But only for admins
-		echo $this->render('help/list_topics', array('items' => app\models\HelpTopic::model()->fts(array('title', 'path'), glue::http()->param('query', ''), array('type' => 'topic'))) );
+		echo $this->render('help/list_topics', array('items' => app\models\HelpTopic::fts(array('title', 'path'), glue::http()->param('query', ''), array('type' => 'topic'))) );
 	}
 
 	function action_addTopic()
@@ -88,7 +88,7 @@ class HelpController extends Controller
 	function action_editTopic()
 	{
 		$this->title = 'Edit Help Topic - StageX';
-		$model = HelpTopic::model()->findOne(array('_id' => new MongoId($_GET['id'])));
+		$model = HelpTopic::findOne(array('_id' => new MongoId($_GET['id'])));
 
 		if(isset($_POST['HelpTopic'])){
 			$model->attributes=$_POST['HelpTopic'];
@@ -106,7 +106,7 @@ class HelpController extends Controller
 			glue::trigger('404');
 
 		$method = glue::http()->param('method',null);
-		$model = HelpTopic::model()->findOne(array('_id' => new MongoId(glue::http()->param('id',null))));
+		$model = HelpTopic::findOne(array('_id' => new MongoId(glue::http()->param('id',null))));
 
 		if(!$model)
 			$this->json_error('That topic could no longer be found');
@@ -124,7 +124,7 @@ class HelpController extends Controller
 
 		// Will list all help articles. But only for admins
 		echo $this->render('help/list_articles', array(
-			'items' => HelpArticle::model()->fts(array('title', 'content', 'path'), glue::http()->param('query', ''), array('type' => 'article'))) );
+			'items' => HelpArticle::fts(array('title', 'content', 'path'), glue::http()->param('query', ''), array('type' => 'article'))) );
 	}
 
 	function action_addArticle()
@@ -148,7 +148,7 @@ class HelpController extends Controller
 	{
 		$this->title = 'Edit Help Article - StageX';
 
-		$model = HelpArticle::model()->findOne(array('_id' => new MongoId($_GET['id'])));
+		$model = HelpArticle::findOne(array('_id' => new MongoId($_GET['id'])));
 
 		if(isset($_POST['HelpArticle'])){
 			$model->attributes=$_POST['HelpArticle'];
@@ -169,7 +169,7 @@ class HelpController extends Controller
 		if(!glue::http()->isAjax())
 			glue::trigger('404');
 		
-		$model = HelpArticle::model()->findOne(array('_id' => new MongoId(glue::http()->param('id'))));
+		$model = HelpArticle::findOne(array('_id' => new MongoId(glue::http()->param('id'))));
 		if(!$model)
 			$this->json_error('That article could no longer be found');
 

@@ -121,7 +121,7 @@ class Stream extends \glue\db\Document{
 	}
 
 	static function newWallPost_on_OtherUserWall($user_id, $to_user, $text){
-		$status = Stream::model()->findOne(array('user_id' => $to_user, 'posted_by_id' => $user_id, 'message' => $text, 'type' => Stream::WALL_POST));
+		$status = Stream::findOne(array('user_id' => $to_user, 'posted_by_id' => $user_id, 'message' => $text, 'type' => Stream::WALL_POST));
 
 		if($status){
 			$status->save(); // Just resave so it resets the ts on the object
@@ -137,7 +137,7 @@ class Stream extends \glue\db\Document{
 	}
 
 	static function subscribedTo($user_id, $subscribed_user){
-		$status = Stream::model()->findOne(array('userId' => $user_id, 'subscribed_user_id' => $subscribed_user, 'type' => Stream::SUBSCRIBED_TO));
+		$status = Stream::findOne(array('userId' => $user_id, 'subscribed_user_id' => $subscribed_user, 'type' => Stream::SUBSCRIBED_TO));
 
 		if($status){
 			$status->save();
@@ -151,7 +151,7 @@ class Stream extends \glue\db\Document{
 	}
 
 	static function videoWatch($user_id, $video_id){
-		$status = Stream::model()->findOne(array('user_id' => $user_id, 'video_id' => $video_id, 'type' => Stream::VIDEO_WATCHED));
+		$status = Stream::findOne(array('user_id' => $user_id, 'video_id' => $video_id, 'type' => Stream::VIDEO_WATCHED));
 
 		if($status){
 			$status->save(); // Just resave so it resets the ts on the object
@@ -173,7 +173,7 @@ class Stream extends \glue\db\Document{
 	}
 
 	static function shareItem($user_id, $item_id, $item_type, $custom_text = null){
-		$status = Stream::model()->findOne(array('user_id' => $user_id, 'item_id' => $item_id, 'type' => Stream::ITEM_SHARED));
+		$status = Stream::findOne(array('user_id' => $user_id, 'item_id' => $item_id, 'type' => Stream::ITEM_SHARED));
 
 		if($status){
 			$status->message = $custom_text;
@@ -190,7 +190,7 @@ class Stream extends \glue\db\Document{
 	}
 
 	static function videoLike($video_id, $user_id){
-		$status = Stream::model()->findOne(array('user_id' => $user_id, 'video_id' => $video_id, 'type' => Stream::VIDEO_RATE));
+		$status = Stream::findOne(array('user_id' => $user_id, 'video_id' => $video_id, 'type' => Stream::VIDEO_RATE));
 
 		if($status){
 			$status->like = 1;
@@ -206,7 +206,7 @@ class Stream extends \glue\db\Document{
 	}
 
 	static function videoDislike($video_id, $user_id){
-		$status = Stream::model()->findOne(array('user_id' => $user_id, 'video_id' => $video_id, 'type' => Stream::VIDEO_RATE));
+		$status = Stream::findOne(array('user_id' => $user_id, 'video_id' => $video_id, 'type' => Stream::VIDEO_RATE));
 
 		if($status){
 			$status->like = 0;
@@ -222,7 +222,7 @@ class Stream extends \glue\db\Document{
 	}
 
 	static function commentedOn($user_id, $video_id, $comment_id){
-		$status = Stream::model()->findOne(array('user_id' => $user_id, 'video_id' => $video_id, 'type' => Stream::COMMENTED_ON));
+		$status = Stream::findOne(array('user_id' => $user_id, 'video_id' => $video_id, 'type' => Stream::COMMENTED_ON));
 
 		if($status){
 			$status->addItemBy_id($comment_id);
@@ -238,7 +238,7 @@ class Stream extends \glue\db\Document{
 	}
 
 	public static function PlaylistAddVideo($user_id, $playlist_id, $video_id){
-		$status = Stream::model()->findOne(array('userId' => $user_id, 'itemId' => $playlist_id, 'type' => Stream::ADD_TO_PL));
+		$status = Stream::findOne(array('userId' => $user_id, 'itemId' => $playlist_id, 'type' => Stream::ADD_TO_PL));
 
 		if($status){
 			$status->addItemBy_id($video_id);
@@ -254,7 +254,7 @@ class Stream extends \glue\db\Document{
 	}
 
 	public static function like_playlist($user_id, $playlist_id){
-		$status = Stream::model()->findOne(array('user_id' => $user_id, 'playlist_id' => $playlist_id, 'type' => Stream::LIKE_PL));
+		$status = Stream::findOne(array('user_id' => $user_id, 'playlist_id' => $playlist_id, 'type' => Stream::LIKE_PL));
 
 		if($status){
 			$status->save();

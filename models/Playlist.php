@@ -26,7 +26,7 @@ class Playlist extends \glue\db\Document{
 
 	public $deleted = 0;
 
-	public public static function collectionName(){
+	public static function collectionName(){
 		return 'playlist';
 	}
 
@@ -64,7 +64,7 @@ class Playlist extends \glue\db\Document{
 			}
 		}
 
-		$video = Video::model()->findOne(array('_id' => $this->videos[0]['_id']));
+		$video = Video::findOne(array('_id' => $this->videos[0]['_id']));
 		return $video->getImage(138, 77);
 	}
 
@@ -73,7 +73,7 @@ class Playlist extends \glue\db\Document{
 
 		if(count($this->videos) > 0){
 			for($i, $size = count($this->videos) >= 4 ? 4 : count($this->videos); $i < $size; $i++){
-				$video = Video::model()->findOne(array('_id' => $this->videos[$i]['_id']));
+				$video = Video::findOne(array('_id' => $this->videos[$i]['_id']));
 
 				if(!$video)
 					$video = new Video;
@@ -121,7 +121,7 @@ class Playlist extends \glue\db\Document{
 		$videos = $this->videos;
 
 		foreach($videos as $k => $v){
-			$video = Video::model()->findOne(array('_id' => $v['_id']));
+			$video = Video::findOne(array('_id' => $v['_id']));
 			if($video){
 				$videos[$k] = $video;
 			}

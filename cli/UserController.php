@@ -11,7 +11,7 @@ class UserController extends Controller
 	function action_publishStream()
 	{
 		// Get all jobs which are in progress or done
-		$cursor=AutoPublishQueue::model()->findAll(array('processing' => 0, 'done' => 0))->sort(array('ts' => -1))->limit(100);
+		$cursor=AutoPublishQueue::findAll(array('processing' => 0, 'done' => 0))->sort(array('ts' => -1))->limit(100);
 		
 		// Get a list of _ids of these docs to be able to easily update them
 		$_ids = array();
@@ -24,7 +24,7 @@ class UserController extends Controller
 		// Set them to processing so future crons don't try and share twice
 		// The idea for this is that the cronjob runs once every 3 mins but it will take long than 3 mins for the cronjob to finish
 		// so I reserve the docs are are being processed by one thread so another thread won't try and take them and create duplicates or an infinite loop.
-		$c = AutoPublishQueue::model()->updateAll(array('_id' => array('$in' => $_ids)), array('$set' => array('processing' => 1)), array('multiple' => true));
+		$c = AutoPublishQueue::updateAll(array('_id' => array('$in' => $_ids)), array('$set' => array('processing' => 1)), array('multiple' => true));
 		
 		//print count($cursor); // DEBUG
 		
@@ -35,9 +35,9 @@ class UserController extends Controller
 			// I have used different fields for each entity to be able to
 			// query them like this and then understand below if I have the required information to complete a task.
 			// Saves me having to copy and paste the query for each case
-			$user = User::model()->findOne(array('_id' => $v['userId']));
-			$video = Video::model()->findOne(array('_id' => $v['videoId']));
-			$playlist = Playlist::model()->findOne(array('_id' => $v['playlistId']));
+			$user = User::findOne(array('_id' => $v['userId']));
+			$video = Video::findOne(array('_id' => $v['videoId']));
+			$playlist = Playlist::findOne(array('_id' => $v['playlistId']));
 		
 			// Now since we have no Cookies here we need to set the facebook API to use a pre-defined access token from the DB
 			$facebook = glue::facebook();
@@ -128,12 +128,12 @@ class UserController extends Controller
 		// Tell the db they are done now since removabls are expensive so I can do those some other time. Plus good to house them
 		// for duplicate testing
 		//glue::db()->auto_publish_stream->update(array('_id' => array('$in' => $_ids)), array('$set' => array('done' => 1)));
-		AutoPublishQueue::model()->deleteAll(array('_id' => array('$in' => $_ids)));		
+		AutoPublishQueue::deleteAll(array('_id' => array('$in' => $_ids)));		
 	}
 	
 	function action_resetUploadBandwith()
 	{
-		$user=app\models\User::model()->find(array('nextBandwidthTopup' => array('$lt' => time())));
+		$user=app\models\User::find(array('nextBandwidthTopup' => array('$lt' => time())));
 		foreach($users as $k => $v)
 			$user->reset_upload_bandwidth();		
 	}

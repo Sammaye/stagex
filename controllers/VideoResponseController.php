@@ -35,7 +35,7 @@ class VideoResponseController extends Controller
 
 	public function action_list()
 	{
-		$video = Video::model()->findOne(array('_id' => new MongoId(glue::http()->param('id',''))));
+		$video = Video::findOne(array('_id' => new MongoId(glue::http()->param('id',''))));
 		if(!glue::auth()->check(array('viewable' => $video))){
 			echo $this->render('video/deleted');
 			exit();
@@ -72,7 +72,7 @@ class VideoResponseController extends Controller
 				$usernames[$k]=new MongoId($v);
 			}
 			$query['userId'] = array('$in'=>$usernames);
-			$users=iterator_to_array(app\models\User::model()->find(array('_id'=>array('$in'=>$usernames))));
+			$users=iterator_to_array(app\models\User::find(array('_id'=>array('$in'=>$usernames))));
 			
 			// Once again just to formulate the users
 			foreach($usernames as $k => $v){
@@ -84,14 +84,14 @@ class VideoResponseController extends Controller
 		$now = new MongoDate();
 		$_SESSION['lastCommentPull'] = serialize($now);
 		echo $this->render('response/all', array('model' => $video, 'pending' => false, 'username_filter_string' => $usernames_string, 'comments' => glue::auth()->check(array("^"=>$video)) ? 
-			app\models\VideoResponse::model()->find(array_merge(array('videoId'=>$video->_id),$query))->sort(array('created'=>-1)) :
-			app\models\VideoResponse::model()->public()->find(array_merge(array('videoId'=>$video->_id),$query))->sort(array('created'=>-1))
+			app\models\VideoResponse::find(array_merge(array('videoId'=>$video->_id),$query))->sort(array('created'=>-1)) :
+			app\models\VideoResponse::public()->find(array_merge(array('videoId'=>$video->_id),$query))->sort(array('created'=>-1))
 		)); 
 	}
 	
 	public function action_pending()
 	{
-		$video = Video::model()->findOne(array('_id' => new MongoId(glue::http()->param('id',''))));
+		$video = Video::findOne(array('_id' => new MongoId(glue::http()->param('id',''))));
 		if(!glue::auth()->check(array('^' => $video)))
 			glue::trigger('404');
 		
@@ -126,7 +126,7 @@ class VideoResponseController extends Controller
 				$usernames[$k]=new MongoId($v);
 			}
 			$query['userId'] = array('$in'=>$usernames);
-			$users=iterator_to_array(app\models\User::model()->find(array('_id'=>array('$in'=>$usernames))));
+			$users=iterator_to_array(app\models\User::find(array('_id'=>array('$in'=>$usernames))));
 				
 			// Once again just to formulate the users
 			foreach($usernames as $k => $v){
@@ -138,7 +138,7 @@ class VideoResponseController extends Controller
 		$now = new MongoDate();
 		$_SESSION['lastCommentPull'] = serialize($now);
 		echo $this->render('response/all', array('model' => $video, 'pending' => true, 'comments' => 
-			app\models\VideoResponse::model()->find(array('videoId'=>$video->_id, 'approved'=>false))->sort(array('created'=>-1)) 
+			app\models\VideoResponse::find(array('videoId'=>$video->_id, 'approved'=>false))->sort(array('created'=>-1)) 
 		));		
 	}
 
@@ -147,7 +147,7 @@ class VideoResponseController extends Controller
 		$this->title = 'View Response Thread - StageX';
 		$this->layout='user_section';
 		
-		$comment = VideoResponse::model()->findOne(array('_id' => new MongoId(glue::http()->param('id'))));
+		$comment = VideoResponse::findOne(array('_id' => new MongoId(glue::http()->param('id'))));
 		if(
 			!glue::auth()->check(array('viewable'=>$comment)) || 
 			!glue::auth()->check(array('viewable'=>$comment->video))
@@ -158,11 +158,11 @@ class VideoResponseController extends Controller
 		$path_segs = explode(',', $path);
 
 		if(glue::auth()->check(array('^' => $comment->video))){
-			$thread_parent = VideoResponse::model()->findOne(array('_id' => new MongoId($path_segs[0]), 'deleted' => 0));
-			$thread = VideoResponse::model()->find(array('path' => new MongoRegex('/'.$path_segs[0].',/'), 'deleted' => 0))->sort(array('ts' => -1));
+			$thread_parent = VideoResponse::findOne(array('_id' => new MongoId($path_segs[0]), 'deleted' => 0));
+			$thread = VideoResponse::find(array('path' => new MongoRegex('/'.$path_segs[0].',/'), 'deleted' => 0))->sort(array('ts' => -1));
 		}else{
-			$thread_parent = VideoResponse::model()->public()->findOne(array('_id' => new MongoId($path_segs[0]), 'deleted' => 0));
-			$thread = VideoResponse::model()->public()->find(array('path' => new MongoRegex('/'.$path_segs[0].',/'), 'deleted' => 0))->sort(array('ts' => -1));
+			$thread_parent = VideoResponse::public()->findOne(array('_id' => new MongoId($path_segs[0]), 'deleted' => 0));
+			$thread = VideoResponse::public()->find(array('path' => new MongoRegex('/'.$path_segs[0].',/'), 'deleted' => 0))->sort(array('ts' => -1));
 		}
 
 		if(!glue::auth()->check(array('viewable' => $thread_parent)))
@@ -179,7 +179,7 @@ class VideoResponseController extends Controller
 		extract(glue::http()->param(array('video_id','type','mode','reply_vid','parent_comment')),null);
 
 		$comment = new VideoResponse();
-		$video = Video::model()->findOne(array('_id' => new MongoId($video_id)));
+		$video = Video::findOne(array('_id' => new MongoId($video_id)));
 		if(
 			!$video||!$type||!glue::auth()->check(array('viewable' => $video))
 			||($type!='text'&&$type!='video')
@@ -226,7 +226,7 @@ class VideoResponseController extends Controller
 			glue::trigger('404');
 		extract(glue::http()->param(array('video_id','ids')),null);
 		
-		$video = app\models\Video::model()->findOne(array('_id' => new MongoId($video_id)));
+		$video = app\models\Video::findOne(array('_id' => new MongoId($video_id)));
 		if(!$ids||!$video||(is_array($ids)&&count($ids)<=0))
 			$this->json_error(self::UNKNOWN);
 		if(!glue::auth()->check(array('^' => $video)))
@@ -237,7 +237,7 @@ class VideoResponseController extends Controller
 			$mongoIds[] = new MongoId($v);
 		}
 		
-		$comments = app\models\VideoResponse::model()->find(array('_id' => array('$in' => $mongoIds), 'videoId' => $video->_id))->limit(1000); 
+		$comments = app\models\VideoResponse::find(array('_id' => array('$in' => $mongoIds), 'videoId' => $video->_id))->limit(1000); 
 		$row_count = $comments->count();
 		foreach($comments as $comment)
 			$comment->approve();
@@ -250,7 +250,7 @@ class VideoResponseController extends Controller
 		if(!glue::auth()->check('ajax'))
 			glue::trigger('404');
 
-		$comment = VideoResponse::model()->findOne(array("_id"=>new MongoId($_GET['id'])));
+		$comment = VideoResponse::findOne(array("_id"=>new MongoId($_GET['id'])));
 
 		if($comment){
 
@@ -269,7 +269,7 @@ class VideoResponseController extends Controller
 		if(!glue::auth()->check('ajax'))
 			glue::trigger('404');
 
-		$comment = VideoResponse::model()->findOne(array("_id"=>new MongoId($_GET['id'])));
+		$comment = VideoResponse::findOne(array("_id"=>new MongoId($_GET['id'])));
 
 		if($comment){
 
@@ -290,7 +290,7 @@ class VideoResponseController extends Controller
 			glue::trigger('404');
 		extract(glue::http()->param(array('video_id','ids')),null);
 
-		$video = app\models\Video::model()->findOne(array('_id' => new MongoId($video_id)));
+		$video = app\models\Video::findOne(array('_id' => new MongoId($video_id)));
 		if(!$ids||!$video||(is_array($ids)&&count($ids)<=0))
 			$this->json_error(self::UNKNOWN);
 
@@ -304,13 +304,13 @@ class VideoResponseController extends Controller
 		else // If this is not done by the owner the user can only delete their own comments
 			$condition=array('_id' => array('$in' => $mongoIds), 'videoId' => $video->_id, 'userId'=>glue::user()->_id);
 
-		$comments = app\models\VideoResponse::model()->findAll($condition)->limit(1000); 
+		$comments = app\models\VideoResponse::findAll($condition)->limit(1000); 
 		$row_count = $comments->count();
 		
-		$text_count=app\models\VideoResponse::model()->findAll(array_merge($condition,array('type'=>'text')))->limit(1000)->count();
-		$video_count=app\models\VideoResponse::model()->findAll(array_merge($condition,array('type'=>'video')))->limit(1000)->count();
+		$text_count=app\models\VideoResponse::findAll(array_merge($condition,array('type'=>'text')))->limit(1000)->count();
+		$video_count=app\models\VideoResponse::findAll(array_merge($condition,array('type'=>'video')))->limit(1000)->count();
 		
-		app\models\VideoResponse::model()->deleteAll($condition);
+		app\models\VideoResponse::deleteAll($condition);
 		glue::db()->videoresponse_likes->remove(array("response_id"=>array('$in' => $mongoIds)));
 		$video->saveCounters(array('totalResponses'=>-$row_count,'totalTextResponses'=>-$text_count,'totalVideoResponses'=>-$video_count),0);
 		
@@ -341,7 +341,7 @@ class VideoResponseController extends Controller
 			$template = ob_get_contents();
 		ob_end_clean();
 
-		$video = Video::model()->findOne(array("_id"=>new MongoId($id)));
+		$video = Video::findOne(array("_id"=>new MongoId($id)));
 		if(glue::auth()->check(array('^' => $video))){
 
 			if(isset($_POST['user_id'])){
@@ -379,7 +379,7 @@ class VideoResponseController extends Controller
 				}
 			}
 
-			$comments = VideoResponse::model()->find($query)->sort(array('created' => -1));
+			$comments = VideoResponse::find($query)->sort(array('created' => -1));
 		}else{
 			$query = array('$or' => array(
 				array('videoId' => $video->_id, 'approved' => true),
@@ -388,7 +388,7 @@ class VideoResponseController extends Controller
 
 			if(isset($_POST['userId'])) $query['userId'] = $_POST['userId'];
 
-			$comments = VideoResponse::model()->find($query)->sort(array('ts' => -1));
+			$comments = VideoResponse::find($query)->sort(array('ts' => -1));
 		}
 		
 		ob_start();
@@ -417,13 +417,13 @@ class VideoResponseController extends Controller
 		if(!glue::http()->isAjax())
 			glue::trigger('404');
 
-		$video = Video::model()->findOne(array("_id"=>new MongoId(glue::http()->param('id'))));
+		$video = Video::findOne(array("_id"=>new MongoId(glue::http()->param('id'))));
 		if(glue::auth()->check(array('^'=>$video))){
-			$comments = VideoResponse::model()->find(array('videoId' => $video->_id, 'deleted' => 0,
+			$comments = VideoResponse::find(array('videoId' => $video->_id, 'deleted' => 0,
 				'userId' => array('$ne' => glue::user()->_id), 'ts' => array('$gt' => unserialize($_SESSION['LastCommentPull'])))
 			)->sort(array('ts' => -1));
 		}else{
-			$comments = VideoResponse::model()->find(array('videoId' => $video->_id, 'approved' => true, 'deleted' => 0,
+			$comments = VideoResponse::find(array('videoId' => $video->_id, 'approved' => true, 'deleted' => 0,
 				'userId' => array('$ne' => glue::user()->_id), 'ts' => array('$gt' => unserialize($_SESSION['LastCommentPull'])))
 			)->sort(array('ts' => -1));
 		}

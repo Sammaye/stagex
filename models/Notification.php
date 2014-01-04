@@ -55,7 +55,7 @@ class Notification extends \glue\db\Document{
 
 	static function getNewCount_Notifications(){
 		//var_dump(glue::user()->lastNotificationPull);
-		return Notification::model()->find(array('userId' => glue::user()->_id,
+		return Notification::find(array('userId' => glue::user()->_id,
 				'created' => array('$gt' => glue::user()->lastNotificationPull)))->count();
 	}
 
@@ -118,7 +118,7 @@ class Notification extends \glue\db\Document{
 	}
 
 	static function newWallPost_on_OtherUserWall($userId, $to_user){
-		$notification = Notification::model()->findOne(array('userId' => $to_user, 'type' => Notification::WALL_POST));
+		$notification = Notification::findOne(array('userId' => $to_user, 'type' => Notification::WALL_POST));
 
 		if($notification){
 			$notification->addUser($userId);
@@ -136,7 +136,7 @@ class Notification extends \glue\db\Document{
 	}
 
 	public static function newVideoResponse($to_user, $video_id, $approved){
-		$status = Notification::model()->findOne(array( 'type' => Notification::VIDEO_COMMENT, 'userId' => $to_user, 'videoId' => $video_id ));
+		$status = Notification::findOne(array( 'type' => Notification::VIDEO_COMMENT, 'userId' => $to_user, 'videoId' => $video_id ));
 
 		if($status){
 			$status->addUser(glue::user()->_id);
@@ -157,7 +157,7 @@ class Notification extends \glue\db\Document{
 	}
 
 	public static function newVideoResponseReply($comment_id, $to_user, $reply_id, $video_id, $from_user = null){
-		$status = Notification::model()->findOne(array( 'type' => Notification::VIDEO_COMMENT_REPLY, 'userId' => $to_user, 'responseId' => $comment_id));
+		$status = Notification::findOne(array( 'type' => Notification::VIDEO_COMMENT_REPLY, 'userId' => $to_user, 'responseId' => $comment_id));
 
 		if($status){
 			$status->addUser($from_user ? $from_user : glue::user()->_id);
@@ -179,7 +179,7 @@ class Notification extends \glue\db\Document{
 	}
 
 	public static function commentApproved($from_user, $video_id, $to_user){
-		$status = Notification::model()->findOne(array( 'type' => Notification::VIDEO_RESPONSE_APPROVE, 'userId' => $to_user, 'videoId' => $video_id));
+		$status = Notification::findOne(array( 'type' => Notification::VIDEO_RESPONSE_APPROVE, 'userId' => $to_user, 'videoId' => $video_id));
 
 		if($status){
 			$status->addUser($from_user ? $from_user : glue::user()->_id);
@@ -204,7 +204,7 @@ class Notification extends \glue\db\Document{
 		$i = 0;
 		foreach($this->fromUsers as $user){
 
-			$user = User::model()->findOne(array('_id' => $this->fromUsers[$i]));
+			$user = User::findOne(array('_id' => $this->fromUsers[$i]));
 
 			
 			if($users_count > 1 && $i == $users_count-1){

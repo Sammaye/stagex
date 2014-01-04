@@ -39,7 +39,7 @@ class Follower extends \glue\db\Document{
 	}
 
 	public static function isSubscribed($user_id){
-		return self::model()->findOne(array('fromId' => glue::user()->_id, 'toId' => $user_id)) != null;
+		return self::findOne(array('fromId' => glue::user()->_id, 'toId' => $user_id)) != null;
 	}
 
 	public static function model($className = __CLASS__){
@@ -63,13 +63,13 @@ class Follower extends \glue\db\Document{
 		// We need to do a JOIN here...
 		$idRange=array();
 		if($term){
-			$users=iterator_to_array(\app\models\User::model()->find(array('username'=>new \MongoRegex("/^$term/")))->sort(array('username'=>1))->limit($limit));
+			$users=iterator_to_array(\app\models\User::find(array('username'=>new \MongoRegex("/^$term/")))->sort(array('username'=>1))->limit($limit));
 			$mongoIds=array();
 			foreach($users as $_id=>$user)
 				$mongoIds[]=new \MongoId($_id);
 			$idRange=array('toId'=>array('$in'=>$mongoIds));
 			
-			$following=self::model()->find(array_merge(array('fromId'=>$user_id),$idRange));
+			$following=self::find(array_merge(array('fromId'=>$user_id),$idRange));
 			
 			$followedUsers=array();
 			foreach($following as $_id=>$follower){
@@ -79,10 +79,10 @@ class Follower extends \glue\db\Document{
 			return $followedUsers;			
 			
 		}else{
-			$following=self::model()->find(array('fromId'=>$user_id))->limit(20);
+			$following=self::find(array('fromId'=>$user_id))->limit(20);
 			foreach($following as $_id=>$follower)
 				$mongoIds[]=new \MongoId($follower->toId);			
-			$users=\app\models\User::model()->find(array('_id'=>array('$in'=>$mongoIds)))->sort(array('username'=>1));
+			$users=\app\models\User::find(array('_id'=>array('$in'=>$mongoIds)))->sort(array('username'=>1));
 			return $users;
 		}
 	}

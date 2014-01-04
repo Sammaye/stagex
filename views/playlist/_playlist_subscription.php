@@ -1,5 +1,5 @@
 <?php 
-if(!($model=app\models\Playlist::model()->findOne(array('_id' => $item['playlist_id'])))||!glue::auth()->check(array('viewable' => $model))){
+if(!($model=app\models\Playlist::findOne(array('_id' => $item['playlist_id'])))||!glue::auth()->check(array('viewable' => $model))){
 	$model=new app\models\Playlist();
 	$model->title='Playlist Unavailable';
 	$model->deleted=1;

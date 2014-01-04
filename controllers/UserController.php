@@ -98,11 +98,11 @@ class UserController extends Controller
 
 		if(preg_match('/@googlemail.com/i', $fb_user['email']) > 0 || preg_match('/@gmail.com/i', $fb_user['email'])){
 			$email_username = explode('@', $fb_user['email']);
-			$user = User::model()->findOne(array('$or' => array(
+			$user = User::findOne(array('$or' => array(
 				array('fbUid' => $fb_user['id']), array('email' => array('$in' => array($email_username[0].'@googlemail.com', $email_username[0].'@gmail.com')))
 			)));
 		}else{
-			$user = User::model()->findOne(array('$or' => array(
+			$user = User::findOne(array('$or' => array(
 				array('fbUid' => $fb_user['id']), array('email' => $fb_user['email'])
 			)));
 		}
@@ -152,7 +152,7 @@ class UserController extends Controller
 
 				$x_un = explode('@', $g_user->email);
 				$username = $x_un[0];
-				$user = User::model()->findOne(array('$or' => array(
+				$user = User::findOne(array('$or' => array(
 					array('google_uid' => $g_user->id), array('email' => array('$in' => array($username.'@googlemail.com', $username.'@gmail.com')))
 				)));
 
@@ -199,7 +199,7 @@ class UserController extends Controller
 		if(isset($_POST['recoverForm'])){
 			$model->attributes=$_POST['recoverForm'];
 			if($model->validate()){
-				$user =  User::model()->findOne(array('email' => $model->email));
+				$user =  User::findOne(array('email' => $model->email));
 				if($user){
 					$user->setScenario('recoverPassword');
 					$user->password = \glue\util\Crypt::generate_new_pass();
@@ -219,7 +219,7 @@ class UserController extends Controller
 			$user=glue::user();
 		}elseif(
 			!glue::http()->param('id',null) ||
-			!($user = User::model()->findOne(array('_id' => new MongoId(glue::http()->param('id','')) ))) || 
+			!($user = User::findOne(array('_id' => new MongoId(glue::http()->param('id','')) ))) || 
 			!glue::auth()->check(array('viewable' => $user))
 		){
 			glue::trigger('404');
@@ -244,7 +244,7 @@ class UserController extends Controller
 			$user=glue::user();
 		}elseif(
 			!glue::http()->param('id',null) ||
-			!($user = User::model()->findOne(array('_id' => new MongoId(glue::http()->param('id','')) ))) || 
+			!($user = User::findOne(array('_id' => new MongoId(glue::http()->param('id','')) ))) || 
 			!glue::auth()->check(array('viewable' => $user))
 		){
 			glue::trigger('404');
@@ -293,7 +293,7 @@ class UserController extends Controller
 			$user=glue::user();
 		}elseif(
 			!glue::http()->param('id',null) ||
-			!($user = User::model()->findOne(array('_id' => new MongoId(glue::http()->param('id','')) ))) || 
+			!($user = User::findOne(array('_id' => new MongoId(glue::http()->param('id','')) ))) || 
 			!glue::auth()->check(array('viewable' => $user))
 		){
 			glue::trigger('404');
@@ -343,7 +343,7 @@ class UserController extends Controller
 				break;
 		}
 
-		$video_rows = Video::model()->fts(
+		$video_rows = Video::fts(
 			array('title', 'description', 'tags'), isset($_GET['query']) ? $_GET['query'] : '', array_merge(
 				array('userId' => glue::user()->_id, 'deleted' => 0), $filter_obj))
 			->sort(array('created' => -1));
@@ -359,7 +359,7 @@ class UserController extends Controller
 		$this->layout = 'user_section';
 		$this->tab = 'playlists';
 
-		$playlist_rows = Playlist::model()->fts(
+		$playlist_rows = Playlist::fts(
 			array('title', 'description'), glue::http()->param('query',''), 
 				array('userId' => glue::user()->_id, 'title' => array('$ne' => 'Watch Later'), 'deleted' => 0)
 			)->sort(array('created' => -1));
@@ -373,7 +373,7 @@ class UserController extends Controller
 
 		$this->layout = 'user_section';
 		$this->tab = 'watch_later';
-		$watch_later = Playlist::model()->findOne(array('title' => 'Watch Later', 'userId' => glue::user()->_id));
+		$watch_later = Playlist::findOne(array('title' => 'Watch Later', 'userId' => glue::user()->_id));
 		echo $this->render('user/watch_later', array('model' => $watch_later));
 	}
 
@@ -402,7 +402,7 @@ class UserController extends Controller
 		if($to_date)
 			$timeRange['ts']['$lt']=new MongoDate(strtotime(str_replace('/','-',$to_date.' +1 day')));
 		if($query){
-			$videos=iterator_to_array(\app\models\Video::model()->find(array('title'=>new \MongoRegex("/^$query/")))->sort(array('title'=>1))->limit(1000));
+			$videos=iterator_to_array(\app\models\Video::find(array('title'=>new \MongoRegex("/^$query/")))->sort(array('title'=>1))->limit(1000));
 			$mongoIds=array();
 			foreach($videos as $_id=>$video)
 				$mongoIds[]=new \MongoId($_id);
@@ -428,7 +428,7 @@ class UserController extends Controller
 		if($to_date)
 			$timeRange['ts']['$lt']=new MongoDate(strtotime(str_replace('/','-',$to_date.' +1 day')));
 		if($query){
-			$videos=iterator_to_array(\app\models\Video::model()->find(array('title'=>new \MongoRegex("/^$query/")))->sort(array('title'=>1))->limit(1000));
+			$videos=iterator_to_array(\app\models\Video::find(array('title'=>new \MongoRegex("/^$query/")))->sort(array('title'=>1))->limit(1000));
 			$mongoIds=array();
 			foreach($videos as $_id=>$video)
 				$mongoIds[]=new \MongoId($_id);
@@ -473,7 +473,7 @@ class UserController extends Controller
 		$rows=glue::db()->video_likes->find(array('user_id'=>glue::user()->_id, "_id" => array('$in' => $mongoIds)));
 	
 		foreach($rows as $k=>$v){
-			$item = app\models\Video::model()->findOne(array('_id' => $v['item']));
+			$item = app\models\Video::findOne(array('_id' => $v['item']));
 			if($item instanceof app\models\Video){
 				if($v['like'] == 1){
 					$item->saveCounters(array('likes'=>-1),0);
@@ -614,11 +614,11 @@ class UserController extends Controller
 			
 			if(
 				($id=glue::http()->param('id',null))===null ||
-				($user=User::model()->findOne(array("_id"=>new MongoId($id))))===null
+				($user=User::findOne(array("_id"=>new MongoId($id))))===null
 			)
 				$this->json_error('User not found');
 
-			if(!Follower::model()->findOne(array('fromId' => glue::user()->_id, 'toId' => $user->_id))){
+			if(!Follower::findOne(array('fromId' => glue::user()->_id, 'toId' => $user->_id))){
 				$follower = new Follower();
 				$follower->fromId=  glue::user()->_id;
 				$follower->toId = $user->_id;
@@ -639,8 +639,8 @@ class UserController extends Controller
 			if(($id=glue::http()->param('id',null))===null)
 				$this->json_error('User not found');
 			
-			$user = User::model()->findOne(array('_id' => new MongoId($id)));
-			$follow = Follower::model()->findOne(array('fromId' => glue::user()->_id, 'toId' => new MongoId($id)));
+			$user = User::findOne(array('_id' => new MongoId($id)));
+			$follow = Follower::findOne(array('fromId' => glue::user()->_id, 'toId' => new MongoId($id)));
 
 			if($follow && $user && $follow->delete())
 				$this->json_success('You have unfollowed this user');
@@ -689,7 +689,7 @@ class UserController extends Controller
 		$hash = urldecode(glue::http()->param('h', ''));
 		$id = new MongoId(urldecode(glue::http()->param('uid', '')));
 
-		$user = User::model()->findOne(array('_id' => $id));
+		$user = User::findOne(array('_id' => $id));
 
 		if(
 			($user!==null&&is_array($user->accessToken)) &&
@@ -723,7 +723,7 @@ class UserController extends Controller
 		if(!glue::http()->isAjax())
 			glue::trigger('404');
 		extract(glue::http()->param(array('query','page')));
-		$users=app\models\Follower::model()->search(glue::user()->_id,$query);
+		$users=app\models\Follower::search(glue::user()->_id,$query);
 
 		if(count($users) > 0){
 			echo glue\widgets\ListView::run(array(
@@ -742,7 +742,7 @@ class UserController extends Controller
 		if(!glue::http()->isAjax())
 			glue::trigger('404');
 		$term=glue::http()->param('query');
-		$users=app\models\User::model()->find(array('username'=>new MongoRegex("/$term/")));
+		$users=app\models\User::find(array('username'=>new MongoRegex("/$term/")));
 		
 		$suggestions=array();
 		foreach($users as $user)
@@ -760,7 +760,7 @@ class UserController extends Controller
 
 		$term=glue::http()->param('term');
 		$limit=glue::http()->param('limit');
-		$users=app\models\User::model()->find(array('username'=>new MongoRegex("/$term/")))->limit($limit);		
+		$users=app\models\User::find(array('username'=>new MongoRegex("/$term/")))->limit($limit);		
 		
 		$suggestions=array();
 		foreach($users as $user)
@@ -784,7 +784,7 @@ class UserController extends Controller
 
 	function loadModel()
 	{
-		$user = User::model()->findOne(array("_id"=>glue::user()->_id));
+		$user = User::findOne(array("_id"=>glue::user()->_id));
 		if(!$user){
 			Html::setErrorFlashMessage("You must be logged in to access this area.");
 			glue::http()->redirect('/user/login', array('nxt' => glue::http()->url('SELF')));

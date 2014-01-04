@@ -32,11 +32,11 @@ class HelpTopic extends Help{
 
 	function getDescendants(){
 		/** $secondLevel = $this->Db()->find(array("path"=>new MongoRegex("/^".$path.",[^,]*,[^,]*$/")))->sort(array("seq"=>1)); // Second Level **/
-		return self::model()->find(array("path"=>new \MongoRegex("/^".$this->path.",[^,]*$/")))->sort(array("seq"=>1)); // First Level
+		return self::find(array("path"=>new \MongoRegex("/^".$this->path.",[^,]*$/")))->sort(array("seq"=>1)); // First Level
 	}
 
 	function getChildren(){
-		return self::model()->find(array("path"=>new \MongoRegex("/^".$this->path.",/")))->sort(array("path"=>1));
+		return self::find(array("path"=>new \MongoRegex("/^".$this->path.",/")))->sort(array("path"=>1));
 	}
 
 	function rules(){
@@ -153,7 +153,7 @@ class HelpTopic extends Help{
 
 	static function getSelectBox_list($exclude = false){
 
-		$topics = self::model()->find(array("type"=>"topic"))->sort(array("path"=>1));
+		$topics = self::find(array("type"=>"topic"))->sort(array("path"=>1));
 		$ret = array();
 
 		if($topics->count() <= 0 || !$topics){

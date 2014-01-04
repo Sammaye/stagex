@@ -14,7 +14,7 @@ class Help extends \glue\db\Document{
 	}
 
 	function getFlatTree(){
-		$topics = self::model()->find(array("type"=>"topic"))->sort(array("path"=>1));
+		$topics = self::find(array("type"=>"topic"))->sort(array("path"=>1));
 		$ret = array();
 
 		foreach($topics as $_id => $item){
@@ -24,7 +24,7 @@ class Help extends \glue\db\Document{
 	}
 
 	static function getRootItems(){
-		return self::model()->find(array("path"=>new \MongoRegex("/^[^,]*$/")))->sort(array("seq"=>1));
+		return self::find(array("path"=>new \MongoRegex("/^[^,]*$/")))->sort(array("seq"=>1));
 	}
 
 	function getBreadCrumb(){
@@ -34,7 +34,7 @@ class Help extends \glue\db\Document{
 		$c=0;
 		foreach($breadcrumb as $i => $item){
 			if($item != $this->normalisedTitle){
-				$itemModel = self::model()->findOne(array('normalisedTitle' => $item));
+				$itemModel = self::findOne(array('normalisedTitle' => $item));
 				$final_breadcrumb[$i] = \html::openTag('li')
 					.\html::a(array('href' => glue::http()->url('/help/view', array('title' => $item)), 'text' => $itemModel->title))
 					.($c<(count($breadcrumb)-2)?\html::openTag('span',array('class'=>'divider')).'/'.\html::closeTag('span'):'')
@@ -108,9 +108,9 @@ class Help extends \glue\db\Document{
 	    $cursor = glue::elasticSearch()->search($search);
 		$cursor->setIteratorCallback(function($doc){
 			if($doc['_source']['resourceType']=='article')
-				return HelpArticle::model()->findOne(array('_id'=>new \MongoId($doc['_id'])));
+				return HelpArticle::findOne(array('_id'=>new \MongoId($doc['_id'])));
 			elseif($doc['_source']['resourceType']=='topic')
-				return HelpTopic::model()->findOne(array('_id'=>new \MongoId($doc['_id'])));
+				return HelpTopic::findOne(array('_id'=>new \MongoId($doc['_id'])));
 		});
 		return $cursor;		
 	}

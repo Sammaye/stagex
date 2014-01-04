@@ -140,7 +140,7 @@ $this->js('page', "
 		'page' 		 => glue::http()->param('page',1),
 		"cursor"	 => $items,
 		'callback' => function($i,$item,$view){
-			$v=app\models\Video::model()->findOne(array('_id' => $item['item']));
+			$v=app\models\Video::findOne(array('_id' => $item['item']));
 			if(!$v instanceof app\models\Video)
 				$v = new app\models\Video;
 			echo glue::controller()->renderPartial($view, array('model' => $item, 'custid' => $item['_id'], 'item' => $v, 'show_checkbox' => true, 'admin' => true));				

@@ -362,9 +362,11 @@ class Model extends Component
 		$data = $this->getAttributes();
 		$this->clearErrors();
 		$this->setValidated(false);
+		$this->setValid(false);
 
 		if($runEvents && !$this->onBeforeValidate()){
-			$this->setValidated(true); return false; // NOT VALID
+			$this->setValidated(true); 
+			return false; // NOT VALID
 		}
 		
 		$valid = true;
@@ -579,7 +581,7 @@ class Model extends Component
 	
 		$cName = $params['class'];
 		$condition = isset($params['condition']) ? $params['condition'] : array();
-		$object = $cName::model()->findOne(array_merge(array($params['field']=>$value), $condition));
+		$object = $cName::findOne(array_merge(array($params['field']=>$value), $condition));
 	
 		if($params['notExist']){
 			if($object){

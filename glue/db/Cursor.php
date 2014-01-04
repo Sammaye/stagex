@@ -137,6 +137,7 @@ class Cursor extends Component implements Iterator, Countable
 
 	public function count($takeSkip = false)
 	{
+		$this->rewind();
 		return $this->cursor()->count($takeSkip);
 	}
 	

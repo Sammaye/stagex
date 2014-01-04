@@ -35,7 +35,7 @@ class VideoController extends Controller
 				$state = 'pending';
 			}
 		
-			app\models\Video::model()->updateAll(array('jobId' => $job['jobId']), array('$set' => array('state' => $state)));
+			app\models\Video::updateAll(array('jobId' => $job['jobId']), array('$set' => array('state' => $state)));
 		
 			glue::db()->encoding_jobs->update(array('_id' => $job['_id']), array('$set' => array('img_submit' => $img_submit, 'mp4_submit' => $mp4_submit,
 			'ogv_submit' => $ogv_submit, 'state' => $state)));
@@ -152,7 +152,7 @@ class VideoController extends Controller
 		
 			if(isset($job['ogg_state']) && isset($job['mp4_state']) && isset($job['img_state'])){
 				if($job['ogg_state'] == 'failed' || $job['mp4_state'] == 'failed' || $job['img_state'] == 'failed'){
-					app\models\Video::model()->updateAll(array('jobId' => $message->id), array('$set' => array('state' => 'failed', 'encoding_state_reason' => $job['errors'])));
+					app\models\Video::updateAll(array('jobId' => $message->id), array('$set' => array('state' => 'failed', 'encoding_state_reason' => $job['errors'])));
 	
 					$response=$sqs->deleteMessageBatch(array('QueueUrl' => glue::aws()->output_queue, 'Entries' => array(
 							array('Id' => 1, 'ReceiptHandle' => $job['img_receipt_handle']),
@@ -160,7 +160,7 @@ class VideoController extends Controller
 							array('Id' => 3, 'ReceiptHandle' => $job['ogg_receipt_handle']),
 					)));
 					
-					$videos = app\models\Video::model()->find(array('jobId' => $message->id));
+					$videos = app\models\Video::find(array('jobId' => $message->id));
 					foreach($videos as $k => $video){
 						if($video->author->emailEncodingResult){
 							glue::mailer()->mail(
@@ -170,7 +170,7 @@ class VideoController extends Controller
 						}
 					}
 				}elseif($job['ogg_state'] == 'finished' && $job['mp4_state'] == 'finished' && $job['img_state'] == 'finished'){
-					$videos = app\models\Video::model()->find(array('jobId' => $message->id));
+					$videos = app\models\Video::find(array('jobId' => $message->id));
 					foreach($videos as $k => $video){
 		
 						$video->duration = $job['duration'];

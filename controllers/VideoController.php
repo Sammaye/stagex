@@ -74,7 +74,7 @@ class VideoController extends Controller
 
 				// Then this file is done uploading. Get the queue
 				// If it dont have a queue row return null
-				$video = Video::model()->findOne(array('uploadId' => strval($upload_id)));
+				$video = Video::findOne(array('uploadId' => strval($upload_id)));
 				if(!$video){
 					$ret[$i] = null;
 				}elseif($video->state == 'uploading'){
@@ -143,7 +143,7 @@ class VideoController extends Controller
 		if(!glue::auth()->check('ajax','post'))
 			glue::trigger('404');
 
-		$video = Video::model()->findOne(array('userId' => glue::user()->_id, 'uploadId' => $_POST['uploadId']));
+		$video = Video::findOne(array('userId' => glue::user()->_id, 'uploadId' => $_POST['uploadId']));
 		$exists = true;
 
 		if(!$video){
@@ -180,7 +180,7 @@ class VideoController extends Controller
 		$now = new MongoDate();
 		$_SESSION['LastCommentPull'] = serialize($now);
 
-		$video = Video::model()->findOne(array("_id"=>new MongoId(glue::http()->param('id'))));
+		$video = Video::findOne(array("_id"=>new MongoId(glue::http()->param('id'))));
 		if(!glue::auth()->check(array('viewable' => $video))){
 			$this->title = 'Video Not Found - StageX';
 			echo $this->render('deleted', array('video'=>$video));
@@ -213,7 +213,7 @@ class VideoController extends Controller
 		}
 
 		if($playlist_id=glue::http()->param('playlist_id',null))
-			$playlist = app\models\Playlist::model()->findOne(array('_id' => new MongoId($playlist_id)));
+			$playlist = app\models\Playlist::findOne(array('_id' => new MongoId($playlist_id)));
 		$this->layout = 'watch_video_layout';
 		echo $this->render('watch', array("model"=>$video, 'playlist' => isset($playlist)?$playlist:null, 'LastCommentPull' => $now));
 	}
@@ -222,7 +222,7 @@ class VideoController extends Controller
 	{
 		$this->layout = 'black_blank_page';
 
-		$video = Video::model()->findOne(array("_id"=>new MongoId($_GET['id'])));
+		$video = Video::findOne(array("_id"=>new MongoId($_GET['id'])));
 		if(!glue::auth()->check(array('viewable' => $video))){
 			$this->title = 'Video Not Found - StageX';
 			$this->render('deleted', array('video'=>$video));
@@ -244,7 +244,7 @@ class VideoController extends Controller
 			glue::trigger('404');
 		if(
 			(isset($_POST['Video'])&&($id=glue::http()->param('id',null))) &&
-			($video = Video::model()->findOne(array('_id' => new MongoId($id))))
+			($video = Video::findOne(array('_id' => new MongoId($id))))
 		){
 			if(!glue::auth()->check(array('^' => $video)))
 				$this->json_error(self::UNKNOWN);
@@ -264,7 +264,7 @@ class VideoController extends Controller
 		if(isset($_POST['Video'])&&($ids=glue::http()->param('ids',null))!==null){
 			$updated=0;
 			foreach($ids as $id){
-				$video = Video::model()->findOne(array('_id' => new MongoId($id)));
+				$video = Video::findOne(array('_id' => new MongoId($id)));
 				if(!glue::auth()->check(array('^' => $video)))
 					continue;
 				$video->attributes=$_POST['Video'];
@@ -282,7 +282,7 @@ class VideoController extends Controller
 			glue::trigger('404');
 		if(
 			($id=glue::http()->param('id',null))!==null &&
-			($video=Video::model()->findOne(array('_id'=>new MongoId($id))))!==null
+			($video=Video::findOne(array('_id'=>new MongoId($id))))!==null
 		){
 			$type=glue::http()->param('type',null);
 			if(!glue::auth()->check(array('^' => $video)))
@@ -309,7 +309,7 @@ class VideoController extends Controller
 		if(!$reason||array_search($reason, array('sex', 'abuse', 'religious', 'dirty'))===false)
 			$this->json_error('You must enter a valid reporting reason');
 		if($id!==null&&$reason!==null){
-			$video = Video::model()->findOne(array('_id' => new MongoId($id)));
+			$video = Video::findOne(array('_id' => new MongoId($id)));
 			if(!glue::auth()->check(array('deleted' => $video)))
 				$this->json_error('That video was not found');
 			$video->report((string)$reason);
@@ -325,7 +325,7 @@ class VideoController extends Controller
 			glue::trigger('404');
 
 		$id=glue::http()->param('id',null);
-		if($video = Video::model()->findOne(array('_id' => new MongoId($id)))){
+		if($video = Video::findOne(array('_id' => new MongoId($id)))){
 			if(!(bool)$video->voteable)
 				$this->json_error('Voting has been disabled on this video');
 
@@ -354,7 +354,7 @@ class VideoController extends Controller
 			glue::trigger('404');
 
 		$id=glue::http()->param('id',null);
-		if($video = Video::model()->findOne(array('_id' => new MongoId($id)))){
+		if($video = Video::findOne(array('_id' => new MongoId($id)))){
 			if(!(bool)$video->voteable)
 				$this->json_error('Voting has been disabled on this video');
 
@@ -391,7 +391,7 @@ class VideoController extends Controller
 			$mongoIds[$k] = new MongoId($id);
 		}
 
-		$video_rows = Video::model()->find(array('_id' => array('$in' => $mongoIds), 'userId' => glue::user()->_id, 'deleted' => 0));
+		$video_rows = Video::find(array('_id' => array('$in' => $mongoIds), 'userId' => glue::user()->_id, 'deleted' => 0));
 		
 		$ids=array(); // We reset these to know which were actually picked from the DB
 		$mongoIds=array();
@@ -402,7 +402,7 @@ class VideoController extends Controller
 			
 			Queue::AddMessage($video->collectionName(),$video->_id,Queue::DELETE);
 		}
-		Video::model()->updateAll(array('_id' => array('$in' => $mongoIds)), array('$set'=>array('deleted'=>1)));
+		Video::updateAll(array('_id' => array('$in' => $mongoIds)), array('$set'=>array('deleted'=>1)));
 		glue::elasticSearch()->deleteByQuery(array(
 			'type' => 'video',
 			'body' => array(
@@ -420,7 +420,7 @@ class VideoController extends Controller
 		$id=glue::http()->param('id',null);
 		if(
 			$id===null||
-			($video=Video::model()->findOne(array('_id'=>new MongoId($id), 'userId'=>glue::user()->_id)))===null
+			($video=Video::findOne(array('_id'=>new MongoId($id), 'userId'=>glue::user()->_id)))===null
 		)
 			$this->json_error(self::UNKNOWN);
 
@@ -434,7 +434,7 @@ class VideoController extends Controller
 
 	function action_analytics()
 	{
-		$video = Video::model()->findOne(array("_id" => new MongoId(glue::http()->param('id',''))));
+		$video = Video::findOne(array("_id" => new MongoId(glue::http()->param('id',''))));
 		if(!$video || !glue::auth()->check(array('^' => $video))) // Only the owner of the video can see this
 			glue::trigger('404');
 
@@ -460,7 +460,7 @@ class VideoController extends Controller
 			$this->json_error('You entered an invalid to and/or from date');
 		}
 
-		if(!($model = Video::model()->findOne(array('_id' => new MongoId($id)))))
+		if(!($model = Video::findOne(array('_id' => new MongoId($id)))))
 			$this->json_error('The video you are looking for could not be found.');
 		if(!glue::auth()->check(array('^' => $model)))
 			$this->json_error(self::DENIED);
@@ -479,7 +479,7 @@ class VideoController extends Controller
 			glue::trigger('404');
 	
 		$ret = array();
-		$sphinx=Video::model()->search(glue::http()->param('term', ''));
+		$sphinx=Video::search(glue::http()->param('term', ''));
 		$sphinx->match('uid', strval(glue::user()->_id));// I do this in case this needs changing later
 		$cursor=$sphinx->limit(5)->query();
 	

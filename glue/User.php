@@ -274,7 +274,7 @@ class User extends Document
 
 		/** Remove session from table */
 		if($this->_id){
-			glue\User::model()->updateAll(array('_id' => $this->_id), array('$unset'=>array("sessions.".session_id()=>'')));
+			glue\User::updateAll(array('_id' => $this->_id), array('$unset'=>array("sessions.".session_id()=>'')));
 		}
 		
 		//echo "in logout";

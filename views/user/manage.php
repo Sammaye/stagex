@@ -1,6 +1,6 @@
 <div style='width:970px; margin:auto; margin-top:20px;'>
 	<?php $this->widget('glue/widgets/GGridView.php', array(
-		'cursor' => User::model()->search(),
+		'cursor' => User::search(),
 		'columns' => array(
 			array(
 				'type' => 'checkbox'

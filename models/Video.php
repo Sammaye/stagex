@@ -285,7 +285,7 @@ class Video extends \glue\Db\Document{
 		$this->state = 'uploading';
 
 		if(
-			($matched_video=self::model()->findOne(array('md5' => $this->md5))) 
+			($matched_video=self::findOne(array('md5' => $this->md5))) 
 			&& $matched_video->state == 'finished'
 		){
 			$this->duration = $matched_video->duration;
@@ -816,7 +816,7 @@ class Video extends \glue\Db\Document{
 	
 	function delete(){
 		foreach($video_rows as $video){
-			\app\models\VideoResponse::model()->Db()->remove(array('$or' => array(
+			\app\models\VideoResponse::Db()->remove(array('$or' => array(
 			array('vid' => $video->_id), array('xtn_vid' => $video->_id)
 			)), array('safe' => true));
 			$video->deleted = 1;
@@ -827,16 +827,16 @@ class Video extends \glue\Db\Document{
 	}
 	
 	function removeVideoResponses(){
-		$count=\app\models\VideoResponse::model()->findAll(array('videoId' => $this->_id, 'type' => 'video'))->count();
-		\app\models\VideoResponse::model()->deleteAll(array('videoId' => $this->_id, 'type' => 'video'));
+		$count=\app\models\VideoResponse::findAll(array('videoId' => $this->_id, 'type' => 'video'))->count();
+		\app\models\VideoResponse::deleteAll(array('videoId' => $this->_id, 'type' => 'video'));
 		$this->totalResponses = $this->totalResponses-$count;
 		$this->totalVideoResponses = $this->totalVideoResponses-$count;
 		$this->save();		
 	}
 	
 	function removeTextResponses(){
-		$count = \app\models\VideoResponse::model()->find(array('videoId' => $this->_id, 'type' => 'text'))->count();
-		\app\models\VideoResponse::model()->deleteAll(array('videoId' => $this->_id, 'type' => 'text'));
+		$count = \app\models\VideoResponse::find(array('videoId' => $this->_id, 'type' => 'text'))->count();
+		\app\models\VideoResponse::deleteAll(array('videoId' => $this->_id, 'type' => 'text'));
 		$this->totalResponses = $this->totalResponses-$count;
 		$this->totalTextReponses = $this->totalTextReponses-$count;
 		$this->save();		

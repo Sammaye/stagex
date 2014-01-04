@@ -40,7 +40,7 @@ class StreamController extends Controller
 		$subscription_model = new Follower();
 
 		$subscriptions = $subscription_model->getAll_ids();
-		$stream = Stream::model()->find(array('user_id' => array('$in' => $subscriptions),
+		$stream = Stream::find(array('user_id' => array('$in' => $subscriptions),
 			'$or' => array(
 				array('type' => array('$nin' => array(Stream::WALL_POST))),
 				array('comment_user' => array('$in' => $subscriptions))
@@ -53,7 +53,7 @@ class StreamController extends Controller
 	{
 		$this->title = 'Notifications - StageX';
 
-		app\models\User::model()->updateAll(array('_id'=>glue::user()->_id),array('$set'=>array('lastNotificationPull'=>new MongoDate())));
+		app\models\User::updateAll(array('_id'=>glue::user()->_id),array('$set'=>array('lastNotificationPull'=>new MongoDate())));
 
 		$this->tab = 'notifications';
 		echo $this->render('stream/notifications');
@@ -84,9 +84,9 @@ class StreamController extends Controller
 		}
 
 		if($type == 'video'){
-			$item_shared = Video::model()->findOne(array('_id' => new MongoId($_GET['id'])));
+			$item_shared = Video::findOne(array('_id' => new MongoId($_GET['id'])));
 		}elseif($type == 'playlist'){
-			$item_shared = Playlist::model()->findOne(array('_id' => new MongoId($_GET['id'])));
+			$item_shared = Playlist::findOne(array('_id' => new MongoId($_GET['id'])));
 		}
 
 		if($item_shared){
@@ -106,7 +106,7 @@ class StreamController extends Controller
 		}
 
 		$text = strip_whitespace($_POST['text']);
-		$user = User::model()->findOne(array('_id' => new MongoId($_POST['user_id'])));
+		$user = User::findOne(array('_id' => new MongoId($_POST['user_id'])));
 
 		if($user && strlen($text) > 0){
 			$comment = Stream::newWallPost_on_OtherUserWall(glue::session()->user->_id, $user->_id, $text);
@@ -139,7 +139,7 @@ class StreamController extends Controller
 		$mongoIds = array();
 		foreach($ids as $k=>$v)
 			$mongoIds[] = new MongoId($v);
-		Stream::model()->deleteAll(array('_id'=>array('$in'=>$mongoIds), 'user_id'=>glue::user()->_id));
+		Stream::deleteAll(array('_id'=>array('$in'=>$mongoIds), 'user_id'=>glue::user()->_id));
 		$this->json_success(array('message'=>'Stream items were deleted','updated'=>count($mongoIds)));
 	}
 
@@ -153,7 +153,7 @@ class StreamController extends Controller
 		),null));
 		
 		if($user)
-			$user = app\models\User::model()->findOne(array('_id' => new MongoId($user)));
+			$user = app\models\User::findOne(array('_id' => new MongoId($user)));
 		elseif(!$user&&!$news) // If I am not searching for news I don't need a user
 			$this->json_error(self::UNKNOWN);
 		elseif($news&&!glue::session()->authed) // If they want news they need to be logged in to get it
@@ -206,7 +206,7 @@ class StreamController extends Controller
 			}
 		}
 
-		return Stream::model()->find(array_merge(array(
+		return Stream::find(array_merge(array(
 			'user_id' => $user ? $user->_id : glue::user()->_id
 		), $_ts_sec, $_filter_a))->sort(array('created' => -1))->limit(20);
 	}
@@ -220,7 +220,7 @@ class StreamController extends Controller
 		if($_ts)
 			$ts_filter = array('created' => array('$lt' => new MongoDate($_ts)));
 
-		return Stream::model()->find(array_merge(array('user_id' => array('$in' => $subscriptions),
+		return Stream::find(array_merge(array('user_id' => array('$in' => $subscriptions),
 			'type' => array('$nin' => array(Stream::WALL_POST))), $ts_filter))->sort(array('created' => -1))->limit(20);
 	}
 }

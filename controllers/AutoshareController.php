@@ -170,7 +170,7 @@ class AutoshareController extends Controller
 
 	function loadModel()
 	{
-		$user = app\models\User::model()->findOne(array("_id"=>glue::user()->_id));
+		$user = app\models\User::findOne(array("_id"=>glue::user()->_id));
 		return $user;
 	}
 }

@@ -70,7 +70,7 @@ if(!$item->subscribed_user /*|| !glue::auth()->check(array('viewable'=>$item->su
 		<div class='stream_media_item'><?php $this->renderPartial('video/_video_small', array('model' => $item->video)) ?></div><?php
 	elseif($item->type == Stream::ADD_TO_PL):
 		?><div class='stream_item_head'><?php
-		$firstVideo = app\models\Video::model()->findOne(array('_id' => $item->items[0]));
+		$firstVideo = app\models\Video::findOne(array('_id' => $item->items[0]));
 		echo html::a(array('href' => array('/user/view', 'id' => $item->status_sender->_id), 'text' => $item->status_sender->getUsername()))." added "
 			.html::a(array('href' => array('/video/watch', 'id' => $firstVideo->_id), 'text' => $firstVideo->title)).
 			(count($item->items)>1?' and '.count($item->items).' others':'').

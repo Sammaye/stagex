@@ -474,8 +474,8 @@ $this->js('edit', "
 			<a class='view_all' href="<?php echo glue::http()->url("/videoresponse/list", array("id"=>$model->_id)) ?>">View All Responses</a>
 			<?php echo $this->renderPartial('response/list', array('model' => $model, 'comments' => 
 				glue::auth()->check(array("^"=>$model)) ? 
-					app\models\VideoResponse::model()->find(array('videoId'=>$model->_id))->sort(array('created'=>-1)) :
-					app\models\VideoResponse::model()->public()->find(array('videoId'=>$model->_id))->sort(array('created'=>-1))
+					app\models\VideoResponse::find(array('videoId'=>$model->_id))->sort(array('created'=>-1)) :
+					app\models\VideoResponse::public()->find(array('videoId'=>$model->_id))->sort(array('created'=>-1))
 			, 'pageSize' => 10, 'ajaxPagination'=>true)) ?>
 		</div>
 		<?php endif ?>

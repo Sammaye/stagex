@@ -66,11 +66,11 @@ class ImageController extends Controller
 			$height = 77;
 		}
 
-		if(strlen($file_name)>0&&($video=Video::model()->findOne(array('_id' => new MongoId($file_name))))){
-			$file=Image::model()->findOne(array('ref.type' => 'video', 'ref._id' => new MongoId($file_name), 'width' => $width, 'height' => $height));
+		if(strlen($file_name)>0&&($video=Video::findOne(array('_id' => new MongoId($file_name))))){
+			$file=Image::findOne(array('ref.type' => 'video', 'ref._id' => new MongoId($file_name), 'width' => $width, 'height' => $height));
 			if($file){
 				$bytes = $file->bytes->bin; // The file is in the video row let's get EIT!!
-			}elseif(($original_image=Image::model()->findOne(array('ref.type' => 'video', 'ref._id' => new MongoId($file_name), 'original' => 1)))!==null){
+			}elseif(($original_image=Image::findOne(array('ref.type' => 'video', 'ref._id' => new MongoId($file_name), 'original' => 1)))!==null){
 				$bytes = $original_image->bytes->bin; // The file is in the video row let's get EIT!!
 				$insert_cache = true;
 				$resize = true;
@@ -117,11 +117,11 @@ class ImageController extends Controller
 
 		$bytes = file_get_contents(glue::getPath('@app')."/www/images/null_images/nullavatar_".$width."_".$height.".png"); // get bytes of null img
 
-		if(strlen($file_name) > 0 && User::model()->findOne(array('_id' => new MongoId($file_name)))){ // We have to do a user lookup to make sure they are not spamming us with ids
-			$file=Image::model()->findOne(array('ref.type' => 'user', 'ref._id' => new MongoId($file_name), 'width' => $width, 'height' => $height));
+		if(strlen($file_name) > 0 && User::findOne(array('_id' => new MongoId($file_name)))){ // We have to do a user lookup to make sure they are not spamming us with ids
+			$file=Image::findOne(array('ref.type' => 'user', 'ref._id' => new MongoId($file_name), 'width' => $width, 'height' => $height));
 			if($file){
 				$bytes = $file->bytes->bin; // The file is in the video row let's get EIT!!
-			}elseif(($original_image=Image::model()->findOne(array('ref.type' => 'user', 'ref._id' => new MongoId($file_name), 'original' => 1)))!==null){
+			}elseif(($original_image=Image::findOne(array('ref.type' => 'user', 'ref._id' => new MongoId($file_name), 'original' => 1)))!==null){
 				$bytes = $original_image->bytes->bin; // The file is in the video row let's get EIT!!
 				$insert_cache = true;
 				$resize = true;
