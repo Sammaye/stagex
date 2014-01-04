@@ -59,6 +59,10 @@ return array(
 			 * Note: Due to how bad indexing can be if the indexes change I recommend you don't do this tbh
 			 */
 			"indexes" => array(
+				'session' => array(
+					array('session_id' => 1), array("unique" => true)
+				),
+			
 				'users' => array(
 					array(array('email' => 1)),
 					array(array('_id' => 1, 'username' => 1)),

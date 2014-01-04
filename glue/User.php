@@ -2,11 +2,12 @@
 
 namespace glue;
 
-use glue,
-	\glue\util\Crypt;
+use Glue;
+use \glue\db\Document;
+use \glue\util\Crypt;
 
-class User extends \glue\db\Document{
-
+class User extends Document
+{
 	public $username;
 	public $password;
 	public $email;
@@ -46,29 +47,36 @@ class User extends \glue\db\Document{
 	 */
 	private $cookie_domain;
 	private $cookie_path='/';
+
+	private $logAttempts = true;
+	private $logCollectionName = 'session_log';
+
+	/**
+	 * Set the default session values
+	 */
+	public function defaults()
+	{
+		glue::session()->set(array(
+			'id' => 0,
+			'email'=>'',
+			'authed' => false
+		));
+	}	
 	
-	/*
-	 * Not currently used
-	private $use_cookies;
-	private $use_only_cookies;	
-	private $cookie_secure;
-	private $cookie_httponly;
-	*/
-
-	private $logAttempts=true;
-	private $logCollectionName='session_log';
-
-	function collectionName(){
+	public function collectionName()
+	{
 		return "user";
 	}
 
-	public static function model($className = __CLASS__){
+	public static function model($className = __CLASS__)
+	{
 		return parent::model($className);
 	}
 
-	function init(){
+	public function init()
+	{
 		if(php_sapi_name() != 'cli'){
-			if(session_id()===''){
+			if(session_id() === ''){
 				if($this->cookie_domain!==null)
 					ini_set("session.cookie_domain", $this->domain);
 				if($this->cookie_path!==null)
@@ -88,7 +96,6 @@ class User extends \glue\db\Document{
 
 			}
 		}
-
 		// else we don't do anything if we are in console but we keep this class so that
 		// it can be used to assign users to cronjobs.
 	}
@@ -100,7 +107,8 @@ class User extends \glue\db\Document{
 	 * @param string $email
 	 * @param boolean $success
 	 */
-	function log($email, $success = false){
+	function log($email, $success = false)
+	{
 		if($this->logAttempts){
 			if($success){
 				// If successful I wanna remove the users row so they don't get caught by it again
@@ -119,21 +127,10 @@ class User extends \glue\db\Document{
 	}
 
 	/**
-	 * Set the default session values
-	 */
-	function defaults() {
-		glue::session()->set(array(
-			'id' => 0,
-			'email'=>'',
-			'authed' => false
-		));
-	}
-
-	/**
 	 * Check the session
 	 */
-	private function validateSession() {
-
+	private function validateSession()
+	{
 		/** Query for the object */
 		$user=$this->getCollection()->findOne(array('_id' => new \MongoId(glue::session()->id),'deleted' => 0));
 		if(!$user){

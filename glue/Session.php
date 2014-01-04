@@ -1,62 +1,60 @@
 <?php
-/**
- * Default Session Class
- *
- * This is the default session class of the framework.
- */
 
 namespace glue;
 
-use	glue;
+use	Glue;
+use \glue\Component;
 
-class Session extends \glue\Component{
-
+class Session extends Component
+{
 	/**
 	 * This decides the lifetime (in seconds) of the session
-	 *
-	 * @access private
 	 * @var int
 	 */
-	public $lifeTime='+2 weeks';
+	public $lifeTime = '+2 weeks';
 
-	public $sessionCollectionName='sessions';
+	public $collectionName = 'session';
 
-	public function __get($name){
-		if(property_exists($this,$name))
-			return $this->$name;
-		else
-			return $this->get($name);
+	public function __get($name)
+	{
+		return $this->get($name);
 	}
 
-	public function __set($name,$value){
-		if(property_exists($this,$name))
-			return $this->$name=$value;
-		else
-			return $this->set($name,$value);
+	public function __set($name, $value)
+	{
+		return $this->set($name, $value);
 	}
 
-	public function get($name){
-		return isset($_SESSION[$name])?$_SESSION[$name]:null;
+	public function get($name)
+	{
+		return isset($_SESSION[$name]) ? $_SESSION[$name] : null;
 	}
 
-	public function set($name,$value=null){
+	public function set($name, $value = null)
+	{
 		if(is_array($name)){
-			foreach($name as $k=>$v)
-				$_SESSION[$k]=$v;
+			foreach($name as $k => $v){
+				$_SESSION[$k] = $v;
+			}
 		}else{
-			$_SESSION[$name]=$value;
+			$_SESSION[$name] = $value;
 		}
+	}
+	
+	public function getCollection()
+	{
+		return glue::db()->{$this->collectionName};
 	}
 
 	/**
 	 * Constructor
 	 */
-	function start() {
-
-		// Ensure index on Session ID
-		// Why am I dong this here??
-		glue::db()->sessions->ensureIndex(array('session_id' => 1), array("unique" => true));
-
+	public function start()
+	{
+		if (session_status() == PHP_SESSION_ACTIVE) {
+			return;
+		}		
+		
 		// Register this object as the session handler
 		session_set_save_handler(
 			array( $this, "open" ),
@@ -79,7 +77,8 @@ class Session extends \glue\Component{
 	 * @param string $save_path
 	 * @param string $session_name
 	 */
-	function open( $save_path, $session_name ) {
+	public function open( $save_path, $session_name )
+	{
 		global $sess_save_path;
 		$sess_save_path = $save_path;
 
@@ -91,8 +90,8 @@ class Session extends \glue\Component{
 	/**
 	 * This function closes the session (end of session)
 	 */
-	function close() {
-
+	public function close()
+	{
 		// Return true to indicate session closed
 		return true;
 
@@ -105,14 +104,16 @@ class Session extends \glue\Component{
 	 *
 	 * @param string $id
 	 */
-	function read( $id ) {
-
+	public function read($id)
+	{
 		// Set empty result
 		$data = '';
 
-		if(($session=glue::db()->{$this->sessionCollectionName}->findOne(array("session_id"=>$id)))!==null)
-			$data=isset($session['data'])?$session['data']:'';
-		//$this->_session=$session;
+		if((
+			$session = $this->getCollection()->findOne(array("session_id" => $id))
+		) !== null){
+			$data = isset($session['data']) ? $session['data'] : '';
+		}
 		return $data;
 	}
 
@@ -127,25 +128,24 @@ class Session extends \glue\Component{
 	 *
 	 * @todo Need to make this function aware of other users since php sessions are not always unique maybe delete all old sessions.
 	 */
-	function write( $id, $data ) {
-
+	public function write($id, $data)
+	{
 		//Write details to session table
 		$time = strtotime($this->lifeTime);
-//var_dump($data);
-//var_dump($id);
-		// If the user is logged in record their uid
-		//var_dump(
-		glue::db()->{$this->sessionCollectionName}->update(array("session_id"=>$id), array('$set'=>array(
-			"session_id"=>$id,
-			//"user_id"=>glue::session()->authed ? $_SESSION['uid'] : 0,
-			"data"=>$data,
-			"expires"=>$time,
-			//"active"=>1
-		)), array("upsert"=>true));
-		//);
-		//var_dump(glue::db()->{$this->sessionCollectionName}->findOne(array("session_id"=>$id)));
-//exit();
-		// DONE
+
+		$response = $this->getCollection()->update(
+			array("session_id" => $id), 
+			array('$set' => array(
+				"session_id" => $id,
+				"data" => $data,
+				"expires" => $time,
+			)), 
+			array("upsert" => true)
+		);
+		
+		if($response['err']){
+			Glue::error(E_ERROR, $response['err'], __FILE__, __LINE__);
+		}
 		return true;
 	}
 
@@ -155,10 +155,10 @@ class Session extends \glue\Component{
 	 *
 	 * @param string $id
 	 */
-	function destroy( $id ) {
-
+	public function destroy($id)
+	{
 		// Remove from Db
-		glue::db()->{$this->sessionCollectionName}->remove(array("session_id" => $id));
+		$this->getCollection()->remove(array("session_id" => $id));
 		return true;
 	}
 
@@ -169,32 +169,35 @@ class Session extends \glue\Component{
 	 *
 	 * @todo Make a cronjob to delete all sessions after about a day old and are still inactive
 	 */
-	function gc() {
-		glue::db()->{$this->sessionCollectionName}->remove(array('expires' => array('$lt' => strtotime($this->lifeTime))));
+	public function gc()
+	{
+		$this->getCollection()->remove(array('expires' => array('$lt' => strtotime($this->lifeTime))));
 		return true;
 	}
 
-	public function regenerateID($deleteOldSession=false)
+	public function regenerateID($deleteOldSession = false)
 	{
-		$oldID=session_id();
+		$oldID = session_id();
 
 		// if no session is started, there is nothing to regenerate
 		if(empty($oldID))
 			return;
 
 		session_regenerate_id(false);
-		$newID=session_id();
+		$newID = session_id();
 
-		$row=glue::db()->{$this->sessionCollectionName}->findOne(array('session_id' => $oldID));
-		if($row!==null){
+		if($this->getCollection()->findOne(array('session_id' => $oldID)) !== null){
 			if($deleteOldSession){
-				glue::db()->{$this->sessionCollectionName}->update(array('session_id'=>$oldID),array('$set'=>array('session_id'=>$newID)));
+				$this->getCollection()->update(
+					array('session_id' => $oldID),
+					array('$set' => array('session_id' => $newID))
+				);
 			}else{
-				$row['session_id']=$newID;
-				glue::db()->{$this->sessionCollectionName}->insert($row);
+				$row['session_id'] = $newID;
+				$this->getCollection()->insert($row);
 			}
 		}else{
-			glue::db()->{$this->sessionCollectionName}->insert(array(
+			$this->getCollection()->insert(array(
 				'id'=>$newID,
 				'expire'=>strtotime($this->lifeTime)
 			));

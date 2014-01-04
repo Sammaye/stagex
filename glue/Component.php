@@ -20,7 +20,7 @@ class Component{
 	 * @param string $name
 	 * @param array $parameters
 	 */
-	function __call($name, $parameters)
+	public function __call($name, $parameters)
 	{
 		foreach($this->_behaviours as $k => $m){
 			if($m->method_exists($name)){
@@ -52,11 +52,12 @@ class Component{
 		$this->init();
 	}
 
-	function init()
+	public function init()
 	{
 	}
 	
-	function getName(){
+	public static function getName()
+	{
 		$class=get_class($this);
 		$parts=explode('\\',$class);
 		return end($parts);
@@ -67,7 +68,7 @@ class Component{
 	 * @param string $f
 	 * @return boolean
 	 */
-	function method_exists($f)
+	public function method_exists($f)
 	{
 		if(method_exists($this, $f)){
 			return true;
@@ -83,7 +84,7 @@ class Component{
 		return false;
 	}
 
-	function attach($name, $options = array())
+	public function attach($name, $options = array())
 	{
 		if(!isset($options['class']))
 			throw new Exception("There is no class set for {$name} behaviour");
@@ -100,7 +101,7 @@ class Component{
 		}
 	}
 
-	function detach($name)
+	public function detach($name)
 	{
 		if($behaviour = $this->_behaviours[$name]){
 			foreach($behaviour->events() as $e => $f){
@@ -110,7 +111,7 @@ class Component{
 		}
 	}
 
-	function trigger($event, $data = array())
+	public function trigger($event, $data = array())
 	{
 		$event_success = true;
 		if(is_array($this->_events) && isset($this->_events[$event])){
@@ -125,12 +126,12 @@ class Component{
 		return $event_success;
 	}
 
-	function on($event, $callback = array())
+	public function on($event, $callback = array())
 	{
 		$this->_events[$event][] = $callback;
 	}
 
-	function off($event, $handler = null)
+	public function off($event, $handler = null)
 	{
 		if(isset($this->_events[$name])){
 			if($handler === null){
