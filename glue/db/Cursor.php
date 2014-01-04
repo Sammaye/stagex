@@ -41,12 +41,10 @@ class Cursor extends Component implements Iterator, Countable
 			return call_user_func_array(array($this->cursor(), $method), $params);
 		}
 		
-		if($this->model !== null){
+		if($this->model !== null && method_exists($this->model, $method)){
 			$class = $this->model;
-			if(method_exists($class, $method)){
-				array_unshift($params, $this);
-				call_user_func_array(array($class, $method), $params);
-			}
+			array_unshift($params, $this);
+			call_user_func_array(array($class, $method), $params);
 		}
 		
 		parent::__call($method, $params);
