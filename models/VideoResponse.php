@@ -22,7 +22,7 @@ class VideoResponse extends \glue\db\Document{
 
 	public $deleted = 0;
 
-	function collectionName(){
+	public static function collectionName(){
 		return "videoresponse";
 	}
 

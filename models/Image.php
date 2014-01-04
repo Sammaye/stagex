@@ -7,7 +7,7 @@ include_once glue::getPath('@glue').'/components/phpthumb/ThumbLib.inc.php';
 
 class Image extends \glue\db\Document{
 
-	function collectionName(){
+	public static function collectionName(){
 		return 'image';
 	}
 

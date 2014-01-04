@@ -28,7 +28,7 @@ class Stream extends \glue\db\Document{
 	public $item_type;
 	public $like;
 
-	function collectionName(){
+	public static function collectionName(){
 		return "stream";
 	}
 

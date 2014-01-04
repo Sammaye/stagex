@@ -84,7 +84,7 @@ class Video extends \glue\Db\Document{
 		);
 	}
 
-	function collectionName(){
+	public static function collectionName(){
 		return "video";
 	}
 

@@ -5,7 +5,7 @@ use glue;
 
 class Help extends \glue\db\Document{
 
-	function collectionName(){
+	public static function collectionName(){
 		return "help";
 	}
 

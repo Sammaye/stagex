@@ -132,7 +132,7 @@ class User extends \glue\User{
 		);
 	}
 
-	function collectionName(){
+	public static function collectionName(){
 		return "user";
 	}
 

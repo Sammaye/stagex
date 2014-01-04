@@ -19,7 +19,7 @@ class Cursor extends Component implements Iterator, Countable
 	
 	public $where;
 	
-	public $sort;
+	public $sort = array();
 	
 	public $skip;
 	
@@ -90,7 +90,7 @@ class Cursor extends Component implements Iterator, Countable
 		
 	public function sort($fields)
 	{
-		$this->cursor()->sort($fields);
+		$this->sort = $fields;
 		return $this;
 	}
 		

@@ -19,7 +19,7 @@ class Queue extends \glue\db\Document{
 		);
 	}
 	
-	function collectionName(){
+	public static function collectionName(){
 		return "queue";
 	}	
 	

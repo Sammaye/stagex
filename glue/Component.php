@@ -73,11 +73,9 @@ class Component{
 		if(method_exists($this, $f)){
 			return true;
 		}else{
-			foreach($this->_behaviours as $k => $attr){
-				if(isset($attr['obj'])){
-					if(method_exists($attr['obj'], $f)){
-						return true;
-					}
+			foreach($this->_behaviours as $b){
+				if(method_exists($b, $f)){
+					return true;
 				}
 			}
 		}

@@ -63,7 +63,7 @@ class User extends Document
 		));
 	}	
 	
-	public function collectionName()
+	public static function collectionName()
 	{
 		return "user";
 	}

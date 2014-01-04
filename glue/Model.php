@@ -457,22 +457,26 @@ class Model extends Component
 	/**
 	 * EVENTS
 	 */
-	public function raise($event){
+	public function raise($event)
+	{
 		if(method_exists($this,$event)){
 			$f = $this->$event();
 		}
 		return isset($f) ? $this->trigger($event) && $f : $this->trigger($event);
 	}
 	
-	public function onAfterConstruct(){
+	public function onAfterConstruct()
+	{
 		$this->raise('afterConstruct');
 	}
 	
-	public function onBeforeValidate(){
+	public function onBeforeValidate()
+	{
 		return $this->raise('beforeValidate');
 	}
 	
-	public function onAfterValidate(){
+	public function onAfterValidate()
+	{
 		return $this->raise('afterValidate');
 	}
 

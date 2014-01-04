@@ -29,7 +29,7 @@ class Notification extends \glue\db\Document{
 	public $videoId;
 	public $responseId;
 
-	function collectionName(){
+	public static function collectionName(){
 		return "notification";
 	}
 

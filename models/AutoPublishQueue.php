@@ -47,7 +47,7 @@ class AutoPublishQueue extends \glue\db\Document{
 		return parent::model($className);
 	}
 
-	function collectionName(){
+	public static function collectionName(){
 		return "auto_publish_queue";
 	}
 
