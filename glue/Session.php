@@ -51,7 +51,7 @@ class Session extends Component
 	 */
 	public function start()
 	{
-		if (session_status() == PHP_SESSION_ACTIVE) {
+		if (session_id() !== "") {
 			return;
 		}		
 		

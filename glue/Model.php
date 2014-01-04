@@ -113,7 +113,7 @@ class Model extends Component
 	 */
 	public function getRules($scenario=null)
 	{
-		$rules = array_merge($this->rules(), $this->rules);
+		$rules = array_merge($this->rules(), $this->_rules);
 		if($scenario === null){
 			return $rules;
 		}else{
@@ -367,10 +367,11 @@ class Model extends Component
 			$this->setValidated(true); return false; // NOT VALID
 		}
 		
-		foreach($this->rules as $k => $rule){
-			$valid=$this->validateRule($rule)&&$valid;
+		$valid = true;
+		foreach($this->getRules() as $k => $rule){
+			$valid = $this->validateRule($rule) && $valid;
 		}
-
+		
 		$this->setValidated(true);
 		$this->setValid($valid);
 
@@ -894,6 +895,7 @@ class Model extends Component
 	
 	public function hash($field, $value, $params = array())
 	{
+		return true;
 		if(glue::http()->validateCsrfToken($value)){
 			return true;
 		}
