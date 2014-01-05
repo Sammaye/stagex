@@ -568,7 +568,7 @@ class Document extends Model
     {
     	$cursor = new Cursor(array(
     		'select' => $fields,
-    		'from' => get_called_class(),
+    		'model' => get_called_class(),
     		'where' => $query
     	));
     	return $cursor->one();
@@ -581,7 +581,7 @@ class Document extends Model
     	}
     	$cursor = new Cursor(array(
     		'select' => $fields,
-    		'from' => get_called_class(),
+    		'model' => get_called_class(),
     		'where' => $query
     	));
     	return $cursor;

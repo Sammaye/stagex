@@ -67,14 +67,14 @@ class UserController extends Controller
 
 		if(isset($_POST['loginForm'])){
 			if($model->validate()){
-				if(glue::user()->login($model->email,$model->password,$model->remember)){
+				if(glue::session()->login($model->email,$model->password,$model->remember)){
 					if(isset($_GET['nxt'])){
 						glue::http()->redirect(glue::http()->param('nxt'));
 					}else{
 						glue::http()->redirect("/");
 					}
 				}else{
-					foreach(glue::user()->getErrors() as $k=>$v)
+					foreach(glue::session()->getErrors() as $k=>$v)
 						$model->setError($k,$v);
 				}
 			}
@@ -654,7 +654,7 @@ class UserController extends Controller
 	{
 		$this->title = 'Logout of StageX';
 
-		Glue::user()->logout(false);
+		Glue::session()->logout(false);
 		if(isset($_GET['nxt']))
 			header("Location: ".$_GET['nxt']);
 		else
@@ -672,7 +672,7 @@ class UserController extends Controller
 
 		if($toDelete == 1){
 			$model->deactivate();
-			glue::user()->logout(false);
+			glue::session()->logout(false);
 			html::setSuccessFlashMessage("Your account has been deactivated and is awaiting deletion!");
 			header("Location: /user/login");
 			exit();
@@ -701,7 +701,7 @@ class UserController extends Controller
 				$user->sessions=array();
 				$user->save();
 
-				Glue::user()->logout(false);
+				Glue::session()->logout(false);
 
 				html::setSuccessFlashMessage("Email Changed! All devices have been signed out. You must login again.");
 				header("Location: ".Glue::http()->url("/user/login"));

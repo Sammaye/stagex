@@ -28,7 +28,7 @@ class Glue
 	
 	private static $_components = array(
 		'user' => array(
-			'class' => '\\glue\\UserIdentity'
+			'class' => '\\app\\models\\User'
 		),
 		'session' => array(
 			'class' => '\\glue\\Session'
@@ -149,7 +149,7 @@ class Glue
 			$args = self::http()->parseArgs($_SERVER['argv']);
 			self::$www = '/cli';		
 		}else{
-			self::getComponent('user'); // force the user to be inited
+			self::getComponent('session'); // force the user to be inited
 		}
 		self::route($url);
 	}
@@ -214,7 +214,7 @@ class Glue
 			$route = '';
 		}
 
-		$controllerName = $id."Controller";
+		$controllerName = preg_replace('/\{name\}/', $id, static::$controllerName);
 		if(php_sapi_name() == 'cli'){
 			$controllerFile = ( self::getPath('@cli') !== null ? 
 				self::getPath('@cli') : 

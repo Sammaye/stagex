@@ -4,6 +4,7 @@ namespace glue;
 
 use	Glue;
 use \glue\Component;
+use \glue\util\Crypt;
 
 class Session extends Component
 {
@@ -14,7 +15,56 @@ class Session extends Component
 	public $lifeTime = '+2 weeks';
 
 	public $collectionName = 'session';
+	
+	/**
+	 * This decides when the user should no longer be "trusted" as being logged in
+	 * @var int|float of seconds
+	 */
+	public $timeout = 5;
+	
+	/**
+	 * This variable determines if cookies are actually allowed, true for yes and false for no
+	 * @var boolean
+	 */
+	public $allowCookies = true;
+	
+	/**
+	 * Name of the temp cookie that is used during the $timeout period to judge if the user is logged in.
+	 * @var string
+	 */
+	public $tempCookie = '_temp';
+	
+	/**
+	 * A more permanent cookie which will not give full access to the site
+	 * @var string
+	 */
+	public $permCookie = '_perm';
+	
+	/**
+	 * The cookie domain, defaults to the base Url.
+	 *
+	 * If you intend to use a domain that is not your root domain, i.e. a subdomain you will require cookies
+	 *
+	 * @var string
+	 */
+	public $cookieDomain;
+	public $cookiePath='/';
+	
+	public $logAttempts = true;
+	public $logCollectionName = 'session_log';	
 
+	/**
+	 * Set the default session values
+	 */
+	public function defaults()
+	{
+		$this->set(array(
+		'_id' => 0,
+		'email'=>'',
+		'authed' => false
+		));
+	}	
+	
 	public function __get($name)
 	{
 		return $this->get($name);
@@ -30,6 +80,49 @@ class Session extends Component
 		return isset($_SESSION[$name]) ? $_SESSION[$name] : null;
 	}
 
+	public function init()
+	{
+		
+		if(php_sapi_name() != 'cli'){
+			if(session_id() === ''){
+				
+				//if($this->cookieDomain!==null){
+					//ini_set("session.cookie_domain", $this->cookieDomain);
+				//}
+				if($this->cookiePath!==null){
+					ini_set("session.cookie_path", $this->cookiePath);
+				}
+				// Register this object as the session handler
+				session_set_save_handler(
+					array( $this, "open" ),
+					array( $this, "close" ),
+					array( $this, "read" ),
+					array( $this, "write"),
+					array( $this, "destroy"),
+					array( $this, "gc" )
+				);
+				session_start(); // Start the damn session
+// 				var_dump(session_id());
+// 				var_dump($_SESSION);
+// 				var_dump($this->authed);
+// 				var_dump(isset($_COOKIE[$this->tempCookie])); 
+				// Are they logged in?
+				// I use the temp cookie here because it is like augmenting the PHPSESS cookie with
+				// something relatively trustable
+				if(glue::session()->authed && isset($_COOKIE[$this->tempCookie])){
+					$this->validateSession();
+				}elseif($this->allowCookies && isset($_COOKIE[$this->permCookie])){
+					$this->restoreFromCookie();
+				}else{
+					$this->defaults();
+				}
+	
+			}
+		}
+		// else we don't do anything if we are in console but we keep this class so that
+		// it can be used to assign users to cronjobs.
+	}
+	
 	public function set($name, $value = null)
 	{
 		if(is_array($name)){
@@ -47,25 +140,299 @@ class Session extends Component
 	}
 
 	/**
-	 * Constructor
+	 * Creates a log table for keeping track of botters trying to spam the login form and
+	 * if it catches one it will show a recaptcha
+	 *
+	 * @param string $email
+	 * @param boolean $success
 	 */
-	public function start()
+	function log($email, $success = false)
 	{
-		if (session_id() !== "") {
-			return;
-		}		
-		
-		// Register this object as the session handler
-		session_set_save_handler(
-			array( $this, "open" ),
-			array( $this, "close" ),
-			array( $this, "read" ),
-			array( $this, "write"),
-			array( $this, "destroy"),
-			array( $this, "gc" )
-		);
-		session_start(); // Start the damn session
+		if($this->logAttempts){
+			if($success){
+				// If successful I wanna remove the users row so they don't get caught by it again
+				glue::db()->{$this->logCollectionName}->remove(array('email' => $email));
+			}else{
+				$doc = glue::db()->{$this->logCollectionName}->findOne(array('email' => $email));
+				if($doc){
+					if($doc['ts']->sec > time()-(60*5)){ // Last error was less than 5 mins ago update
+						glue::db()->{$this->logCollectionName}->update(array('email' => $email), array('$inc' => array('c' => 1), '$set' => array('ts' => new \MongoDate())));
+						return;
+					}
+				}
+				glue::db()->{$this->logCollectionName}->update(array('email' => $email), array('$set' => array('c' => 1, 'ts' => new \MongoDate())), array('upsert' => true));
+			}
+		}
 	}
+	
+	/**
+	 * Check the session
+	 */
+	private function validateSession()
+	{
+		if(
+			($user = Glue::user()->findOne(array('_id' => new \MongoId($this->_id), 'deleted' => 0))) &&
+			isset($user->sessions[session_id()])
+		){
+		}else{
+			$this->logout(false);
+			return false;
+		}
+		if(($user->sessions[session_id()]['last_active']->sec + $this->timeout) < time()){
+			$this->restoreFromCookie();
+		}else{
+			/** VALID */
+			$this->setSession($user);
+		}
+	}
+	
+	/**
+	 * Set the session
+	 *
+	 * @param string $user
+	 * @param int $remember
+	 */
+	private function setSession($user, $remember = false, $init = false)
+	{
+		glue::setComponents(array('user' => array(
+			'__i_' => $user
+		)));
+		
+		$ident = array(
+				'id' => session_id(),
+				"ip"=>$_SERVER['REMOTE_ADDR'],
+				"agent"=>$_SERVER['HTTP_USER_AGENT'],
+				"last_request"=>$_SERVER['REQUEST_URI'],
+				"last_active"=>new \MongoDate()
+		);
+	
+		/** Set session */
+		$this->_id = strval(glue::user()->_id);
+		$this->authed = true;
+	
+		/** Single sign on active? */
+		if((bool)glue::user()->singleSignOn){
+			/** Delete all other sessions */
+			glue::user()->sessions = array();
+		}
+	
+		// Lets delete old sessions (anything older than 2 weeks)
+		foreach(glue::user()->sessions as $k => $v){
+			if($v['last_active']->sec < strtotime('-2 weeks')){
+				unset(glue::user()->sessions[$k]);
+			}
+		}
+	
+		//var_dump($this->getErrors()); exit();
+		$this->setAuthCookie($remember, $init);
+	
+		if($init){
+			$ident['remember'] = (int)$remember;
+			$ident['created'] = new \MongoDate();
+				
+			if((bool)glue::user()->emailLogins){
+				$this->emailLoginNotification();
+			}
+		}
+		glue::user()->sessions[session_id()] = $ident;
+		glue::user()->save();
+	}
+	
+	/**
+	 * Log the user in
+	 *
+	 * @param string $username
+	 * @param string $password
+	 * @param int $remember
+	 */
+	public function login($username, $password, $remember = false, $checkPassword = true)
+	{
+		$this->logout(false);
+	
+		/** Find the user */
+		$user = glue::user()->findOne(array('email' => $username));
+	
+		if(!$user){
+			$this->logout(false);
+			$this->setError("The username and/or password could not be be found. Please try again. If you encounter further errors please try to recover your password.");
+			return false;
+		}
+	
+		if($checkPassword === false || Crypt::verify($password, $user->password)){
+			if($user->deleted){
+				$this->setError("Your account has been deleted. This process cannot be undone and may take upto 24 hours.");
+			}elseif($user->banned){
+				$this->setError('You have been banned from this site.');
+			}else{
+				/** Then log the login */
+				$this->log($user->email, true);
+				$this->setSession($user, $remember, true);
+				return true;
+			}
+		}else{
+			// poop
+			$this->log($user->email, false);
+			$this->setError("The username and/or password could not be be found. Please try again. If you encounter further errors please try to recover your password.");
+			return false;
+		}
+		$this->logout(false);
+	}
+	
+	/**
+	 * Logout a user
+	 *
+	 * @param bool $remember
+	 */
+	public function logout($remember = true)
+	{
+		/** Deletes the temporary cookie */
+		$this->setCookie($this->tempCookie, "", 1);
+	
+		if(!$remember){
+			/** Deletes the permanent cookie */
+			// 			var_dump($_COOKIE);
+			// 			var_dump(ini_get("session.cookie_domain"));
+			// 			var_dump($this->domain);
+			// 			var_dump($this->permCookie);
+			$this->setCookie($this->permCookie, "", 1);
+		}
+	
+		/** Remove session from table */
+		if($this->_id){
+			glue::user()->updateAll(array('_id' => glue::user()->_id), array('$unset'=>array("sessions.".session_id()=>'')));
+		}
+	
+		//echo "in logout";
+	
+		/** Unset session */
+		if(session_id()!==''){
+			session_unset();
+			//session_destroy();
+			//session_write_close();
+			//setcookie(session_name(),'',0,'/');
+		}
+		$this->defaults();
+		//glue::session()->regenerateID(true);
+		glue::setComponents(array('user' => array()));
+	
+		/** SUCCESS */
+		return true;
+	}
+	
+	public function logoutAllDevices($devices = null)
+	{
+		if(is_array($devices)){
+	
+			$i = 0;
+			foreach(glue::user()->sessions as $k=>$v){
+				if($devices[$i] == $k){
+					unset(glue::user()->sessions[$k]);
+				}
+			}
+		}else{
+			unset(glue::user()->sessions);
+		}
+		glue::user()->save();
+		return true;
+	}
+	
+	/**
+	 * Set the users cookie
+	 *
+	 * @param int $remember
+	 * @param array $ins
+	 */
+	private function setAuthCookie($remember, $init = false)
+	{
+		/** Source the cookie information */
+		$cookie_string = Crypt::AES_encrypt256($this->_id);
+		$session_cookie = Crypt::AES_encrypt256(session_id());
+	
+		/** If remember is set create the permanent cookie */
+		if($init){
+			if($remember){
+				$this->setCookie($this->permCookie, serialize(array($cookie_string, $session_cookie)), time()+60*60*24*365*10);
+			}else{
+				$this->setCookie($this->permCookie, "", 1);
+			}
+		}
+		/** Set the temporary cookie anyway */
+		$this->setCookie($this->tempCookie, serialize(array($cookie_string, $session_cookie)), 0);
+	}
+	
+	/**
+	 * Checks the users cookie to make sure it is valid.
+	 * This will only ever check temporary cookies and not permanent
+	 * ones
+	 */
+	private function restoreFromCookie()
+	{
+		/** Is the cookie set? */
+		if(isset($_COOKIE[$this->tempCookie])){
+			
+			/** Source the information */
+			list($user_id, $id) = unserialize($_COOKIE[$this->tempCookie]);
+			$user_id = Crypt::AES_decrypt256($user_id);
+			$s_id = Crypt::AES_decrypt256($id);
+
+			$user = glue::user()->findOne(array(
+					'_id' => new \MongoId($user_id),
+					'deleted' => 0,
+					'sessions.'.$s_id.'.id' => $s_id
+			));
+
+			/** Check variable to ensure the session is valid */
+			if($user && $user->sessions[session_id()]['ip'] == $_SERVER['REMOTE_ADDR']){
+	
+				/** Auth user */
+				$this->setSession($user);
+	
+			}else{
+				/** Logout */
+				$this->logout(false);
+			}
+		}elseif(isset($_COOKIE[$this->permCookie])){
+			list($user_id, $id) = unserialize($_COOKIE[$this->permCookie]);
+			$user_id = Crypt::AES_decrypt256($user_id);
+			$s_id = Crypt::AES_decrypt256($id);
+	
+			$user = glue::user()->findOne(array(
+					"_id"=>new \MongoId($user_id),
+					'sessions' => array('$elemMatch' => array('id' => $s_id, 'remember' => 1)),
+					"deleted" => 0
+			));
+	
+			if($user && $user->_id){
+				$this->setSession($user);
+			}else{
+				$this->logout(false);
+			}
+		}
+		return false;
+	}
+	
+	function setCookie($name, $content, $expire=0, $path=null, $domain=null, $secure=false, $httponly=false)
+	{
+		if($path === null && $this->cookiePath !== null){
+			$path = $this->cookiePath;
+		}
+		if($domain === null && $this->cookieDomain !== null){
+			//$domain = $this->cookieDomain;
+		}
+		return setCookie($name, $content, $expire, $path, $domain, $secure, $httponly);
+	}
+	
+	function emailLoginNotification()
+	{
+		glue::mailer()->mail(
+			glue::user()->email,
+			array('no-reply@stagex.co.uk', 'StageX'),
+			'Someone has logged onto your StageX account',
+			"user/emailLogin.php",
+			array_merge(glue::user()->sessions[session_id()], array("username"=>glue::user()->username))
+		);
+		return true;
+	}	
 
 	/**
 	 * Open session

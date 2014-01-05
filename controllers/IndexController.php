@@ -19,7 +19,6 @@ class IndexController extends Controller
 
     public function action_index()
     {
-    	js_encode(array('d' => 1));
         $this->title = "Welcome to the StageX Beta";
         if(glue::auth()->check('@')){
             glue::runAction('stream/news');

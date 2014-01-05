@@ -128,7 +128,7 @@ class Cursor extends Component implements Iterator, Countable
 			return $current;
 		}else{
 			$class = $this->model;
-			return $class::populate($this->cursor()->current(), true);
+			return $class::populate($current, true);
 		}
 	}
 	
