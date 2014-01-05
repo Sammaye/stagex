@@ -12,7 +12,9 @@ class Subdocument extends Validator
 	public $type;
 	public $rules;
 	public $scenario;
-	public $preserveKeys=true;
+	public $preserveKeys = true;
+	
+	public $allowEmpty = true;
 
 	public function validateAttribute($object, $attribute, $value)
 	{
@@ -21,6 +23,12 @@ class Subdocument extends Validator
 		}
 		if(!$this->class && !$this->rules){
 			throw new Exception('You must supply either some rules to validate by or a class name to use');
+		}
+		
+		if(!$object->$attribute && $this->allowEmpty){
+			return true;
+		}else{
+			return false;
 		}
 
 		// Lets judge what class we are using

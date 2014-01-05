@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use \glue\db\Document;
 use glue,
 	glue\Model,
 	app\models\Playlist,
@@ -9,7 +10,7 @@ use glue,
 	glue\Collection,
 	glue\Validation;
 
-class User extends \glue\User{
+class User extends Document{
 
 	/* ATM these are not being used
 	const AUTOPUBLISH_UPLOAD=1;

@@ -5,38 +5,35 @@ namespace glue;
 use Glue;
 use \glue\db\Document;
 use \glue\util\Crypt;
+use \app\models\User;
 
-class User extends Document
+class UserIdentity extends Document
 {
-	public $username;
-	public $password;
-	public $email;
-
-	public $sessions=array();
+	public $user;
 
 	/**
 	 * This decides when the user should no longer be "trusted" as being logged in
 	 * @var int|float of seconds
 	 */
-	private $timeout = 5;
+	public $timeout = 5;
 
 	/**
 	 * This variable determines if cookies are actually allowed, true for yes and false for no
 	 * @var boolean
 	 */
-	private $allowCookies = true;
+	public $allowCookies = true;
 
 	/**
 	 * Name of the temp cookie that is used during the $timeout period to judge if the user is logged in.
 	 * @var string
 	 */
-	private $tempCookie = '_temp';
+	public $tempCookie = '_temp';
 
 	/**
 	 * A more permanent cookie which will not give full access to the site
 	 * @var string
 	 */
-	private $permCookie = '_perm';
+	public $permCookie = '_perm';
 
 	/**
 	 * The cookie domain, defaults to the base Url.
@@ -45,11 +42,11 @@ class User extends Document
 	 *
 	 * @var string
 	 */
-	private $cookie_domain;
-	private $cookie_path='/';
+	public $cookieDomain;
+	public $cookiePath='/';
 
-	private $logAttempts = true;
-	private $logCollectionName = 'session_log';
+	public $logAttempts = true;
+	public $logCollectionName = 'session_log';
 
 	/**
 	 * Set the default session values
@@ -57,20 +54,27 @@ class User extends Document
 	public function defaults()
 	{
 		glue::session()->set(array(
-			'id' => 0,
+			'_id' => 0,
 			'email'=>'',
 			'authed' => false
 		));
 	}	
 	
-	public static function collectionName()
+	public function __get($k)
 	{
-		return "user";
+		return $this->user->$k;
 	}
-
-	public static function model($className = __CLASS__)
+	
+	public function __set($k, $v)
 	{
-		return parent::model($className);
+		return $this->user->$k = $v;
+	}
+	
+	public function __call($name, $parameters)
+	{
+		if($this->user instanceof User){
+			return call_user_func_array(array($this->user, $name), $parameters);
+		}
 	}
 
 	public function init()
@@ -131,27 +135,21 @@ class User extends Document
 	 */
 	private function validateSession()
 	{
-		/** Query for the object */
-		$user=$this->getCollection()->findOne(array('_id' => new \MongoId(glue::session()->id),'deleted' => 0));
-		if(!$user){
+		if(
+			$user = User::findOne(array('_id' => glue::session()->_id, 'deleted' => 0)) &&
+			isset($user->sessions[session_id()])
+		){
+			$this->user = $user;
+		}else{
 			$this->logout(false);
 			return false;
 		}
-
-		// Set the model attributes
-		$this->clean();
-		foreach($user as $k=>$v)
-			$this->$k=$v;
-		if(isset($this->sessions[session_id()])){
-			if(($this->sessions[session_id()]['last_active']->sec + $this->timeout) < time()){
-				$this->restoreFromCookie();
-			}else{
-				/** VALID */
-				$this->setSession();
-			}
+		
+		if(($this->getUser()->sessions[session_id()]['lastActive']->sec + $this->timeout) < time()){
+			$this->restoreFromCookie();
 		}else{
-			/** Not VALID */
-			$this->logout(false);
+			/** VALID */
+			$this->setSession();
 		}
 	}
 
@@ -161,52 +159,46 @@ class User extends Document
 	 * @param string $user
 	 * @param int $remember
 	 */
-	private function setSession($remember = false, $init = false) {
-
-		/** Single sign on active? */
-		if((bool)$this->singleSignOn){
-			/** Delete all other sessions */
-			$this->sessions = array();
-		}
-		$this->setScenario('update');
-		$this->setIsNewRecord(false);
-
-		/** Set session */
-		glue::session()->id=$this->_id;
-		glue::session()->authed=true;
-
-		$this->sessions[session_id()] = array(
+	private function setSession($remember = false, $init = false)
+	{
+		$ident = array(
 			'id' => session_id(),
 			"ip"=>$_SERVER['REMOTE_ADDR'],
 			"agent"=>$_SERVER['HTTP_USER_AGENT'],
-			"last_request"=>$_SERVER['REQUEST_URI'],
-			"last_active"=>new \MongoDate()
+			"lastRequest"=>$_SERVER['REQUEST_URI'],
+			"lastActive"=>new \MongoDate()
 		);
+		
+		/** Set session */
+		glue::session()->_id = strval($this->getUser()->_id);
+		glue::session()->authed = true;
 
+		/** Single sign on active? */
+		if((bool)$this->user->singleSignOn){
+			/** Delete all other sessions */
+			$this->user->sessions = array();
+		}		
+		
 		// Lets delete old sessions (anything older than 2 weeks)
-		foreach($this->sessions as $k => $v){
-			if($v['last_active']->sec < strtotime('-2 weeks'))
+		foreach($this->user->sessions as $k => $v){
+			if($v['lastActive']->sec < strtotime('-2 weeks')){
 				unset($this->sessions[$k]);
+			}
 		}
-
-		if($init){
-			$this->sessions[session_id()]['remember'] = (int)$remember;
-			$this->sessions[session_id()]['created'] = new \MongoDate();
-		}
-
-		$this->save();
+		
 		//var_dump($this->getErrors()); exit();
-		$this->setAuthCookie($remember, $init);
+		$this->setAuthCookie($remember, $init);		
 
-		/** Now if the user needs notifying via email lets do it */
 		if($init){
-			if((bool)$this->emailLogins){
+			$ident['remember'] = (int)$remember;
+			$ident['created'] = new \MongoDate();
+			
+			if((bool)$this->user->emailLogins){
 				$this->emailLoginNotification();
 			}
 		}
-
-		// refresh the doc now that I have had some fun with it
-		$this->refresh();
+		$this->user->sessions[session_id()] = $ident;
+		$this->user->save();
 	}
 
 	/**
@@ -216,37 +208,34 @@ class User extends Document
 	 * @param string $password
 	 * @param int $remember
 	 */
-	public function login($username, $password, $remember = false, $checkPassword = true){
-
+	public function login($username, $password, $remember = false, $checkPassword = true)
+	{
 		$this->logout(false);
 
 		/** Find the user */
-		$r=$this->getCollection()->findOne(array('email' => $username));
+		$user = User::findOne(array('email' => $username));
 
-		if(!$r){
+		if(!$user){
 			$this->logout(false);
 			$this->setError("The username and/or password could not be be found. Please try again. If you encounter further errors please try to recover your password.");
 			return false;
 		}
 
-		$this->clean();
-		foreach($r as $k=>$v)
-			$this->$k=$v;
-
-		if($checkPassword===false||Crypt::verify($password, $this->password)){
-			if($this->deleted){
+		if($checkPassword === false || Crypt::verify($password, $user->password)){
+			if($user->deleted){
 				$this->setError("Your account has been deleted. This process cannot be undone and may take upto 24 hours.");
-			}elseif($this->banned){
+			}elseif($user->banned){
 				$this->setError('You have been banned from this site.');
 			}else{
 				/** Then log the login */
-				$this->log($this->email, true);
+				$this->log($user->email, true);
+				$this->user = $user;
 				$this->setSession($remember, true);
 				return true;
 			}
 		}else{
 			// poop
-			glue::user()->log($this->email, false);
+			glue::user()->log($user->email, false);
 			$this->setError("The username and/or password could not be be found. Please try again. If you encounter further errors please try to recover your password.");
 			return false;
 		}
@@ -258,8 +247,8 @@ class User extends Document
 	 *
 	 * @param bool $remember
 	 */
-	public function logout($remember = true){
-
+	public function logout($remember = true)
+	{
 		/** Deletes the temporary cookie */
 		$this->setCookie($this->tempCookie, "", 1);
 
@@ -274,7 +263,7 @@ class User extends Document
 
 		/** Remove session from table */
 		if($this->_id){
-			glue\User::updateAll(array('_id' => $this->_id), array('$unset'=>array("sessions.".session_id()=>'')));
+			User::updateAll(array('_id' => $this->user->_id), array('$unset'=>array("sessions.".session_id()=>'')));
 		}
 		
 		//echo "in logout";
@@ -288,25 +277,26 @@ class User extends Document
 		}
 		$this->defaults();
 		//glue::session()->regenerateID(true);
-		$this->clean();
+		$this->user = null;
 
 		/** SUCCESS */
 		return true;
 	}
 
-	public function logoutAllDevices($devices = null){
+	public function logoutAllDevices($devices = null)
+	{
 		if(is_array($devices)){
 
 			$i = 0;
-			foreach($this->sessions as $k=>$v){
+			foreach($this->user->sessions as $k=>$v){
 				if($devices[$i] == $k){
-					unset($this->sessions[$k]);
+					unset($this->user->sessions[$k]);
 				}
 			}
 
 			$this->save();
 		}else{
-			unset($this->sessions);
+			unset($this->user->sessions);
 			$this->save();
 		}
 		return true;
@@ -318,10 +308,10 @@ class User extends Document
 	 * @param int $remember
 	 * @param array $ins
 	 */
-	private function setAuthCookie($remember, $init = false){
-
+	private function setAuthCookie($remember, $init = false)
+	{
 		/** Source the cookie information */
-		$cookie_string = Crypt::AES_encrypt256($this->_id);
+		$cookie_string = Crypt::AES_encrypt256($this->user->_id);
 		$session_cookie = Crypt::AES_encrypt256(session_id());
 
 		/** If remember is set create the permanent cookie */
@@ -335,7 +325,6 @@ class User extends Document
 
 		/** Set the temporary cookie anyway */
 		$this->setCookie($this->tempCookie, serialize(array($cookie_string, $session_cookie)), 0);
-
 	}
 
 	/**
@@ -343,9 +332,8 @@ class User extends Document
 	 * This will only ever check temporary cookies and not permanent
 	 * ones
 	 */
-	private function restoreFromCookie(){
-//echo "restoring from cookie";
-
+	private function restoreFromCookie()
+	{
 		/** Is the cookie set? */
 		if(isset($_COOKIE[$this->tempCookie])){
 
@@ -354,23 +342,17 @@ class User extends Document
 			$user_id = Crypt::AES_decrypt256($user_id);
 			$s_id = Crypt::AES_decrypt256($id);
 
-			/** Form the criteria for the search */
-			$criteria['_id'] = new \MongoId($user_id);
-			$criteria['sessions.id'] = $s_id;
-			$criteria['deleted'] = 0;
-
-			/** Get the matching user and session */
-			$r=$this->getCollection()->findOne($criteria);
-			if($r!==null){
-				foreach($r as $k=>$v)
-					$this->$k=$v;
-			}
-
+			$user = User::findOne(array(
+				'_id' => new \MongoId($user_id),
+				'deleted' => 0,
+				'sessions.id' => $s_id
+			));
+			
 			/** Check variable to ensure the session is valid */
-			if($this->sessions[session_id()]['ip'] == $_SERVER['REMOTE_ADDR']){
+			if($user && $user->sessions[session_id()]['ip'] == $_SERVER['REMOTE_ADDR']){
 
 				/** Auth user */
-				glue::session()->tier2_logged=true;
+				$this->user = $user;
 				$this->setSession();
 
 			}else{
@@ -382,17 +364,14 @@ class User extends Document
 			$user_id = Crypt::AES_decrypt256($user_id);
 			$s_id = Crypt::AES_decrypt256($id);
 
-			$r = $this->getCollection()->findOne(array(
+			$user = User::findOne(array(
 					"_id"=>new \MongoId($user_id),
 					'sessions' => array('$elemMatch' => array('id' => $s_id, 'remember' => 1)),
 					"deleted" => 0
 			));
-			if($r!==null){
-				foreach($r as $k=>$v)
-					$this->$k=$v;
-			}
 
-			if($this->_id){
+			if($user && $user->_id){
+				$this->user = $user;
 				$this->setSession();
 			}else{
 				$this->logout(false);
@@ -401,17 +380,26 @@ class User extends Document
 		return false;
 	}
 	
-	function setCookie($name,$content,$expire=0,$path=null,$domain=null,$secure=false,$httponly=false){
-		if($path===null&&$this->cookie_path!==null)
-			$path=$this->cookie_path;
-		if($domain===null&&$this->cookie_domain!==null)
-			$domain=$this->cookie_domain;
-		return setCookie($name,$content,$expire,$path,$domain,$secure,$httponly);
+	function setCookie($name, $content, $expire=0, $path=null, $domain=null, $secure=false, $httponly=false)
+	{
+		if($path === null && $this->cookiePath !== null){
+			$path = $this->cookiePath;
+		}
+		if($domain === null && $this->cookieDomain !== null){
+			$domain = $this->cookieDomain;
+		}
+		return setCookie($name, $content, $expire, $path, $domain, $secure, $httponly);
 	}
 
-	function emailLoginNotification(){
-		glue::mailer()->mail($this->email, array('no-reply@stagex.co.uk', 'StageX'), 'Someone has logged onto your StageX account',	"user/emailLogin.php",
-			array_merge($this->sessions[session_id()], array("username"=>$this->username)));
+	function emailLoginNotification()
+	{
+		glue::mailer()->mail(
+			$this->user->email,
+			array('no-reply@stagex.co.uk', 'StageX'),
+			'Someone has logged onto your StageX account',
+			"user/emailLogin.php",
+			array_merge($this->user->sessions[session_id()], array("username"=>$this->user->username))
+		);
     	return true;
 	}
 }

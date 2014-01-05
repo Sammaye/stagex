@@ -28,7 +28,7 @@ class Glue
 	
 	private static $_components = array(
 		'user' => array(
-			'class' => '\\glue\\User'
+			'class' => '\\glue\\UserIdentity'
 		),
 		'session' => array(
 			'class' => '\\glue\\Session'

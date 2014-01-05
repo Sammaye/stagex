@@ -207,8 +207,13 @@ class Video extends \glue\Db\Document{
 	public function populateDefaults(){
 		if(glue::session()->authed){
 			$defaults=glue::user()->defaultVideoSettings;
-			foreach($defaults as $k => $v)
+			
+			if(!is_array($defaults)){
+				return;
+			}
+			foreach($defaults as $k => $v){
 				$this->$k=$v;
+			}
 		}
 	}
 	

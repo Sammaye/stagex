@@ -36,7 +36,8 @@ class Cursor extends Component implements Iterator, Countable
 	 * @param $method
 	 * @param $params
 	 */
-	public function __call($method, $params = array()){
+	public function __call($method, $params = array())
+	{
 		if($this->cursor() instanceof \MongoCursor && method_exists($this->cursor(), $method)){
 			return call_user_func_array(array($this->cursor(), $method), $params);
 		}
@@ -53,7 +54,8 @@ class Cursor extends Component implements Iterator, Countable
 	/**
 	 * Holds the MongoCursor
 	 */
-	public function cursor(){
+	public function cursor()
+	{
 		return $this->_mongoCursor;
 	}
 	
@@ -74,7 +76,7 @@ class Cursor extends Component implements Iterator, Countable
 	
 	public function one()
 	{
-		return $this->getCollection()->findOne($this->where, $this->select);
+		return $this->current($this->getCollection()->findOne($this->where, $this->select));
 	}
 	
 	public function all()
@@ -116,8 +118,10 @@ class Cursor extends Component implements Iterator, Countable
 	 */
 	public function current($current = null)
 	{
-		if($current === null){
+		if($current === null && $this->cursor() instanceof \MongoCursor){
 			$current = $this->cursor()->current();
+		}elseif($current === null){
+			return null;
 		}
 		
 		if($this->model === null){
