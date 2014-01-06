@@ -2,6 +2,7 @@
 
 namespace glue\widgets;
 
+use Glue;
 use \glue\Widget;
 
 class Pagination extends Widget
@@ -11,7 +12,6 @@ class Pagination extends Widget
 	
 	public $params = array(); // Additional URL vars
 		
-	public $pageSize;
 	public $itemCount;
 
 	public $enableAjaxPagination = false;
@@ -25,16 +25,22 @@ class Pagination extends Widget
 	public $pageRange = 5;
 	
 	private $_page;
+	private $_pageSize;
 	private $_pageCount;
 	
 	public function getPageSize()
 	{
 		if($this->_pageSize === null){
 			$this->_pageSize = glue::http()->param($this->sizeParam);
-			if($_pageSize <= 0){
+			if($this->_pageSize <= 0){
 				$this->_pageSize = 20;
 			}
 		}
+	}
+	
+	public function setPageSize($size)
+	{
+		$this->_pageSize = $size;
 	}
 	
 	public function getPageCount($refresh = false)

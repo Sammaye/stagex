@@ -4,7 +4,7 @@ namespace glue\widgets;
 
 use glue;
 use \glue\Widget;
-use \glue\Pagination;
+use \glue\widgets\Pagination;
 
 /**
  * listview Widget
@@ -111,9 +111,9 @@ class ListView extends Widget
 
 		// Get the current page
 		if($this->enablePagination){
-			$pager = Pagination::start(array_merge($pagination, array(
+			$pager = Pagination::start(array_merge($this->pagination, array(
 				'itemCount' => $this->itemCount,
-				'params' => array_merge($this->params, array(
+				'params' => array_merge($this->data, array(
 					$this->sortParam => $this->currentSortAttribute,
 					$this->orderParam => $this->currentSortOrder
 				))

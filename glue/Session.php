@@ -40,9 +40,7 @@ class Session extends Component
 	
 	/**
 	 * The cookie domain, defaults to the base Url.
-	 *
 	 * If you intend to use a domain that is not your root domain, i.e. a subdomain you will require cookies
-	 *
 	 * @var string
 	 */
 	public $cookieDomain;
@@ -104,10 +102,7 @@ class Session extends Component
 			array( $this, "gc" )
 		);
 		session_start(); // Start the damn session
-// 		var_dump(session_id());
-// 		var_dump($_SESSION);
-// 		var_dump($this->authed);
-// 		var_dump(isset($_COOKIE[$this->tempCookie])); 
+
 		// Are they logged in?
 		// I use the temp cookie here because it is like augmenting the PHPSESS cookie with
 		// something relatively trustable
@@ -235,8 +230,8 @@ class Session extends Component
 				unset(glue::user()->sessions[$k]);
 			}
 		}
-	
-		//var_dump($this->getErrors()); exit();
+		
+		glue::user()->sessions[session_id()] = $ident;
 		$this->setSessionCookie($remember, $init);
 	
 		if($init){
@@ -247,7 +242,6 @@ class Session extends Component
 				$this->emailLoginNotification();
 			}
 		}
-		glue::user()->sessions[session_id()] = $ident;
 		glue::user()->saveAttributes(array('sessions'));
 	}
 	
