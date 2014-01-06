@@ -32,7 +32,7 @@
 			</table>
 
 			<p>Note: Please be advised that if you see "FATAL: NOT SURE" within the "Device Signature" field this means
-			the device could not be identified. This might be bengin but it might also be a hacker hiding his footprints.</p>
+			the device could not be identified. This might be benign but it might also be a hacker hiding his footprints.</p>
 		</td>
 	</tr>
 </table>

@@ -58,8 +58,8 @@ class Component{
 	
 	public static function getName()
 	{
-		$class=get_class($this);
-		$parts=explode('\\',$class);
+		$class = get_called_class();
+		$parts = explode('\\',$class);
 		return end($parts);
 	}	
 

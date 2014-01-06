@@ -70,7 +70,7 @@ abstract class Widget extends Component
 	
 	public function getAttributeName()
 	{
-		return $this->name = Html::getModelFormVariableName($this->attribute, $this->model);
+		return $this->name = Html::getAttributeName($this->attribute, $this->model);
 	}
 	
 	public function getAttributeId()

@@ -201,7 +201,7 @@ class Html{
 	}
 
 	public static function activeTextField($model, $attribute, $options = array()){
-		return self::textfield(self::getModelFormVariableName($attribute, $model), self::getModelFormVariableValue($attribute, $model), $options);
+		return self::textfield(self::getAttributeName($attribute, $model), self::getAttributeValue($attribute, $model), $options);
 	}
 
 	/**
@@ -220,7 +220,7 @@ class Html{
 	}
 
 	public static function activeHiddenField($model, $attribute, $options = array()){
-		return self::hiddenfield(self::getModelFormVariableName($attribute, $model), self::getModelFormVariableValue($attribute, $model, $options), $options);
+		return self::hiddenfield(self::getAttributeName($attribute, $model), self::getAttributeValue($attribute, $model, $options), $options);
 	}
 
 	/**
@@ -235,7 +235,7 @@ class Html{
 	}
 
 	public static function activePasswordField($model, $attribute, $options = array()){
-		return self::passwordfield(self::getModelFormVariableName($attribute, $model), self::getModelFormVariableValue($attribute, $model), $options);
+		return self::passwordfield(self::getAttributeName($attribute, $model), self::getAttributeValue($attribute, $model), $options);
 	}
 
 	/**
@@ -257,7 +257,7 @@ class Html{
 	 * @param array $options
 	 */
 	public static function activeFileField($model, $attribute, $options = array()){
-		return self::filefield(self::getModelFormVariableName($attribute, $model), null, $options);
+		return self::filefield(self::getAttributeName($attribute, $model), null, $options);
 	}
 
 	/**
@@ -272,7 +272,7 @@ class Html{
 	}
 
 	public static function activeTextarea($model, $attribute, $options = array()){
-		return self::textarea(self::getModelFormVariableName($attribute, $model), self::getModelFormVariableValue($attribute, $model), $options);
+		return self::textarea(self::getAttributeName($attribute, $model), self::getAttributeValue($attribute, $model), $options);
 	}
 
 	/**
@@ -301,7 +301,7 @@ class Html{
 	}
 
 	public static function activeSelectbox($model, $attribute, $items, $options = array()){
-		return self::selectbox(self::getModelFormVariableName($attribute, $model), $items, self::getModelFormVariableValue($attribute, $model), $options);
+		return self::selectbox(self::getAttributeName($attribute, $model), $items, self::getAttributeValue($attribute, $model), $options);
 	}
 
 	/**
@@ -321,7 +321,7 @@ class Html{
 	}
 
 	public static function activeRadiobutton($model, $attribute, $chk_value, $options = array()){
-		return self::radiobutton(self::getModelFormVariableName($attribute, $model), $chk_value, self::getModelFormVariableValue($attribute, $model), $options);
+		return self::radiobutton(self::getAttributeName($attribute, $model), $chk_value, self::getAttributeValue($attribute, $model), $options);
 	}
 
 	/**
@@ -349,7 +349,7 @@ class Html{
 	 * @param array $options
 	 */
 	public static function activeCheckbox($model, $attribute, $chk_value, $options = array()){
-		return self::checkbox(self::getModelFormVariableName($attribute, $model), $chk_value, self::getModelFormVariableValue($attribute, $model), $options);
+		return self::checkbox(self::getAttributeName($attribute, $model), $chk_value, self::getAttributeValue($attribute, $model), $options);
 	}
 
 	/**
@@ -371,7 +371,7 @@ class Html{
 	 * @param array $options
 	 */
 	public static function activeCheckbox_group($model, $attribute, $options = array()){
-		return self::radio_group(self::getModelFormVariableName($attribute, $model), self::getModelFormVariableValue($attribute, $model), $options);
+		return self::radio_group(self::getAttributeName($attribute, $model), self::getAttributeValue($attribute, $model), $options);
 	}
 
 	/**
@@ -389,7 +389,7 @@ class Html{
 	}
 
 	public static function activeRadio_group($model, $attribute, $options = array()){
-		return self::radio_group(self::getModelFormVariableName($attribute, $model), self::getModelFormVariableValue($attribute, $model), $options);
+		return self::radio_group(self::getAttributeName($attribute, $model), self::getAttributeValue($attribute, $model), $options);
 	}
 
 	/**
@@ -586,77 +586,69 @@ class Html{
 		$html = stripslashes(strip_tags($html));
 		return preg_replace('/<[^>]*>/', '', $html);
 	}
-
-	public static function getModelFormVariableName($attribute, $model){
-		if(($pos=strpos($attribute,'['))!==false)
-		{
-			if($pos!==0)  // e.g. name[a][b]
-			return self::getModelShortName($model).'['.substr($attribute,0,$pos).']'.substr($attribute,$pos);
-			if(($pos=strrpos($attribute,']'))!==false && $pos!==strlen($attribute)-1)  // e.g. [a][b]name
-			{
+	
+	public static function getAttributeName($attribute, $model = null)
+	{
+		if($model === null){
+			return $attribute;
+		}
+		
+		if(($pos=strpos($attribute,'['))!==false){
+			if($pos!==0){  // e.g. name[a][b]
+				$attribute = '['.substr($attribute, 0, $pos).']' . substr($attribute,$pos);
+			}elseif(($pos=strrpos($attribute,']'))!==false && $pos!==strlen($attribute)-1){  // e.g. [a][b]name{
 				$sub=substr($attribute,0,$pos+1);
 				$attribute=substr($attribute,$pos+1);
-				return self::getModelShortName($model).$sub.'['.$attribute.']';
-			}
-			if(preg_match('/\](\w+\[.*)$/',$attribute,$matches))
-			{
-				$name=self::getModelShortName($model).'['.str_replace(']','][',trim(strtr($attribute,array(']['=>']','['=>']')),']')).']';
-				$attribute=$matches[1];
-				return $name;
-			}
-		}
-		else
-			return self::getModelShortName($model).'['.$attribute.']';
-	}
 
-	public static function getModelFormVariableValue($attribute, $model, $options = array()){
+				$attribute = $sub.'['.$attribute.']';
+			}elseif(preg_match('/\](\w+\[.*)$/',$attribute,$matches)){
+				$attribute = '['.str_replace(']','][',trim(strtr($attribute,array(']['=>']','['=>']')),']')).']';
+			}
+		}else{
+			$attribute = '['.$attribute.']';
+		}
+		return $model::getName().$attribute;
+	}
+	
+	public static function getAttributeValue($attribute, $model, $options = array())
+	{
 		if(isset($options['value'])){
 			return $options['value'];
-		}else{
-			if(($pos=strpos($attribute,'['))!==false)
-			{
-				if($pos!==0){  // e.g. name[a][b]
-					//var_dump($attribute);
-					$exploded_path = explode('.', trim(strtr($attribute,array(']['=>'.','['=>'.')),']'));
-					if(count($exploded_path) > 0){
-						$previous = $model;
-						foreach($exploded_path as $part){
-							if(is_object($previous)){
-								//var_dump($previous);
-								if(!property_exists($previous, $part)) return null;
-								$previous = $previous->$part;
-							}else{
-								if(!isset($previous[$part])) return null;
-								$previous = $previous[$part];
-							}
+		}
+		if(($pos=strpos($attribute,'['))!==false){
+			if($pos!==0){  // e.g. name[a][b]
+				//var_dump($attribute);
+				$exploded_path = explode('.', trim(strtr($attribute,array(']['=>'.','['=>'.')),']'));
+				if(count($exploded_path) > 0){
+					$previous = $model;
+					foreach($exploded_path as $part){
+						if(is_object($previous)){
+							//var_dump($previous);
+							if(!property_exists($previous, $part)) return null;
+							$previous = $previous->$part;
+						}else{
+							if(!isset($previous[$part])) return null;
+							$previous = $previous[$part];
 						}
-						return $previous;
-					}else{
-						return $model->{substr($attribute,0,$pos)};
 					}
-				}
-				if(($pos=strrpos($attribute,']'))!==false && $pos!==strlen($attribute)-1)  // e.g. [a][b]name
-				{
-					$sub=substr($attribute,0,$pos+1);
-					$attribute=substr($attribute,$pos+1);
-					return $model->$attribute;
-				}
-				if(preg_match('/\](\w+\[.*)$/',$attribute,$matches))
-				{
-					$name=self::getModelShortName($model).'['.str_replace(']','][',trim(strtr($attribute,array(']['=>']','['=>']')),']')).']';
-					$attribute=$matches[1];
-					return $model->$attribute;
+					return $previous;
+				}else{
+					return $model->{substr($attribute,0,$pos)};
 				}
 			}
-			else
+			if(($pos=strrpos($attribute,']'))!==false && $pos!==strlen($attribute)-1){
+				$sub=substr($attribute,0,$pos+1);
+				$attribute=substr($attribute,$pos+1);
+				return $model->$attribute;
+			}
+			if(preg_match('/\](\w+\[.*)$/',$attribute,$matches)){
+				$attribute=$matches[1];
+				return $model->$attribute;
+			}
+		}else{
 			return $model->$attribute;
 		}
-		return "";
-	}
-
-	static function getModelShortName($model){
-		$d=explode('\\',get_class($model));
-		return end($d);
+		return "";		
 	}
 	
 	static function getIdByName($name){
