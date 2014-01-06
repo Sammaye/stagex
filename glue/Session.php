@@ -2,7 +2,7 @@
 
 namespace glue;
 
-use	Glue;
+use Glue;
 use \glue\Component;
 use \glue\util\Crypt;
 
