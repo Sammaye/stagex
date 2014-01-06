@@ -27,7 +27,7 @@ class Subdocument extends Validator
 		
 		if(!$object->$attribute && $this->allowEmpty){
 			return true;
-		}else{
+		}elseif(!$object->$attribute){
 			return false;
 		}
 

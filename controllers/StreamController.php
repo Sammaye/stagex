@@ -8,6 +8,7 @@ use app\models\Notification;
 class StreamController extends Controller
 {
 	public $layout = 'user_section';
+	public $tab = 'news_feed';
 	public $subtab;
 
 	public function behaviours()

@@ -524,8 +524,7 @@ class UserController extends Controller
 			}
 
 			$model->attributes=$_POST['User'];
-
-			if($model->validate()&&$model->save()){
+			if($model->save()){
 				if($model->getScenario()=='updateEmail'){
 					Html::setSuccessFlashMessage('An email has been sent asking for confirmation of your new address');
 				}else{
@@ -590,13 +589,13 @@ class UserController extends Controller
 				$model->setScenario($_POST['User']['action']);
 			if($model->getScenario()=='updatePic'){
 				$model->avatar=new glue\File(array('model'=>$model,'id'=>'avatar'));
-				if($model->validate()&&$model->setAvatar()){
+				if($model->validate() && $model->setAvatar()){
 					Html::setSuccessFlashMessage('Your profile picture has been changed');
 					glue::http()->redirect("/user/profile");
 				}
 			}else{
 				$model->attributes=$_POST['User'];
-				if($model->validate()&&$model->save()){
+				if($model->save()){
 					Html::setSuccessFlashMessage('Your profile settings have been saved');
 					glue::http()->redirect("/user/profile");
 				}
