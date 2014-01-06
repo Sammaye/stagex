@@ -60,22 +60,21 @@ class UserController extends Controller
 		$model->attributes=isset($_POST['loginForm']) ? $_POST['loginForm'] : array();
 
 		/** Count how many times the user has logged in over 5 mins */
-		$loginAttempts = Glue::db()->session_log->findOne(array("email"=>$model->email, "ts"=>array("\$gt"=>new MongoDate(time()-(60*5)))));
+		$loginAttempts = Glue::session()->getLogCollection()->findOne(array("email"=>$model->email, "ts"=>array("\$gt"=>new MongoDate(time()-(60*5)))));
 		if($loginAttempts['c'] > 4){
 			$model->setScenario('captcha');
 		}
 
 		if(isset($_POST['loginForm'])){
 			if($model->validate()){
-				if(glue::session()->login($model->email,$model->password,$model->remember)){
+				if(glue::session()->login($model->email, $model->password, $model->remember)){
 					if(isset($_GET['nxt'])){
 						glue::http()->redirect(glue::http()->param('nxt'));
 					}else{
 						glue::http()->redirect("/");
 					}
 				}else{
-					foreach(glue::session()->getErrors() as $k=>$v)
-						$model->setError($k,$v);
+					$model->setError('email', glue::session()->getError());
 				}
 			}
 		}
