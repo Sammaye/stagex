@@ -2,21 +2,16 @@
 
 namespace glue;
 
-use glue;
+use Glue;
 
 /**
- * HTML constructor class
- *
- * This class deals with the construction and usage of HTML elements and tags.
+ * HTML
  *
  * Warning: This class currently does not support HTML 5.
  * Warning: This class does not sanitise HTML. You must use the HTMLPurifier plugin for that.
  * Warning: This class does not solve HTML errors nor does it prevent them.
  *
  * This class is designed to just allow you to correctly form HTMl tags in no particular order for certain functions.
- *
- * @author Sam Millman
- *
  */
 class Html{
 
@@ -196,7 +191,10 @@ class Html{
 	 * @param array $options
 	 */
 	public static function textfield($name, $value = null, $options = array()){
-		if(!isset($options['id'])) $options['id']=self::getIdByName($name);
+		if(is_string($options)){
+			$options = array('class' => $options);
+		}
+		if(!isset($options['id'])) $options['id'] = self::getIdByName($name);
 		return "<input ".implode(" ", self::formOptions($options))."  type='text' name='{$name}' value='{$value}'/>";
 	}
 
@@ -593,15 +591,15 @@ class Html{
 			return $attribute;
 		}
 		
-		if(($pos=strpos($attribute,'['))!==false){
-			if($pos!==0){  // e.g. name[a][b]
+		if(($pos = strpos($attribute,'[')) !== false){
+			if($pos !== 0){  // e.g. name[a][b]
 				$attribute = '['.substr($attribute, 0, $pos).']' . substr($attribute,$pos);
-			}elseif(($pos=strrpos($attribute,']'))!==false && $pos!==strlen($attribute)-1){  // e.g. [a][b]name{
+			}elseif(($pos=strrpos($attribute,']')) !== false && $pos !== strlen($attribute)-1){  // e.g. [a][b]name{
 				$sub=substr($attribute,0,$pos+1);
 				$attribute=substr($attribute,$pos+1);
 
 				$attribute = $sub.'['.$attribute.']';
-			}elseif(preg_match('/\](\w+\[.*)$/',$attribute,$matches)){
+			}elseif(preg_match('/\](\w+\[.*)$/', $attribute, $matches)){
 				$attribute = '['.str_replace(']','][',trim(strtr($attribute,array(']['=>']','['=>']')),']')).']';
 			}
 		}else{
@@ -615,8 +613,8 @@ class Html{
 		if(isset($options['value'])){
 			return $options['value'];
 		}
-		if(($pos=strpos($attribute,'['))!==false){
-			if($pos!==0){  // e.g. name[a][b]
+		if(($pos = strpos($attribute,'[')) !== false){
+			if($pos !== 0){  // e.g. name[a][b]
 				//var_dump($attribute);
 				$exploded_path = explode('.', trim(strtr($attribute,array(']['=>'.','['=>'.')),']'));
 				if(count($exploded_path) > 0){
@@ -651,8 +649,15 @@ class Html{
 		return "";		
 	}
 	
-	static function getIdByName($name){
+	public static function getIdByName($name)
+	{
 		return str_replace(array('[]', '][', '[', ']', ' '), array('', '_', '_', '', '_'), $name);		
+	}
+	
+	public static function getAttributeNameId($attribute, $model)
+	{
+		$name = static::getAttributeName($attribute, $model);
+		return array($name, static::getIdByName($name));
 	}
 }
 
