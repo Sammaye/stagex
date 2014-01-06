@@ -27,6 +27,11 @@ class Document extends Model
 	{
 		return strtolower(preg_replace('/\B([A-Z])/', '_$1', get_called_class()));
 	}
+	
+	public function relations()
+	{
+		return array();
+	}
 
 	public function __get($name)
 	{
@@ -75,6 +80,18 @@ class Document extends Model
 			unset($this->$name);
 		}
 	}
+	
+	public function __call($name,$parameters)
+	{
+		if(array_key_exists($name, $this->relations())){
+			if(empty($parameters)){
+				return $this->getRelated($name, false);
+			}else{
+				return $this->getRelated($name, true, $parameters[0]);
+			}
+		}
+		return parent::__call($name, $parameters);
+	}	
 
 	public function __construct($scenario = 'insert')
 	{
@@ -117,18 +134,6 @@ class Document extends Model
 		}else{
 			return null;
 		}
-	}	
-
-	public function __call($name,$parameters)
-	{
-		if(array_key_exists($name, $this->relations())){
-			if(empty($parameters)){
-				return $this->getRelated($name, false);
-			}else{
-				return $this->getRelated($name, true, $parameters[0]);
-			}
-		}
-		return parent::__call($name, $parameters);
 	}
 	
 	public static function getDb()

@@ -35,10 +35,6 @@ return array(
 	// This part houses all of the configuration settings for framework components
 	'components' => array(
 
-		'user' => array(
-			'class'=>'app\\models\\User'
-		),
-
 		/**
 		 * Configures the session handler
 		 */
@@ -59,7 +55,11 @@ return array(
 			 */
 			"indexes" => array(
 				'session' => array(
-					array('session_id' => 1), array("unique" => true)
+					array(array('session_id' => 1), array("unique" => true))
+				),
+				
+				'session_log' => array(
+					array(array('email' => 1, 'ts' => 1))
 				),
 			
 				'users' => array(
@@ -399,11 +399,11 @@ return array(
 	 * in a eager manner, it will just store these as places to look within the global namespace.
 	 */
 	'directories' => array(
-		'@app' => dirname(__DIR__),
+		'app' => dirname(__DIR__),
 
 		// These are not required but are here to show you how it is done
 		//'@controllers' => 'controllers',
-		'@models' => 'models'
+		'models' => 'models'
 	),
 
 	/**

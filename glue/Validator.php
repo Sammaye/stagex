@@ -11,7 +11,7 @@ class Validator extends Component
 {
 	public $owner;
 	
-	function validateAttribute($model, $attribute, $value)
+	public function validateAttribute($model, $attribute, $value)
 	{
 	}
 

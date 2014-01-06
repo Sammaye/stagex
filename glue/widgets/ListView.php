@@ -36,7 +36,7 @@ class ListView extends Widget
 	/**
 	 * Additional data to be passed to the view when rendering
 	 */
-	public $data=array();
+	public $data = array();
 
 	public $template = '<div class="list_contents">{items}{pager}</div>';
 	public $itemView;
