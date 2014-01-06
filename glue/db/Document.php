@@ -85,7 +85,7 @@ class Document extends Model
 	{
 		if(array_key_exists($name, $this->relations())){
 			if(empty($parameters)){
-				return $this->getRelated($name, false);
+				return $this->_related[$name] = $this->getRelated($name, false);
 			}else{
 				return $this->getRelated($name, true, $parameters[0]);
 			}
@@ -572,12 +572,7 @@ class Document extends Model
     
     public static function findOne($query = array(), $fields = array())
     {
-    	$cursor = new Cursor(array(
-    		'select' => $fields,
-    		'model' => get_called_class(),
-    		'where' => $query
-    	));
-    	return $cursor->one();
+    	return static::find($query, $fields)->one();
     }
     
     public static function find($query = array(), $fields = array())
@@ -587,9 +582,11 @@ class Document extends Model
     	}
     	$cursor = new Cursor(array(
     		'select' => $fields,
-    		'model' => get_called_class(),
-    		'where' => $query
+    		'model' => get_called_class()
     	));
+    	
+    	$cursor->defaultScope();
+    	$cursor->andWhere($query);
     	return $cursor;
     }
     

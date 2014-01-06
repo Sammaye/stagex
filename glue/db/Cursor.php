@@ -17,7 +17,7 @@ class Cursor extends Component implements Iterator, Countable
 	
 	public $with = array();
 	
-	public $where;
+	public $where = array();
 	
 	public $sort = array();
 	
@@ -88,6 +88,14 @@ class Cursor extends Component implements Iterator, Countable
 			->limit($this->limit);
 		$this->_mongoCursor = $cursor;
 		return $this;
+	}
+	
+	public function andWhere($query = array())
+	{
+		$this->where = array_merge(
+			$this->where,
+			$query
+		);
 	}
 		
 	public function sort($fields)

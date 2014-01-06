@@ -85,7 +85,7 @@ class VideoResponseController extends Controller
 		$_SESSION['lastCommentPull'] = serialize($now);
 		echo $this->render('response/all', array('model' => $video, 'pending' => false, 'username_filter_string' => $usernames_string, 'comments' => glue::auth()->check(array("^"=>$video)) ? 
 			app\models\VideoResponse::find(array_merge(array('videoId'=>$video->_id),$query))->sort(array('created'=>-1)) :
-			app\models\VideoResponse::public()->find(array_merge(array('videoId'=>$video->_id),$query))->sort(array('created'=>-1))
+			app\models\VideoResponse::find(array_merge(array('videoId'=>$video->_id),$query))->public()->sort(array('created'=>-1))
 		)); 
 	}
 	
@@ -161,8 +161,8 @@ class VideoResponseController extends Controller
 			$thread_parent = VideoResponse::findOne(array('_id' => new MongoId($path_segs[0]), 'deleted' => 0));
 			$thread = VideoResponse::find(array('path' => new MongoRegex('/'.$path_segs[0].',/'), 'deleted' => 0))->sort(array('ts' => -1));
 		}else{
-			$thread_parent = VideoResponse::public()->findOne(array('_id' => new MongoId($path_segs[0]), 'deleted' => 0));
-			$thread = VideoResponse::public()->find(array('path' => new MongoRegex('/'.$path_segs[0].',/'), 'deleted' => 0))->sort(array('ts' => -1));
+			$thread_parent = VideoResponse::find(array('_id' => new MongoId($path_segs[0]), 'deleted' => 0))->public()->one();
+			$thread = VideoResponse::find(array('path' => new MongoRegex('/'.$path_segs[0].',/'), 'deleted' => 0))->public()->sort(array('ts' => -1));
 		}
 
 		if(!glue::auth()->check(array('viewable' => $thread_parent)))

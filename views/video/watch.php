@@ -1,5 +1,7 @@
 <?php
 
+use \app\models\VideoResponse;
+
 $this->jsFile('/js/views/playlist_bar.js');
 // This include of a script is temp to just get this working.
 $this->jsFile('/js/jdropdown.js');
@@ -248,7 +250,7 @@ $this->js('edit', "
 			</div>
 			<button type="button" class='delete_video btn btn-error'>Delete</button>
 			<a href='<?php echo glue::http()->url('/video/analytics', array('id' => $model->_id)) ?>' class='btn btn-link'>Analytics</a>
-			<a href='<?php echo glue::http()->url('/videoresponse/list', array('id' => $model->_id)) ?>' class='btn btn-link'>Responses (<?php echo $model->getRelated('responses',true,array('videoId'=>$model->_id,'approved'=>false))->count() ?> pending)</a>
+			<a href='<?php echo glue::http()->url('/videoresponse/list', array('id' => $model->_id)) ?>' class='btn btn-link'>Responses (<?php //echo $model->getRelated('responses',true,array('videoId'=>$model->_id,'approved'=>false))->count() ?> pending)</a>
 		</div>
 		<div class="edit_panes">
 			<?php $form = html::activeForm(array('action' => '')) ?>
@@ -437,7 +439,7 @@ $this->js('edit', "
 					<div class='all_views stats_block'><?php echo $model->views ?> views</div>
 					<div class='unique_views stats_block'><?php echo $model->uniqueViews ?> unique views</div>
 					<div class="text_responses stats_block">
-					<?php $textResponseCount = $model->with('responses', array('type' => 'text', 'deleted' => 0))->count() ?>
+					<?php $textResponseCount = VideoResponse::find(array('type' => 'text'))->count() ?>
 					<?php echo $textResponseCount ?> text <?php if($textResponseCount > 1): echo "responses"; else: echo "response"; endif ?>
 					</div>
 					<div class="video_responses stats_block">
@@ -473,9 +475,7 @@ $this->js('edit', "
 			<div class="head"><?php echo $model->totalResponses ?> responses</div>
 			<a class='view_all' href="<?php echo glue::http()->url("/videoresponse/list", array("id"=>$model->_id)) ?>">View All Responses</a>
 			<?php echo $this->renderPartial('response/list', array('model' => $model, 'comments' => 
-				glue::auth()->check(array("^"=>$model)) ? 
-					app\models\VideoResponse::find(array('videoId'=>$model->_id))->sort(array('created'=>-1)) :
-					app\models\VideoResponse::public()->find(array('videoId'=>$model->_id))->sort(array('created'=>-1))
+					app\models\VideoResponse::find(array('videoId'=>$model->_id))->visible($model)->sort(array('created'=>-1))
 			, 'pageSize' => 10, 'ajaxPagination'=>true)) ?>
 		</div>
 		<?php endif ?>

@@ -3,7 +3,7 @@
 use \glue\Html;
 
 glue::controller()->jsFile("/js/jquery.expander.js");
-glue::controll()->jsFile('/js/views/subscribeButton.js');
+glue::controller()->jsFile('/js/views/subscribeButton.js');
 
 glue::controller()->js('profile', "
 	$(function(){

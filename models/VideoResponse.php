@@ -2,9 +2,12 @@
 namespace app\models;
 
 use glue;
+use \glue\db\Document;
+use \app\models\Notification;
+use \app\models\Stream;
 
-class VideoResponse extends \glue\db\Document{
-
+class VideoResponse extends Document
+{
 	public $userId;
 	public $videoId;
 	public $type;
@@ -22,43 +25,48 @@ class VideoResponse extends \glue\db\Document{
 
 	public $deleted = 0;
 
-	public static function collectionName(){
+	public static function collectionName()
+	{
 		return "videoresponse";
 	}
 
-	function behaviours(){
-		return array(
-				'timestampBehaviour' => array(
-						'class' => 'glue\\behaviours\\Timestamp'
-				)
-		);
+	public static function defaultScope($cursor)
+	{
+		$cursor->andWhere(array('deleted' => 0));
+		$cursor->sort(array('created' => -1));
+	}
+	
+	public static function visible($cursor, $video = null)
+	{
+		if($video === null || !Glue::auth()->check(array('^' => $video))){
+			$cursor->andWhere(array('$or' => array(
+				array('approved' => true),
+				array('userId' => glue::user()->_id)
+			)));
+		}
+	}
+	
+	public static function moderated($cursor)
+	{
+		$cursor->andWhere(array('approved' => true));
+	}
+	
+	public static function pending($cursor)
+	{
+		$cursor->andWhere(array('approved' => false));
 	}
 
-	function defaultScope(){
+	public function behaviours()
+	{
 		return array(
-				'condition' => array('deleted' => 0),
-				'sort' => array('created'=>-1)
+			'timestampBehaviour' => array(
+				'class' => 'glue\\behaviours\\Timestamp'
+			)
 		);
-	}
-
-	function scopes(){
-		return array(
-				'public' => array(
-						'condition' => array('$or' => array(
-								array('approved' => true),
-								array('userId' => glue::user()->_id)
-						))
-				),
-				'moderated' => array(
-						'condition' => array('approved'=>true)
-				),
-				'pending' => array(
-						'condition' => array('approved'=>false)
-				)
-		);
-	}
-
-	function relations(){
+	}	
+	
+	public function relations()
+	{
 		return array(
 				"author" => array('one', 'app\\models\\User', "_id", 'on' => 'userId'),
 				"video" => array('one', 'app\\models\\Video', "_id", 'on' => 'videoId'),
@@ -67,23 +75,22 @@ class VideoResponse extends \glue\db\Document{
 		);
 	}
 
-	public static function model($className = __CLASS__){
-		return parent::model($className);
-	}
-
-	public static function findAllComments($video, $ts_query = array()){
+	public static function findAllComments($video, $ts_query = array())
+	{
 		return self::find(array('videoId' => $video->_id, 'created' => $ts_query));
 	}
 
-	public static function findPublicComments($video,  $ts_query = array(), $showOnlyModerated = false){
+	public static function findPublicComments($video,  $ts_query = array(), $showOnlyModerated = false)
+	{
 		if($showOnlyModerated){
 			return self::moderated()->find(array('videoId' => $video->_id));
 		}else{
-			return self::public()->find(array('videoId' => $video->_id, 'created' => $ts_query));
+			return self::find(array('videoId' => $video->_id, 'created' => $ts_query))->visible();
 		}
 	}
 
-	function beforeValidate(){
+	public function beforeValidate()
+	{
 		// Custom error handling which makes sure we are actually allowed to post comments to this video before we do.
 		if($this->getIsNewRecord()){
 			// 			if($this->getScenario() == 'video_comment'){
@@ -101,7 +108,8 @@ class VideoResponse extends \glue\db\Document{
 		return true;
 	}
 
-	function rules(){
+	function rules()
+	{
 		return array(
 				array('videoId', 'required', 'message' => 'An unknown error occured. Try refreshing the page to fix this.'),
 				array('videoId', 'objExist',
@@ -132,20 +140,24 @@ class VideoResponse extends \glue\db\Document{
 		);
 	}
 
-	function check_already_reply($field, $value, $params = array()){
+	function check_already_reply($field, $value, $params = array())
+	{
 		return !self::findOne(array('replyVideoId' => $value, 'videoId' => $this->videoId));
 	}
 
-	function check_same_video($field, $value, $params = array()){
+	function check_same_video($field, $value, $params = array())
+	{
 		return $this->replyVideoId != $this->videoId;
 	}
 
-	function getThread(){
+	function getThread()
+	{
 		/** $secondLevel = $this->Db()->find(array("path"=>new MongoRegex("/^".$path.",[^,]*,[^,]*$/")))->sort(array("seq"=>1)); // Second Level **/
 		return self::find(array("path"=>new \MongoRegex("/^".$this->path.",[^,]*$/")))->sort(array("ts"=>1)); // First Level
 	}
 
-	function beforeSave(){
+	function beforeSave()
+	{
 		if($this->getIsNewRecord()){
 			$this->userId = $this->userId?:glue::user()->_id;
 
@@ -172,7 +184,8 @@ class VideoResponse extends \glue\db\Document{
 		return true;
 	}
 
-	function afterSave(){
+	function afterSave()
+	{
 		if($this->getIsNewRecord()){
 			$counters=array('totalResponses'=>1);
 			if($this->getScenario() == 'video_comment')
@@ -207,7 +220,8 @@ class VideoResponse extends \glue\db\Document{
 		return true;
 	}
 
-	function approve(){
+	function approve()
+	{
 		if(!$this->approved){
 			$this->approved = true;
 			$this->save();
@@ -227,11 +241,13 @@ class VideoResponse extends \glue\db\Document{
 		return false;
 	}
 
-	function currentUserLikes(){
+	function currentUserLikes()
+	{
 		return glue::db()->videoresponse_likes->findOne(array('userId' => glue::user()->_id, 'responseId' => $this->_id));
 	}
 
-	function like(){
+	function like()
+	{
 		glue::db()->videoresponse_likes->update(
 		array("userId"=>glue::user()->_id, "responseId"=>$this->_id),
 		array("userId"=>glue::user()->_id, "responseId"=>$this->_id, "weight"=>"+1", 'videoId' => $this->videoId, "ts" => new \MongoDate()),
@@ -243,14 +259,16 @@ class VideoResponse extends \glue\db\Document{
 		return true;
 	}
 
-	function unlike(){
+	function unlike()
+	{
 		glue::db()->videoresponse_likes->remove(array("userId"=>glue::user()->_id, "responseId"=>$this->_id));
 		$this->likes = $this->likes-1;
 		$this->save();
 		return true;
 	}
 
-	function delete(){
+	function delete()
+	{
 		$this->video->saveCounters(array('totalResponses'=>-1),0);
 		glue::db()->videoresponse_likes->remove(array("responseId"=>$this->_id));
 		parent::delete();
