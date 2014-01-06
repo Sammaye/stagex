@@ -249,16 +249,17 @@ class Document extends Model
 		}
 
 		$this->trace(__FUNCTION__);
-		$values=array();
+		$values = array();
 		foreach($attributes as $name=>$value){
 			if(is_integer($name)){
 				$v = $this->$value;
 				if(is_array($this->$value)){
 					$v = $this->filterRawDocument($this->$value);
 				}
-				$values[$value]=$v;
-			}else
-				$values[$name]=$this->$name=$value;
+				$values[$value] = $v;
+			}else{
+				$values[$name] = $this->$name = $value;
+			}
 		}
 		return $this->update(false, $values);
 	}

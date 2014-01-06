@@ -43,10 +43,9 @@ return array(
 		 * Configures the session handler
 		 */
 		"session"=>array(
-			"class" => "glue\\Session",
 			"timeout"=>5,
 			"allowCookies"=>true,
-			'cookieDomain' => '.stagex-local.co.uk'
+			//'cookieDomain' => '.stagex-local.co.uk'
 		),
 
 		// MongoDB configuration settings
