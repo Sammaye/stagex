@@ -40,7 +40,7 @@ class Document extends Model
 		}elseif(isset($this->_related[$name])){
 			return $this->_related[$name];
 		}elseif(array_key_exists($name, $this->relations())){
-			return $this->_related[$name] = $this->getRelated($name);
+			return $this->_related[$name] = $this->with($name);
 		}else{
 			return parent::__get($name);
 		}
@@ -64,7 +64,7 @@ class Document extends Model
 		}elseif(isset($this->_related[$name])){
 			return true;
 		}elseif(array_key_exists($name, $this->relations())){
-			return $this->getRelated($name) !== null;
+			return $this->with($name) !== null;
 		}elseif(property_exists($this, $name)){
 			return true;
 		}
@@ -85,9 +85,9 @@ class Document extends Model
 	{
 		if(array_key_exists($name, $this->relations())){
 			if(empty($parameters)){
-				return $this->_related[$name] = $this->getRelated($name, false);
+				return $this->_related[$name] = $this->with($name, array(), false);
 			}else{
-				return $this->getRelated($name, true, $parameters[0]);
+				return $this->getRelated($name, $parameters[0]);
 			}
 		}
 		return parent::__call($name, $parameters);
@@ -388,14 +388,15 @@ class Document extends Model
 	 */
 	public function with($name, $params=array(), $refresh = false)
 	{
-		return $this->getRelated($name, !empty($params) ? true : $refresh, $params);
+		if(!$refresh && $params===array() && (isset($this->_related[$name]) || array_key_exists($name,$this->_related)))
+			return $this->_related[$name];		
+		
+		$related = $this->getRelated($name, $params);
+		return $this->_related[$name] = $related instanceof \Iterator ? iterator_to_array($related) : $related;
 	}
 
-	public function getRelated($name, $refresh=false, $params=array())
+	public function getRelated($name, $params=array())
 	{
-		if(!$refresh && $params===array() && (isset($this->_related[$name]) || array_key_exists($name,$this->_related)))
-			return $this->_related[$name];
-
 		$relations = $this->relations();
 
 		if(!isset($relations[$name]))
@@ -422,7 +423,7 @@ class Document extends Model
 					$row = $this->populateReference($singleReference, $cname);
 					if ($row) array_push($result, $row);
 				}
-				return $this->_related[$name]=$result;
+				return $result;
 			}
 			// It is an array of _ids
 			$clause = array_merge($where, array($fkey=>array('$in' => $pk)));
@@ -430,7 +431,7 @@ class Document extends Model
 			
 			// I should probably just return it here
 			// otherwise I will continue on
-			return $this->_related[$name]=$this->populateReference($pk, $cname);
+			return $this->populateReference($pk, $cname);
 		}else{
 			// It is just one _id
 			$clause = array_merge($where, array($fkey=>$pk));
@@ -438,7 +439,7 @@ class Document extends Model
 		
 		$o = new $cname;
 		if($relation[0] === 'one'){
-			return $this->_related[$name] = $o->findOne($clause);
+			return $o->findOne($clause);
 		}elseif($relation[0] === 'many'){
 		
 			// Lets find them and return them
@@ -447,7 +448,7 @@ class Document extends Model
 			->skip(isset($relation['skip']) ? $relation['skip'] : null)
 			->limit(isset($relation['limit']) ? $relation['limit'] : null);
 			
-			return $this->_related[$name] = iterator_to_array($cursor);
+			return $cursor;
 		}
 		return $cursor;
 	}

@@ -134,7 +134,7 @@ $this->js('admin', "
 		<ul class="nav nav-tabs">
 			<li <?php if($pending===false) echo 'class="active"'; ?>><a href="<?php echo glue::http()->url('/videoresponse/list',array('id'=>$model->_id)) ?>">Approved</a></li>
 			<li <?php if($pending) echo 'class="active"'; ?>><a href="<?php echo glue::http()->url('/videoresponse/pending',array('id'=>$model->_id)) ?>">Pending 
-			<span class="badge"><?php echo $model->getRelated('responses',true,array('videoId'=>$model->_id,'approved'=>false))->count() ?></span></a></li>
+			<span class="badge"><?php echo $model->getRelated('responses', array('videoId'=>$model->_id,'approved'=>false))->count() ?></span></a></li>
 		</ul>
 	</div>		
 	<?php } ?>

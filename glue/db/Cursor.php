@@ -46,6 +46,7 @@ class Cursor extends Component implements Iterator, Countable
 			$class = $this->model;
 			array_unshift($params, $this);
 			call_user_func_array(array($class, $method), $params);
+			return $this;
 		}
 		
 		parent::__call($method, $params);

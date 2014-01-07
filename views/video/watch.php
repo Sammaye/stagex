@@ -250,7 +250,7 @@ $this->js('edit', "
 			</div>
 			<button type="button" class='delete_video btn btn-error'>Delete</button>
 			<a href='<?php echo glue::http()->url('/video/analytics', array('id' => $model->_id)) ?>' class='btn btn-link'>Analytics</a>
-			<a href='<?php echo glue::http()->url('/videoresponse/list', array('id' => $model->_id)) ?>' class='btn btn-link'>Responses (<?php //echo $model->getRelated('responses',true,array('videoId'=>$model->_id,'approved'=>false))->count() ?> pending)</a>
+			<a href='<?php echo glue::http()->url('/videoresponse/list', array('id' => $model->_id)) ?>' class='btn btn-link'>Responses (<?php echo $model->getRelated('responses',array('videoId'=>$model->_id,'approved'=>false))->count() ?> pending)</a>
 		</div>
 		<div class="edit_panes">
 			<?php $form = html::activeForm(array('action' => '')) ?>
@@ -439,11 +439,11 @@ $this->js('edit', "
 					<div class='all_views stats_block'><?php echo $model->views ?> views</div>
 					<div class='unique_views stats_block'><?php echo $model->uniqueViews ?> unique views</div>
 					<div class="text_responses stats_block">
-					<?php $textResponseCount = VideoResponse::find(array('type' => 'text'))->count() ?>
+					<?php $textResponseCount = $model->getRelated('responses', array('type' => 'text'))->count() ?>
 					<?php echo $textResponseCount ?> text <?php if($textResponseCount > 1): echo "responses"; else: echo "response"; endif ?>
 					</div>
 					<div class="video_responses stats_block">
-					<?php $videoResponseCount = $model->with('responses', array('type' => 'video', 'deleted' => 0))->count() ?>
+					<?php $videoResponseCount = $model->getRelated('responses', array('type' => 'video', 'deleted' => 0))->count() ?>
 					<?php echo $videoResponseCount ?> video <?php if($videoResponseCount > 1): echo "responses"; else: echo "response"; endif ?>					
 					</div>
 				</div>
