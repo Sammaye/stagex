@@ -233,7 +233,7 @@ echo $this->renderPartial('response/_selector',array('model'=>$model));
 				'pageSize'	 => 1,
 				"cursor"	 => $comments,
 				'template' 	 => $template,
-				'sortableAttributes' => array('likes'=>null,'created'=>null),
+				'sortableAttributes' => array('likes','created'),
 				'data' 		 => array('mode' => isset($mode) ? $mode : ''),
 				'enableAjaxPagination' => $ajaxPagination?:false,				
 				'itemView' => 'response/_response.php',

@@ -36,6 +36,7 @@ class Pagination extends Widget
 				$this->_pageSize = 20;
 			}
 		}
+		return $this->_pageSize;
 	}
 	
 	public function setPageSize($size)
@@ -46,7 +47,7 @@ class Pagination extends Widget
 	public function getPageCount($refresh = false)
 	{
 		if($refresh || $this->_pageCount === null){
-			$this->_pageCount = (int)$this->_itemCount / $this->pageSize;
+			$this->_pageCount = ceil($this->itemCount / $this->_pageSize);
 		}
 		return $this->_pageCount;
 	}
@@ -83,10 +84,9 @@ class Pagination extends Widget
 	{
 		if($this->getPageSize() < 1)
 			return; // Infinite
-		
 		$page = $this->getPage();
 		$pageCount = $this->getPageCount();
-		
+
 		$start = $page - $this->pageRange > 0 ? $page - $this->pageRange : 1;
 		$end = ($page + $this->pageRange) <= $pageCount ? $page + $this->pageRange : $pageCount;
 		$ret = "";
@@ -135,7 +135,7 @@ class Pagination extends Widget
 	function createUrl($morph = array())
 	{
 		return glue::http()->url(array_merge($this->params, array(
-			$this->sizeParam => $this->getPageCount(),
+			$this->sizeParam => $this->getPageSize(),
 			$this->pageParam =>$this->getPage(),
 		), $morph));
 	}	

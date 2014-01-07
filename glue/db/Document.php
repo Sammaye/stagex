@@ -585,7 +585,7 @@ class Document extends Model
     		'select' => $fields,
     		'model' => get_called_class()
     	));
-    	
+
     	$cursor->defaultScope();
     	$cursor->andWhere($query);
     	return $cursor;

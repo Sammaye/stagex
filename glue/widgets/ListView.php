@@ -75,11 +75,11 @@ class ListView extends Widget
 		foreach($this->sortableAttributes as $k => $v){
 			if(is_numeric($k) && $v == $this->currentSortAttribute){
 				if($this->currentSortOrder == 1 || $this->currentSortOrder == -1)
-					$this->cursor->sort(array($this->currentSortAttribute => $this->currentSortOrder));
+					$this->cursor->sort(array($this->currentSortAttribute => (int)$this->currentSortOrder));
 				else
 					$this->cursor->sort(array($this->currentSortAttribute => 1)); // Default ASC
 				break;
-			}elseif($k == $this->currentSortAttribute){
+			}elseif($k === $this->currentSortAttribute){
 				$sortableAttribute = $this->sortableAttributes[$k];
 				if(is_array($sortableAttribute)){
 					// Then check if this sort is allowed
@@ -117,8 +117,8 @@ class ListView extends Widget
 					$this->sortParam => $this->currentSortAttribute,
 					$this->orderParam => $this->currentSortOrder
 				))
-			)));			
-			$this->cursor->skip($pager->getSkip())->limit($pager->getLimit());
+			)));
+			$this->cursor->skip($pager->getSkip())->limit($pager->getLimit())->all();
 			$html = preg_replace("/{pager}/", $pager->render(), $this->template);
 		}
 
