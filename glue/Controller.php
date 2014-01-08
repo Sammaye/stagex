@@ -262,6 +262,7 @@ class Controller extends Component
 	public function getViewPath($path)
 	{
 		$path = strlen(pathinfo($path, PATHINFO_EXTENSION)) <= 0 ? $path.'.php' : $path;
+		$viewPath = glue::getPath('@views') ? glue::getPath('@views') : glue::getPath('@app/views');
 
 		if(strpos($path, '../') === 0){
 
@@ -271,12 +272,12 @@ class Controller extends Component
 		}elseif(strpos($path, '/')!==false){
 
 			// Then this should go from views root (/application/views) because we have something like user/edit.php
-			return str_replace('/', DIRECTORY_SEPARATOR, glue::getPath('@app').'/views/'.$path);
+			return str_replace('/', DIRECTORY_SEPARATOR, $viewPath.'/'.$path);
 
 		}else{
 
 			// Then lets attempt to get the cwd from the controller. If the controller is not set we use siteController as default. This can occur for cronjobs
-			return str_replace('/', DIRECTORY_SEPARATOR, glue::getPath('@app').'/views/'.str_replace('Controller', '',
+			return str_replace('/', DIRECTORY_SEPARATOR, $viewPath.'/'.str_replace('Controller', '',
 					glue::controller() instanceof \glue\Controller ? get_class(glue::controller()) : 'siteController').'/'.$path);
 		}
 	}
@@ -284,16 +285,17 @@ class Controller extends Component
 	public function getLayoutPath($path)
 	{
 		$path = strlen(pathinfo($path, PATHINFO_EXTENSION)) <= 0 ? $path.'.php' : $path;
+		$layoutPath = glue::getPath('@layouts') ? glue::getPath('@layouts') : glue::getPath('@app/layouts');
 
 		if(mb_substr($path, 0, 1) == '/'){
 
 			// Then this should go from doc root
-			return str_replace('/', DIRECTORY_SEPARATOR, glue::getPath('@app').$path);
+			return str_replace('/', DIRECTORY_SEPARATOR, $layoutPath.'/'.$path);
 
 		}else{
 
 			// Then this should go from layouts root (/application/layouts) because we have something like user/blank
-			return str_replace('/', DIRECTORY_SEPARATOR, glue::getPath('@app').'/layouts/'.$path);
+			return str_replace('/', DIRECTORY_SEPARATOR, $layoutPath.'/'.$path);
 
 		}
 	}

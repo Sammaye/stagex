@@ -68,8 +68,7 @@ class Glue
 		if(func_num_args() > 2){
 			$args = func_get_args();
 			unset($args[0]);
-			
-			$config = call_user_func_array(array('Collection', 'mergeArray'), func_get_args());
+			$config = call_user_func_array(array('\glue\Collection', 'mergeArray'), $args);
 		}
 		
 		// Setup the configuration
