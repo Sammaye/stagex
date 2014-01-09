@@ -1,0 +1,46 @@
+Options +FollowSymLinks -Indexes -MultiViews
+#CustomLog "|/usr/sbin/rotatelogs /var/log/apache2/access.log 86400" common #Not sure if this is needed
+
+#AuthType Basic
+#AuthName "Restricted Files"
+#AuthUserFile /etc/apache2/passwords
+#Require user webuser
+
+<IfModule mod_rewrite.c>
+        
+	RewriteEngine on
+	RewriteBase /
+
+	RewriteCond %{HTTP_HOST} ^stagex\.co\.uk
+	RewriteRule ^(.*)$ http://www.stagex.co.uk/$1 [R=301,L] 
+	
+	ErrorDocument 404 /404
+	ErrorDocument 403 /403
+	
+	RewriteCond %{HTTP_HOST} !www.stagex.co.uk$ [NC]
+	RewriteCond %{HTTP_HOST} ^images.stagex.co.uk$ [NC]	
+	RewriteRule ^/?videos/([0-9a-zA-z]+)_w_([0-9a-zA-z]+)_h_([0-9a-zA-z]+)\.png index.php?url=image/video&file=$1&w=$2&h=$3 [L,NC,QSA]
+	
+	RewriteCond %{HTTP_HOST} !www.stagex.co.uk$ [NC]
+	RewriteCond %{HTTP_HOST} ^images.stagex.co.uk$ [NC]
+    RewriteRule ^/?videos/(.*)_w_([0-9a-zA-z]+)_h_([0-9a-zA-z]+)(.*) index.php?url=image/video&w=$2&h=$3 [NC,QSA]
+	
+	RewriteCond %{HTTP_HOST} !www.stagex.co.uk$ [NC]
+	RewriteCond %{HTTP_HOST} ^images.stagex.co.uk$ [NC]	
+	RewriteRule ^/?user/([0-9a-zA-z]+)_w_([0-9a-zA-z]+)_h_([0-9a-zA-z]+)\.png index.php?url=image/user&file=$1&w=$2&h=$3 [L,NC,QSA]
+	
+	RewriteCond %{HTTP_HOST} !www.stagex.co.uk$ [NC]
+	RewriteCond %{HTTP_HOST} ^images.stagex.co.uk$ [NC]	
+	RewriteRule ^/?user/(.*)_w_([0-9a-zA-z]+)_h_([0-9a-zA-z]+)(.*) index.php?url=image/user?w=$2&h=$3 [NC,QSA]	
+	
+	RewriteRule ^/?404 index.php?url=error/notfound [NC]
+	RewriteRule ^/?403 index.php?url=error/forbidden [NC]
+	
+	RewriteRule ^/?profile/([^/]+)/?$ index.php?url=user/view&id=$1&%{QUERY_STRING} [NC]
+	#RewriteRule ^/?watch/([^/]+)$ index.php?url=video/watch&id=$1 [NC]
+	RewriteRule ^/?help/view/([^/]+)$ index.php?url=help/view&title=$1&%{QUERY_STRING} [NC]
+	
+	RewriteCond %{REQUEST_URI} ^/[^\.]+[^/]$
+	RewriteRule ^(.*)$ index.php?url=$1&%{QUERY_STRING}
+
+</IfModule>
