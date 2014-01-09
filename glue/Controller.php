@@ -35,6 +35,8 @@ class Controller extends Component
 	
 	public $js;
 	public $jsFiles;
+	
+	public $theme;
 
 	public function init()
 	{
@@ -262,24 +264,40 @@ class Controller extends Component
 	public function getViewPath($path)
 	{
 		$path = strlen(pathinfo($path, PATHINFO_EXTENSION)) <= 0 ? $path.'.php' : $path;
-		$viewPath = glue::getPath('@views') ? glue::getPath('@views') : glue::getPath('@app/views');
-
-		if(strpos($path, '../') === 0){
-
-			// Then this should go from doc root
-			return str_replace('../', DIRECTORY_SEPARATOR, glue::getPath('@app').$path);
-
-		}elseif(strpos($path, '/')!==false){
-
-			// Then this should go from views root (/application/views) because we have something like user/edit.php
-			return str_replace('/', DIRECTORY_SEPARATOR, $viewPath.'/'.$path);
-
-		}else{
-
-			// Then lets attempt to get the cwd from the controller. If the controller is not set we use siteController as default. This can occur for cronjobs
-			return str_replace('/', DIRECTORY_SEPARATOR, $viewPath.'/'.str_replace('Controller', '',
-					glue::controller() instanceof \glue\Controller ? get_class(glue::controller()) : 'siteController').'/'.$path);
+		$viewPaths = array();
+		
+		if(is_array(Glue::$theme)){
+			foreach(Glue::$theme as $p){
+				$viewPaths[] = glue::getPath($p);
+			}
 		}
+		if($viewPaths === array()){
+			$viewPaths = array(glue::getPath('@views') ? glue::getPath('@views') : glue::getPath('@app/views'));
+		}
+		
+		foreach($viewPaths as $viewPath){
+			
+			if(strpos($path, '../') === 0){
+	
+				// Then this should go from doc root
+				$fpath = str_replace('../', DIRECTORY_SEPARATOR, glue::getPath('@app').$path);
+	
+			}elseif(strpos($path, '/')!==false){
+
+				// Then this should go from views root (/application/views) because we have something like user/edit.php
+				$fpath = str_replace('/', DIRECTORY_SEPARATOR, $viewPath.'/'.$path);
+			}else{
+	
+				// Then lets attempt to get the cwd from the controller. If the controller is not set we use siteController as default. This can occur for cronjobs
+				$fpath = str_replace('/', DIRECTORY_SEPARATOR, $viewPath.'/'.str_replace('Controller', '',
+						glue::controller() instanceof \glue\Controller ? get_class(glue::controller()) : 'siteController').'/'.$path);
+			}
+			
+			if(file_exists($fpath)){
+				return $fpath;
+			}
+		}
+		throw new Exception('Could not find view: '.$path);
 	}
 
 	public function getLayoutPath($path)

@@ -5,9 +5,16 @@ if (isset($_SERVER['HTTP_CF_CONNECTING_IP'])){
 
 return array(
 	"debug"=>true,
+
+	'theme' => array(
+		'@views',
+		'@base'
+	),
+
 	'directories' => array(
 		'app' => dirname(__DIR__),
 		'views' => '@app/views_m',
+		'base' => '@app/views',
 		'layouts' => '@views/layouts',
 	)
 );

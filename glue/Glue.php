@@ -16,6 +16,8 @@ class Glue
 	public static $params = array();
 
 	public static $www;
+	
+	public static $theme;
 
 	public static $defaultController = 'index';
 	public static $controllerName = '{name}Controller'; 

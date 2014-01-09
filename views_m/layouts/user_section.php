@@ -25,44 +25,49 @@ $this->beginPage() ?>
 	<div id="page">
 	<?php $this->beginBody() ?>
 		<?php //echo app\widgets\Menu::run() ?>
-			<div id="header">
-				<a href="#menu"></a>
-				<?php echo Html::encode($this->title) ?>
-			</div>
+		<div id="header">
+			<a href="#menu"></a>
+			<?php echo Html::encode($this->title) ?>
+		</div>
 
-			<nav id="menu">
-				<ul>
-					<li class="Selected"><a href="index.html">News Feed</a></li>
-					<li><a href="horizontal-submenus.html">Watch Later</a></li>
-					<li>
-						<a href="vertical-submenus.html">Videos</a>
-						<ul>
-							<li><a href="#">First sub-item</a></li>
-							<li><a href="#">Second sub-item</a></li>
-							<li><a href="#">Third sub-item</a></li>
-						</ul>
-					</li>
-					<li><a href="photos.html">Playlists</a></li>
-					<li><a href="positions.html">Following</a></li>
-					<li><a href="colors.html">Notifications</a></li>
-					<li><a href="advanced.html">Profile</a></li>
-					<li><a href="onepage.html">Settings</a></li>
-					<li><a href="onepage.html">Logout</a></li>
-				</ul>
-			</nav>
+		<nav id="menu">
+			<ul>
+				<li class="Selected"><a href="index.html">News Feed</a></li>
+				<li><a href="horizontal-submenus.html">Watch Later</a></li>
+				<li>
+					<a href="vertical-submenus.html">Videos</a>
+					<ul>
+						<li><a href="#">First sub-item</a></li>
+						<li><a href="#">Second sub-item</a></li>
+						<li><a href="#">Third sub-item</a></li>
+					</ul>
+				</li>
+				<li><a href="photos.html">Playlists</a></li>
+				<li><a href="positions.html">Following</a></li>
+				<li><a href="colors.html">Notifications</a></li>
+				<li><a href="advanced.html">Profile</a></li>
+				<li><a href="onepage.html">Settings</a></li>
+				<li><a href="onepage.html">Logout</a></li>
+			</ul>
+		</nav>
 
+		<div class="row" style='padding:20px; padding-top:0;'>
+		<div class="col-md-12">
 		<?php echo $content ?>
+		</div>
+		</div>
 		<div id="mainSearch_results"></div>
+		<script src="https://code.jquery.com/jquery.js"></script>
+		<script type="text/javascript" src="js/mmenu.js"></script>
+		<script src="js/bootstrap.min.js"></script>
+		<script type="text/javascript">
+		$(function() {
+			$('nav#menu').mmenu();
+		});
+		</script>			
 	<?php $this->endBody() ?>
 	</div>
-	<script src="https://code.jquery.com/jquery.js"></script>
-	<script type="text/javascript" src="js/mmenu.js"></script>
-	<script src="js/bootstrap.min.js"></script>
-	<script type="text/javascript">
-	$(function() {
-		$('nav#menu').mmenu();
-	});
-	</script>	
+
 </body>
 </html>
 <?php $this->endPage() ?>
