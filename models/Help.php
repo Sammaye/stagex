@@ -60,23 +60,19 @@ class Help extends \glue\db\Document{
 		//return substr_replace($truncated, "...", strlen($truncated)-3);
 	}
 
-	function findOne($criteria=array(),$fields=array()){
-		$this->trace(__FUNCTION__);
-		if((
-				$record=$this->getCollection()->findOne($this->mergeCriteria(isset($c['condition']) ? $c['condition'] : array(), $criteria),
-						$this->mergeCriteria(isset($c['project']) ? $c['project'] : array(), $fields))
-		)!==null){
-			$this->resetScope();
-			
+	public static function findOne($query = array(), $fields = array())
+	{
+		if(($doc = parent::findOne($query, $fields)) !== null){
 			$o = null;
 			if($record['type'] == 'topic'){
 				$o = new HelpTopic();
 			}elseif($record['type'] == 'article'){
 				$o = new HelpArticle();
 			}
-			return $o->populateRecord($record,true,$fields===array()?false:true);
-		}else
-			return null;		
+			return $o->populate($record, true, $fields===array() ? false : true);
+		}else{
+			return null;
+		}		
 	}
 	
 	public function search($keywords=''){

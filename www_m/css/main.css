@@ -33,6 +33,11 @@
     right: 10px;
 }
 
+.header_search{
+	background: #999;
+	padding:20px;
+}
+
 .arrow-up{
     border-top: 0 dotted;
     border-bottom: 4px solid #000000;
@@ -626,7 +631,6 @@ input.date{
 }
 
 .user_create_body{
-    width:600px;
     margin:auto;
     margin-top:80px;
 }
@@ -643,14 +647,12 @@ input.date{
 }
 
 .user_create_body .declaration_footer{
-    width:480px;
     margin:auto;
     margin-top:15px;
     margin-bottom:15px;
 }
 
 .social_logins_outer{
-    width:440px;
     margin:auto;
 }
 
@@ -939,7 +941,7 @@ input.date{
 }
 
 .video .checkbox_col .checkbox_input{
-    margin:25px 15px 0 0;
+    margin:15px 15px 0 0;
 }
 
 .video .thumbnail{
@@ -947,6 +949,7 @@ input.date{
     border:0;
     border-radius:0;
     margin:0 10px 0 0;
+    float:left;
 }
 
 .video .thumbnail img{
@@ -954,13 +957,14 @@ input.date{
 }
 
 .video .info{
-    float:left; width:450px;
+    margin-left:140px;
 }
 
 .video .info h3{
     font-size:18px;
-    line-height:30px;
+    line-height:19px;
     margin:0;
+    margin-bottom:5px;
 }
 
 .video .info .description{
@@ -1186,7 +1190,7 @@ input.date{
 }
 
 .help_page{
-    width:980px; margin:auto;
+    margin:auto;
 }
 
 .help_index h1{
@@ -1195,10 +1199,6 @@ input.date{
 
 .help_index .other_links{
     margin:10px 0;
-}
-
-.help_index .light{
-    line-height:25px;   
 }
 
 .help_index .ask{
@@ -1228,19 +1228,7 @@ input.date{
 }
 
 .help_layout .article .body{
-    float:left; width:760px;
-}
-
-.help_layout .head{
-    padding:20px 0;
-}
-
-.help_layout .head .left{
     float:left;
-}
-
-.help_layout .head .search{
-    float:right; margin-top:30px;
 }
 
 .help_layout .head .ask{
@@ -1248,7 +1236,7 @@ input.date{
 }
 
 .help_layout .article .body .content{
-    font-size:14px; line-height:20px;
+    line-height:20px;
 }
 
 .help_layout .form-search .search_input input{

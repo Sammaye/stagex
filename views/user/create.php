@@ -5,8 +5,6 @@
 		)) ?>
 	<h1>Register for a StageX account</h1>
 	<?php $form = html::activeForm(array('class'=>'form-horizontal')); ?>
-
-
 		<?php echo $form->hiddenfield($model, "hash", array("value"=>glue::http()->getCsrfToken())) ?>
 		<div class="form">
 			<div class="form-group">
