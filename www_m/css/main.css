@@ -36,6 +36,7 @@
 .header_search{
 	background: #999;
 	padding:20px;
+	display:none;
 }
 
 .arrow-up{

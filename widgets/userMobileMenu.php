@@ -10,9 +10,21 @@ class userMobileMenu extends Widget
 {
 	function render()
 	{
+		$menujs = <<<JS
+$('#header .glyphicon').on('click', function(e){
+	if($('.header_search').css('display') == 'none'){
+		$('.header_search').css({display: 'block'});
+	}else{
+		$('.header_search').css({display: 'none'});
+	}
+});
+JS;
+		glue::controller()->js('menu', $menujs);
+		
 		?>
 		<div id="header">
 			<a href="#menu"></a>
+			<span class="glyphicon glyphicon-search" style='float:left; font-size:23px; margin-top:12px; margin-left:7px;'></span>
 			<?php echo Html::encode(Glue::controller()->title) ?>
 		</div>
 		
