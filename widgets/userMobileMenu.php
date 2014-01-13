@@ -24,7 +24,7 @@ JS;
 		?>
 		<div id="header">
 			<a href="#menu"></a>
-			<span class="glyphicon glyphicon-search" style='float:left; font-size:23px; margin-top:12px; margin-left:7px;'></span>
+			<span class="glyphicon glyphicon-search"></span>
 			<?php echo Html::encode(Glue::controller()->title) ?>
 		</div>
 		

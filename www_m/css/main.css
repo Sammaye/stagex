@@ -33,6 +33,10 @@
     right: 10px;
 }
 
+#header .glyphicon-search{
+	float:left; font-size:23px; margin-top:12px; margin-left:7px;
+}
+
 .header_search{
 	background: #999;
 	padding:20px;
