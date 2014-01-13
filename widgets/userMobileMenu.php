@@ -11,31 +11,27 @@ class userMobileMenu extends Widget
 	function render()
 	{
 		$menujs = <<<JS
-$('#header .glyphicon').on('click', function(e){
-	if($('.header_search').css('display') == 'none'){
-		$('.header_search').css({display: 'block'});
+$('.user_menu_header .glyphicon').on('click', function(e){
+	if($('.user_menu_header_search').css('display') == 'none'){
+		$('.user_menu_header_search').css({display: 'block'});
 	}else{
-		$('.header_search').css({display: 'none'});
+		$('.user_menu_header_search').css({display: 'none'});
 	}
 });
 JS;
-		glue::controller()->js('menu', $menujs);
-		
-		?>
-		<div id="header">
+		glue::controller()->js('menu', $menujs); ?>
+		<div class="user_menu_header">
 			<a href="#menu"></a>
 			<span class="glyphicon glyphicon-search"></span>
 			<?php echo Html::encode(Glue::controller()->title) ?>
 		</div>
-		
-		<div class="header_search">
-	    <form class="" role="search">
-	      <div class="form-group"><input type="text" class="form-control" placeholder="Search"></div>
-	      <button type="submit" class="btn btn-default">Submit</button>
-	    </form>
-		</div>		
-
-		<nav id="menu">
+		<div class="user_menu_header_search">
+		<form class="" role="search">
+		<div class="form-group"><input type="text" class="form-control" placeholder="Search"></div>
+		<button type="submit" class="btn btn-default">Submit</button>
+		</form>
+		</div>
+		<nav id="menu" class="user_menu">
 			<?php if(!glue::session()->authed){ ?>
 			<ul>
 				<li class="selected"><a href="<?php echo glue::http()->url('/user/create') ?>">Create Account</a></li>

@@ -1,12 +1,9 @@
-#page nav
-{
+nav.user_menu{
     display: none;
 }
 
-#header,
-#footer
-{
-    background: #999;
+.user_menu_header{
+    background: #101010;
     font-size: 16px;
     font-weight: bold;
     text-align: center;
@@ -15,8 +12,8 @@
     height: 50px;
     padding: 0 50px;
 }
-#header a
-{
+
+.user_menu_header a{
     background: center center no-repeat transparent;
     background-image: url( data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAYAAADE6YVjAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAADhJREFUeNpi/P//PwOtARMDHQBdLGFBYtMq3BiHT3DRPU4YR4NrNAmPJuHRJDyahEeT8Ii3BCDAAF0WBj5Er5idAAAAAElFTkSuQmCC );
     display: block;
@@ -26,20 +23,20 @@
     top: 0;
     left: 10px;
 }
-#header a.right,
-.header a.right
-{
+
+.user_menu_header a.right{
     left: auto;
     right: 10px;
 }
 
-#header .glyphicon-search{
+.user_menu_header .glyphicon-search{
 	float:left; font-size:23px; margin-top:12px; margin-left:7px;
+	cursor:pointer;
 }
 
-.header_search{
-	background: #999;
-	padding:20px;
+.user_menu_header_search{
+	background: #101010;
+	padding:10px 20px 20px;
 	display:none;
 }
 
@@ -343,11 +340,11 @@ input.date{
 }
 
 .grey_sticky_toolbar .inner_bar{
-    height:34px; padding:10px 10px 10px 10px; /*background:#f1f1f1;*/ 
+    padding:10px 10px 10px 10px;
 }
 
 .grey_sticky_toolbar .stickytoolbar-bar{
-    background:#eeeeee; /*border-bottom:1px solid #cccccc;*/
+    background:#eeeeee;
 }
 
 .grey_sticky_toolbar .btn{

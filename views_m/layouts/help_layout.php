@@ -22,7 +22,6 @@ $this->beginPage() ?>
 ?>
 </head>
 <body>
-	<div id="page">
 	<?php $this->beginBody() ?>
 		<?php echo app\widgets\userMobileMenu::run() ?>
 
@@ -91,8 +90,6 @@ $this->beginPage() ?>
 		});
 		</script>			
 	<?php $this->endBody() ?>
-	</div>
-
 </body>
 </html>
 <?php $this->endPage() ?>

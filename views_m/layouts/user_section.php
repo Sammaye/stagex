@@ -22,29 +22,25 @@ $this->beginPage() ?>
 ?>
 </head>
 <body>
-	<div id="page">
-	<?php $this->beginBody() ?>
-		<?php echo app\widgets\userMobileMenu::run() ?>
-
-		<div class="row" style='padding:20px;'>
-		<div class="col-md-12">
-		<?php echo $content ?>
-		</div>
-		</div>
-		<div id="mainSearch_results"></div>
-		<script src="https://code.jquery.com/jquery.js"></script>
-		<script type="text/javascript" src="/js/jquery-ui.min.js"></script>
-		<script type="text/javascript" src="/js/mmenu.js"></script>
-		<script src="/js/bootstrap.min.js"></script>
-		<script type="text/javascript" src="/js/common.js"></script>
-		<script type="text/javascript">
-		$(function() {
-			$('nav#menu').mmenu();
-		});
-		</script>			
-	<?php $this->endBody() ?>
+<?php $this->beginBody() ?>
+	<?php echo app\widgets\userMobileMenu::run() ?>
+	<div class="row" style='padding:20px;'>
+	<div class="col-md-12">
+	<?php echo $content ?>
 	</div>
-
+	</div>
+	<div id="mainSearch_results"></div>
+	<script src="https://code.jquery.com/jquery.js"></script>
+	<script type="text/javascript" src="/js/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="/js/mmenu.js"></script>
+	<script src="/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="/js/common.js"></script>
+	<script type="text/javascript">
+	$(function() {
+		$('nav#menu').mmenu();
+	});
+	</script>			
+<?php $this->endBody() ?>
 </body>
 </html>
 <?php $this->endPage() ?>
