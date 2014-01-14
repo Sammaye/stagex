@@ -50,7 +50,7 @@ $(function(){
 	var options = {
 		'base_class' : 'alert',
 			
-		'error_class' : 'alert-error',
+		'error_class' : 'alert-danger',
 		'success_class' : 'alert-success',
 		'warning_class' : 'alert-warning',
 		'info_class' : 'alert-info',

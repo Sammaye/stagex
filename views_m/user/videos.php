@@ -80,12 +80,12 @@ $this->js('videos', "
 	<div class="header">
     		<div class='search form-search'>
 			<?php $form = Html::form(array('method' => 'get')); ?>
-				<?php echo app\widgets\Jqautocomplete::run(array(
+				<div class="form-group"><?php echo app\widgets\Jqautocomplete::run(array(
 					'attribute' => 'query',
 					'value' => urldecode(htmlspecialchars(isset($_GET['query']) ? $_GET['query'] : '')),
 					'placeholder' => 'Search Uploads',
 					'htmlOptions' => array(
-						'class' => 'form-search-input col-38'
+						'class' => 'form-search-input form-control'
 					),
 					'options' => array(
 						'appendTo' => '#user_video_results',
@@ -97,7 +97,7 @@ $this->js('videos', "
 							.data( 'item.autocomplete', item )
 							.append( '<a class=\'content\'><span>' + item.label + '</span></div></a>' )
 							.appendTo( ul );
-				"))  ?><button class="btn submit_search"><span>&nbsp;</span></button>
+				"))  ?></div><button class="btn btn-default submit_search">Search</button>
 				<span class='text-muted small amount_found'><?php echo $video_rows->count() ?> found</span>
 			<?php $form->end() ?>
 			</div>    	

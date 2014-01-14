@@ -90,7 +90,8 @@ $this->js('autosharesettings', '
 		'errorHead' => '<h4>Could not save settings</h4><p>Your account settings could not be saved because:</p>'
 	)) ?>
 
-	<div class="account_settings_part edit_email_address">
+	<div class="row">
+	<div class="account_settings_part edit_email_address col-md-4">
 		<h3>Email Address</h3>
 		<div><div class="value"><?php echo $model->email ?></div><a href="#" class="edit" title="Change Email Address">Change Email Address</a></div>
 		<div class="clear"></div>
@@ -103,8 +104,10 @@ $this->js('autosharesettings', '
 			<?php $form->end() ?>
 		</div>
 	</div>
+	</div>
 
-	<div class="account_settings_part edit_password">
+	<div class="row">
+	<div class="account_settings_part edit_password col-md-4">
 		<h3>Password</h3>
 		<a href="#" class="edit" title="Change Password">Change Password</a>
 		<div class="clear"></div>
@@ -120,6 +123,7 @@ $this->js('autosharesettings', '
 					<?php echo html::submitbutton("Change Password", array('class' => 'btn btn-success')) ?>
 			<?php $form->end() ?>
 		</div>
+	</div>
 	</div>
 
 	<div class='hr'>&nbsp;</div>
@@ -148,13 +152,13 @@ $this->js('autosharesettings', '
 
 		<h3 class='section_head'>Analytics</h3>
 		<p>Entering your Clicky site ID will allow you to track via Clicky. Enter a site ID to start tracking:</p>
-		<div class="form-group"><label class="grid-col-10">Clicky Site ID:</label> <?php echo $form->textfield($model, 'clickyUid','form-control grid-col-10') ?></div>
+		<div class="row"><div class="form-group col-md-4"><label class="grid-col-10">Clicky Site ID:</label> <?php echo $form->textfield($model, 'clickyUid','form-control grid-col-10') ?></div></div>
 
 		<h3 class='section_head'>Default Video Settings</h3>
 		<p>These settings change what options, by default, any uploaded videos will get. Please be aware that changing these settings will not change the settings of
 		any videos previously uploaded, only future uploads.</p>
-		<div class="upload_settings">
-			<div class="left">
+		<div class="upload_settings row">
+			<div class="left col-md-3">
 				<h5>Listing</h5>
 				<?php $group = $form->radio_group($model, "defaultVideoSettings[listing]") ?>
 				<label class="radio"><?php echo $group->add(0) ?>Public</label>
@@ -168,7 +172,7 @@ $this->js('autosharesettings', '
 				</div>
 			</div>
 
-			<div class='right'>
+			<div class='right col-md-4'>
 				<label class='checkbox'><?php echo $form->checkbox($model, "defaultVideoSettings[embeddable]", 1) ?>Allow embedding of my video</label>
 				<label class='checkbox'><?php echo $form->checkbox($model, "defaultVideoSettings[moderated]", 1) ?>Moderate Responses</label>
 				<label class='checkbox'><?php echo $form->checkbox($model, "defaultVideoSettings[voteableComments]", 1) ?>Allow users to vote on responses</label>
@@ -184,15 +188,15 @@ $this->js('autosharesettings', '
 		<p>Auto-sharing allows you to connect your favourite social networks directly to your profile. When connected your social actions across this site will be
 		echoed onto your social profiles allowing your friends to join in with the fun.</p>
 
-		<div class="autoshare_settings">
-		<div class="left">
+		<div class="autoshare_settings row">
+		<div class="left col-md-3">
 			<p>Include the following actions in my feed:</p>
 			<label class="checkbox"><?php echo $form->checkbox($model, "autoshareUploads", 1) ?>Upload a video</label>
 			<label class="checkbox"><?php echo $form->checkbox($model, "autoshareAddToPlaylist", 1) ?>Add a video to playlist</label>
 			<label class="checkbox"><?php echo $form->checkbox($model, "autoshareLikes", 1) ?>Like or dislike something</label>
 			<label class="checkbox"><?php echo $form->checkbox($model, "autoshareResponses", 1) ?>Comment on a video</label>
 		</div>
-		<div class="right autoshare_networks">
+		<div class="right autoshare_networks col-md-4">
 			<p>Automatically share my feed with these sites:</p>
 			<div class="facebook">
 				<span><b>Facebook</b></span>

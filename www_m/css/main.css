@@ -736,22 +736,6 @@ input.date{
     display:block;float:left;
 }
 
-.account_settings_body .upload_settings .left{
-    float:left;
-}
-
-.account_settings_body .upload_settings .right{
-    margin-left:320px;  
-}
-
-.account_settings_body .autoshare_settings .left{
-    float:left; width:300px;
-}
-
-.account_settings_body .autoshare_settings .right{
-    margin:0 0 0 310px; 
-}
-
 .account_settings_body .autoshare_networks .twitter{
     margin:10px 0 0;
 }
@@ -1082,7 +1066,7 @@ input.date{
 }
 
 .user_videos_body .header .amount_found{
-    float:left; display:block; margin:10px 15px 0 15px;
+    margin-left:10px;
 }
 
 .user_videos_body .header .form-search{
@@ -2080,12 +2064,16 @@ input.date{
     padding:10px 0;border-bottom:1px solid #eeeeee;
 }
 
+.user_playlist_item .row{
+    margin-left:50px;
+}
+
 .user_playlist_item .checkbox_col{
     float:left;padding:10px 10px 0 10px;
 }
 
 .user_playlist_item .thumbnail{
-    float:left;width:150px;padding:0;padding-top:6px;border:0;border-radius:0;
+    padding:0;padding-top:6px;border:0;border-radius:0; margin-bottom:0;
 }
 
 .user_playlist_item .thumbnail img{
@@ -2093,7 +2081,7 @@ input.date{
 }
 
 .user_playlist_item .info{
-    float:left;width:400px;margin-right:20px;
+	padding:0;
 }
 
 .user_playlist_item .info .title{
@@ -2120,9 +2108,7 @@ input.date{
     margin:10px 0 10px 0;
 }
 
-.create_playlist_modal{
-    width:850px;
-}
+
 
 .create_playlist_form{
     padding:20px;
@@ -2130,14 +2116,6 @@ input.date{
 
 .create_playlist_form .alert{
     display:none;margin:10px 0;
-}
-
-.create_playlist_form .form_left{
-    float:left;width:400px;margin-right:50px;
-}
-
-.create_playlist_form .form_right{
-    float:right;width:350px;
 }
 
 .video_analytics_body{
