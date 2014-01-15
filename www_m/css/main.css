@@ -1,3 +1,7 @@
+.container{
+	padding-top:20px;
+}
+
 nav.user_menu{
     display: none;
 }
@@ -751,7 +755,7 @@ input.date{
 }
 
 .profile_settings .show_on_profile{
-    display:inline-block; margin:0 0 0 15px;
+    display:inline-block; margin:0 0 0 0;
 }
 
 .profile_settings .birthday select{
@@ -763,7 +767,7 @@ input.date{
 }
 
 .profile_settings .upload_avatar{
-    margin:0 0 40px 30px;
+    margin:0 0 40px 0;
 }
 
 .profile_settings .upload_avatar .left{
@@ -791,15 +795,11 @@ input.date{
 }
 
 .profile_settings .external_link{
-    margin:0 0 10px 0;
+    margin-bottom:10px;
 }
 
-.profile_settings .external_link input{
-    width:80%;
-}
-
-.profile_settings .external_link div{
-    display:inline;
+.profile_settings .external_link .remove_link{
+	margin-top:20px;
 }
 
 .form_summary{

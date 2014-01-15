@@ -66,9 +66,16 @@
 				foreach($socialProfiles as $socialProfile){
 					?>
 					<div class="external_link form-group">
-						<?php echo html::label('URL:','url','grid-col-4') ?><div class="grid-col-12"><?php echo $form->textfield($model, "[externalLinks][$i]url", array('value' => $socialProfile['url'], 'class'=>'form-control')) ?></div>
+						<div class="form-group">
+						<?php echo html::label('URL:','url','grid-col-4') ?>
+						<div class="grid-col-12"><?php echo $form->textfield($model, "[externalLinks][$i]url", array('value' => $socialProfile['url'], 'class'=>'form-control')) ?></div>
+						</div>
+						<div class="form-group">
 						<?php echo html::label('Link Title (optional):','title','grid-col-10') ?><div class="grid-col-10"><?php echo $form->textfield($model, "[externalLinks][$i]title", array('value' => $socialProfile['title'], 'class'=>'form-control')) ?></div>
+						</div>
+						<div class="form-group">
 						<a href="#" class="remove">Remove</a>
+						</div>
 					</div>
 					<?php $i++;
 				} ?>
@@ -76,10 +83,18 @@
 
 			<?php
 			ob_start();
-				?><div class="external_link form-group">
-					<?php echo html::label('URL:','url','grid-col-4') ?><div class="grid-col-12"><?php echo html::activeTextField($model,"[externalLinks][0]url", 'form-control') ?></div>
-					<?php echo html::label('Link Title (optional):','title','grid-col-10') ?><div class="grid-col-10"><?php echo html::activeTextField($model,"[externalLinks][0]title",'form-control') ?></div>
+				?><div class="external_link row">
+					<div class="form-group col-md-4">
+					<?php echo html::label('URL:','url') ?>
+					<?php echo html::activeTextField($model,"[externalLinks][0]url", 'form-control') ?>
+					</div>
+					<div class="form-group col-md-4">
+					<?php echo html::label('Link Title (optional):','title') ?>
+					<?php echo html::activeTextField($model,"[externalLinks][0]title",'form-control') ?>
+					</div>
+					<div class="form-group col-md-3 remove_link">
 					<a href="#" class="remove">Remove</a>
+					</div>
 				</div><?php
 				$item_html = js_encode(ob_get_contents());
 			ob_end_clean();

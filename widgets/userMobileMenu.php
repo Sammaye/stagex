@@ -77,7 +77,12 @@ JS;
 				<li><a href="<?php echo glue::http()->url('/user/logout') ?>">Logout</a></li>
 			</ul>
 			<?php } ?>
-		</nav>	
+		</nav>
+		<?php if(html::hasFlashMessage()){
+			?><div class="container"><div class="col-md-12" style=''><?php 
+			echo html::getFlashMessage();
+			?></div></div><?php 
+		} ?>
 		<?php 
 	}
 }

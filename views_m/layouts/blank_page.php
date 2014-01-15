@@ -24,7 +24,7 @@ $this->beginPage() ?>
 <body>
 <?php $this->beginBody() ?>
 	<?php echo app\widgets\userMobileMenu::run() ?>
-	<div class="row" style='padding:20px;'>
+	<div class="container">
 	<div class="col-md-12">
 	<?php echo $content ?>
 	</div>

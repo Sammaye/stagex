@@ -25,7 +25,7 @@ $this->beginPage() ?>
 	<?php $this->beginBody() ?>
 		<?php echo app\widgets\userMobileMenu::run() ?>
 
-		<div class="row" style='padding:20px;'>
+		<div class="container">
 		<div class="col-md-12">
 		<div class="help_page help_layout">
 		<div class='head row'>
