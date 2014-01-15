@@ -1682,8 +1682,8 @@ input.date{
     border-bottom:2px solid #3369cb;
 }
 
-.followers_page .search_input input{
-    width:300px;
+.followers_page .form-search .form-group{
+    min-width:80%;
 }
 
 .subscription:nth-child(odd){
