@@ -65,15 +65,16 @@
 				$i = 0;
 				foreach($socialProfiles as $socialProfile){
 					?>
-					<div class="external_link form-group">
-						<div class="form-group">
-						<?php echo html::label('URL:','url','grid-col-4') ?>
-						<div class="grid-col-12"><?php echo $form->textfield($model, "[externalLinks][$i]url", array('value' => $socialProfile['url'], 'class'=>'form-control')) ?></div>
+					<div class="external_link row">
+						<div class="form-group col-md-4">
+						<?php echo html::label('URL:','url') ?>
+						<?php echo $form->textfield($model, "[externalLinks][$i]url", array('value' => $socialProfile['url'], 'class'=>'form-control')) ?>
 						</div>
-						<div class="form-group">
-						<?php echo html::label('Link Title (optional):','title','grid-col-10') ?><div class="grid-col-10"><?php echo $form->textfield($model, "[externalLinks][$i]title", array('value' => $socialProfile['title'], 'class'=>'form-control')) ?></div>
+						<div class="form-group col-md-4">
+						<?php echo html::label('Link Title (optional):','title') ?>
+						<?php echo $form->textfield($model, "[externalLinks][$i]title", array('value' => $socialProfile['title'], 'class'=>'form-control')) ?>
 						</div>
-						<div class="form-group">
+						<div class="form-group col-md-3 remove_link">
 						<a href="#" class="remove">Remove</a>
 						</div>
 					</div>
