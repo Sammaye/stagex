@@ -3,9 +3,10 @@
 namespace app\models;
 
 use glue;
+use \glue\db\Document;
 
-class Follower extends \glue\db\Document{
-
+class Follower extends Document
+{
 	public $fromId;
 	public $toId;
 	
@@ -42,10 +43,6 @@ class Follower extends \glue\db\Document{
 		return self::findOne(array('fromId' => glue::user()->_id, 'toId' => $user_id)) != null;
 	}
 
-	public static function model($className = __CLASS__){
-		return parent::model($className);
-	}
-
 	function afterSave(){
 		if($this->getIsNewRecord()){
 			$this->following->saveCounters(array('totalFollowers'=>1));
@@ -58,8 +55,7 @@ class Follower extends \glue\db\Document{
 		$this->follower->saveCounters(array('totalFollowing'=>-1),0);
 	}
 	
-	function search($user_id,$term,$limit=1000){
-		
+	public static function search($user_id,$term,$limit=1000){
 		// We need to do a JOIN here...
 		$idRange=array();
 		if($term){
@@ -69,7 +65,7 @@ class Follower extends \glue\db\Document{
 				$mongoIds[]=new \MongoId($_id);
 			$idRange=array('toId'=>array('$in'=>$mongoIds));
 			
-			$following=self::find(array_merge(array('fromId'=>$user_id),$idRange));
+			$following=static::find(array_merge(array('fromId'=>$user_id),$idRange));
 			
 			$followedUsers=array();
 			foreach($following as $_id=>$follower){
@@ -79,7 +75,7 @@ class Follower extends \glue\db\Document{
 			return $followedUsers;			
 			
 		}else{
-			$following=self::find(array('fromId'=>$user_id))->limit(20);
+			$following=static::find(array('fromId'=>$user_id))->limit(20);
 			foreach($following as $_id=>$follower)
 				$mongoIds[]=new \MongoId($follower->toId);			
 			$users=\app\models\User::find(array('_id'=>array('$in'=>$mongoIds)))->sort(array('username'=>1));

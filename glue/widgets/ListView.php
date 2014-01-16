@@ -118,7 +118,10 @@ class ListView extends Widget
 					$this->orderParam => $this->currentSortOrder
 				))
 			)));
-			$this->cursor->skip($pager->getSkip())->limit($pager->getLimit())->all();
+			$this->cursor->skip($pager->getSkip())->limit($pager->getLimit());
+			if($this->cursor instanceof \glue\db\Cursor){
+				$this->cursor->all();
+			}
 			$html = preg_replace("/{pager}/", $pager->render(), $this->template);
 		}
 

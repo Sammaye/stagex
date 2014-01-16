@@ -1722,11 +1722,12 @@ input.date{
 }
 
 .subscription{
-    margin-bottom:10px;float:left;height:75px;width:400px;border:1px solid #d8d8d8;border-bottom-width:2px;
+    margin-bottom:10px;float:left;height:75px;border:1px solid #d8d8d8;border-bottom-width:2px;
+    min-width:315px;
 }
 
 .subscription img{
-    padding:0; border:0; border-radius:0;
+    padding:0; border:0; border-radius:0; margin:0;
 }
 
 .subscription .subscribe_widget{
@@ -1734,11 +1735,11 @@ input.date{
 }
 
 .subscription .thumbnail{
-    float:left;margin-right:10px;width:75px;height:75px;
+    float:left;margin-right:10px;width:73px;height:73px;
 }
 
 .subscription .username{
-    float:left;margin-top:20px;overflow:hidden;
+    float:left;margin-top:20px;overflow:hidden; min-width:115px; overflow:hidden;
 }
 
 .subscription .username a{
