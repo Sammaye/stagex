@@ -1330,7 +1330,6 @@ input.date{
 
 .watch_page .edit_settings input[type="text"],
 .watch_page .edit_settings textarea{
-    width:480px;
 }
 
 .watch_page .edit_settings textarea{
@@ -1342,7 +1341,7 @@ input.date{
 }
 
 .watch_page .edit_menu .btn-primary{
-    margin-right:60px;
+    margin-right:10px;
 }
 
 .watch_page .edit_ribbon_menu .alert{
@@ -1350,23 +1349,18 @@ input.date{
 }
 
 .watch_page .edit_menu .delete_video{
-    margin:0 0 0 60px; display:inline-block;
+    margin:0 0 0 10px; display:inline-block;
 }
 
 .watch_page .edit_menu .btn-link{
-    float:right;
 }
 
 .watch_page .video_element{
-    height:464px; border-radius:4px; background:#000; border:1px solid #000; color:#fff; text-align:center; font-size:30px;
+    border-radius:4px; background:#000; border:1px solid #000; color:#fff; text-align:center; font-size:30px;
 }
 
 .watch_page .video_element .status-message{
-    margin-top:190px;
-}
-
-.watch_page .main_body{
-    margin:40px auto 45px auto; width:980px;
+    padding:100px 0;
 }
 
 .watch_page .share_content .embed{
@@ -1387,7 +1381,6 @@ input.date{
 }
 
 .watch_page .share_content .share_status_text{
-    width:400px;
     height:120px;
     margin-bottom:15px;
 }
@@ -1499,11 +1492,11 @@ input.date{
 }
 
 .watch_page .edit_ribbon_menu .edit_menu{
-    padding:10px 0 10px 10px;width:980px; margin:auto;
+    padding:10px 0 10px 10px;margin:auto;
 }
 
 .watch_page .edit_ribbon_menu .edit_panes{
-    width:980px; margin:auto;
+	padding:0 10px;
 }
 
 .watch_page .edit_ribbon_menu .edit_panes h4{
@@ -1534,12 +1527,8 @@ input.date{
     margin-bottom:15px; display:block;
 }
 
-.watch_page .left_menu{
-    float:left; width:145px;
-}
-
 .watch_page .video_body{
-    float:left; width:825px; margin-left:10px;
+	padding: 10px;
 }
 
 .watch_page .video_body .category{
@@ -1551,7 +1540,7 @@ input.date{
 }
 
 .watch_page .video_body .details{
-    padding:20px 15px 0 15px;
+    padding:0 0 0 0;
 }
 
 .watch_page .video_body .details .left{
@@ -1579,7 +1568,7 @@ input.date{
 }
 
 .watch_page .video_body .details .views{
-    color: #999999; font-size: 16px; font-weight: bold; float:left;
+    color:#999;
 }
 
 .watch_page .video_body .details .right .infocons{
@@ -1641,11 +1630,9 @@ input.date{
 }
 
 .watch_page .share_content .share_item_with_subs{
-    float:left; margin-right:20px;
 }
 
 .watch_page .share_content .share_other{
-    float:left;
 }
 
 .watch_page .share_content .share_other input[type="text"]{
@@ -2680,4 +2667,8 @@ input.date{
 
 .nav-tabs{
 	border-bottom:0;
+}
+
+.video_edit_menu_container{
+	padding:0;
 }
