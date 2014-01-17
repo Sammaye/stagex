@@ -8,6 +8,8 @@ use glue\Html;
 
 class userMobileMenu extends Widget
 {
+	public $tab;
+	
 	function render()
 	{
 		$menujs = <<<JS
@@ -34,7 +36,7 @@ JS;
 		<nav id="menu" class="user_menu">
 			<?php if(!glue::session()->authed){ ?>
 			<ul>
-				<li class="selected"><a href="<?php echo glue::http()->url('/user/create') ?>">Create Account</a></li>
+				<li><a href="<?php echo glue::http()->url('/user/create') ?>">Create Account</a></li>
 				<li><a href="<?php echo glue::http()->url('/user/login') ?>">Login</a></li>
 				<li><a href="<?php echo glue::http()->url('/help') ?>">Help</a></li>
 			</ul>
@@ -46,9 +48,9 @@ JS;
 			    <b><?php echo glue::user()->getUsername() ?></b>
 			    </a>
 				</li>			
-				<li class="selected"><a href="<?php echo glue::http()->url('/stream/news') ?>">News Feed</a></li>
-				<li><a href="<?php echo glue::http()->url('/user/watchLater') ?>">Watch Later</a></li>
-				<li>
+				<li <?php echo $this->tab == "news_feed" ? "class='mm-selected'" : "" ?>><a href="<?php echo glue::http()->url('/stream/news') ?>">News Feed</a></li>
+				<li <?php echo $this->tab == "watch_later" ? "class='mm-selected'" : "" ?>><a href="<?php echo glue::http()->url('/user/watchLater') ?>">Watch Later</a></li>
+				<li <?php echo $this->tab == "videos" ? "class='mm-selected'" : "" ?>>
 					<a href="<?php echo glue::http()->url('/user/videos') ?>">Videos</a>
 					<ul>
 						<li><a href="<?php echo glue::http()->url('/user/videos') ?>">Uploads</a></li>
@@ -57,20 +59,22 @@ JS;
 						<li><a href="<?php echo glue::http()->url('/user/rated?tab=dislikes') ?>">Disliked</a></li>
 					</ul>
 				</li>
-				<li><a href="<?php echo glue::http()->url('/user/playlists') ?>">Playlists</a>
+				<li <?php echo $this->tab == "playlists" ? "class='mm-selected'" : "" ?>>
+					<a href="<?php echo glue::http()->url('/user/playlists') ?>">Playlists</a>
 					<ul>
 						<li><a href="<?php echo glue::http()->url('/user/playlists') ?>">My Playlists</a></li>
 						<li><a href="<?php echo glue::http()->url('/user/playlistSubscriptions') ?>">Subscribed</a></li>
-					</ul>				
+					</ul>
 				</li>
-				<li><a href="<?php echo glue::http()->url('/user/following') ?>">Following</a></li>
-				<li><a href="<?php echo glue::http()->url('/stream/notifications') ?>">Notifications</a></li>
-				<li><a href="<?php echo glue::http()->url('/user/view') ?>">Profile</a></li>
-				<li><a href="<?php echo glue::http()->url('/user/settings') ?>">Settings</a>
+				<li <?php echo $this->tab == "subscriptions" ? "class='mm-selected'" : "" ?>><a href="<?php echo glue::http()->url('/user/following') ?>">Following</a></li>
+				<li <?php echo $this->tab == "notifications" ? "class='mm-selected'" : "" ?>><a href="<?php echo glue::http()->url('/stream/notifications') ?>">Notifications</a></li>
+				<li <?php echo $this->tab == "profile" ? "class='mm-selected'" : "" ?>><a href="<?php echo glue::http()->url('/user/view') ?>">Profile</a></li>
+				<li >
+					<a href="<?php echo glue::http()->url('/user/settings') ?>">Settings</a>
 					<ul>
-						<li><a href="<?php echo glue::http()->url('/user/settings') ?>">Account Settings</a></li>
-						<li><a href="<?php echo glue::http()->url('/user/profile') ?>">Profile Settings</a></li>
-						<li><a href="<?php echo glue::http()->url('/user/activity') ?>">Account Acivity</a></li>
+						<li <?php echo $this->tab == "settings" ? "class='mm-selected'" : "" ?>><a href="<?php echo glue::http()->url('/user/settings') ?>">Account Settings</a></li>
+						<li <?php echo $this->tab == "profile_settings" ? "class='mm-selected'" : "" ?>><a href="<?php echo glue::http()->url('/user/profile') ?>">Profile Settings</a></li>
+						<li <?php echo $this->tab == "activity" ? "class='mm-selected'" : "" ?>><a href="<?php echo glue::http()->url('/user/activity') ?>">Account Acivity</a></li>
 					</ul>				
 				</li>
 				<li><a href="<?php echo glue::http()->url('/help') ?>">Help</a></li>

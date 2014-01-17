@@ -23,7 +23,7 @@ $this->beginPage() ?>
 </head>
 <body>
 <?php $this->beginBody() ?>
-	<?php echo app\widgets\userMobileMenu::run() ?>
+	<?php echo app\widgets\userMobileMenu::run(array('tab' => $this->tab)) ?>
 	<div class="container">
 	<div class="col-md-12">
 	<?php echo $content ?>
