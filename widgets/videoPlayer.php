@@ -11,6 +11,8 @@ class videoPlayer extends \glue\Widget{
 
 	public $docDim = false;
 	public $embedded = false;
+	
+	public $mobile = false;
 
 	public $mp4;
 	public $ogg;
@@ -64,6 +66,17 @@ class videoPlayer extends \glue\Widget{
 				});
 			");
 		endif;
+		
+		if($this->mobile){
+			glue::controller()->js('resize', "
+				var value = $('.video_body').width(), width = value;
+      			value *= 1;
+      			var valueHeight = Math.round((value/16)*9);
+				
+				$('video').prop('width', width)
+					.prop('height', valueHeight);
+			");
+		}
 		?>
 		<video width="<?php echo $this->width ?>" height="<?php echo $this->height ?>" <?php if((glue::user()->autoplayVideos || !glue::session()->authed) && !$this->embedded): echo "autoplay"; endif; ?> controls="controls" preload="none">
 		    <source type="video/mp4" src="<?php echo $this->mp4 ?>" />

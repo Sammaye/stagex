@@ -358,7 +358,7 @@ class Video extends \glue\Db\Document{
 				$this->tags[$i] = strip_whitespace($this->tags[$i]);
 			}
 		}else{
-			unset($this->tags);
+			$this->tags = null;
 		}
 		return true;
 	}

@@ -15,6 +15,7 @@ nav.user_menu{
     color: #fff;
     height: 50px;
     padding: 0 50px;
+    overflow:hidden;
 }
 
 .user_menu_header a{
@@ -621,7 +622,6 @@ input.date{
 .error{
     margin:auto;
     margin-top:80px;
-    width:600px;
 }
 
 .error .options a{
@@ -1403,7 +1403,6 @@ input.date{
 
 .watch_page .infocons .listing,
 .watch_page .infocons .comments{
-    float:right;
     display:block;
     -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=40)";
     filter: alpha(opacity=70);
@@ -2314,8 +2313,9 @@ input.date{
     border-bottom:1px solid #eee;
 }
 
-.author_top_bar .grid-container{
-    padding:15px 0;
+.author_top_bar .container{
+    padding-top:15px;
+    padding-bottom:5px;
 }
 
 .author_top_bar .user_image{
@@ -2355,7 +2355,7 @@ input.date{
 }
 
 .playlist_ext_item .thumbnails{
-    width:138px; height:77px; float:left;
+    width:70px; height:77px; float:left;
 }
 
 .playlist_ext_item .thumbnails img{
@@ -2363,23 +2363,23 @@ input.date{
 }
 
 .playlist_ext_item img.tr{
-    width:67px; height:38; float:left;
+    width:67px; height:38px; float:left;
 }
 
 .playlist_ext_item img.tl{
-    width:67px; height:38; float:left; margin-left:2px;
+    width:67px; height:38px; float:left; margin-left:2px;
 }
 
 .playlist_ext_item img.br{
-    width:67px; height:38; margin-top:2px; float:left;
+    width:67px; height:38px; margin-top:2px; float:left;
 }
 
 .playlist_ext_item img.bl{
-    width:67px; height:38; margin-top:2px; float:left; margin-left:2px;
+    width:67px; height:38px; margin-top:2px; float:left; margin-left:2px;
 }
 
 .playlist_ext_item .playlist_item_right{
-    margin-left:148px;
+    margin-left:80px;
 }
 
 .playlist_ext_item h3{
@@ -2613,6 +2613,10 @@ input.date{
     float:right;
 }
 
+.site_search_page .form-search-lg .form-search-group{
+	min-width:80%;
+}
+
 .site_search_page .alert-warning{
     margin:20px 0 0;
 }
@@ -2625,16 +2629,20 @@ input.date{
     border-top:0;
 }
 
+.site_search_page .video .info{
+	margin-left:100px;
+}
+
 .user_ext_item .thumbnail{
     float:left; border:0; padding:0; margin:0;
 }
 
 .user_ext_item .thumbnail img{
-    width:80px; height:80px; border-radius:5px;
+    width:55px; height:55px; border-radius:5px;
 }
 
 .user_ext_item .user_ext_right{
-    margin-left:90px;
+    margin-left:65px;
 }
 
 .user_ext_item .username{

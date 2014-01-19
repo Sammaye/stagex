@@ -35,6 +35,8 @@
 			} ?>
 			<div class='expandable description'><?php echo html::encode($desc) ?></div>
 		<?php } ?>		
+		<?php if($model->userHasWatched() && $show_watched_status){ ?>
 		<span class='label label-default'>Watched</span>	
+		<?php } ?>
 	</div>
 </div>

@@ -28,7 +28,7 @@ JS;
 			<?php echo Html::encode(Glue::controller()->title) ?>
 		</div>
 		<div class="user_menu_header_search">
-		<form class="" role="search">
+		<form class="" action="<?php echo glue::http()->url('/search') ?>" role="search">
 		<div class="form-group"><input type="text" class="form-control" placeholder="Search"></div>
 		<button type="submit" class="btn btn-default">Submit</button>
 		</form>

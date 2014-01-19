@@ -151,7 +151,7 @@ $(function(){
 			settings['success_class'],
 			settings['warning_class'],
 			settings['info_class']
-		].join(' ')).html('');			
+		].join(' ')).css({display: 'none'}).html('');			
 	};
 	
 	$(document).on('click', '.summarise-alert .close', function(event){

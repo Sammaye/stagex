@@ -218,19 +218,19 @@ $this->js('edit', "
 
 	<?php if(!glue::auth()->check(array('^'=>$model))){ ?>
 <div class="author_top_bar">
-<div class="grid-container">
+<div class="container">
 	<div class="user_image">
 	<img alt='thumbnail' class="thumbnail" src="<?php echo $model->author->getAvatar(30, 30); ?>"/>
 	</div>
 	<div class="user_text">
-	<a href="<?php echo glue::http()->url('/user/view', array('id' => $model->author->_id)) ?>" class="h3"><?php echo $model->author->getUsername() ?></a><span class="sep h3">/</span><a href="<?php echo glue::http()->url('/user/viewVideos', array('id' => $model->author->_id)) ?>" class="h3">Videos</a>
+	<a href="<?php echo glue::http()->url('/user/view', array('id' => $model->author->_id)) ?>" class="h4"><?php echo $model->author->getUsername() ?></a><span class="sep h4">/</span><a href="<?php echo glue::http()->url('/user/viewVideos', array('id' => $model->author->_id)) ?>" class="h4">Videos</a>
 	</div>
 	<div class='right'>
 	<div class="subscribe_widget" data-user_id="<?php echo $model->author->_id ?>">
 		<span class="follower_count text-muted"><?php echo $model->author->totalFollowers ?> Subscribers</span>
 		<?php if(glue::session()->authed){ ?>
 		<?php if(app\models\Follower::isSubscribed($model->author->_id)){ ?>
-		<button type="button" class='unsubscribe button btn btn-error'>Unsubscribe</button>
+		<button type="button" class='unsubscribe button btn btn-danger'>Unsubscribe</button>
 		<?php }else{ ?>
 		<button type="button" class='subscribe btn btn-primary button'>Subscribe</button>
 		<?php } ?>
@@ -317,13 +317,13 @@ $this->js('edit', "
 			?><div class='status-message'>Hold on, we're processing...</div><?php
 		}else{
 			echo app\widgets\videoPlayer::run(array(
-				"mp4"=>$model->mp4, "ogg"=>$model->ogg, "width"=>823, "height"=>463
+				"mp4"=>$model->mp4, "ogg"=>$model->ogg, "width"=>823, "height"=>463, 'mobile' => true
 			));
 		} ?>
 	</div>	
 	
 		<a class="category" href="#"><?php echo $model->get_category_text()?></a>
-		<h1 class="title"><?php echo $model->title ?></h1>		
+		<h1 class="h3 title"><?php echo $model->title ?></h1>		
 		
 		<div class="details clearfix">
 				<?php if(strlen($model->description) > 0): ?><div class="expandable description"><?php echo nl2br(htmlspecialchars($model->description)) ?></div><?php endif ?>
@@ -337,8 +337,7 @@ $this->js('edit', "
 				<div class="licence">
 				<b>License: </b><span><?php echo $model->get_licence_text() ? $model->get_licence_text() : "StageX Licence" ?></span>
 				</div>
-				<div class="views"><?php echo !$model->privateStatistics ? '<strong>'.$model->uniqueViews.'</strong> views' : '' ?></div>
-				<div class='infocons'>
+				<div class="views infocons"><?php echo !$model->privateStatistics ? '<strong>'.$model->uniqueViews.'</strong> views' : '' ?>
 					<span class='listing'>
 						<?php if($model->isUnlisted()){ ?>
 							<img alt='Unlisted' src='/images/unlisted_icon.png'/>
@@ -352,8 +351,8 @@ $this->js('edit', "
 						<?php }elseif($model->moderated){ ?>
 							<img alt='Moderated' src='/images/moderated_icon.png'/>
 						<?php } ?>
-					</span>	
-				</div>						
+					</span>					
+				</div>
 		</div>
 
 		<div class="video_actions">

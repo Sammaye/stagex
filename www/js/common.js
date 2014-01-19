@@ -104,7 +104,7 @@ $(function(){
 				    settings['success_class'],
 				    settings['warning_class'],
 				    settings['info_class']
-				].join(' ')).addClass(cssClass);
+				].join(' ')).css({display: 'none'}).addClass(cssClass);
 			}
 		},
 		content : function(content,el){
