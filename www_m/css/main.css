@@ -1657,7 +1657,7 @@ input.date{
 }
 
 .watch_page .playlists_content .search input{
-    margin:10px;margin-top:0;border-radius:2px;
+    margin:0 0 10px 0;
 }
 
 .watch_page .playlists_content .results{
@@ -1696,9 +1696,7 @@ input.date{
 }
 
 .video_response_selector .text_comment_content{
-    width:95%;
     height:60px;
-    border-radius:3px;
 }
 
 .video_response_selector .videoResponseSearch{
@@ -1816,6 +1814,10 @@ input.date{
     background:#eee;
 }
 
+.edit_playlist_body .top_grey_bar .container{
+	padding-top:0;
+}
+
 .edit_playlist_body .form_left input,
 .edit_playlist_body .form_left textarea{
     width:95%;
@@ -1878,11 +1880,11 @@ input.date{
 }
 
 .edit_playlist_body .edit_ribbon_menu .btn-group{
-    margin:0 60px;
+    margin:0 10px;
 }
 
 .edit_playlist_body .share_area .form-control{
-    display:inline; margin-left:10px;
+    display:inline; margin-left:10px; width:200px;
 }
 
 .edit_playlist_body .edit_panes .pane{
@@ -1894,7 +1896,6 @@ input.date{
 }
 
 .edit_playlist_body .edit_panes .form-control{
-    width:480px;
 }
 
 .edit_playlist_body .edit_panes textarea{
@@ -1923,7 +1924,7 @@ input.date{
 }
 
 .edit_playlist_body .subscribe_to_playlist{
-    float:left; 
+	padding:10px 0;
 }
 
 .edit_playlist_body .subscribe_to_playlist .btn{
@@ -1935,7 +1936,7 @@ input.date{
 }
 
 .edit_playlist_body .share_area{
-    margin:0px 0 0 0;float:right;
+    margin:0px 0 0 0;
 }
 
 .share_area .share_network_btn{
@@ -2679,4 +2680,8 @@ input.date{
 
 .video_edit_menu_container{
 	padding:0;
+}
+
+.list_responses_body .long_input{
+	min-width:30%;
 }

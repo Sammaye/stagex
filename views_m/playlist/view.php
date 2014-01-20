@@ -132,25 +132,25 @@ $this->js('edit', "
 <div class='edit_playlist_body'>
 <?php if(glue::auth()->check(array('^'=>$model))){ ?>
 <div class="top_grey_bar">
-	<div class='edit_ribbon_menu grid-container'>
+<div class="container">
+	<div class='edit_ribbon_menu'>
 		<div class='edit_menu'>
 			<div class='alert'></div>
 			<input type="button" class="btn btn-primary btn_save" value="Save Changes"/>
 			<div class="btn-group">
-			<button type="button" id="settings_tab" class="btn btn-white btn-tab">Settings</button>
+			<button type="button" id="settings_tab" class="btn btn-default btn-tab">Settings</button>
 			</div>
-			<button type="button" class='btn btn-error btn_delete'>Delete</button>
-			
+			<button type="button" class='btn btn-danger btn_delete'>Delete</button>
 			<span class="edit_menu_text"><?php echo $model->followers.($model->followers===1?' follower':' followers') ?></span>
 		</div>
-		<div class="edit_panes">
+		<div class="edit_panes row">
 			<?php $form = html::activeForm(array('action' => '')) ?>
 				<div class='edit_settings pane' id="settings_content">
-				<div class="left">
+				<div class="col-md-8">
 					<div class="form-group"><?php echo html::label('Title', 'title') ?><?php echo html::activeTextField($model, 'title',array('class'=>'form-control')) ?></div>
 					<div class="form-group"><?php echo html::label('Description', 'description')?><?php echo html::activeTextarea($model, 'description',array('class'=>'form-control')) ?></div>			
 				</div>
-				<div class='right'>
+				<div class='col-md-4'>
 					<h4>Listing</h4>
 					<?php $grp = html::activeRadio_group($model, 'listing') ?>
 					<div class="label_options">
@@ -169,9 +169,10 @@ $this->js('edit', "
 		</div>
 	</div>
 </div>
+</div>
 <?php }else{ ?>
 <div class="author_top_bar">
-<div class="grid-container">
+<div class="container">
 	<div class="user_image">
 	<img alt='thumbnail' class="thumbnail" src="<?php echo $model->author->getAvatar(30, 30); ?>"/>
 	</div>
@@ -183,7 +184,7 @@ $this->js('edit', "
 		<span class="follower_count text-muted"><?php echo $model->author->totalFollowers ?> Subscribers</span>
 		<?php if(glue::session()->authed){ ?>
 		<?php if(app\models\Follower::isSubscribed($model->author->_id)){ ?>
-		<button type="button" class='unsubscribe button btn btn-error'>Unsubscribe</button>
+		<button type="button" class='unsubscribe button btn btn-danger'>Unsubscribe</button>
 		<?php }else{ ?>
 		<button type="button" class='subscribe btn btn-primary button'>Subscribe</button>
 		<?php } ?>
@@ -194,32 +195,29 @@ $this->js('edit', "
 </div>
 <?php } ?>
 
-<div class="grid-container main_playlist_body">
-	<div class='grid-col-41'>
+<div class="container main_playlist_body">
+	<div class=''>
 	
 	<h1><?php echo $model->title ?></h1>
-	
-	<div class="clearfix">
+	<p class="expandable playlist_description"><?php echo nl2br($model->description) ?></p>
+
+	<div class="clearfix share_area subscribe_to_playlist row" data-id="<?php echo $model->_id ?>">
 	<?php if(!glue::auth()->check(array('^'=>$model))&&glue::auth()->check(array('@'))){ ?>
-	<div class="clearfix subscribe_to_playlist" data-id="<?php echo $model->_id ?>">
+		<div class="col-md-3">
 		<?php if(!$model->user_is_subscribed(glue::user())){ ?>
 		<button class="btn btn-success btn_subscribe" type="button">Subscribe to Playlist</button>
 		<?php }else{ ?>
 		<button class="btn btn-error btn_unsubscribe" type="button">Unsubscribe</button>
 		<?php } ?>
 		<span class="subscriber_count"><?php echo $model->followers ?></span>
-	</div>
-	<?php } ?>
-	<div class="share_area col-25 clearfix">
+		</div>
+		<?php } ?>
 		<label>Share</label>
 		<a rel='new_window' class="share_network_btn fb_btn" href="http://www.facebook.com/sharer.php?u=<?php echo urlencode(glue::http()->url("/playlist/view", array("id"=>$model->_id))) ?>"></a>
 		<a rel='new_window' class="share_network_btn twt_btn" href="http://twitter.com/share?url=<?php echo urlencode(glue::http()->url("/playlist/view", array("id"=>$model->_id))) ?>"></a>
 		<a rel="new_window" class="share_network_btn google_btn" href="https://plus.google.com/u/0/share?url=<?php echo urlencode(glue::http()->url("/playlist/view", array("id"=>$model->_id))) ?>"></a>
-		<input type="text" value="<?php echo glue::http()->url('/playlist/view', array('id' => $model->_id)) ?>" class="form-control select_all_onfoc col-25"/>
-	</div>
+		<input type="text" value="<?php echo glue::http()->url('/playlist/view', array('id' => $model->_id)) ?>" class="form-control select_all_onfoc col-25"/>		
 	</div>	
-	
-	<p class="expandable playlist_description"><?php echo nl2br($model->description) ?></p>
 	
 	<?php if(glue::auth()->check(array('^'=>$model))){ ?>
 	<?php ob_start(); ?>
@@ -227,7 +225,7 @@ $this->js('edit', "
 			<div class='stickytoolbar-bar'>
 				<div class='inner_bar'>
 					<div class='checkbox_button checkbox_input'><?php echo html::checkbox('selectAll', 1, 0, array('class' => 'selectAll_input')) ?></div>
-					<button class='btn btn-error btn_delete_videos'>Delete</button>
+					<button class='btn btn-danger btn_delete_videos'>Delete</button>
 				</div>
 				<div class="alert block-alert"></div>
 			</div>

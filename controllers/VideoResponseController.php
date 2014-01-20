@@ -85,7 +85,7 @@ class VideoResponseController extends Controller
 		$_SESSION['lastCommentPull'] = serialize($now);
 		echo $this->render('response/all', array('model' => $video, 'pending' => false, 'username_filter_string' => $usernames_string, 'comments' => glue::auth()->check(array("^"=>$video)) ? 
 			app\models\VideoResponse::find(array_merge(array('videoId'=>$video->_id),$query))->sort(array('created'=>-1)) :
-			app\models\VideoResponse::find(array_merge(array('videoId'=>$video->_id),$query))->public()->sort(array('created'=>-1))
+			app\models\VideoResponse::find(array_merge(array('videoId'=>$video->_id),$query))->visible()->sort(array('created'=>-1))
 		)); 
 	}
 	
@@ -137,7 +137,7 @@ class VideoResponseController extends Controller
 		
 		$now = new MongoDate();
 		$_SESSION['lastCommentPull'] = serialize($now);
-		echo $this->render('response/all', array('model' => $video, 'pending' => true, 'comments' => 
+		echo $this->render('response/all', array('model' => $video, 'pending' => true, 'username_filter_string' => $usernames_string, 'comments' => 
 			app\models\VideoResponse::find(array('videoId'=>$video->_id, 'approved'=>false))->sort(array('created'=>-1)) 
 		));		
 	}

@@ -142,8 +142,8 @@ $this->js('admin', "
     	<div class='search clearfix'>
 		<?php $form = Html::form(array('method' => 'get', 'class' => 'form-inline')); ?>
 			<?php echo $form->hiddenField('id',$model->_id) ?>
-			<div class='form-group'><?php echo html::textfield('filter-keywords',htmlspecialchars(glue::http()->param('filter-keywords',null)),array('placeholder'=>'Enter keywords to search by', 'autocomplete'=>'off', 'class'=>'search form-control')) ?></div>
-			<div class='form-group'><input type="hidden" id="filter-username" name="filter-username" value="<?php echo $username_filter_string ?>" style="width:100%;"/></div>
+			<div class='form-group long_input'><?php echo html::textfield('filter-keywords',htmlspecialchars(glue::http()->param('filter-keywords',null)),array('placeholder'=>'Enter keywords to search by', 'autocomplete'=>'off', 'class'=>'search form-control')) ?></div>
+			<div class='form-group long_input'><input type="hidden" id="filter-username" name="filter-username" value="<?php echo $username_filter_string ?>" style="width:100%;"/></div>
 			<div class="form-group"><input type="text" id="from" class="date form-control" name="from_date" placeholder="Enter start date" value="<?php echo htmlspecialchars(glue::http()->param('from_date',null)) ?>"/> <span class="sep">-</span> 
 			<input type="text" id="to" class="date form-control" name="to_date" placeholder="Enter end date" value="<?php echo htmlspecialchars(glue::http()->param('to_date',null)) ?>"/></div>
 			<div class="form-group"><button class="btn btn-default">Search</button></div>
@@ -155,13 +155,13 @@ $this->js('admin', "
 		<div class='stickytoolbar-placeholder grey_sticky_toolbar'>
 			<div class='stickytoolbar-bar'>
 				<div class='inner_bar row'>
+				<div class="col-md-4">
 					<?php if(glue::auth()->check(array('^' => $model))): ?>
-					<div class="col-md-4">
 					<div class='checkbox_button checkbox_input'><?php echo Html::checkbox('selectAll', 1, 0, array('class' => 'selectAll_input')) ?></div>
 					<button class='btn btn-success selected_actions btn_approve'>Approve</button>
 					<button class='btn-danger btn selected_actions btn_delete'>Delete</button>
-					</div>
 					<?php endif; ?>
+				</div>
 					<div class="col-md-8">
 					<div class="dropdown-group btn_sort">
 						<button class='btn btn-default dropdown-anchor'>Sort<?php
