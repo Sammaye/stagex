@@ -1884,7 +1884,7 @@ input.date{
 }
 
 .edit_playlist_body .share_area .form-control{
-    display:inline; margin-left:10px; width:200px;
+    display:inline; margin-left:10px; width:150px;
 }
 
 .edit_playlist_body .edit_panes .pane{
@@ -1919,14 +1919,6 @@ input.date{
     float:right;margin:7px 0 7px;color:#777;
 }
 
-.edit_playlist_body .main_playlist_body{
-    margin:0 auto;padding:40px 0;
-}
-
-.edit_playlist_body .subscribe_to_playlist{
-	padding:10px 0;
-}
-
 .edit_playlist_body .subscribe_to_playlist .btn{
     float:left;border-radius:4px 0 0 4px;
 }
@@ -1935,8 +1927,8 @@ input.date{
     float:left;display:block;border:1px solid #eeeeee;font-size:14px;color:#999;padding:6px 10px;border-radius:0 4px 4px 0;
 }
 
-.edit_playlist_body .share_area{
-    margin:0px 0 0 0;
+.edit_playlist_body .video_row .info{
+	margin-left:160px;
 }
 
 .share_area .share_network_btn{
@@ -2304,6 +2296,10 @@ input.date{
 
 .video_row .uploader_info .sep{
     margin:0 5px;
+}
+
+.video_row.without_controls .info{
+    margin-left:100px;
 }
 
 .playlist_sortable_highlight{

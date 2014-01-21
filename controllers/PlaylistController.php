@@ -337,8 +337,8 @@ class PlaylistController extends Controller
 			ob_start(); ?>
 				<ol>
 					<?php foreach($videos_a as $k => $v){
-						$video = app\models\Video::populateRecord($v);
-						$video->author = app\models\User::populateRecord($users_a[strval($video->userId)]);
+						$video = app\models\Video::populate($v);
+						$video->author = app\models\User::populate($users_a[strval($video->userId)]);
 
 						?>
 						<li class='playlist_video_item'>

@@ -110,7 +110,7 @@ $this->js('edit', "
 		$.post('".glue::http()->url('/playlist/subscribe')."', {id:container.data('id')}, null, 'json')
 		.done(function(data){
 			if(data.success){
-				btn.removeClass('btn-success btn_subscribe').addClass('btn-error btn_unsubscribe').html('Unsubscribe');
+				btn.removeClass('btn-success btn_subscribe').addClass('btn-danger btn_unsubscribe').html('Unsubscribe');
 			}
 		});
 	});
@@ -123,7 +123,7 @@ $this->js('edit', "
 		$.post('".glue::http()->url('/playlist/unsubscribe')."', {id:container.data('id')}, null, 'json')
 		.done(function(data){
 			if(data.success){
-				btn.removeClass('btn-error btn_unsubscribe').addClass('btn-success btn_subscribe').html('Subscribe to Playlist');
+				btn.removeClass('btn-danger btn_unsubscribe').addClass('btn-success btn_subscribe').html('Subscribe to Playlist');
 			}
 		});
 	});		
@@ -203,20 +203,22 @@ $this->js('edit', "
 
 	<div class="clearfix share_area subscribe_to_playlist row" data-id="<?php echo $model->_id ?>">
 	<?php if(!glue::auth()->check(array('^'=>$model))&&glue::auth()->check(array('@'))){ ?>
-		<div class="col-md-3">
+		<div class="col-md-3 clearfix">
 		<?php if(!$model->user_is_subscribed(glue::user())){ ?>
 		<button class="btn btn-success btn_subscribe" type="button">Subscribe to Playlist</button>
 		<?php }else{ ?>
-		<button class="btn btn-error btn_unsubscribe" type="button">Unsubscribe</button>
+		<button class="btn btn-danger btn_unsubscribe" type="button">Unsubscribe</button>
 		<?php } ?>
 		<span class="subscriber_count"><?php echo $model->followers ?></span>
 		</div>
 		<?php } ?>
+		<div class="col-md-6">
 		<label>Share</label>
 		<a rel='new_window' class="share_network_btn fb_btn" href="http://www.facebook.com/sharer.php?u=<?php echo urlencode(glue::http()->url("/playlist/view", array("id"=>$model->_id))) ?>"></a>
 		<a rel='new_window' class="share_network_btn twt_btn" href="http://twitter.com/share?url=<?php echo urlencode(glue::http()->url("/playlist/view", array("id"=>$model->_id))) ?>"></a>
 		<a rel="new_window" class="share_network_btn google_btn" href="https://plus.google.com/u/0/share?url=<?php echo urlencode(glue::http()->url("/playlist/view", array("id"=>$model->_id))) ?>"></a>
-		<input type="text" value="<?php echo glue::http()->url('/playlist/view', array('id' => $model->_id)) ?>" class="form-control select_all_onfoc col-25"/>		
+		<input type="text" value="<?php echo glue::http()->url('/playlist/view', array('id' => $model->_id)) ?>" class="form-control select_all_onfoc col-25"/>
+		</div>		
 	</div>	
 	
 	<?php if(glue::auth()->check(array('^'=>$model))){ ?>
@@ -250,7 +252,7 @@ $this->js('edit', "
 				if(glue::auth()->check(array('^'=>$model))){
 					echo $this->renderPartial('video/_video_row',array('item'=>$video,'show_sorter'=>true,'show_delete'=>false,'playlistId'=>$model->_id,'useLiTag'=>true, 'admin'=>true));
 				}else{
-					echo $this->renderPartial('video/_video_row',array('item'=>$video,'show_sorter'=>false,'show_delete'=>false,'playlistId'=>$model->_id,'useLiTag'=>true));
+					echo $this->renderPartial('video/_video_row',array('item'=>$video,'show_sorter'=>true,'show_delete'=>false,'playlistId'=>$model->_id,'useLiTag'=>true, 'admin' => true));
 				}
 			} ?>
 			</ul>

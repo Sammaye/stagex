@@ -591,6 +591,20 @@ class Document extends Model
     	return $cursor;
     }
     
+    public static function findAll($query = array(), $fields = array())
+    {
+    	if(!is_array($query)){
+    		$query = array(static::primaryKey() => new \MongoId($query));
+    	}
+    	$cursor = new Cursor(array(
+    		'select' => $fields,
+    		'from' => static::collectionName()
+    	));
+    	$cursor->defaultScope();
+    	$cursor->andWhere($query);
+    	return $cursor;
+    }    
+    
     public static function updateAll($query, $attributes, $options = array())
     {
     	return static::getCollection()->update(

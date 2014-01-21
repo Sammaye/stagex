@@ -9,9 +9,18 @@ if(!isset($model)||!$model){
 	$model->title='This video is unavailable';
 	$model->deleted=1; // Stands to reason this video was deleted
 }
+
+$extraClasses = isset($extraClasses) ? $extraClasses : '';
+if(
+	(isset($show_sorter) && $show_sorter === false || !isset($show_sorter)) &&  
+	(isset($show_delete) && $show_delete === false || !isset($show_delete))
+){
+	$extraClasses .= ' without_controls';
+}
+
 ?>
 <<?php if(isset($useLiTag)&&$useLiTag): echo 'li'; else: echo 'div'; endif; ?> 
-		class="video_row clearfix" data-id="<?php echo isset($custid)?$custid:$item->_id ?>">
+		class="video_row clearfix<?php echo isset($extraClasses) ? $extraClasses : '' ?>" data-id="<?php echo isset($custid)?$custid:$item->_id ?>">
 	<div class="inner">
 	<?php if(isset($admin)&&$admin): ?><div class='checkbox_col'><div class="checkbox_input" style=''><?php echo html::checkbox('video_id[]', strval(isset($custid) ? $custid : $item->_id), 0) ?></div></div><?php endif; ?>
 	<?php if(isset($show_sorter)&&$show_sorter): ?><div class='sortable_handle'><img alt='sort' src='/images/sortable_icon.png'/></div><?php endif; ?>
