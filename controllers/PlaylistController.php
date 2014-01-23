@@ -343,7 +343,7 @@ class PlaylistController extends Controller
 						?>
 						<li class='playlist_video_item'>
 							<?php if(glue::auth()->check(array('viewable' => $video))){ ?>
-								<span class='vieo_image'><a href='<?php echo glue::http()->url('/video/watch', array('id' => $video->_id, 'playlist_id' => $playlist->_id)) ?>'><img src='<?php echo $video->getImage(124, 69) ?>' alt='thumbnail'/></a></span>
+								<span class='vieo_image'><a href='<?php echo glue::http()->url('/video/watch', array('id' => $video->_id, 'playlist_id' => $playlist->_id)) ?>'><img src='<?php echo $video->getImage(88, 49) ?>' alt='thumbnail'/></a></span>
 								<span class='info_pane'>
 									<a href='<?php echo glue::http()->url('/video/watch', array('id' => $video->_id, 'playlist_id' => $playlist->_id)) ?>'>
 										<?php echo strlen($video->title) > 100 ? html::encode(substr_replace(substr($video->title, 0, 50), '...', -3)) : html::encode($video->title) ?></a>

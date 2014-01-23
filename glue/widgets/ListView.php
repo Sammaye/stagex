@@ -129,11 +129,10 @@ class ListView extends Widget
 		$i = 0;
 		
 		$data = $this->data;
-		$data['i'] = $i;
-
 		foreach($this->cursor as $_id => $item){
 			$fn=$this->callback;
 			$data['item'] = $item;
+			$data['i'] = $i;
 			
 			if((is_string($fn) && function_exists($fn)) || (is_object($fn) && ($fn instanceof \Closure))){
 				$fn($i,$item,$this->itemView);

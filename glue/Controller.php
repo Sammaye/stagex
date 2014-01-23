@@ -287,7 +287,6 @@ class Controller extends Component
 				// Then this should go from views root (/application/views) because we have something like user/edit.php
 				$fpath = str_replace('/', DIRECTORY_SEPARATOR, $viewPath.'/'.$path);
 			}else{
-	
 				// Then lets attempt to get the cwd from the controller. If the controller is not set we use siteController as default. This can occur for cronjobs
 				$fpath = str_replace('/', DIRECTORY_SEPARATOR, $viewPath.'/'.str_replace('Controller', '',
 						glue::controller() instanceof \glue\Controller ? get_class(glue::controller()) : 'siteController').'/'.$path);

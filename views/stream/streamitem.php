@@ -24,9 +24,9 @@ if(!$item->subscribed_user /*|| !glue::auth()->check(array('viewable'=>$item->su
 		<span class="close_button"><a href="#"><?php echo utf8_decode('&#215;') ?></a></span>
 	<?php endif; ?>
 
-	<a href='<?php echo glue::http()->url('/user/view', array('id' => strval($item->status_sender->_id))) ?>'><img alt='thumbnail' src='<?php echo $item->status_sender->getAvatar(48, 48) ?>' class='' style='float:left;border-radius:5px;'/></a>
+	<a class="user_avatar" href='<?php echo glue::http()->url('/user/view', array('id' => strval($item->status_sender->_id))) ?>'><img alt='thumbnail' src='<?php echo $item->status_sender->getAvatar(48, 48) ?>'/></a>
 
-	<div class='stream_item_inner' style='float:left; margin-left:10px;'>
+	<div class='stream_item_inner'>
 	<?php if($item->type == Stream::WALL_POST): ?>
 		<div class='stream_comment'><span class='expandable'><?php echo htmlspecialchars($item->message) ?></span>
 		<?php if(glue::user()->_id != $item->status_sender->_id){ ?>

@@ -2680,3 +2680,23 @@ input.date{
 .profile_videos_body .video_list{
 	margin-top:15px;
 }
+
+.stream_item_inner{
+    margin-left:58px;
+}
+
+.streamitem .user_avatar{
+    float:left;
+}
+
+.streamitem .user_avatar img{
+	border-radius:5px;
+}
+
+.stream_item_user .user_img{
+    float:left;vertical-align:middle;border-radius:5px;
+}
+
+.stream_item_user .username{
+    margin:8px 0 0 10px;float:left;font-size:14px;
+}
