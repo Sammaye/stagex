@@ -139,14 +139,14 @@ $this->js('admin', "
 	<?php } ?>
 
 	<div class="advanced_filter_header">   
-    	<div class='search clearfix'>
-		<?php $form = Html::form(array('method' => 'get', 'class' => 'form-inline')); ?>
+    	<div class='search clearfix row'>
+		<?php $form = Html::form(array('method' => 'get', 'class' => '')); ?>
 			<?php echo $form->hiddenField('id',$model->_id) ?>
-			<div class='form-group long_input'><?php echo html::textfield('filter-keywords',htmlspecialchars(glue::http()->param('filter-keywords',null)),array('placeholder'=>'Enter keywords to search by', 'autocomplete'=>'off', 'class'=>'search form-control')) ?></div>
-			<div class='form-group long_input'><input type="hidden" id="filter-username" name="filter-username" value="<?php echo $username_filter_string ?>" style="width:100%;"/></div>
-			<div class="form-group"><input type="text" id="from" class="date form-control" name="from_date" placeholder="Enter start date" value="<?php echo htmlspecialchars(glue::http()->param('from_date',null)) ?>"/> <span class="sep">-</span> 
+			<div class='col-md-3 long_input form-inline-col'><?php echo html::textfield('filter-keywords',htmlspecialchars(glue::http()->param('filter-keywords',null)),array('placeholder'=>'Enter keywords to search by', 'autocomplete'=>'off', 'class'=>'search form-control')) ?></div>
+			<div class='col-md-3 long_input form-inline-col'><input type="hidden" id="filter-username" name="filter-username" value="<?php echo $username_filter_string ?>" style="width:100%;"/></div>
+			<div class="col-md-3 form-inline-col"><input type="text" id="from" class="date form-control" name="from_date" placeholder="Enter start date" value="<?php echo htmlspecialchars(glue::http()->param('from_date',null)) ?>"/> <span class="sep">-</span> 
 			<input type="text" id="to" class="date form-control" name="to_date" placeholder="Enter end date" value="<?php echo htmlspecialchars(glue::http()->param('to_date',null)) ?>"/></div>
-			<div class="form-group"><button class="btn btn-default">Search</button></div>
+			<div class="col-md-1 form-inline-col"><button class="btn btn-default">Search</button></div>
 			<?php $form->end() ?>
 		</div>		
     </div>		

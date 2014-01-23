@@ -1750,7 +1750,7 @@ input.date{
     font-size:12px;
 }
 
-.advanced_filter_header{
+.advanced_filter_header .form-inline-col{
     margin:10px 0;
 }
 
@@ -1786,6 +1786,10 @@ input.date{
 
 .videos_nav_top{
     border-bottom:1px solid #dddddd;height:41px;    
+}
+
+.videos_nav_top .nav-tabs{
+	border:0;
 }
 
 .videos_nav_top ul{

@@ -75,11 +75,12 @@ $this->js('page', "
 <div class="rated_videos_body">
 	<a class="btn btn-success btn-upload" href="<?php echo glue::http()->url('/video/upload', array(), glue::$params['uploadBase']) ?>">Add New Upload</a>
 	<div class="advanced_filter_header">   
-    	<div class='search clearfix'>
-		<?php $form = Html::form(array('method' => 'get', 'class' => 'form-inline')); ?>
-			<?php echo html::textfield('query',htmlspecialchars(glue::http()->param('query',null)),array('placeholder'=>'Enter keywords to search by', 'autocomplete'=>'off', 'class'=>'search form-control')) ?>
-			<input type="text" id="from" class="date form-control" name="from_date" placeholder="Enter start date" value="<?php echo htmlspecialchars(glue::http()->param('from_date',null)) ?>"/> <span class="sep">-</span> 
-			<input type="text" id="to" class="date form-control" name="to_date" placeholder="Enter end date" value="<?php echo htmlspecialchars(glue::http()->param('to_date',null)) ?>"/>	<button type="button" class="btn btn-default">Search</button>
+    	<div class='search clearfix row'>
+		<?php $form = Html::form(array('method' => 'get', 'class' => '')); ?>
+			<div class="col-md-6 form-inline-col"><?php echo html::textfield('query',htmlspecialchars(glue::http()->param('query',null)),array('placeholder'=>'Enter keywords to search by', 'autocomplete'=>'off', 'class'=>'search form-control')) ?></div>
+			<div class="col-md-3 form-inline-col"><input type="text" id="from" class="date form-control" name="from_date" placeholder="Enter start date" value="<?php echo htmlspecialchars(glue::http()->param('from_date',null)) ?>"/> <span class="sep">-</span> 
+			<input type="text" id="to" class="date form-control" name="to_date" placeholder="Enter end date" value="<?php echo htmlspecialchars(glue::http()->param('to_date',null)) ?>"/></div>
+			<div class="col-md-2 form-inline-col"><button type="button" class="btn btn-default">Search</button></div>
 			<?php echo html::hiddenfield('tab',html::encode(glue::http()->param('tab',null))) ?>
 			<?php $form->end() ?>
 		</div>		
