@@ -34,31 +34,14 @@ $this->beginPage() ?>
 				<li><a href="/help">Support</a></li>
 				<?php echo isset($model) ? $model->getBreadCrumb() : '' ?>
 			</ol>
-			<h1 class="jumbo"><?php if(isset($model)&&$model!==null): echo $model->title; else: echo "404 Not Found"; endif; ?></h1>
+			<h1><?php if(isset($model)&&$model!==null): echo $model->title; else: echo "404 Not Found"; endif; ?></h1>
 			</div>
 			
-    		<div class='search form-search col-md-3'>
+    		<div class='search col-md-3 row'>
 			<?php $form = Html::form(array('method' => 'get', 'action'=>glue::http()->url('/help/search'))); ?>
-				<?php echo app\widgets\Jqautocomplete::run(array(
-					'attribute' => 'query',
-					'value' => urldecode(htmlspecialchars(isset($_GET['query']) ? $_GET['query'] : '')),
-					'placeholder' => 'Search Help',
-					'htmlOptions' => array(
-						'class' => 'form-search-input'
-					),
-					'options' => array(
-						'appendTo' => '#help_search_results',
-						'source' => '/help/suggestions',
-						'minLength' => 2,
-					),
-					'renderItem' => "
-						return $( '<li></li>' )
-							.data( 'item.autocomplete', item )
-							.append( '<a class=\'content\'><span>' + item.label + '</span></div></a>' )
-							.appendTo( ul );
-				"))  ?><button class="btn submit_search"><span>&nbsp;</span></button>
+				<div class="col-md-10 form-group"><?php echo $form->textField('query', glue::http()->param('query'), 'form-control') ?></div>
+				<div class="col-md-2 form-group"><button class="btn btn-primary submit_search">Search</button></div>
 			<?php $form->end() ?>
-			<p class='ask'><a href='https://getsatisfaction.com/stagex'>Ask a Question on the Forums</a></p>
 			</div>
 		</div>
 

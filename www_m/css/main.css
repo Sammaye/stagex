@@ -1184,11 +1184,25 @@ input.date{
 }
 
 .help_index .other_links{
-    margin:10px 0;
+    margin:0 0 10px 0;
 }
 
 .help_index .ask{
     font-size:16px; margin-top:20px;
+}
+
+.help_layout .head{
+	margin:10px 0;
+}
+
+.help_layout .breadcrumb{
+	background:transparent;
+	margin:0;
+	padding:0;
+}
+
+.help_layout .breadcrumb-header h1{
+	margin-top:10px;
 }
 
 .help_layout .help_menu{
@@ -1215,10 +1229,6 @@ input.date{
 
 .help_layout .article .body{
     float:left;
-}
-
-.help_layout .head .ask{
-    margin-top:7px; font-size:13px;
 }
 
 .help_layout .article .body .content{
@@ -1283,7 +1293,11 @@ input.date{
 }
 
 .help_page .search_head{
-    margin:50px 0;
+    margin:10px 0;
+}
+
+.help_page .search_head .breadcrumb{
+	background:transparent;
 }
 
 .help_search_large .form-search-input{
