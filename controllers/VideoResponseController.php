@@ -161,8 +161,8 @@ class VideoResponseController extends Controller
 			$thread_parent = VideoResponse::findOne(array('_id' => new MongoId($path_segs[0]), 'deleted' => 0));
 			$thread = VideoResponse::find(array('path' => new MongoRegex('/'.$path_segs[0].',/'), 'deleted' => 0))->sort(array('ts' => -1));
 		}else{
-			$thread_parent = VideoResponse::find(array('_id' => new MongoId($path_segs[0]), 'deleted' => 0))->public()->one();
-			$thread = VideoResponse::find(array('path' => new MongoRegex('/'.$path_segs[0].',/'), 'deleted' => 0))->public()->sort(array('ts' => -1));
+			$thread_parent = VideoResponse::find(array('_id' => new MongoId($path_segs[0]), 'deleted' => 0))->visible()->one();
+			$thread = VideoResponse::find(array('path' => new MongoRegex('/'.$path_segs[0].',/'), 'deleted' => 0))->visible()->sort(array('ts' => -1));
 		}
 
 		if(!glue::auth()->check(array('viewable' => $thread_parent)))

@@ -76,6 +76,7 @@ class Follower extends Document
 			
 		}else{
 			$following=static::find(array('fromId'=>$user_id))->limit(20);
+			$mongoIds = array();
 			foreach($following as $_id=>$follower)
 				$mongoIds[]=new \MongoId($follower->toId);			
 			$users=\app\models\User::find(array('_id'=>array('$in'=>$mongoIds)))->sort(array('username'=>1));

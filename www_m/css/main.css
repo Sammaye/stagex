@@ -2056,7 +2056,7 @@ input.date{
 }
 
 .user_playlist_item .thumbnail img{
-    display:inline;
+    display:inline; border-radius:3px;
 }
 
 .user_playlist_item .info{
@@ -2566,7 +2566,7 @@ input.date{
 }
 
 .user_playlist_subscription_item .created .username{
-    margin-left:10px;
+    margin:0 10px;
 }
 
 .user_playlist_subscription_item .btn_subscribe{
@@ -2605,6 +2605,10 @@ input.date{
     line-height:22px;
 }
 
+.thread_parent .thread_video .info{
+	margin-left:90px;
+}
+
 .thread_reply_list .thread_reply_amnt{
     margin:20px 0 10px 0;
 }
@@ -2622,7 +2626,7 @@ input.date{
 }
 
 .thread_parent .main_body{
-    float:left; width:757px;
+    margin-left:60px;
 }
 
 .search_filter_bar .dropdown-group{
@@ -2730,6 +2734,5 @@ input.date{
 }
 
 .user_playlist_item .thumbnail{
-	width:140px;
-	margin-right:10px;
+	width:105px;
 }
