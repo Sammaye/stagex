@@ -464,7 +464,7 @@ class Html{
 		// Has model been validated?
 		if($model_validated){
 			if(count($messages) > 0){ // If the model/s did not validate
-				$html .= self::openTag('div', array('class' => 'alert alert-error alert-danger form_summary'));
+				$html .= self::openTag('div', array('class' => 'alert alert-danger alert-danger form_summary'));
 				$html .= self::a(array('href' => '#', 'text' => utf8_decode('&#215;'), 'class'=>'close'));
 
 				if(isset($options['errorHead'])){
@@ -521,7 +521,7 @@ class Html{
 	 * @param string $message
 	 */
 	public static function setErrorFlashMessage($message){
-		$_SESSION['flash_message'] = array($message, "flash-error");
+		$_SESSION['flash_message'] = array($message, "flash-danger");
 	}
 
 	/**

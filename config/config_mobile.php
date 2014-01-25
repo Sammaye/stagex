@@ -13,8 +13,10 @@ return array(
 
 	'directories' => array(
 		'app' => dirname(__DIR__),
-		'views' => '@app/views_m',
-		'base' => '@app/views',
-		'layouts' => '@views/layouts',
+
+		'views' => '@app/mobile/views',
+		'layouts' => '@app/mobile/layouts',
+			
+		'base' => '@app/desktop/views',
 	)
 );

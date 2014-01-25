@@ -400,6 +400,9 @@ return array(
 	 */
 	'directories' => array(
 		'app' => dirname(__DIR__),
+			
+		'views' => '@app/desktop/views',
+		'layouts' => '@app/desktop/layouts',
 
 		// These are not required but are here to show you how it is done
 		//'@controllers' => 'controllers',
