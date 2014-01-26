@@ -23,13 +23,24 @@ $('.user_menu_header .glyphicon').on('click', function(e){
 JS;
 		glue::controller()->js('menu', $menujs); ?>
 		<div class="user_menu_header">
-			<a href="#menu"></a>
+			<a class="menu_toggle" href="#menu"></a>
 			<span class="glyphicon glyphicon-search"></span>
 			<?php echo Html::encode(Glue::controller()->title) ?>
+			
+			<?php if(glue::session()->authed){ ?>
+			<?php $newNotifications = \app\models\Notification::getNewCount_Notifications(); ?>
+		  	<a href="/stream/notifications" class="notification right <?php if($newNotifications > 0): echo "new_notifications"; endif; ?>">
+		  		<?php if($newNotifications > 100){ ?>
+					100+
+				<?php }else{
+					echo $newNotifications;
+				} ?>
+			</a>
+			<?php } ?>
 		</div>
 		<div class="user_menu_header_search">
-		<form class="" action="<?php echo glue::http()->url('/search') ?>" role="search">
-		<div class="form-group"><input type="text" class="form-control" placeholder="Search"></div>
+		<form action="<?php echo glue::http()->url('/search') ?>" role="search">
+		<div class="form-group"><input type="text" class="form-control" name="query" placeholder="Search"></div>
 		<button type="submit" class="btn btn-default">Submit</button>
 		</form>
 		</div>

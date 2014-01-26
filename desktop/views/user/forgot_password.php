@@ -2,7 +2,7 @@
 	<?php $form = html::activeForm() ?>
 
 		<div class='form col-30'>
-			<?php echo html::form_summary($model, array(
+			<?php echo html::formSummary($model, array(
 				'errorHead' => 'Could not recover your account because:',
 			)) ?>
 

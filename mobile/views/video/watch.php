@@ -322,7 +322,7 @@ $this->js('edit', "
 		} ?>
 	</div>	
 	
-		<a class="category" href="#"><?php echo $model->get_category_text()?></a>
+		<a class="category" href="<?php echo glue::http()->url('/search', array('filter_type' => 'video', 'filter_category' => $model->category)) ?>"><?php echo $model->get_category_text()?></a>
 		<h1 class="h3 title"><?php echo $model->title ?></h1>		
 		
 		<div class="details clearfix">
@@ -463,7 +463,7 @@ $this->js('edit', "
 			<div class="row">
 			<div class='head_left col-md-9 col-sm-7 col-xs-8'>Playlist: <a href='<?php echo glue::http()->url('/playlist/view', array('id' => $playlist->_id)) ?>'><?php echo html::encode($playlist->title) ?></a> (<?php echo count($playlist->videos) ?> Videos)
 			- By <b><a href='<?php echo glue::http()->url('/user/view', array('id' => $playlist->userId)) ?>'><?php echo $playlist->author->getUsername(); ?></a></b></div>
-			<div class="col-md-3 col-sm-5 col-xs-4"><button class='view_all_videos'>View All Videos</button></div>
+			<div class="col-md-3 col-sm-5 col-xs-4"><button class='view_all_videos btn btn-default btn-xs'>View All Videos</button></div>
 			</div>
 		</div>
 		<div class='playlist_content'>

@@ -1,4 +1,4 @@
-<?php echo html::form_summary($model, array(
+<?php echo html::formSummary($model, array(
 	'errorHead' => '<h4>Could not Save Help Topic</h4>The Help Topic could not be saved because:'
 )) ?>
 

@@ -39,13 +39,10 @@
 		</div>
 	<?php $form->end() ?>
 
-	<div class='social_logins_outer'>
-		<ul>
-			<li class="first"><a href='<?php echo glue::facebook()->getLoginUrl(array( "scope"=>"email" )) ?>'>
-				<img src='/images/fb_large.png'/><span>Login with Facebook</span></a></li>
-			<li><a href='<?php echo glue::google()->getLoginURI(array('email', 'profile')) ?>'>
-				<img src='/images/google_large.png'/><span>Login with Google Accounts</span></a></li>
-		</ul>
-		<div class='clearer'></div>
+	<div class='social_logins_outer row'>
+	<div class="col-md-4 social_login_option"><a href='<?php echo glue::facebook()->getLoginUrl(array( "scope"=>"email" )) ?>'>
+	<img src='/images/fb_large.png'/><span>Login with Facebook</span></a></div>
+	<div class="col-md-4 social_login_option"><a href='<?php echo glue::google()->getLoginURI(array('email', 'profile')) ?>'>
+	<img src='/images/google_large.png'/><span>Login with Google Accounts</span></a></div>
 	</div>
 </div>

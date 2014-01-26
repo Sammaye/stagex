@@ -1,7 +1,7 @@
 <?php use glue\Html; ?>
 <div class="profile_settings">
 
-	<?php echo html::form_summary($model, array(
+	<?php echo html::formSummary($model, array(
 		'errorHead' => '<h4>Could not save profile settings</h4><p>Your profile settings could not be saved because:</p>',
 		'successMessage' => ''
 	)) ?>

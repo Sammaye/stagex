@@ -4,7 +4,7 @@
 	<h1>Welcome to a simple and easy video sharing experience with StageX</h1>
 	<div class="right_actions">
 	<a class="btn btn-lg btn-block btn-success" href="<?php echo glue::http()->url('/user/create') ?>">Sign up</a>
-	<a class="btn btn-lg btn-block btn-white" href="<?php echo glue::http()->url('/user/login') ?>">Login</a>
+	<a class="btn btn-lg btn-block btn-default" href="<?php echo glue::http()->url('/user/login') ?>">Login</a>
 	</div>
 	</div>
 

@@ -436,7 +436,7 @@ class Html{
 	 * @param GModel|array $models The models by which to grab errors from
 	 * @param array $options The options for the function
 	 */
-	static function form_summary($models, $options = array()){
+	static function formSummary($models, $options = array()){
 		$messages = array();
 		$html = '';
 
@@ -464,7 +464,7 @@ class Html{
 		// Has model been validated?
 		if($model_validated){
 			if(count($messages) > 0){ // If the model/s did not validate
-				$html .= self::openTag('div', array('class' => 'alert alert-danger alert-danger form_summary'));
+				$html .= self::openTag('div', array('class' => 'alert alert-danger alert-danger formSummary'));
 				$html .= self::a(array('href' => '#', 'text' => utf8_decode('&#215;'), 'class'=>'close'));
 
 				if(isset($options['errorHead'])){
