@@ -12,8 +12,8 @@
 		</div>
 	</div>
 
-	<div class='article'>
-		<div class='left'>
+	<div class='article row'>
+		<div class='col-md-3 col-sm-3'>
 			<ul class='help_menu'>
 				<li><a href='<?php echo $this->createUrl('/help') ?>'>Go to Help Home</a></li>
 		        <?php foreach(app\models\Help::getRootItems() as $item){ ?>
@@ -22,7 +22,7 @@
 		        <li><a href='https://getsatisfaction.com/stagex'>Ask A Question</a></li>
 			</ul>
 		</div>
-		<div class='body'>
+		<div class='body col-md-9 col-sm-9'>
 		<?php if($sphinx->totalFound > 0){ ?>
 			<div class='search_list'>
 				<?php foreach($sphinx as $item){

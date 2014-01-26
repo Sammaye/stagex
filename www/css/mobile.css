@@ -316,13 +316,29 @@ input.date{
     margin:20px 0 0;
 }
 
-.social_logins_outer img{
-    margin-right:10px;
-}
-
 .social_logins_outer .social_login_option{
 	padding-top:5px;
 	padding-bottom:5px;
+}
+
+.social_logins_outer a{
+	line-height:32px; padding-left:10px;
+}
+
+.facebook-social-icon{
+	background:url(/images/social_icons.png) 0 0 no-repeat;
+	width:32px;
+	height:32px;
+	float:left;
+	vertical-align:middle;
+}
+
+.google-social-icon{
+    background:url(/images/social_icons.png) -64px 0 no-repeat;
+    width:32px;
+    height:32px;
+    float:left;
+    vertical-align:middle;
 }
 
 .user_login_body{
@@ -439,10 +455,6 @@ input.date{
 
 .formSummary{
     margin:0 0 10px 0;
-}
-
-.deactivate_body{
-    width:600px; margin:auto; margin-top:40px;
 }
 
 .deactivate_body form{
@@ -846,7 +858,14 @@ input.date{
 }
 
 .help_layout .article .left{
-    float:left; width:190px; margin-right:30px;
+}
+
+@media (max-width: 767px) {
+    .help_layout .help_menu{
+        background:#eee;
+        border-radius:3px;
+        padding:10px;
+    }
 }
 
 .help_layout .article .body{
@@ -2360,4 +2379,8 @@ input.date{
 
 .user_playlist_item .thumbnail{
 	width:105px;
+}
+
+.user_history_body .video_row.without_controls .info{
+    margin-left:133px;
 }

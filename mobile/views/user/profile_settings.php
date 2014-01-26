@@ -11,7 +11,7 @@
 			<div class="left"><img alt='thumbnail' src="<?php echo $model->getAvatar(125, 125) ?>"/></div>
 			<div class="right">
 				<p><b>Choose a profile picture:</b></p>
-				<?php echo $form->filefield($model, "avatar") ?>
+				<?php echo $form->filefield($model, "avatar", 'form-control') ?>
 				<?php echo $form->hiddenField($model, "action", array('value' => "updatePic")) ?>
 				<p class="light">Maximum upload size: 2 Megabytes</p>
 				<?php echo html::submitButton("Set Profile Picture", array('class'=>'btn btn-success')) ?>

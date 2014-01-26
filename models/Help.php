@@ -37,7 +37,7 @@ class Help extends \glue\db\Document{
 				$itemModel = self::findOne(array('normalisedTitle' => $item));
 				$final_breadcrumb[$i] = \html::openTag('li')
 					.\html::a(array('href' => glue::http()->url('/help/view', array('title' => $item)), 'text' => $itemModel->title))
-					.($c<(count($breadcrumb)-2)?\html::openTag('span',array('class'=>'divider')).'/'.\html::closeTag('span'):'')
+					.($c<(count($breadcrumb)-2)?\html::openTag('span',array('class'=>'divider')).\html::closeTag('span'):'')
 					.\html::closeTag('li');
 			} $c++;
 		}
@@ -64,12 +64,12 @@ class Help extends \glue\db\Document{
 	{
 		if(($doc = parent::findOne($query, $fields)) !== null){
 			$o = null;
-			if($record['type'] == 'topic'){
+			if($doc->type == 'topic'){
 				$o = new HelpTopic();
-			}elseif($record['type'] == 'article'){
+			}elseif($doc->type == 'article'){
 				$o = new HelpArticle();
 			}
-			return $o->populate($record, true, $fields===array() ? false : true);
+			return $o->populate($doc->getRawDocument(), true, $fields===array() ? false : true);
 		}else{
 			return null;
 		}		

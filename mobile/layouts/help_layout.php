@@ -41,7 +41,7 @@ $this->beginPage() ?>
 		</div>
 
 		<div class='article row'>
-			<div class='col-md-3'>
+			<div class='col-md-3 col-sm-3'>
 				<ul class='help_menu'>
 					<li><a href='<?php echo $this->createUrl('/help') ?>'>Go to Help Home</a></li>
 			        <?php foreach(app\models\Help::getRootItems() as $item){ ?>
@@ -50,7 +50,7 @@ $this->beginPage() ?>
 			        <li><a href='https://getsatisfaction.com/stagex'>Ask A Question</a></li>
 				</ul>
 			</div>
-			<div class='body col-md-9'><?php echo $content ?></div>
+			<div class='body col-md-9 col-sm-9'><?php echo $content ?></div>
 	    	<div class='clear'></div>
 	    </div>	
 	    </div>		
