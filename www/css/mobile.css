@@ -6,6 +6,10 @@ nav.user_menu{
     display: none;
 }
 
+.user_menu .user_avatar{
+	border-radius:3px;width:30px;height:30px;margin-right:6px;
+}
+
 .user_menu_header{
     background: #101010;
     font-size: 16px;
@@ -474,11 +478,11 @@ input.date{
 }
 
 .upload .upload_form{
-    display: block; position:relative; width: 812px; height: 60px; overflow: hidden; border:1px dashed #cccccc;
+    display: block; position:relative; height: 60px; overflow: hidden; border:1px dashed #cccccc;
 }
 
 .upload .upload_form .add_upload{
-    font-size:22px; display:block; overflow:hidden; font-weight:bold; width: 775px; height: 30px; position: absolute; 
+    font-size:22px; display:block; overflow:hidden; font-weight:bold; width: 100%; position: absolute; 
     top:0; left:0; padding:15px 18px; text-align:center; cursor:pointer; text-decoration:none; color:#333333; 
     opacity:0.4; filter: alpha(opacity = 40);
 }
@@ -495,21 +499,8 @@ input.date{
     margin:10px 0 0;
 }
 
-.upload .edit_information input[type="text"],
-.upload .edit_information textarea{
-    width:420px;
-}
-
 .upload .edit_information textarea{
     height:190px;
-}
-
-.upload .edit_information .left{
-    float:left; width:440px; margin:0 20px 0 0;
-}
-
-.upload .edit_information .right{
-    float:left; width:300px;
 }
 
 .upload .upload_details{

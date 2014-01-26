@@ -76,7 +76,7 @@ $this->js('videos', "
 ");
 ?>
 <div class="user_videos_body">
-
+	<a class="btn btn-success btn-upload" href="<?php echo glue::http()->url('/video/upload', array(), glue::$params['uploadBase']) ?>">Add New Upload</a>
 	<div class="header">
     		<div class='search form-search'>
 			<?php $form = Html::form(array('method' => 'get')); ?>
