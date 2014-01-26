@@ -1967,12 +1967,8 @@ input.date{
     margin-left:10px;
 }
 
-.playlist_bar_outer{
-    position:fixed; bottom:0; width:100%; z-index:20000000;
-}
-
 .playlist_bar_outer .playlist_bar_head{
-    height:40px; background:#333333; color:#fff; line-height:17px; padding-left:10px;
+    background:#333333; color:#fff; line-height:17px; padding-left:10px;
 }
 
 .playlist_bar_outer .playlist_bar_head a{
@@ -1980,13 +1976,12 @@ input.date{
 }
 
 .playlist_bar_outer .playlist_bar_head .head_left{
-	padding-top:12px; overflow:hidden; height:30px;
-	padding-left:-10px;
+	padding-top:15px; padding-bottom:10px;
 }
 
 .playlist_bar_outer .view_all_videos{
     cursor:pointer;
-    margin:8px 10px 0 0; color:#fff;
+    margin:8px 10px 8px 0; color:#fff;
     background: none repeat scroll 0 0 #232323;
     border: 1px solid #000000;
     border-radius: 3px 3px 3px 3px;

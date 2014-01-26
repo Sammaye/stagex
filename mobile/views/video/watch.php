@@ -455,7 +455,25 @@ $this->js('edit', "
 		</div>
 		<?php endif; ?>
 
-		</div>		
+		</div>
+		
+	<?php if(glue::auth()->check(array('viewable' => $playlist))){ ?>
+	<div class="playlist_bar_outer" data-id='<?php echo $playlist->_id ?>'>
+		<div class='playlist_bar_head'>
+			<div class="row">
+			<div class='head_left col-md-9 col-sm-7 col-xs-8'>Playlist: <a href='<?php echo glue::http()->url('/playlist/view', array('id' => $playlist->_id)) ?>'><?php echo html::encode($playlist->title) ?></a> (<?php echo count($playlist->videos) ?> Videos)
+			- By <b><a href='<?php echo glue::http()->url('/user/view', array('id' => $playlist->userId)) ?>'><?php echo $playlist->author->getUsername(); ?></a></b></div>
+			<div class="col-md-3 col-sm-5 col-xs-4"><button class='view_all_videos'>View All Videos</button></div>
+			</div>
+		</div>
+		<div class='playlist_content'>
+			<button class='move_left hidden-xs hidden-sm'></button>
+			<button class='move_right hidden-xs hidden-sm'></button>
+			<div class='playlist_video_list'>
+				<div class='tray_content'>Loading</div></div>
+		</div>
+	</div>
+	<?php } ?>		
 
 		<?php if($model->allowTextComments||$model->allowVideoComments): ?>
 		<div class="video_comments">
@@ -471,21 +489,3 @@ $this->js('edit', "
 
 <div id='video_response_options' style='width:200px;'></div>
 <div id='videoResponse_results' class=''></div>
-
-<?php if(glue::auth()->check(array('viewable' => $playlist))){ ?>
-<div class="playlist_bar_outer" data-id='<?php echo $playlist->_id ?>'>
-	<div class='playlist_bar_head'>
-		<div class="row">
-		<div class='head_left col-md-9 col-sm-7 col-xs-8'>Playlist: <a href='<?php echo glue::http()->url('/playlist/view', array('id' => $playlist->_id)) ?>'><?php echo html::encode($playlist->title) ?></a> (<?php echo count($playlist->videos) ?> Videos)
-		- By <b><a href='<?php echo glue::http()->url('/user/view', array('id' => $playlist->userId)) ?>'><?php echo $playlist->author->getUsername(); ?></a></b></div>
-		<div class="col-md-3 col-sm-5 col-xs-4"><button class='view_all_videos'>View All Videos</button></div>
-		</div>
-	</div>
-	<div class='playlist_content'>
-		<button class='move_left hidden-xs hidden-sm'></button>
-		<button class='move_right hidden-xs hidden-sm'></button>
-		<div class='playlist_video_list'>
-			<div class='tray_content'>Loading</div></div>
-	</div>
-</div>
-<?php } ?>
