@@ -545,7 +545,7 @@ class Html{
 		$message = $session_flash[0] ? $session_flash[0] : $message;
 		$class = $session_flash[1] ? $session_flash[1] : $class;
 
-		$html = html::openTag('div', array('class' => 'alert '.$class));
+		$html = html::openTag('div', array('class' => 'alert flash-alert '.$class));
 		$html .= '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>';
 		$html .= html::openTag('p', array('class' => 'message')).$message.html::closeTag('p');
 

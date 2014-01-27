@@ -82,8 +82,16 @@
 							</div>
 						</div>
 					</div>
-					<button class='btn btn-danger selected_actions btn_delete'>Remove</button>
-					<button class='btn btn-danger selected_actions btn_delete_all'>Clear Queue</button>					
+<div class="btn-group">
+  <button type="button" class="btn btn-danger btn_delete">Delete</button>
+  <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">
+    <span class="caret"></span>
+    <span class="sr-only">Toggle Dropdown</span>
+  </button>
+  <ul class="dropdown-menu" role="menu">
+    <li><a href="#" class="btn_delete_all">Clear Queue</a></li>
+  </ul>
+</div>
 				</div>
 				<div class="alert block-alert"></div>
 			</div>

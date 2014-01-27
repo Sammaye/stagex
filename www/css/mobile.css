@@ -251,7 +251,8 @@ input.date{
     float:right;
 }
 
-.grey_sticky_toolbar .btn-danger{
+.grey_sticky_toolbar .btn-danger,
+.grey_sticky_toolbar .btn-group{
     margin-left:35px;
 }
 
@@ -1651,6 +1652,10 @@ input.date{
     float:right;margin:7px 0 7px;color:#777;
 }
 
+.edit_playlist_body .subscribe_to_playlist{
+	margin-bottom:10px;
+}
+
 .edit_playlist_body .subscribe_to_playlist .btn{
     float:left;border-radius:4px 0 0 4px;
 }
@@ -2297,7 +2302,7 @@ input.date{
 }
 
 .playlist-dropdown .dropdown-menu{
-    width:350px;
+    width:300px;
 }
 
 .reply .reply_footer .btn_cancel{
@@ -2462,4 +2467,27 @@ input.date{
 
 .user_history_body .video_row.without_controls .info{
     margin-left:133px;
+}
+
+.flash-alert{
+    border-radius:0;
+    color: #fff;
+    padding:10px;
+    margin-bottom:0;
+}
+
+.flash-success{
+    background:#17AA56;
+}
+
+.flash-info{
+    background:#0E83CD;
+}
+
+.flash-warning{
+    background:#FCAD26;
+}
+
+.flash-danger{
+    background:#CB4E4E;
 }

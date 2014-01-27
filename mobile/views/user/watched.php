@@ -98,7 +98,6 @@ $this->js('watched_page', "
 			<div class='stickytoolbar-bar'>
 				<div class='inner_bar'>
 					<div class='checkbox_button checkbox_input'><?php echo Html::checkbox('selectAll', 1, 0, array('class' => 'selectAll_input')) ?></div>
-					<button class='btn btn-danger selected_actions btn_delete'>Delete</button>
 					<div class="dropdown-group playlist-dropdown">
 						<button class='btn btn-default add_to_playlist dropdown-anchor'>Add To <span class="caret"></span></button>
 						<div class="dropdown-menu">
@@ -119,7 +118,16 @@ $this->js('watched_page', "
 							</div>
 						</div>
 					</div>
-					<button class='btn btn-danger selected_actions btn_clear'>Clear Watched History</button>
+<div class="btn-group">
+  <button type="button" class="btn btn-danger btn_delete">Delete</button>
+  <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">
+    <span class="caret"></span>
+    <span class="sr-only">Toggle Dropdown</span>
+  </button>
+  <ul class="dropdown-menu" role="menu">
+    <li><a href="#" class="btn_clear">Clear Queue</a></li>
+  </ul>
+</div>					
 				</div>
 				<div class="alert block-alert" style='display:none;'></div>
 			</div>
