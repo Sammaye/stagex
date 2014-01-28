@@ -368,8 +368,9 @@ class Document extends Model
 			foreach($counters as $k => $v){
 				if(($lower !== null && (($this->$k + $v) >= $lower)) || $lower === null){
 					$this->$k = $this->$k + $v;
-				}else
+				}else{
 					unset($counters[$k]);
+				}
 			}
 			if(count($counters) > 0){
 				return static::saveAllCounters($this->getPrimaryKey(), $counters);
@@ -579,7 +580,7 @@ class Document extends Model
     public static function find($query = array(), $fields = array())
     {
     	if(!is_array($query)){
-    		$query = array(static::primaryKey() => new \MongoId($query));
+    		$query = array(static::primaryKey() => static::formatPrimaryKey($query));
     	}
     	$cursor = new Cursor(array(
     		'select' => $fields,
@@ -594,7 +595,7 @@ class Document extends Model
     public static function findAll($query = array(), $fields = array())
     {
     	if(!is_array($query)){
-    		$query = array(static::primaryKey() => new \MongoId($query));
+    		$query = array(static::primaryKey() => static::formatPrimaryKey($query));
     	}
     	$cursor = new Cursor(array(
     		'select' => $fields,
@@ -618,7 +619,7 @@ class Document extends Model
     {
     	return static::getCollection()->update(
     		is_array($query) ? $query : array(static::primaryKey() => static::formatPrimaryKey($query)), 
-    		array('$set' => $counters), 
+    		array('$inc' => $counters), 
     		array_merge(array('multiple' => true), $options)
     	);
     }

@@ -181,6 +181,7 @@ $this->js('edit', "
 		$.post('".glue::http()->url('/playlist/subscribe')."', {id:container.data('id')}, null, 'json')
 		.done(function(data){
 			if(data.success){
+				container.data('sub-id', data._id);
 				btn.removeClass('btn-success btn_subscribe').addClass('btn-danger btn_unsubscribe').html('Unsubscribe');
 			}
 		});
@@ -191,7 +192,7 @@ $this->js('edit', "
 		var btn=$(this),
 			container=$(this).parents('.subscribe_to_playlist');
 		
-		$.post('".glue::http()->url('/playlist/unsubscribe')."', {id:container.data('id')}, null, 'json')
+		$.post('".glue::http()->url('/playlist/unsubscribe')."', {id:[container.data('sub-id')]}, null, 'json')
 		.done(function(data){
 			if(data.success){
 				btn.removeClass('btn-danger btn_unsubscribe').addClass('btn-success btn_subscribe').html('Subscribe to Playlist');
@@ -274,15 +275,18 @@ $this->js('edit', "
 	<h1><?php echo $model->title ?></h1>
 	<p class="expandable playlist_description"><?php echo nl2br($model->description) ?></p>
 
-	<div class="clearfix share_area subscribe_to_playlist row" data-id="<?php echo $model->_id ?>">
-	<?php if(!glue::auth()->check(array('^'=>$model))&&glue::auth()->check(array('@'))){ ?>
+	<div class="clearfix share_area row">
+	<?php if(!glue::auth()->check(array('^'=>$model)) && glue::auth()->check(array('@'))){ ?>
 		<div class="col-md-3 clearfix">
-		<?php if(!$model->user_is_subscribed(glue::user())){ ?>
-		<button class="btn btn-success btn_subscribe" type="button">Subscribe to Playlist</button>
+		<?php $subscription = $model->getSubscription(glue::user()) ?>
+		<div class="subscribe_to_playlist" data-id="<?php echo $model->_id ?>" data-sub-id="<?php echo $subscription ? $subscription['_id'] :  '' ?>">
+		<?php if(!$subscription){ ?>
+			<button class="btn btn-success btn_subscribe" type="button">Subscribe to Playlist</button>
 		<?php }else{ ?>
-		<button class="btn btn-danger btn_unsubscribe" type="button">Unsubscribe</button>
+			<button class="btn btn-danger btn_unsubscribe" type="button">Unsubscribe</button>
 		<?php } ?>
 		<span class="subscriber_count"><?php echo $model->followers ?></span>
+		</div>
 		</div>
 		<?php } ?>
 		<div class="col-md-6">

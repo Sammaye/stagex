@@ -4,17 +4,28 @@ namespace glue;
 
 class Json
 {
+	public static $succeeded = 0;
+	public static $failed = 0;
+	public static $total = 0;
+	
 	const DENIED = 1;
 	const LOGIN = 2;
 	const UNKNOWN = 3;
-
-	public static function success($params)
+	
+	public static function op($total)
 	{
+		return static::success(array('n' => static::$succeeded, 'failed' => static::$failed, 'total' => $total));
+	}
+
+	public static function success($params, $exit = true)
+	{
+		$json='';
 		if(is_string($params)){
-			return json_encode(array('success' => true, 'message' => array($params)));
+			$json= json_encode(array('success' => true, 'message' => array($params)));
 		}else{
-			return json_encode(array_merge(array('success' => true), $params));
+			$json= json_encode(array_merge(array('success' => true), $params));
 		}
+
 		if($exit){
 			echo $json;
 			exit(0);
@@ -22,27 +33,28 @@ class Json
 		return $json;
 	}
 
-	public static function error($params)
+	public static function error($params, $exit = true)
 	{
+		$json='';
 		switch(true){
 			case $params == self::DENIED:
-				return json_encode(array('success' => false, 'message' => array('Action not Permitted')));
+				$json= json_encode(array('success' => false, 'message' => 'Action not Permitted'));
 				break;
 			case $params == self::LOGIN:
-				return json_encode(array('success' => false, 'message' => array('You must login to continue')));
+				$json= json_encode(array('success' => false, 'message' => 'You must login to continue'));
 				break;
 			case $params == self::UNKNOWN:
-				return json_encode(array('success' => false, 'message' => array('An unknown error was encountered')));
+				$json= json_encode(array('success' => false, 'message' => 'An unknown error was encountered'));
 				break;
 			default:
 				if(is_string($params)){
-					return json_encode(array('success' => false, 'message' => array($params)));
+					$json= json_encode(array('success' => false, 'message' => $params));
 				}else{
-					return json_encode(array_merge(array('success' => false), $params));
+					$json= json_encode(array_merge(array('success' => false), $params));
 				}
 				break;
 		}
-		
+
 		if($exit){
 			echo $json;
 			exit(0);

@@ -7,12 +7,15 @@ $this->js('page', "
 		
 	$(document).on('click', '.user_playlist_subscription_item .btn_subscribe', function(){
 		
+		$('.grey_sticky_toolbar .block-alert').summarise('close');
+		
 		var btn=$(this),
 			container=$(this).parents('.user_playlist_subscription_item');
 		
-		$.post('".glue::http()->url('/playlist/subscribe')."', {id:container.data('id')}, null, 'json')
+		$.post('".glue::http()->url('/playlist/subscribe')."', {id:container.data('playlist-id')}, null, 'json')
 		.done(function(data){
 			if(data.success){
+				container.data('id', data._id);
 				btn.css({display:'none'});
 			}
 		});
@@ -35,11 +38,11 @@ $this->js('page', "
 		$.post('/playlist/unsubscribe', params, null, 'json').done(function(data){
 			if(data.success){
 				$('.grey_sticky_toolbar .block-alert').summarise('set', 'success','The playlists you selected were deleted');
-				$.each(params['ids[]'],function(i,item){
+				$.each(params['id[]'],function(i,item){
 					$('.playlist_list .playlist[data-id='+item+']').find('.btn_subscribe').css({display:'block'});
 				});
 				$('.grey_sticky_toolbar .block-alert').summarise('set', 'success',
-					'You have been unsubscribed from those playlists');		
+					'You have been unsubscribed from those playlists');
 				reset_checkboxes();
 			}else{
 				$('.grey_sticky_toolbar .block-alert').summarise('set', 'error','Could not unsubscribe you from those playlists');

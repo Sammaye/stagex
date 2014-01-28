@@ -6,8 +6,8 @@ if(!($model=app\models\Playlist::findOne(array('_id' => $item['playlist_id'])))|
 }
 ?>
 
-<div class='playlist clearfix user_playlist_item user_playlist_subscription_item' data-id="<?php echo isset($custid)?$custid:$model->_id ?>">
-	<div class='checkbox_col'><div class="checkbox_input" style=''><?php echo html::checkbox('sub_id[]', strval(isset($custid) ? $custid : $model->_id), 0) ?></div></div>
+<div class='playlist clearfix user_playlist_item user_playlist_subscription_item' data-id="<?php echo strval($item['_id']) ?>" data-playlist-id="<?php echo strval($model->_id) ?>">
+	<div class='checkbox_col'><div class="checkbox_input" style=''><?php echo html::checkbox('sub_id[]', strval($item['_id']), 0) ?></div></div>
 	<div class="row">
 	<div class='thumbnail col-md-3'>
 		<?php $pics = $model->get4Pics(); ?><?php for($i = 1; $i < count($pics)-1; $i++){ ?>
@@ -26,7 +26,7 @@ if(!($model=app\models\Playlist::findOne(array('_id' => $item['playlist_id'])))|
 				echo html::a(array('text' => $model->author->getUsername(), 'href' => array('/user/view','id'=>$model->author->_id), 'class' => 'username'));
 			} ?>
 			<?php echo count($model->videos) ?> videos
-			<div><button type="button" class="btn btn-success btn_subscribe">Subscribe</button></div>
+			<div><button type="button" class="btn btn-success btn_subscribe btn-xs">Subscribe</button></div>
 		</div>	
 		<?php } ?>
 	</div>

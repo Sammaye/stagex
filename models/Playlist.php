@@ -214,7 +214,7 @@ class Playlist extends \glue\db\Document{
 		return true;
 	}
 	
-	function user_is_subscribed($user){
-		return glue::db()->playlist_subscription->findOne(array('user_id' => $user->_id, 'playlist_id' => $this->_id))!==null;
+	function getSubscription($user){
+		return glue::db()->playlist_subscription->findOne(array('user_id' => $user->_id, 'playlist_id' => $this->_id));
 	}
 }

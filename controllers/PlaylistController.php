@@ -4,6 +4,7 @@ use \glue\Controller;
 use app\models\AutoPublishQueue;
 use app\models\Video;
 use app\models\Playlist;
+use glue\Json;
 
 class PlaylistController extends Controller
 {
@@ -239,46 +240,56 @@ class PlaylistController extends Controller
 	
 	function action_subscribe()
 	{
-		if(glue::auth()->check('ajax','post')){
+		if(!glue::auth()->check('ajax','post')){
+			glue::trigger('404');
+		}
 				
-			if(
-				($id=glue::http()->param('id',null))===null ||
-				($playlist=Playlist::findOne(array("_id"=>new MongoId($id))))===null
-			)
-				$this->json_error('Playlist not found');
+		if(
+			($id = glue::http()->param('id',null)) === null ||
+			($playlist = Playlist::findOne(array("_id"=>new MongoId($id)))) === null
+		){
+			Json::error('Playlist not found');
+		}
 			
-			$f=glue::db()->playlist_subscription->update(
-				array('user_id' => glue::user()->_id, 'playlist_id' => $playlist->_id), 
-				array('$set'=>array('update_time' => new MongoDate())),
-				array('upsert' => true)
-			);
-			if(isset($f['upserted'])&&$f['upserted']){
-				$playlist->saveCounters(array('followers' => 1));
-				$this->json_success('You have subscribed to this playlist');
-			} // Be silent about the relationship already existing
+		$f = glue::db()->playlist_subscription->update(
+			array('user_id' => glue::user()->_id, 'playlist_id' => $playlist->_id),
+			array('$set' => array('update_time' => new MongoDate())),
+			array('upsert' => true)
+		);
+		if(isset($f['upserted']) && $f['upserted']){
+			$playlist->saveCounters(array('followers' => 1));
+			Json::success(array('message' => 'You have subscribed to this playlist', '_id' => strval($f['upserted'])));
+		} // Be silent about the relationship already existing
 			
-			$this->json_error(self::UNKNOWN);
-		}else
-			glue::trigger('404');		
+		Json::error(Json::UNKNOWN);
 	}
 	
 	function action_unsubscribe()
 	{
-		if(glue::auth()->check('ajax','post')){
-			if(
-				($id=glue::http()->param('id',null))===null ||
-				($playlist=Playlist::findOne(array("_id"=>new MongoId($id))))===null
-			)
-				$this->json_error('Playlist not found');
-			
-			$f=glue::db()->playlist_subscription->remove(array('user_id' => glue::user()->_id, 'playlist_id' => $playlist->_id));
-			if($f['n']>0){
-				$playlist->saveCounters(array('followers' => -1));
-				$this->json_success('You have unsubscribed from this playlist');				
+		if(!glue::auth()->check('ajax','post')){
+			glue::trigger('404');	
+		}
+
+		if(($ids = glue::http()->param('id',null)) && is_array($ids)){
+			foreach($ids as $id){
+				if(
+					($subscription = glue::db()->playlist_subscription->findOne(array("_id"=>new MongoId($id)))) !== null
+					&& $response = glue::db()->playlist_subscription->remove(array('user_id' => glue::user()->_id, '_id' => new MongoId($id)))
+				){
+					if($response['n'] > 0){
+						if($playlist = Playlist::findOne($subscription['playlist_id'])){
+							// Playlist may not always exist if it has been deleted
+							$playlist->saveCounters(array('followers' => -1));
+						}
+						Json::$succeeded++;
+						continue;
+					}
+				}
+				Json::$failed++;
 			}
-			$this->json_error(self::UNKNOWN);
-		}else
-			glue::trigger('404');		
+			Json::op(count($ids));
+		}
+		Json::error(Json::UNKNOWN);
 	}
 	
 	function action_ajaxsearch()
