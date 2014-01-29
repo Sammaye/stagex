@@ -142,7 +142,7 @@ $this->js('new_playlist', "
 					<li role="presentation"><a role="menuitem" tabindex="-1" href="<?php echo glue::http()->url(array('sorton'=>'followers','orderby'=>-1)) ?>">Followers</a></li>
 					<li role="presentation"><a role="menuitem" tabindex="-1" href="<?php echo glue::http()->url(array('sorton'=>'totalVideos','orderby'=>-1)) ?>">Videos</a></li>
 				</ul>
-			</div>				
+			</div><span class='text-muted small amount_found'><?php echo $playlist_rows->count() ?> found</span>
 			<?php $form->end() ?>
 			</div>    	
     </div>	

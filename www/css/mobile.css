@@ -857,6 +857,7 @@ input.date{
     float:left;
 }
 
+.user_playlists_page .form-search .btn-group,
 .user_videos_body .form-search .btn-group{
 	margin-left:10px;
 }
