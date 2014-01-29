@@ -102,8 +102,7 @@ $this->js('videos', "
 			<div class="btn-group">
 				<button type="button" class="btn btn-link dropdown-toggle"
 					data-toggle="dropdown">
-					Sort
-					<?php if(glue::http()->param('sorton') == 'created'){
+					Sort<?php if(glue::http()->param('sorton') == 'created'){
 						if(glue::http()->param('orderby') == -1)
 							echo ': Newest';
 						elseif(glue::http()->param('orderby') == 1)
