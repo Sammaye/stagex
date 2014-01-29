@@ -14,13 +14,13 @@
 			<div class='expandable description'><?php echo nl2br(htmlspecialchars($item->description)) ?></div>
 		<?php } ?>
 		<div class="detail">
-			<?php echo date('d F Y', $item->created->sec) ?> - 
+			<?php echo date('d F Y', $item->created->sec) ?>
 			<?php if($item->state === 'failed'): ?>
-			<span class='encoding_failed'>Encoding FAILED <input type="button" class="btn" value="Delete"/></span>
+			 - <span class='encoding_failed'>Encoding FAILED <input type="button" class="btn" value="Delete"/></span>
 			<?php elseif($item->isProcessing()): ?>
-			<span class='currently_encoding'>Encoding In Progress</span>
+			 - <span class='currently_encoding'>Encoding In Progress</span>
 			<?php else: ?>
-			<span class="duration"></span>
+			 - <span class="duration"><?php echo $item->get_time_string() ?></span>
 			<?php endif; ?>
 		</div>
 	</div>

@@ -98,7 +98,39 @@ $this->js('videos', "
 							.append( '<a class=\'content\'><span>' + item.label + '</span></div></a>' )
 							.appendTo( ul );
 				"))  ?></div><button class="btn btn-default submit_search">Search</button>
-				<span class='text-muted small amount_found'><?php echo $video_rows->count() ?> found</span>
+				
+			<div class="btn-group">
+				<button type="button" class="btn btn-link dropdown-toggle"
+					data-toggle="dropdown">
+					Sort
+					<?php if(glue::http()->param('sorton') == 'created'){
+						if(glue::http()->param('orderby') == -1)
+							echo ': Newest';
+						elseif(glue::http()->param('orderby') == 1)
+							echo ": Oldest";
+					}elseif(glue::http()->param('sorton') == 'likes'){
+						if(glue::http()->param('orderby') == -1)
+							echo ': Liked';
+						elseif(glue::http()->param('orderby') == 1)
+							echo ": Disliked";
+					}elseif(glue::http()->param('sorton') == 'views'){
+						if(glue::http()->param('orderby') == -1)
+							echo ': Most Viewed';
+						elseif(glue::http()->param('orderby') == 1)
+							echo ": Least Viewed";
+					} ?>
+					<span class="caret"></span>
+				</button>
+				<ul class="dropdown-menu" role="menu"
+					aria-labelledby="dropdownMenu1">
+					<li role="presentation"><a role="menuitem" tabindex="-1" href="<?php echo glue::http()->url(array('sorton'=>'created','orderby'=>-1)) ?>">Newest</a></li>
+					<li role="presentation"><a role="menuitem" tabindex="-1" href="<?php echo glue::http()->url(array('sorton'=>'created','orderby'=>1)) ?>">Oldest</a></li>
+					<li role="presentation"><a role="menuitem" tabindex="-1" href="<?php echo glue::http()->url(array('sorton'=>'likes','orderby'=>-1)) ?>">Liked</a></li>
+					<li role="presentation"><a role="menuitem" tabindex="-1" href="<?php echo glue::http()->url(array('sorton'=>'dislikes','orderby'=>-1)) ?>">Disliked</a></li>
+					<li role="presentation"><a role="menuitem" tabindex="-1" href="<?php echo glue::http()->url(array('sorton'=>'views','orderby'=>-1)) ?>">Most Viewed</a></li>
+					<li role="presentation"><a role="menuitem" tabindex="-1" href="<?php echo glue::http()->url(array('sorton'=>'views','orderby'=>1)) ?>">Least Viewed</a></li>
+				</ul>
+			</div><span class='text-muted small amount_found'><?php echo $video_rows->count() ?> found</span>
 			<?php $form->end() ?>
 			</div>    	
     	<div class="clear"></div>
@@ -148,6 +180,7 @@ $this->js('videos', "
 	<div class="video_list">
 	<?php if($video_rows->count() > 0){
 		echo glue\widgets\ListView::run(array(
+			'sortableAttributes' => array('dislikes', 'likes', 'created', 'views'),
 			'pageSize'	 => 20,
 			'page' 		 => isset($_GET['page']) ? $_GET['page'] : 1,
 			"cursor"	 => $video_rows,

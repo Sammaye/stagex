@@ -857,6 +857,10 @@ input.date{
     float:left;
 }
 
+.user_videos_body .form-search .btn-group{
+	margin-left:10px;
+}
+
 .checkbox_input{
     background:url('/images/checkbox.png') -2px -4px no-repeat;
     height:18px; width:18px;
