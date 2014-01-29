@@ -74,7 +74,7 @@ class videoPlayer extends \glue\Widget{
 	      			value *= 1;
 	      			var valueHeight = Math.round((value/16)*9);
 					
-					$('video_element_inner').css({width: width, height: valueHeight});
+					$('.video_element_inner').css({width: width, height: valueHeight});
 					$('video').css({display: 'block'});
 				}
 				resizeVideo();

@@ -1336,7 +1336,7 @@ input.date{
 }
 
 .watch_page .statistics_content .stats_block{
-    float:left; width:200px; text-align:center; font-size:16px;
+    float:left; padding:0 20px; text-align:center; font-size:16px;
 }
 
 .watch_page .statistics_content #chartdiv{}
@@ -1821,13 +1821,17 @@ input.date{
 
 .video_analytics_body .stats_block{
     float: left;
-    width: 200px;
+    padding:5px 20px;
     text-align: center;
     font-size: 16px;
 }
 
 .video_analytics_body .stats_filter_bar{
-    padding:10px;text-align:right;background:#f8f8f8;
+    padding:10px; background:#f8f8f8;
+}
+
+.video_analytics_body .stats_filter_bar .sep_outer{
+	width:15px; padding:0; margin:0; text-align:center; margin-top:6px;
 }
 
 .video_analytics_body .stats_filter_bar input{
@@ -1876,19 +1880,18 @@ input.date{
 }
 
 .video_analytics_body .stats_period_caption{
-    padding:30px 0;
+	padding:20px 0;
 }
 
 .video_analytics_body .pie_charts{
-    height:400px;
 }
 
 .video_analytics_body .pie_charts .chart_head_left{
-    margin-left:70px; line-height:25px;
+    line-height:25px;
 }
 
 .video_analytics_body .pie_charts .chart_head_right{
-    margin-left:190px;line-height:25px;
+    line-height:25px;
 }
 
 .video_analytics_body .pie_charts.first{
@@ -1896,7 +1899,11 @@ input.date{
 }
 
 .video_analytics_body .pie_chart{
-    min-width: 300px; height: 300px; margin: 0 auto; float:left;
+    min-width: 300px; height: 300px; margin: 0 auto;
+}
+
+.video_analytics_body .pie_charts .chart_head{
+	text-align:center;
 }
 
 .video_analytics_body .pie_chart.left{

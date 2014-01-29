@@ -35,11 +35,14 @@ $video_stats = $model->getStatistics_dateRange(mktime(0, 0, 0, date("m"), date("
 			<div class="clear"></div>
 		</div>
 		<div class="clear"></div>
-		<div class='stats_filter_bar'>
-			<label for="from">Date range:</label>
-			<input type="text" id="from" name="from" class="form-control col-5" value='<?php echo date("d/m/Y") ?>'/><span class="sep">-</span>
-			<input type="text" id="to" name="to" class="form-control col-5" value='<?php echo date('d/m/Y') ?>'/>
-			<input type="button" class="btn btn-white apply_range" value="Apply"/>
+		<div class='stats_filter_bar row'>
+			<div class="form-group"><label for="from">Date range:</label></div>
+			<div class="row">
+			<div class="col-xs-6 col-sm-3 col-md-2 form-group"><input type="text" id="from" name="from" class="form-control col-5" value='<?php echo date("d/m/Y") ?>'/></div>
+			<div class="hidden-sm hidden-xs col-md-1 sep_outer"><span class="sep">-</span></div>
+			<div class="col-xs-6 col-sm-3 col-md-2 form-group"><input type="text" id="to" name="to" class="form-control col-5" value='<?php echo date('d/m/Y') ?>'/></div>
+			<div class="col-xs-2 col-sm-2 col-md-2 form-group"><input type="button" class="btn btn-default apply_range" value="Apply"/></div>
+			</div>
 		</div>
 		<div id="chartdiv" style='height:250px; width:100%; margin-left:5px;'>
 			<?php echo app\widgets\highcharts::run(array(
@@ -270,19 +273,27 @@ $video_stats = $model->getStatistics_dateRange(mktime(0, 0, 0, date("m"), date("
 			<div class="clear"></div>
 		</div>
 		<p>The pie charts below only show meaningful data for those who have filled in their profile and only for unique visits to your video</p>
-		<div class="pie_charts first">
-			<div class="stats_block chart_head_left"><span class='males_percent'>Browsers</div>
-			<div class="stats_block chart_head_right"><span class='females_percent'>Age all genders</div>		
-			<div id="browser_container" class="pie_chart left"></div>
+		<div class="pie_charts first row">
+			<div class="col-md-6">
+			<h4 class="chart_head h4"><span class='males_percent'></span>Browsers</h4>
+			<div id="browser_container" class="pie_chart"></div>
+			</div>
+			<div class="col-md-6">
+			<h4 class="chart_head h4"><span class='females_percent'></span>Age all genders</h4>
 			<div id="age_group_container" class="pie_chart"></div>
+			</div>
 		</div>
-		<div class="pie_charts">
-			<div class="stats_block chart_head_left"><span class='males_percent'><?php echo $video_stats['males'] ?></span> males by age</div>
-			<div class="stats_block chart_head_right"><span class='females_percent'><?php echo $video_stats['females'] ?></span> females by age</div>		
-			<div id="male_age_container" class="pie_chart left"></div>
+		<div class="pie_charts row">
+			<div class="col-md-6">
+			<h4 class="chart_head h4"><span class='males_percent'><?php echo $video_stats['males'] ?></span> males by age</h4>
+			<div id="male_age_container" class="pie_chart"></div>
+			</div>
+			<div class="col-md-6">
+			<h4 class="chart_head h4"><span class='females_percent'><?php echo $video_stats['females'] ?></span> females by age</h4>
 			<div id="female_age_container" class="pie_chart"></div>
+			</div>
 		</div>		
-
+		<div class="row">
 		<?php
 		// Now get the top 10 referers
 		$referers = glue::db()->video_referers->find(array('video_id' => $model->_id))->sort(array('c' => -1))->limit(10); ?>
@@ -303,5 +314,6 @@ $video_stats = $model->getStatistics_dateRange(mktime(0, 0, 0, date("m"), date("
 				<?php } ?>
 			</tbody>
 		</table>
+		</div>
 	</div>
 </div>
