@@ -69,16 +69,24 @@ class videoPlayer extends \glue\Widget{
 		
 		if($this->mobile){
 			glue::controller()->js('resize', "
-				var value = $('.video_body').width(), width = value;
-      			value *= 1;
-      			var valueHeight = Math.round((value/16)*9);
+				function resizeVideo(){
+					var value = $('.video_body').width(), width = value;
+	      			value *= 1;
+	      			var valueHeight = Math.round((value/16)*9);
+					
+					$('video_element_inner').css({width: width, height: valueHeight});
+					$('video').css({display: 'block'});
+				}
+				resizeVideo();
 				
-				$('video').prop('width', width)
-					.prop('height', valueHeight);
+				$(window).resize(function(){
+					resizeVideo();
+				});
 			");
 		}
 		?>
-		<video width="<?php echo $this->width ?>" height="<?php echo $this->height ?>" <?php if((glue::user()->autoplayVideos || !glue::session()->authed) && !$this->embedded): echo "autoplay"; endif; ?> controls="controls" preload="none">
+		<div class="video_element_inner" style="width:<?php echo $this->width . 'px' ?>; height:<?php echo $this->height . 'px' ?>;">
+		<video style="width:100%;height:100%;" <?php if((glue::user()->autoplayVideos || !glue::session()->authed) && !$this->embedded): echo "autoplay"; endif; ?> controls="controls" preload="none">
 		    <source type="video/mp4" src="<?php echo $this->mp4 ?>" />
 		    <source type="video/ogg" src="<?php echo $this->ogg ?>" />
 		    <object width="320" height="240" type="application/x-shockwave-flash" data="/js/MediaElement/flashmediaelement.swf">
@@ -87,6 +95,7 @@ class videoPlayer extends \glue\Widget{
 		        <!-- <img src="#" width="320" height="240" title="No video playback capabilities" /> -->
 		    </object>
 		</video>
+		</div>
 		<?php
 	}
 }

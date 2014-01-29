@@ -1090,7 +1090,9 @@ input.date{
 }
 
 .watch_page .video_element{
-    border-radius:4px; background:#000; border:1px solid #000; color:#fff; text-align:center; font-size:30px;
+    border-radius:4px; background:#000; 
+    border:1px solid #000; color:#fff; 
+    text-align:center; font-size:30px; display:none;
 }
 
 .watch_page .video_element .status-message{
