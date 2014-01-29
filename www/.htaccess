@@ -1,4 +1,5 @@
 Options +FollowSymLinks -Indexes -MultiViews
+
 #CustomLog "|/usr/sbin/rotatelogs /var/log/apache2/access.log 86400" common #Not sure if this is needed
 
 #AuthType Basic
@@ -41,6 +42,6 @@ Options +FollowSymLinks -Indexes -MultiViews
 	RewriteRule ^/?help/view/([^/]+)$ index.php?url=help/view&title=$1&%{QUERY_STRING} [NC]
 	
 	RewriteCond %{REQUEST_URI} ^/[^\.]+[^/]$
-	RewriteRule ^(.*)$ index.php?url=$1&%{QUERY_STRING}
+	RewriteRule ^(.*)$ index_mobile.php?url=$1&%{QUERY_STRING}
 
 </IfModule>

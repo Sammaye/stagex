@@ -8,6 +8,7 @@ $this->beginPage() ?>
 <head>
 <title><?php echo Html::encode($this->title) ?></title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+<link rel="shortcut icon" href="/images/favicon.ico" />
 <link href="/css/bootstrap.min.css" rel="stylesheet">
 <link type="text/css" rel="stylesheet" href="/css/mmenu.css" />
 <link type="text/css" rel="stylesheet" href="/css/mobile.css" />
@@ -28,7 +29,7 @@ $this->beginPage() ?>
 	<script src="/js/jquery.js"></script>
 	<script type="text/javascript" src="/js/jquery-ui.min.js"></script>
 	<script type="text/javascript" src="/js/mmenu.js"></script>
-	<script src="/js/mobile/bootstrap.min.js"></script>
+	<script src="/js/bootstrap.min.js"></script>
 	<script type="text/javascript" src="/js/common.js"></script>
 	<script type="text/javascript">
 	$(function() {
