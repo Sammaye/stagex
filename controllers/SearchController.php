@@ -1,6 +1,10 @@
 <?php
 
 use \glue\Controller;
+use app\models\Video;
+use app\models\Playlist;
+use app\models\User;
+use glue\components\Elasticsearch\Query;
 
 class SearchController extends Controller
 {
@@ -14,7 +18,7 @@ class SearchController extends Controller
 				)
 			)
 		);
-	}	
+	}
 
 	function action_index()
 	{
@@ -27,12 +31,13 @@ class SearchController extends Controller
 		}
 		
 		// Now being to render to page after sorting out the GET vars
-		if(strlen(trim($query))<=0)
+		if(strlen(trim($query))<=0){
 			$this->title = 'Search - StageX';
-		else
+		}else{
 			$this->title = 'Search results for '.$query.' - StageX';
+		}
 		
-		$c = new \glue\components\Elasticsearch\Query();
+		$c = new Query();
 		$c->filtered = true;
 		if(glue::http()->param('query')){
 			$c->query()->multiPrefix(array('burb', 'title', 'tags', 'username'), glue::http()->param('query'));
@@ -47,11 +52,12 @@ class SearchController extends Controller
 			$c->filter()->and('term', array('mature' => 0));
 		}
 		
-		$categories=app\models\Video::categories('selectBox');
+		$categories = Video::categories('selectBox');
 		if(array_key_exists($filter_category, $categories)){
 			$c->filter()->and('term', array('category' => $filter_category));
-		}else
-			$filter_category=null;
+		}else{
+			$flter_category = null;
+		}
 
 		switch($filter_time){
 			case "today":
@@ -91,54 +97,24 @@ class SearchController extends Controller
 				break;
 		}
 
-		if($filter_type==='video'||$filter_type==='user'||$filter_type==='playlist')
+		if($filter_type==='video'||$filter_type==='user'||$filter_type==='playlist'){
 			$c->type = $filter_type;
-		else
+		}else{
 			$c->type = 'video,user,playlist';
+		}
 		
 		$cursor = glue::elasticSearch()->search($c);
 		$cursor->setIteratorCallback(function($doc){
-			if($doc['_type']==='video')
+			if($doc['_type']==='video'){
 				return app\models\Video::findOne(array('_id'=>new MongoId($doc['_id'])));
-			if($doc['_type']==='playlist')
+			}elseif($doc['_type']==='playlist'){
 				return app\models\Playlist::findOne(array('_id'=>new MongoId($doc['_id'])));
-			if($doc['_type']==='user')
+			}elseif($doc['_type']==='user'){
 				return app\models\User::findOne(array('_id'=>new MongoId($doc['_id'])));
+			}
 		});		
 		
 		echo $this->render('search/search', array('sphinx' => $cursor, 'query' => $query, 'filter_type' => $filter_type, 'filter_time' => $filter_time, 
-				'filter_duration' => $filter_duration, 'filter_category' => $filter_category, 'orderby' => $orderby));
-	}
-
-	function action_suggestions()
-	{
-		$this->pageTitle = 'Suggest Searches - StageX';
-		if(!glue::http()->isAjax()){
-			glue::route('error/notfound');
-		}
-
-		$ret = array();
-
-		$sphinx = glue::sphinx()->getSearcher();
-		$sphinx->limit = 5;
-		$sphinx->query(array('select' => glue::http()->param('term')), "main");
-
-		if($sphinx->matches){
-			foreach($sphinx->matches as $item){
-				if($item instanceof Video){
-					$ret[] = array(
-						'label' => $item->title,
-						'description' => $item->description,
-					);
-				}elseif($item instanceof User){
-					$ret[] = array(
-						'label' => $item->username,
-						'description' => null,
-					);
-				}
-			}
-		}
-
-		echo json_encode($ret);
+			'filter_duration' => $filter_duration, 'filter_category' => $filter_category, 'orderby' => $orderby));
 	}
 }

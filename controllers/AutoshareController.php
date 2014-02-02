@@ -1,6 +1,7 @@
 <?php
 
 use \glue\Controller;
+use app\models\User;
 
 class AutoshareController extends Controller
 {
@@ -26,20 +27,19 @@ class AutoshareController extends Controller
 		glue::trigger('404');
 	}
 
-
 	function getConnectedUser()
 	{
-		$this->user = $this->loadModel();
+		$this->user = glue::user();
 
 		switch($_GET['network']){
 			case "fb":
 				$this->account = glue::facebook();
-				glue::facebook()->facebook->setAccessToken(!empty($this->user->fb_autoshare_token) ? $this->user->fb_autoshare_token : null);
+				glue::facebook()->facebook->setAccessToken(!empty($this->user->autoshareFb) ? $this->user->autoshareFb : null);
 				$this->socialUser =glue::facebook()->getCurrentUser();
 				break;
 			case "twt":
 				$this->account = glue::twitter();
-				$this->account->connect(array("access_token"=>$this->user->twt_autoshare_token));
+				$this->account->connect(array("access_token" => $this->user->autoshareTwitter));
 				$this->socialUser =$this->account->getCurrentUser();
 				break;
 		}
@@ -141,7 +141,7 @@ class AutoshareController extends Controller
 		</html>
 	<?php }
 
-	function action_disconnect()
+	public function action_disconnect()
 	{
 		$this->getConnectedUser(); ?>
 		<html>
@@ -167,10 +167,4 @@ class AutoshareController extends Controller
 			</body>
 		</html>
 	<?php }
-
-	function loadModel()
-	{
-		$user = app\models\User::findOne(array("_id"=>glue::user()->_id));
-		return $user;
-	}
 }

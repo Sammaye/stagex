@@ -1,14 +1,15 @@
 <?php
 
-use \glue\Controller;
+use glue\Controller;
 use app\models\AutoPublishQueue;
 use app\models\Video;
 use app\models\Playlist;
+use app\models\User;
 use glue\Json;
 
 class PlaylistController extends Controller
 {
-	public $tab='playlists';
+	public $tab = 'playlists';
 	
 	public function behaviours()
 	{
@@ -50,8 +51,9 @@ class PlaylistController extends Controller
 
 	public function action_create()
 	{
-		if(!glue::auth()->check('ajax','post'))
+		if(!glue::auth()->check('ajax','post')){
 			glue::trigger('404');
+		}
 
 		$model = new Playlist();
 		if(isset($_POST['Playlist'])){
@@ -59,70 +61,82 @@ class PlaylistController extends Controller
 			if($model->validate()&&$model->save()){
 				$model->author->saveCounters(array('totalPlaylists'=>1));
 				glue::sitemap()->addUrl(glue::http()->url('/playlist/view', array('id' => $model->_id)), 'hourly', '1.0');
-								
-				$this->json_success(array('message' => 'Playlist created', '_id' => strval($model->_id)));
+				
+				Json::success(array('message' => 'Playlist created', '_id' => strval($model->_id)));
 			}
 		}
-		$this->json_error(array('message'=>'Playlist could not be created because:','messages'=>$model->getErrors()));
+		Json::error(array('message'=>'Playlist could not be created because:','messages'=>$model->getErrors()));
 	}
 
 	public function action_save()
 	{
-		if(!glue::auth()->check('ajax','post'))
+		if(!glue::auth()->check('ajax','post')){
 			glue::trigger('404');
+		}
 		
-		if(!($playlist = Playlist::findOne(array('_id' => new MongoId(glue::http()->param('id')),'title' => array('$ne' => 'Watch Later')))))
-			$this->json_error('That playlist was not found');
-		if(!glue::auth()->check(array('^' => $playlist)))
-			$this->json_error(self::DENIED);
+		if(!($playlist = Playlist::findOne(array('_id' => new MongoId(glue::http()->param('id')),'title' => array('$ne' => 'Watch Later'))))){
+			Json::error('That playlist was not found');
+		}
+		if(!glue::auth()->check(array('^' => $playlist))){
+			Json::error(Json::DENIED);
+		}
 
 		if(isset($_POST['Playlist'])){
 			$playlist->attributes=$_POST['Playlist'];
 			$playlist->videos=array();
 			
-			if(($videos=glue::http()->param('videos',array()))&&count($videos)>0&&count($videos)<=500){
+			if(($videos = glue::http()->param('videos',array())) && count($videos) > 0 && count($videos) <= 500){
 				foreach($videos as $k => $v){
-					if($video = Video::findOne(array('_id' => new MongoId(isset($v['video_id'])?$v['video_id']:''))))
+					if($video = Video::findOne(array('_id' => new MongoId(isset($v['video_id']) ? $v['video_id'] : '')))){
 						$playlist->add_video_at_pos($video->_id, $v['position']);
+					}
 				}
 			}
-			$playlist->totalVideos=count($playlist->videos);			
+			$playlist->totalVideos = count($playlist->videos);			
 			
-			if($playlist->validate()&&$playlist->save())
-				$this->json_success('Playlist saved');
-			else
-				$this->json_error(array('message'=>'Playlist could not be saved because:', 'messages'=>$playlist->getErrors()));
-		}else
-			$this->json_error(self::UNKNOWN);
+			if($playlist->validate()&&$playlist->save()){
+				Json::success('Playlist saved');
+			}else{
+				Json::error(array('message'=>'Playlist could not be saved because:', 'messages'=>$playlist->getErrors()));
+			}
+		}else{
+			Json::error(Json::UNKNOWN);
+		}
 	}
 
 	function action_delete()
 	{
-		if(!glue::auth()->check('ajax','post'))
+		if(!glue::auth()->check('ajax','post')){
 			glue::trigger('404');
-		if(!($playlist = Playlist::findOne(array('_id' => new MongoId(glue::http()->param('id','')), 'title' => array('$ne' => 'Watch Later')))))
-			$this->json_error('That playlist could not be found');
-		if(!glue::auth()->check(array('^' => $playlist)))
-			$this->json_error(self::DENIED);
+		}
+		if(!($playlist = Playlist::findOne(array('_id' => new MongoId(glue::http()->param('id','')), 'title' => array('$ne' => 'Watch Later'))))){
+			Json::error('That playlist could not be found');
+		}
+		if(!glue::auth()->check(array('^' => $playlist))){
+			Json::error(self::DENIED);
+		}
 		$playlist->delete();
-		$this->json_success('The playlist was deleted');
+		Json::success('The playlist was deleted');
 	}
 
 	function action_batchDelete()
 	{
-		if(!glue::auth()->check('ajax','post'))
+		if(!glue::auth()->check('ajax','post')){
 			glue::trigger('404');
+		}
+		
 		$ids = glue::http()->param('ids',null);
 		if(count($ids) <= 0 || count($ids)>1000){
 			$this->json_error("No playlists were selected");
 		}
 	
-		foreach($ids as $k => $id)
+		foreach($ids as $k => $id){
 			$mongoIds[$k] = new MongoId($id);
+		}
 		$playlists = Playlist::find(array('_id' => array('$in' => $mongoIds), 'userId' => glue::user()->_id, 'deleted' => 0));
 	
-		$ids=array(); // We reset these to know which were actually picked from the DB
-		$mongoIds=array();
+		$ids = array(); // We reset these to know which were actually picked from the DB
+		$mongoIds = array();
 		foreach($playlists as $playlist){
 			$ids[]=(string)$playlist->_id;
 			$mongoIds[]=$playlist->_id;
@@ -135,25 +149,29 @@ class PlaylistController extends Controller
 			)
 		));		
 		
-		$playlist->author->saveCounters(array('totalPlaylists'=>-count($mongoIds)),0);
-		$this->json_success(array('message'=>'The playlists you selected were deleted','updated'=>count($ids)));
+		$playlist->author->saveCounters(array('totalPlaylists' => -count($mongoIds)), 0);
+		$this->json_success(array('message' => 'The playlists you selected were deleted','updated' => count($ids)));
 	}	
 	
 	function action_batchSave()
 	{
-		if(!glue::auth()->check('ajax','post'))
+		if(!glue::auth()->check('ajax','post')){
 			glue::trigger('404');
-		if(isset($_POST['Playlist'])&&($ids=glue::http()->param('ids',null))!==null){
-			$updated=0;
+		}
+		
+		if(isset($_POST['Playlist']) && ($ids = glue::http()->param('ids', null)) !== null){
+			$updated = 0;
 			foreach($ids as $id){
 				$playlist = Playlist::findOne(array('_id' => new MongoId($id)));
-				if(!glue::auth()->check(array('^' => $playlist)))
+				if(!glue::auth()->check(array('^' => $playlist))){
 					continue;
-				$playlist->attributes=$_POST['Playlist'];
-				if($playlist->validate()&&$playlist->save())
+				}
+				$playlist->attributes = $_POST['Playlist'];
+				if($playlist->validate() && $playlist->save()){
 					$updated++;
+				}
 			}
-			$this->json_success(array('updated'=>$updated,'failed'=>count($ids)-$updated,'total'=>count($ids)));
+			$this->json_success(array('updated' => $updated,'failed' => count($ids) - $updated,'total' => count($ids)));
 		}
 		$this->json_error(self::UNKNOWN);		
 	}
@@ -294,24 +312,33 @@ class PlaylistController extends Controller
 	
 	function action_ajaxsearch()
 	{
-		if(!glue::http()->isAjax())
+		if(!glue::http()->isAjax()){
 			glue::trigger('404');
-		$term=glue::http()->param('term',null);
-		$c=\app\models\Playlist::fts(array('title'),$term,array('deleted'=>0, 'userId' => glue::user()->_id))->limit(100);
-	
-		$res=array();
-		foreach($c as $p){
-			$res[]=array(
-					'_id'=>(string)$p->_id, 'title'=>$p->title,'userId'=>$p->userId,'description'=>$p->description,
-					'listing'=>$p->listing,'totalVideos'=>$p->totalVideos,'likes'=>$p->likes,'created'=>date('d M Y',$p->getTs($p->created)));
 		}
-		$this->json_success(array('results'=>$res));
+		$term = glue::http()->param('term', null);
+		$c = Playlist::fts(array('title'), $term, array('deleted' => 0, 'userId' => glue::user()->_id))->limit(100);
+	
+		$res = array();
+		foreach($c as $p){
+			$res[] = array(
+				'_id' => (string)$p->_id, 
+				'title' => $p->title,
+				'userId' => $p->userId,
+				'description' => $p->description,
+				'listing' => $p->listing,
+				'totalVideos' => $p->totalVideos,
+				'likes' => $p->likes,
+				'created' => date('d M Y', $p->getTs($p->created))
+			);
+		}
+		Json::success(array('results' => $res));
 	}	
 
 	function action_renderBar()
 	{
-		if(!glue::http()->isAjax())
+		if(!glue::http()->isAjax()){
 			glue::trigger('404');
+		}
 		$video_ids = array();
 		$user_ids = array();
 
@@ -324,7 +351,7 @@ class PlaylistController extends Controller
 			?>Playlist not found<?php
 			$html = ob_get_contents();
 			ob_end_clean();
-			$this->json_error(array('html'=>$html));
+			Json::error(array('html' => $html));
 		}
 			
 		// Now lets get its videos
@@ -332,13 +359,13 @@ class PlaylistController extends Controller
 			$video_ids[] = $v['_id'];
 		}
 		
-		$videos_result = app\models\Video::findAll(array('_id' => array('$in' => $video_ids)));
+		$videos_result = Video::findAll(array('_id' => array('$in' => $video_ids)));
 		foreach($videos_result as $k => $v){
 			$videos_a[strval($v['_id'])] = $v;
 			$user_ids[] = $v['userId'];
 		}
 
-		$users_result = app\models\User::findAll(array('_id' => array('$in' => $user_ids)));
+		$users_result = User::findAll(array('_id' => array('$in' => $user_ids)));
 		foreach($users_result as $k => $v){
 			$users_a[strval($v['_id'])] = $v;
 		}
@@ -347,34 +374,35 @@ class PlaylistController extends Controller
 		if(count($videos_a) > 0){
 			ob_start(); ?>
 				<ol>
-					<?php foreach($videos_a as $k => $v){
-						$video = app\models\Video::populate($v);
-						$video->author = app\models\User::populate($users_a[strval($video->userId)]);
-
-						?>
-						<li class='playlist_video_item'>
-							<?php if(glue::auth()->check(array('viewable' => $video))){ ?>
-								<span class='vieo_image'><a href='<?php echo glue::http()->url('/video/watch', array('id' => $video->_id, 'playlist_id' => $playlist->_id)) ?>'><img src='<?php echo $video->getImage(88, 49) ?>' alt='thumbnail'/></a></span>
-								<span class='info_pane'>
-									<a href='<?php echo glue::http()->url('/video/watch', array('id' => $video->_id, 'playlist_id' => $playlist->_id)) ?>'>
-										<?php echo strlen($video->title) > 100 ? html::encode(substr_replace(substr($video->title, 0, 50), '...', -3)) : html::encode($video->title) ?></a>
-									<span class='uploaded_by'>by <a href='<?php echo glue::http()->url('/user/view', array('id' => $video->userId)) ?>'><?php echo $video->author->getUsername() ?></a></span>
-								</span>
-							<?php }else{ ?>
-								<span class='video_not_exist'>Video Not Available</span>
-							<?php } ?>
-						</li>
-					<?php } ?>
+				<?php foreach($videos_a as $k => $v){
+					$video = Video::populate($v);
+					$video->author = User::populate($users_a[strval($video->userId)]);
+					?>
+					<li class='playlist_video_item'>
+						<?php if(glue::auth()->check(array('viewable' => $video))){ ?>
+						<span class='vieo_image'><a href='<?php echo glue::http()->url('/video/watch', array('id' => $video->_id, 'playlist_id' => $playlist->_id)) ?>'>
+						<img src='<?php echo $video->getImage(88, 49) ?>' alt='thumbnail'/></a></span>
+						<span class='info_pane'>
+							<a href='<?php echo glue::http()->url('/video/watch', array('id' => $video->_id, 'playlist_id' => $playlist->_id)) ?>'>
+								<?php echo strlen($video->title) > 100 ? html::encode(substr_replace(substr($video->title, 0, 50), '...', -3)) : html::encode($video->title) ?></a>
+							<span class='uploaded_by'>by <a href='<?php echo glue::http()->url('/user/view', array('id' => $video->userId)) ?>'>
+							<?php echo $video->author->getUsername() ?></a></span>
+						</span>
+						<?php }else{ ?>
+						<span class='video_not_exist'>Video Not Available</span>
+						<?php } ?>
+					</li>
+				<?php } ?>
 				</ol><?php
 				$html = ob_get_contents();
 			ob_end_clean();
-			$this->json_success(array('html'=>$html));
+			Json::success(array('html'=>$html));
 		}else{
 			ob_start();
 				?>No videos found<?php
 				$html = ob_get_contents();
 			ob_end_clean();
-			$this->json_error(array('html'=>$html));
+			Json::error(array('html'=>$html));
 		}
 	}
 }

@@ -120,7 +120,7 @@ class Stream extends \glue\db\Document{
 		$this->Db()->remove(array('stream_type' => 'stream', 'user_id' => glue::session()->user->_id));
 	}
 
-	static function newWallPost_on_OtherUserWall($user_id, $to_user, $text){
+	static function directlyMessageUser($user_id, $to_user, $text){
 		$status = Stream::findOne(array('user_id' => $to_user, 'posted_by_id' => $user_id, 'message' => $text, 'type' => Stream::WALL_POST));
 
 		if($status){

@@ -1,6 +1,9 @@
 <?php
 
-use \glue\Controller;
+use glue\Controller;
+use glue\Validation;
+use glue\Json;
+use app\models\User;
 use app\models\Follower;
 use app\models\Stream;
 use app\models\Notification;
@@ -9,7 +12,6 @@ class StreamController extends Controller
 {
 	public $layout = 'user_section';
 	public $tab = 'news_feed';
-	public $subtab;
 
 	public function behaviours()
 	{
@@ -18,8 +20,8 @@ class StreamController extends Controller
 				'class' => 'glue\Auth',
 				'rules' => array(
 					array('allow', 'actions' => array('getStream'), 'users' => array('*')),
-					array("allow", "users"=>array("@*")),
-					array("deny", "users"=>array("*")),
+					array("allow", "users" => array("@*")),
+					array("deny", "users" => array("*")),
 				)
 			)
 		);
@@ -28,19 +30,17 @@ class StreamController extends Controller
 	public function action_index()
 	{
 		$this->title = 'Your Stream - StageX';
-
 		$this->tab = 'stream';
-		echo $this->render('stream/view', array('cursor' => $this->load_single_stream()));
+		
+		echo $this->render('stream/view', array('cursor' => $this->loadStream()));
 	}
 
 	public function action_news()
 	{
-		$this->pageTitle = 'Recent News - StageX';
-
+		$this->title = 'Recent News - StageX';
 		$this->tab = 'news_feed';
-		$subscription_model = new Follower();
-
-		$subscriptions = $subscription_model->getAll_ids();
+		
+		$subscriptions = Follower::getAllIds();
 		$stream = Stream::find(array('user_id' => array('$in' => $subscriptions),
 			'$or' => array(
 				array('type' => array('$nin' => array(Stream::WALL_POST))),
@@ -53,175 +53,184 @@ class StreamController extends Controller
 	public function action_notifications()
 	{
 		$this->title = 'Notifications - StageX';
-
-		app\models\User::updateAll(array('_id'=>glue::user()->_id),array('$set'=>array('lastNotificationPull'=>new MongoDate())));
-
 		$this->tab = 'notifications';
+
+		User::updateAll(array('_id' => glue::user()->_id),array('$set' => array('lastNotificationPull' => new MongoDate())));
 		echo $this->render('stream/notifications');
 	}
 
 	public function action_share()
 	{
-		$this->pageTitle = 'Share - StageX';
-
 		if(!glue::http()->isAjax()){
-			glue::route('/error/notfound');
+			glue::trigger('404');
 		}
 
-		$type = isset($_GET['type']) ? $_GET['type'] : null;
-		if($type != 'video' && $type != 'playlist'){
-			echo json_encode(array('success' => false));
-			exit();
+		$model = Validation::validate($_GET, array(
+			array('type', 'in', 'range' => array('video', 'playlist')),
+			array('text', 'string', 'max' => 1500),
+			array('id', 'safe')
+		));
+		
+		if(!$model->getValid()){
+			Json::error(array('messages' => $model->getErrors()));
 		}
 
-		$text = '';
-		if(strlen(strip_all($_GET['text'])) > 0){
-			$text = $_GET['text'];
+		if($model->type == 'video'){
+			$item_shared = Video::findOne(array('_id' => new MongoId($model->id)));
+		}elseif($model->type == 'playlist'){
+			$item_shared = Playlist::findOne(array('_id' => new MongoId($model->id)));
 		}
-
-		if(strlen(strip_all($_GET['text'])) > 1500){
-			echo json_encode(array('success' => false, 'message' => 'You can only enter 1500 characters'));
-			exit();
+		
+		if(!$item_shared){
+			Json::error('We could not find that item!');
 		}
-
-		if($type == 'video'){
-			$item_shared = Video::findOne(array('_id' => new MongoId($_GET['id'])));
-		}elseif($type == 'playlist'){
-			$item_shared = Playlist::findOne(array('_id' => new MongoId($_GET['id'])));
-		}
-
-		if($item_shared){
-			Stream::shareItem(glue::session()->user->_id, $item_shared->_id, $type, $text);
-			echo json_encode(array('success' => true, 'message' => 'You shared this with your subscribers'));
-		}else{
-			echo json_encode(array('success' => false, 'message' => 'We could not find that item!'));
-		}
+		
+		Stream::shareItem(glue::session()->user->_id, $item_shared->_id, $model->type, strip_whitespace($model->text));
+		Json::success('You shared this with your subscribers');
 	}
 
-	public function action_add_comment()
+	public function action_createComment()
 	{
-		$this->pageTitle = 'Add Comment - StageX';
-
 		if(!glue::http()->isAjax()){
-			glue::route('/error/notfound');
+			glue::trigger('404');
 		}
+		
+		$model = Validation::validate($_POST, array(
+			array('user_id', 'safe'),
+			array('text', 'required'),
+			array('text', 'string', 'max' => 1500)
+		));
 
-		$text = strip_whitespace($_POST['text']);
-		$user = User::findOne(array('_id' => new MongoId($_POST['user_id'])));
-
-		if($user && strlen($text) > 0){
-			$comment = Stream::newWallPost_on_OtherUserWall(glue::session()->user->_id, $user->_id, $text);
-			$notification = Notification::newWallPost_on_OtherUserWall(glue::session()->user->_id, $user->_id);
+		if(
+			($user = User::findOne(array('_id' => new MongoId($model->user_id)))) && $model->getValid()
+		){
+			$text = strip_whitespace($model->text);
+			
+			$comment = Stream::directlyMessageUser(glue::session()->user->_id, $user->_id, $text);
+			$notification = Notification::directlyMessageUser(glue::session()->user->_id, $user->_id);
 
 			if($user->email_wall_comments){
 				glue::mailer()->mail($user->email, array('no-reply@stagex.co.uk', 'StageX'), 'Someone posted a comment on your profile on StageX',
-					"user/new_profile_comment.php", array( 'username' => $user->username, 'comment' => $text, 'from' => glue::session()->user ));
+					"user/new_profile_comment.php", array('username' => $user->username, 'comment' => $text, 'from' => glue::session()->user));
 			}
 
 			ob_start;
 				$this->partialRender('stream/streamitem', array('item' => $comment));
 				$html = ob_get_contents();
 			ob_end_clean();
-			echo json_encode(array('success' => true, 'html' => $html));
+			Json::success(array('html' => $html));
 		}else{
-			echo json_encode(array('success' => false));
+			Json::error();
 		}
 	}
 
 	public function action_delete()
 	{
-		if(!glue::auth()->check('ajax','post'))
+		if(!glue::auth()->check('ajax','post')){
 			glue::trigger('404');
+		}
 		
-		$ids=glue::http()->param('ids');
-		if(!is_array($ids)||count($ids)<=0)
-			$this->json_error('No stream was selected for deletion');
+		$ids = glue::http()->param('ids');
+		if(!is_array($ids) || count($ids)<=0){
+			Json::error('No stream was selected for deletion');
+		}
 
 		$mongoIds = array();
-		foreach($ids as $k=>$v)
+		foreach($ids as $k=>$v){
 			$mongoIds[] = new MongoId($v);
-		Stream::deleteAll(array('_id'=>array('$in'=>$mongoIds), 'user_id'=>glue::user()->_id));
-		$this->json_success(array('message'=>'Stream items were deleted','updated'=>count($mongoIds)));
+		}
+		Stream::deleteAll(array('_id' => array('$in' => $mongoIds), 'user_id' => glue::user()->_id));
+		Json::success(array('message' => 'Stream items were deleted','updated' => count($mongoIds)));
 	}
 
 	function action_getStream()
 	{
-		if(!glue::http()->isAjax())
+		if(!glue::http()->isAjax()){
 			glue::trigger('404');
+		}
 
 		extract(glue::http()->param(array(
 			'news', 'ts', 'hide_del', 'user', 'filter'
 		),null));
 		
-		if($user)
+		if($user){
 			$user = app\models\User::findOne(array('_id' => new MongoId($user)));
-		elseif(!$user&&!$news) // If I am not searching for news I don't need a user
-			$this->json_error(self::UNKNOWN);
-		elseif($news&&!glue::session()->authed) // If they want news they need to be logged in to get it
-			$this->json_error(self::LOGIN);		
+		}elseif(!$user && !$news){ // If I am not searching for news I don't need a user
+			Json::error(self::UNKNOWN);
+		}elseif($news && !glue::session()->authed){ // If they want news they need to be logged in to get it
+			Json::error(self::LOGIN);
+		}
 			
-		if($ts && !preg_match( '/^[1-9][0-9]*$/', $ts ))
-			$this->json_error('No last stream item could be found');
-
-		if(!$news)
-			$stream = $this->load_single_stream($ts, $user, $filter);
-		else
-			$stream = $this->load_news_stream($ts, $filter);
+		if($ts && !preg_match( '/^[1-9][0-9]*$/', $ts )){
+			Json::error('No last stream item could be found');
+		}
+		if(!$news){
+			$stream = $this->loadStream($ts, $user, $filter);
+		}else{
+			$stream = $this->loadNewsStream($ts, $filter);
+		}
 
 		$html = '';
 		
-		if(glue::session()->authed&&glue::auth()->check(array('^' => $user))){
-			$hide_del=false;
+		if(glue::session()->authed && glue::auth()->check(array('^' => $user))){
+			$hide_del = false;
 		}
-		$hide_del=true;
+		$hide_del = true;
 		
 		if($stream->count() > 0){
-			foreach($stream as $k => $item)
-				$html.=$this->renderPartial('stream/streamitem', array('item' => $item, 'hideDelete' => $hide_del));
-			$this->json_success(array('html'=>$html));
-		}else
-			$this->json_error(array('remaining'=>0,'initMessage'=>'No stream could be found','message'=>'There are no more stream items to load'));
+			foreach($stream as $k => $item){
+				$html .= $this->renderPartial('stream/streamitem', array('item' => $item, 'hideDelete' => $hide_del));
+			}
+			Json::success(array('html'=>$html));
+		}else{
+			Json::error(array('remaining' => 0, 'initMessage' => 'No stream could be found', 'message' => 'There are no more stream items to load'));
+		}
 	}
 
-	function load_single_stream($_ts = null, $user = null, $filter = null)
+	public function loadStream($ts = null, $user = null, $filter = null)
 	{
-		$_ts_sec = array();
-		if($_ts)
-			$_ts_sec = array('created' => array('$lt' => new MongoDate($_ts)));
-
-		$_filter_a = array();
+		$ts_sec = array();
+		if($ts){
+			$ts_sec = array('created' => array('$lt' => new MongoDate($ts)));
+		}
+		
+		$filter_a = array();
 		if($filter){
 			switch($filter){
 				case "watched":
-					$_filter_a = array('type' => Stream::VIDEO_WATCHED);
+					$filter_a = array('type' => Stream::VIDEO_WATCHED);
 					break;
 				case "liked":
-					$_filter_a = array('type' => Stream::VIDEO_RATE, 'like' => 1);
+					$filter_a = array('type' => Stream::VIDEO_RATE, 'like' => 1);
 					break;
 				case "posts":
-					$_filter_a = array('type' => array('$nin' => array(Stream::WALL_POST)));
+					$filter_a = array('type' => array('$nin' => array(Stream::WALL_POST)));
 					break;
 				case "comments":
-					$_filter_a = array('type' => Stream::WALL_POST);
+					$filter_a = array('type' => Stream::WALL_POST);
 					break;
 			}
 		}
 
-		return Stream::find(array_merge(array(
-			'user_id' => $user ? $user->_id : glue::user()->_id
-		), $_ts_sec, $_filter_a))->sort(array('created' => -1))->limit(20);
+		return Stream::find(array_merge(
+			array('user_id' => $user ? $user->_id : glue::user()->_id), 
+			$ts_sec, 
+			$filter_a
+		))->sort(array('created' => -1))->limit(20);
 	}
 
-	function load_news_stream($_ts = null, $_id = null)
+	public function loadNewsStream($_ts = null, $_id = null)
 	{
-		$subscription_model = new app\models\Follower();
-		$subscriptions = $subscription_model->getAll_ids();
+		$subscriptions = Follower::getAllIds();
 
 		$_ts_sec = array();
-		if($_ts)
+		if($_ts){
 			$ts_filter = array('created' => array('$lt' => new MongoDate($_ts)));
+		}
 
-		return Stream::find(array_merge(array('user_id' => array('$in' => $subscriptions),
-			'type' => array('$nin' => array(Stream::WALL_POST))), $ts_filter))->sort(array('created' => -1))->limit(20);
+		return Stream::find(array_merge(
+			array('user_id' => array('$in' => $subscriptions), 'type' => array('$nin' => array(Stream::WALL_POST))), 
+			$ts_filter
+		))->sort(array('created' => -1))->limit(20);
 	}
 }

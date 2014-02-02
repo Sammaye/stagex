@@ -117,7 +117,7 @@ class Notification extends \glue\db\Document{
 		return true;
 	}
 
-	static function newWallPost_on_OtherUserWall($userId, $to_user){
+	static function directlyMessageUser($userId, $to_user){
 		$notification = Notification::findOne(array('userId' => $to_user, 'type' => Notification::WALL_POST));
 
 		if($notification){

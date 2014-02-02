@@ -17,7 +17,7 @@ class Json
 		return static::success(array('n' => static::$succeeded, 'failed' => static::$failed, 'total' => $total));
 	}
 
-	public static function success($params, $exit = true)
+	public static function success($params = array(), $exit = true)
 	{
 		$json='';
 		if(is_string($params)){
@@ -33,7 +33,7 @@ class Json
 		return $json;
 	}
 
-	public static function error($params, $exit = true)
+	public static function error($params = array(), $exit = true)
 	{
 		$json='';
 		switch(true){

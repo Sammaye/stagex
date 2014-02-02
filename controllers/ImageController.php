@@ -44,8 +44,6 @@ class ImageController extends Controller
 
 	function action_video()
 	{
-		$this->title = 'Video Image - StageX';
-
 		$file_name = glue::http()->param('file',null);
 		$width = (int)glue::http()->param('w',138);
 		$height = (int)glue::http()->param('h',77);
@@ -66,15 +64,15 @@ class ImageController extends Controller
 			$height = 77;
 		}
 
-		if(strlen($file_name)>0&&($video=Video::findOne(array('_id' => new MongoId($file_name))))){
-			$file=Image::findOne(array('ref.type' => 'video', 'ref._id' => new MongoId($file_name), 'width' => $width, 'height' => $height));
+		if(strlen($file_name) > 0 && ($video = Video::findOne(array('_id' => new MongoId($file_name))))){
+			$file = Image::findOne(array('ref.type' => 'video', 'ref._id' => new MongoId($file_name), 'width' => $width, 'height' => $height));
 			if($file){
 				$bytes = $file->bytes->bin; // The file is in the video row let's get EIT!!
-			}elseif(($original_image=Image::findOne(array('ref.type' => 'video', 'ref._id' => new MongoId($file_name), 'original' => 1)))!==null){
+			}elseif(($original_image = Image::findOne(array('ref.type' => 'video', 'ref._id' => new MongoId($file_name), 'original' => 1)))!==null){
 				$bytes = $original_image->bytes->bin; // The file is in the video row let's get EIT!!
 				$insert_cache = true;
 				$resize = true;
-			}elseif($original_image=$video->image){ // last resort
+			}elseif($original_image = $video->image){ // last resort
 			    $obj = glue::aws()->S3GetObject(pathinfo($original_image, PATHINFO_BASENAME));
 			    if($obj != null){
 			        $thumb = PhpThumbFactory::create($obj->getpath('Body'), array(), true); // This will need some on spot caching soon
@@ -95,8 +93,6 @@ class ImageController extends Controller
 
 	function action_user()
 	{
-		$this->title = 'User Avatar - StageX';
-
 		$file_name = glue::http()->param('file',null);
 		$width = (int)glue::http()->param('w',45);
 		$height = (int)glue::http()->param('h',45);
@@ -106,8 +102,9 @@ class ImageController extends Controller
 
 		$found = false;
 		foreach($this->avatar_sizes as $size){
-			if($size[0] == $width && $size[1] == $height)
+			if($size[0] == $width && $size[1] == $height){
 				$found = true;
+			}
 		}
 
 		if(!$found){
@@ -121,7 +118,7 @@ class ImageController extends Controller
 			$file=Image::findOne(array('ref.type' => 'user', 'ref._id' => new MongoId($file_name), 'width' => $width, 'height' => $height));
 			if($file){
 				$bytes = $file->bytes->bin; // The file is in the video row let's get EIT!!
-			}elseif(($original_image=Image::findOne(array('ref.type' => 'user', 'ref._id' => new MongoId($file_name), 'original' => 1)))!==null){
+			}elseif(($original_image = Image::findOne(array('ref.type' => 'user', 'ref._id' => new MongoId($file_name), 'original' => 1))) !== null){
 				$bytes = $original_image->bytes->bin; // The file is in the video row let's get EIT!!
 				$insert_cache = true;
 				$resize = true;

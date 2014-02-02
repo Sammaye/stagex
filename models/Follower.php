@@ -29,8 +29,8 @@ class Follower extends Document
 		);
 	}
 
-	function getAll_ids(){
-		$rows = $this->find(array('fromId' => glue::user()->_id));
+	public static function getAllIds(){
+		$rows = static::find(array('fromId' => glue::user()->_id));
 		$_ids = array();
 
 		foreach($rows as $k => $row){

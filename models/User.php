@@ -423,7 +423,7 @@ class User extends Document{
 		return glue::$params['maxFileSize'];
 	}
 
-	function create_username_from_social_signup($username){
+	function createUsernameFromSocialSignup($username){
 		if($this->getCollection()->findOne(array('username' => $username))){
 			for($i=0;$i<5;$i++){
 				if($i == 3 || $i == 4){ // Lets go for even more unique and nuke the username

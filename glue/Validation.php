@@ -14,6 +14,6 @@ class Validation extends Component
 		$model->setAttributes($attributes);
 		$model->setRules($rules);
 		$model->validate(false);
-		return $model->getValid();
+		return $model;
 	}
 }
