@@ -2,43 +2,76 @@
 
 include_once glue::getPath('@glue').'/components/phpthumb/ThumbLib.inc.php';
 
+use app\models\Video;
 use \glue\Controller;
 
 class VideoController extends Controller
 {
-	function action_submitEncodingJob()
+	public function action_submitEncodingJob()
 	{
 		$jobs = iterator_to_array(glue::db()->encoding_jobs->find(array('state' => 'pending'))->sort(array('ts' => -1))->limit(100));
 		
-		$ids=array();
-		foreach($jobs as $_id => $job)
-			$ids=$job['_id'];
-		glue::db()->encoding_jobs->update(array('_id' => array('$in'=>$ids)),array('$set' => array('state' => 'submitting')));
+		$ids = array();
+		foreach($jobs as $_id => $job){
+			$ids[] = $job['_id'];
+		}
 		
+		glue::db()->encoding_jobs->update(array('_id' => array('$in' => $ids)), array('$set' => array('state' => 'submitting')), array('multiple' => true));
+
 		foreach($jobs as $job){
+			
+			$this->logEvent('Loaded Job: '.$job['_id']);
 		
-			$img_submit = true;
-			$mp4_submit = true;
-			$ogv_submit = true;
+			$s3_submit = isset($job['s3_submit']) ? $job['s3_submit'] : false;
+			$img_submit = isset($job['img_submit']) ? $job['img_submit'] : false;
+			$mp4_submit = isset($job['mp4_submit']) ? $job['mp4_submit'] : false;
+			$ogv_submit = isset($job['ogv_submit']) ? $job['ogv_submit'] : false;
+			
+			$updateObj = array();
+			
+			$file_path = rtrim(sys_get_temp_dir(), '/') . '/' . $job['file_name'];
+			
+			if(!$s3_submit){
+				if(glue::aws()->S3Upload($job['file_name'], array('Body' => fopen($file_path, 'r+')))){
+					unlink($file_path); // Free up space in our temp dir
+					$updateObj['original'] = glue::aws()->getS3ObjectURL($job['file_name']);
+					$s3_submit = true;
+				}else{
+					$this->logEvent('Failed to upload to S3: '.$job['_id']);
+				}
+			}
 		
 			// So lets send the command to SQS now
-			if(!$job['img_submit'])
-				$img_submit = glue::aws()->sendEncodingMessage($job['file_name'], $job['jobId'], 'img');
-			if(!$job['mp4_submit'])
-				$mp4_submit = glue::aws()->sendEncodingMessage($job['file_name'], $job['jobId'], 'mp4');
-			if(!$job['ogv_submit'])
-				$ogv_submit = glue::aws()->sendEncodingMessage($job['file_name'], $job['jobId'], 'ogv');
+			if($s3_submit){
+				if(!$img_submit){
+					$img_submit = glue::aws()->sendEncodingMessage($job['file_name'], $job['_id'], 'img');
+				}
+				if(!$mp4_submit){
+					$mp4_submit = glue::aws()->sendEncodingMessage($job['file_name'], $job['_id'], 'mp4');
+				}
+				if(!$ogv_submit){
+					$ogv_submit = glue::aws()->sendEncodingMessage($job['file_name'], $job['_id'], 'ogv');
+				}
+			}
 		
-			if($img_submit && $mp4_submit && $ogv_submit){
+			if($s3_submit && $img_submit && $mp4_submit && $ogv_submit){
 				$state = 'transcoding';
 			}else{
 				$state = 'pending';
 			}
 		
-			app\models\Video::updateAll(array('jobId' => $job['jobId']), array('$set' => array('state' => $state)));
+			Video::updateAll(
+				array('jobId' => $job['_id']), 
+				array('$set' => array_merge($updateObj, array('state' => $state)))
+			);
 		
-			glue::db()->encoding_jobs->update(array('_id' => $job['_id']), array('$set' => array('img_submit' => $img_submit, 'mp4_submit' => $mp4_submit,
-			'ogv_submit' => $ogv_submit, 'state' => $state)));
+			glue::db()->encoding_jobs->update(
+				array('_id' => $job['_id']), 
+				array('$set' => array('s3_submit' => $s3_submit, 'img_submit' => $img_submit, 'mp4_submit' => $mp4_submit,
+						'ogv_submit' => $ogv_submit, 'state' => $state))
+			);
+			
+			$this->logEvent('Done Job: '.$job['_id']);
 		}		
 	}
 	

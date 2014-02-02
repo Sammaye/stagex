@@ -362,8 +362,13 @@ class Controller extends Component
 		}
 		return $json;
 	}
+	
+	public function logEvent($message)
+	{
+		echo '[ '.date('d-m-Y H:i:s').' '.microtime(true).' ] '.$message."\n";
+	}	
 
-	function createUrl($path = '/', $params = array(), $host = '/', $scheme = 'http')
+	public function createUrl($path = '/', $params = array(), $host = '/', $scheme = 'http')
 	{
 		return glue::http()->url($path, $params, $host, $scheme);
 	}

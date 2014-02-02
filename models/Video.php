@@ -245,8 +245,8 @@ class Video extends \glue\Db\Document{
 		}
 	}
 
-	function upload($id){
-
+	public function upload($id)
+	{
 		$file=new \glue\File(array('model'=>null,'id'=>$id));
 		if(strlen($file->tmp_name)<=0){
 			$this->response("ERROR", "NOT_VALID");
@@ -269,8 +269,6 @@ class Video extends \glue\Db\Document{
 			return false;
 		}
 
-		glue::user()->saveCounters(array('bandwidthLeft'=>-$file->size));
-		
 		// Now lets make a new video
 		$this->populateDefaults();
 		/*
@@ -287,10 +285,10 @@ class Video extends \glue\Db\Document{
 		$this->md5 = md5_file($file->tmp_name);
 		$this->uploadId = $id;
 		$this->created = new \MongoDate();
-		$this->state = 'uploading';
+		$this->state = 'pending';
 
 		if(
-			($matched_video=self::findOne(array('md5' => $this->md5))) 
+			($matched_video = static::findOne(array('md5' => $this->md5))) 
 			&& $matched_video->state == 'finished'
 		){
 			$this->duration = $matched_video->duration;
@@ -302,55 +300,30 @@ class Video extends \glue\Db\Document{
 			$this->imageSrc = $matched_video->imageSrc;
 			$this->jobId = $matched_video->jobId;
 		}else{
-			//$this->deleted = 1; // Mark this as deleted to stop it from showing
-		}
-		$this->save(); // We save now to stop race conditions
-
-		if(!$matched_video||$matched_video->state!='finished'){
-			// Lets transfer to S3
+			
 			$file_name = new \MongoId().'.'.pathinfo($file->name, PATHINFO_EXTENSION);
-			if(glue::aws()->S3Upload($file_name, array('Body' => fopen($file->tmp_name, 'r+')))){
-				$this->original = glue::aws()->getS3ObjectURL($file_name);
-				unlink($file->tmp_name); // Free up space in our temp dir
-
-				/*
-				 * I create and insert a new job here into Mongo. This is the easiest way by far
-				 * to keep track of encoding over possibly many videos and many outputs and also to keep track of which
-				 * videos received an AWS cURL error while trying to send messages
-				 */
-				$job = array('jobId' => md5( uniqid( rand(1,255).rand(45,80).rand(112,350), true ) )); // Pre-pop the job with an id
-
-				// So lets send the command to SQS now
-				$img_submit = glue::aws()->sendEncodingMessage($file_name, $job['jobId'], 'img');
-				$mp4_submit = glue::aws()->sendEncodingMessage($file_name, $job['jobId'], 'mp4');
-				$ogv_submit = glue::aws()->sendEncodingMessage($file_name, $job['jobId'], 'ogv');
-
-				if($img_submit && $mp4_submit && $ogv_submit){
-					$state = 'transcoding';
-				}else{
-					$state = 'pending';
-				}
-
-				$this->updateAll(array('_id' => $this->_id), array('$set' => array('state' => $state, 'jobId' => $job['jobId'])));
-				glue::db()->encoding_jobs->insert(array_merge(
-					$job, 
-					array('file_name' => $file_name, 'img_submit' => $img_submit, 'mp4_submit' => $mp4_submit,
-					'ogv_submit' => $ogv_submit, 'state' => $state, 'ts'=>new \MongoDate())
-				));
-				
-				// technically the video is now there so lets inc the total uploads.
-				glue::user()->saveCounters(array('totalUploads'=>1));
+			if(move_uploaded_file($file->tmp_name, rtrim(sys_get_temp_dir(), '/') . '/' . $file_name)){
+				$this->jobId = md5( uniqid( rand(1,255).rand(45,80).rand(112,350), true ));
+				glue::db()->encoding_jobs->insert(array(
+					'_id' => $this->jobId,
+					'file_name' => $file_name,
+					'state' => $this->state,
+					'ts'=>new \MongoDate())
+				);
 			}else{
-				
 				// FAIL
 				$this->updateAll(array('_id' => $this->_id), array('$set' => array('state' => 'failed')));
 				$this->response("ERROR", "UNKNOWN");
 				return false;
 			}
 		}
+		$this->save(); // We save now to stop race conditions
+		// technically the video is now there so lets inc the total uploads.
+		glue::user()->saveCounters(array('totalUploads' => 1, 'bandwidthLeft' => -$file->size));
 	}
 
-	function beforeSave(){
+	public function beforeSave()
+	{
 		if(strlen(strip_whitespace($this->stringTags)) > 0){
 			$this->tags = preg_split("/[\s]*[,][\s]*/", $this->stringTags);
 
