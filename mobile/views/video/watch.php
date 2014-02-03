@@ -38,7 +38,7 @@ $this->js('page', "
 		
 	$('.report_content .btn-success').click(function(event){
 		event.preventDefault();
-		$.get('/video/report', {id: '".strval($model->_id)."', reason: 
+		$.post('/video/report', {id: '".strval($model->_id)."', reason: 
 			$('.report_content .reason input:checked').val()}, null, 'json'
 		).done(function(data){
 			if(data.success){
