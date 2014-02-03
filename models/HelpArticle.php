@@ -2,12 +2,12 @@
 namespace app\models;
 
 use glue;
+use app\models\Help;
 
-class HelpArticle extends \app\models\Help{
-
+class HelpArticle extends Help
+{
 	/** @virtual */
 	public $tagString;
-
 	public $userId;
 
 	public $title;
@@ -26,7 +26,8 @@ class HelpArticle extends \app\models\Help{
 	public $parent;
 	public $seq = "z";
 
-	function behaviours(){
+	public function behaviours()
+	{
 		return array(
 			'timestampBehaviour' => array(
 				'class' => 'glue\\behaviours\\Timestamp'
@@ -34,18 +35,16 @@ class HelpArticle extends \app\models\Help{
 		);
 	}
 
-	public static function model($class = __CLASS__){
-		return parent::model($class);
-	}
-
-	public function afterFind(){
-		if(count($this->tags) > 0)
+	public function afterFind()
+	{
+		if(count($this->tags) > 0){
 			$this->tagString = implode(",", $this->tags);
-
-		$this->parent = self::getParentTopic_selectedVal();
+		}
+		$this->parent = self::getParentTopicSelectedVal();
 	}
 
-	public function rules(){
+	public function rules()
+	{
 		return array(
 			array('tagString, title, content', 'required', 'message' => 'You must fill in at least a title, some content and some tags for this article.'),
 			//array('tagString', 'tokenized', 'target' => 'tags', 'divider' => ','),
@@ -53,8 +52,8 @@ class HelpArticle extends \app\models\Help{
 		);
 	}
 
-	function beforeSave(){
-
+	public function beforeSave()
+	{
 		if(strlen(strip_whitespace($this->tagString)) > 0){
 			$this->tags = preg_split("/[\s]*[,][\s]*/", $this->tagString);
 
@@ -82,7 +81,8 @@ class HelpArticle extends \app\models\Help{
 		return true;
 	}
 
-	function afterSave(){
+	public function afterSave()
+	{
 	    glue::elasticSearch()->index(array(
 	        'id' => strval($this->_id),
 	        'type' => 'help',
@@ -99,7 +99,8 @@ class HelpArticle extends \app\models\Help{
 		return true;
 	}
 
-	function delete(){
+	public function delete()
+	{
 	    glue::elasticSearch()->delete(array(
 	        'id' => strval($this->_id),
 	        'type' => 'help'

@@ -194,7 +194,7 @@ class VideoResponse extends Document
 				$counters['totalTextResponses']=1;
 			$this->video->saveCounters($counters);
 				
-			$this->video->record_statistic($this->getScenario() == 'video_comment' ? 'video_comment' : 'text_comment');
+			$this->video->recordStatistic($this->getScenario() == 'video_comment' ? 'video_comment' : 'text_comment');
 			
 			if($this->video->listing != 1 && $this->video->listing != 2){
 				\app\models\Stream::commentedOn($this->userId, $this->videoId, $this->_id);

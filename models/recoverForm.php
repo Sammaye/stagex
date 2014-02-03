@@ -1,18 +1,19 @@
 <?php
 namespace app\models;
 
-use glue;
-
 glue::import('@app/widgets/reCaptcha/recaptchalib.php',true);
 
-class recoverForm extends \glue\Model{
+use glue;
+use glue\Model;
 
+class recoverForm extends Model
+{
 	public $captchaError;
-	
 	public $email;
 	public $hash;
 
-	public function rules(){
+	public function rules()
+	{
 		return array(
 				array('email', 'required', 'message' => 'You must supply a valid email address'),
 				array("hash", "hash", 'message' => 'We could not verify the source of your post. Please use the submit button to submit the form.'),
@@ -25,7 +26,8 @@ class recoverForm extends \glue\Model{
 		);
 	}
 
-	function validateCaptcha(){
+	public function validateCaptcha()
+	{
 		if (isset($_POST["recaptcha_response_field"])) {
 			$resp = recaptcha_check_answer("6LfCNb0SAAAAAK1J8rPQeDaQvz_wpIaowBiYRB2D", $_SERVER["REMOTE_ADDR"], $_POST["recaptcha_challenge_field"], $_POST["recaptcha_response_field"]);
 

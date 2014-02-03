@@ -88,7 +88,7 @@ class PlaylistController extends Controller
 			if(($videos = glue::http()->param('videos',array())) && count($videos) > 0 && count($videos) <= 500){
 				foreach($videos as $k => $v){
 					if($video = Video::findOne(array('_id' => new MongoId(isset($v['video_id']) ? $v['video_id'] : '')))){
-						$playlist->add_video_at_pos($video->_id, $v['position']);
+						$playlist->addVideoAtPos($video->_id, $v['position']);
 					}
 				}
 			}

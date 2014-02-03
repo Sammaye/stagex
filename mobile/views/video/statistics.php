@@ -19,7 +19,7 @@ $this->js('statistics', "
 	});
 ");
 
-$video_stats = $model->getStatistics_dateRange(mktime(0, 0, 0, date("m"), date("d"), date("Y")), mktime(23, 0, 0, date("m"), date("d"), date("Y")));
+$video_stats = $model->getStatisticsDateRange(mktime(0, 0, 0, date("m"), date("d"), date("Y")), mktime(23, 0, 0, date("m"), date("d"), date("Y")));
 ?>
 <div class='video_analytics_body'>
 	<div class='video_stats_body grid_block alpha'>

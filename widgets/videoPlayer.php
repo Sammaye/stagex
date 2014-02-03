@@ -3,9 +3,10 @@
 namespace app\widgets; 
 
 use glue;
+use glue\Widget;
 
-class videoPlayer extends \glue\Widget{
-
+class videoPlayer extends Widget
+{
 	public $width;
 	public $height;
 
@@ -17,21 +18,24 @@ class videoPlayer extends \glue\Widget{
 	public $mp4;
 	public $ogg;
 
-	function render(){
-		
+	public function render()
+	{
 		$this->mp4 = 'http://videos.stagex.co.uk/'.pathinfo($this->mp4, PATHINFO_BASENAME);
 		$this->ogg = 'http://videos.stagex.co.uk/'.pathinfo($this->ogg, PATHINFO_BASENAME);		
 		
 		if(glue::session()->authed){
 			if(glue::user()->useDivx){
 				$this->divxPlayer();
-			}else
+			}else{
 				$this->mediaElementPlayer();
-		}else
+			}
+		}else{
 			$this->mediaElementPlayer();
+		}
 	}
 
-	function divxPlayer(){
+	public function divxPlayer()
+	{
 		?>
 		<object width="<?php echo $this->width ?>" height="<?php echo $this->height ?>" data="<?php echo $this->mp4 ?>" id="ie_plugin" classid="clsid:67DABFBF-D0AB-41fa-9C46-CC0F21721616">
 		<param value="http://go.divx.com/plugin/DivXBrowserPlugin.cab" name="codebase">
@@ -42,11 +46,12 @@ class videoPlayer extends \glue\Widget{
 		<?php
 	}
 
-	function mediaElementPlayer(){
+	public function mediaElementPlayer()
+	{
 		glue::controller()->jsFile('/js/MediaElement/mediaelement-and-player.min.js');
 		glue::controller()->cssFile('/js/MediaElement/mediaelementplayer.css');
 
-		if($this->docDim):
+		if($this->docDim){
 			glue::controller()->js('play_video', "
 				$(function(){
 					$('video').mediaelementplayer({
@@ -59,13 +64,13 @@ class videoPlayer extends \glue\Widget{
 					//player.play();
 				});
 			");
-		else:
+		}else{
 			glue::controller()->js('play_video', "
 				$(function(){
 					var player  = $('video').mediaelementplayer();
 				});
 			");
-		endif;
+		}
 		
 		if($this->mobile){
 			glue::controller()->js('resize', "

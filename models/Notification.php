@@ -2,17 +2,10 @@
 namespace app\models;
 
 use glue;
+use glue\db\Document;
 
-/**
- * Notifications class
- *
- * This class deals with sending notifications between users (not InMail).
- * Notifications are basically actions that concern other users involved.
- * Notifications were created for the same reason as facebook has them! To stop so much crap
- * from entering the users inbox and leave it clean for important stuff.
- */
-class Notification extends \glue\db\Document{
-
+class Notification extends Document
+{
 	const VIDEO_COMMENT = 1;
 	const VIDEO_COMMENT_REPLY = 2;
 	const VIDEO_RESPONSE_APPROVE = 3;
@@ -29,11 +22,13 @@ class Notification extends \glue\db\Document{
 	public $videoId;
 	public $responseId;
 
-	public static function collectionName(){
+	public static function collectionName()
+	{
 		return "notification";
 	}
 
-	function behaviours(){
+	public function behaviours()
+	{
 		return array(
 			'timestampBehaviour' => array(
 				'class' => 'glue\\behaviours\\Timestamp'
@@ -41,11 +36,8 @@ class Notification extends \glue\db\Document{
 		);
 	}
 
-	public static function model($className = __CLASS__){
-		return parent::model($className);
-	}
-
-	function relations(){
+	public function relations()
+	{
 		return array(
 			"video" => array('one', 'app\\models\\Video', "_id", 'on' => 'videoId'),
 			"response" => array('one', 'app\\models\\VideoResponse', "_id", 'on' => 'responseId'),
@@ -53,18 +45,21 @@ class Notification extends \glue\db\Document{
 		);
 	}
 
-	static function getNewCount_Notifications(){
+	public static function getNewCountNotifications()
+	{
 		//var_dump(glue::user()->lastNotificationPull);
 		return Notification::find(array('userId' => glue::user()->_id,
 				'created' => array('$gt' => glue::user()->lastNotificationPull)))->count();
 	}
 
-	function beforeSave(){
+	public function beforeSave()
+	{
 		$this->read = false;
 		return true;
 	}
 
-	function getDateTime(){
+	public function getDateTime()
+	{
 		$today_start = mktime(0, 0, 0, date("n"), date("j")-1, date("Y"));
 		if($today_start < $this->created->sec){ // Older than a day
 			return date('g:i a', $this->created->sec);
@@ -73,8 +68,8 @@ class Notification extends \glue\db\Document{
 		}
 	}
 
-	function addUser($id){
-
+	public function addUser($id)
+	{
 		if($this->read){
 			$this->fromUsers = array();
 		}
@@ -95,7 +90,8 @@ class Notification extends \glue\db\Document{
 		return true;
 	}
 
-	function addItemBy_id($_id, $unique = true){
+	public function addItemById($_id, $unique = true)
+	{
 		if(is_array($this->items)){
 			if($unique){
 				foreach($this->items as $k => $f_id){
@@ -117,7 +113,8 @@ class Notification extends \glue\db\Document{
 		return true;
 	}
 
-	static function directlyMessageUser($userId, $to_user){
+	public static function directlyMessageUser($userId, $to_user)
+	{
 		$notification = Notification::findOne(array('userId' => $to_user, 'type' => Notification::WALL_POST));
 
 		if($notification){
@@ -135,7 +132,8 @@ class Notification extends \glue\db\Document{
 		}
 	}
 
-	public static function newVideoResponse($to_user, $video_id, $approved){
+	public static function newVideoResponse($to_user, $video_id, $approved)
+	{
 		$status = Notification::findOne(array( 'type' => Notification::VIDEO_COMMENT, 'userId' => $to_user, 'videoId' => $video_id ));
 
 		if($status){
@@ -156,12 +154,13 @@ class Notification extends \glue\db\Document{
 		}
 	}
 
-	public static function newVideoResponseReply($comment_id, $to_user, $reply_id, $video_id, $from_user = null){
+	public static function newVideoResponseReply($comment_id, $to_user, $reply_id, $video_id, $from_user = null)
+	{
 		$status = Notification::findOne(array( 'type' => Notification::VIDEO_COMMENT_REPLY, 'userId' => $to_user, 'responseId' => $comment_id));
 
 		if($status){
 			$status->addUser($from_user ? $from_user : glue::user()->_id);
-			$status->addItemBy_id($reply_id);
+			$status->addItemById($reply_id);
 			$status->totalResponses = $status->totalResponses+1;
 			$status->save();
 		}else{
@@ -171,14 +170,15 @@ class Notification extends \glue\db\Document{
 			$status->videoId = $video_id;
 			$status->responseId = $comment_id;
 			$status->addUser($from_user ? $from_user : glue::user()->_id);
-			$status->addItemBy_id($reply_id);
+			$status->addItemById($reply_id);
 			$status->totalResponses = $status->totalResponses+1;
 			$status->type = Notification::VIDEO_COMMENT_REPLY;
 			$status->save();
 		}
 	}
 
-	public static function commentApproved($from_user, $video_id, $to_user){
+	public static function commentApproved($from_user, $video_id, $to_user)
+	{
 		$status = Notification::findOne(array( 'type' => Notification::VIDEO_RESPONSE_APPROVE, 'userId' => $to_user, 'videoId' => $video_id));
 
 		if($status){
@@ -197,7 +197,8 @@ class Notification extends \glue\db\Document{
 		}
 	}
 
-	function get_usernames_caption($getOnlyFirst = false){
+	public function getUsernamesCaption($getOnlyFirst = false)
+	{
 		$users_count = count($this->fromUsers);
 		$caption = '';
 
@@ -205,8 +206,6 @@ class Notification extends \glue\db\Document{
 		foreach($this->fromUsers as $user){
 
 			$user = User::findOne(array('_id' => $this->fromUsers[$i]));
-
-			
 			if($users_count > 1 && $i == $users_count-1){
 				$caption .=  " and <a href='".glue::http()->url('/user/view', array('id' => strval($user->_id)))."'>@{$user->getUsername()}</a>";
 			}elseif($users_count > 1 && $i != 0){
@@ -214,9 +213,9 @@ class Notification extends \glue\db\Document{
 			}else{
 				$caption .=  "<a href='".glue::http()->url('/user/view', array('id' => strval($user->_id)))."'>@{$user->getUsername()}</a>";
 			}
-
-			if($i == 2 || $getOnlyFirst)
+			if($i == 2 || $getOnlyFirst){
 				break;
+			}
 			$i++;
 		}
 

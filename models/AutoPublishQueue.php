@@ -3,9 +3,10 @@
 namespace app\models;
 
 use glue;
+use glue\db\Document;
 
-class AutoPublishQueue extends \glue\db\Document{
-
+class AutoPublishQueue extends Document
+{
 	// When a user uploads a video
 	const UPLOAD = 1;
 
@@ -35,7 +36,8 @@ class AutoPublishQueue extends \glue\db\Document{
 	protected $processing = 0;
 	protected $done = 0;
 
-	function behaviours(){
+	function behaviours()
+	{
 		return array(
 			'timestampBehaviour' => array(
 				'class' => 'glue\\behaviours\\Timestamp'
@@ -43,15 +45,13 @@ class AutoPublishQueue extends \glue\db\Document{
 		);
 	}
 
-	public static function model($className = __CLASS__){
-		return parent::model($className);
-	}
-
-	public static function collectionName(){
+	public static function collectionName()
+	{
 		return "auto_publish_queue";
 	}
 
-	static function add_to_qeue($type, $user_id, $video_id = null, $playlist_id = null, $text = null){
+	public static function add_to_qeue($type, $user_id, $video_id = null, $playlist_id = null, $text = null)
+	{
 		$oldDoc = AutoPublishQueue::findOne(array('type' => $type, 'userId' => $user_id, 'videoId' => $video_id, 'playlistId' => $playlist_id, 'text' => $text));
 
 		// If oldDoc is filled then we dont do shit else lets add this as something that needs syncing

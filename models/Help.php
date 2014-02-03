@@ -2,19 +2,18 @@
 namespace app\models;
 
 use glue;
+use glue\db\Document;
 
-class Help extends \glue\db\Document{
-
-	public static function collectionName(){
+class Help extends Document
+{
+	public static function collectionName()
+	{
 		return "help";
 	}
 
-	public static function model($className = __CLASS__){
-		return parent::model($className);
-	}
-
-	function getFlatTree(){
-		$topics = self::find(array("type"=>"topic"))->sort(array("path"=>1));
+	public function getFlatTree()
+	{
+		$topics = static::find(array("type" => "topic"))->sort(array("path" => 1));
 		$ret = array();
 
 		foreach($topics as $_id => $item){
@@ -23,39 +22,45 @@ class Help extends \glue\db\Document{
 		return $ret;
 	}
 
-	static function getRootItems(){
-		return self::find(array("path"=>new \MongoRegex("/^[^,]*$/")))->sort(array("seq"=>1));
+	public static function getRootItems()
+	{
+		return static::find(array("path" => new \MongoRegex("/^[^,]*$/")))->sort(array("seq" => 1));
 	}
 
-	function getBreadCrumb(){
+	public function getBreadCrumb()
+	{
 		$breadcrumb = explode(",", $this->path);
 		$final_breadcrumb = array();
 
-		$c=0;
+		$c = 0;
 		foreach($breadcrumb as $i => $item){
 			if($item != $this->normalisedTitle){
-				$itemModel = self::findOne(array('normalisedTitle' => $item));
+				$itemModel = static::findOne(array('normalisedTitle' => $item));
 				$final_breadcrumb[$i] = \html::openTag('li')
 					.\html::a(array('href' => glue::http()->url('/help/view', array('title' => $item)), 'text' => $itemModel->title))
 					.($c<(count($breadcrumb)-2)?\html::openTag('span',array('class'=>'divider')).\html::closeTag('span'):'')
 					.\html::closeTag('li');
-			} $c++;
+			}
+			$c++;
 		}
 		return implode(' ',$final_breadcrumb);
 		//implode(' '.utf8_decode('&rsaquo;').' ', $final_breadcrumb);
 	}
 
-	function getParentTopic_selectedVal(){
+	public function getParentTopicSelectedVal()
+	{
 		$pieces = explode(",", $this->path);
 		unset($pieces[count($pieces)-1]); // Delete the last one which should be the one we are on
 		return implode(",", $pieces);
 	}
 
-	function getPermaLink(){
+	public function getPermaLink()
+	{
 		return glue::http()->url('/help/view', array('title' => $this->normalisedTitle));
 	}
 
-	function getAbstract($amount = 100){
+	public function getAbstract($amount = 100)
+	{
 		return truncate_string(htmlspecialchars(strip_all($this->content)), $amount);
 		//return substr_replace($truncated, "...", strlen($truncated)-3);
 	}
@@ -75,8 +80,8 @@ class Help extends \glue\db\Document{
 		}		
 	}
 	
-	public function search($keywords=''){
-	    
+	public function search($keywords='')
+	{
 	    $search = array('type' => 'help', 'body' =>
 	        array('query' => array('filtered' => array(
 	            'query' => array()

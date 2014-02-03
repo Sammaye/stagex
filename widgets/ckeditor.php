@@ -3,16 +3,19 @@
 namespace app\widgets;
 
 use glue;
+use glue\Widget;
 
-class CKEditor extends \glue\Widget{
-
+class CKEditor extends Widget
+{
 	public $config;
 
-	function formOptions(){
+	public function formOptions()
+	{
 		return $this->config;
 	}
 
-	function render(){
+	public function render()
+	{
 		list($name, $id) = $this->getAttributeNameId();
 
 		glue::controller()->jsFile('ckeditor', '/js/CKEditor/ckeditor.js');
@@ -23,7 +26,6 @@ class CKEditor extends \glue\Widget{
 				);
 			});
 		");
-
 		echo \html::activeTextarea($this->model, $this->attribute, array('id' => $id));
 	}
 }

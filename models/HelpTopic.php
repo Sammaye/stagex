@@ -2,9 +2,10 @@
 namespace app\models;
 
 use glue;
+use app\models\Help;
 
-class HelpTopic extends Help{
-
+class HelpTopic extends Help
+{
 	public $userId;
 
 	public $title;
@@ -18,7 +19,8 @@ class HelpTopic extends Help{
 
 	public $seq = "z";
 
-	function behaviours(){
+	public function behaviours()
+	{
 		return array(
 			'timestampBehaviour' => array(
 				'class' => 'glue\\behaviours\\Timestamp'
@@ -26,20 +28,19 @@ class HelpTopic extends Help{
 		);
 	}
 
-	public static function model($class = __CLASS__){
-		return parent::model($class);
-	}
-
-	function getDescendants(){
+	public function getDescendants()
+	{
 		/** $secondLevel = $this->Db()->find(array("path"=>new MongoRegex("/^".$path.",[^,]*,[^,]*$/")))->sort(array("seq"=>1)); // Second Level **/
-		return self::find(array("path"=>new \MongoRegex("/^".$this->path.",[^,]*$/")))->sort(array("seq"=>1)); // First Level
+		return static::find(array("path"=>new \MongoRegex("/^".$this->path.",[^,]*$/")))->sort(array("seq"=>1)); // First Level
 	}
 
-	function getChildren(){
-		return self::find(array("path"=>new \MongoRegex("/^".$this->path.",/")))->sort(array("path"=>1));
+	public function getChildren()
+	{
+		return static::find(array("path"=>new \MongoRegex("/^".$this->path.",/")))->sort(array("path"=>1));
 	}
 
-	function rules(){
+	public function rules()
+	{
 		return array(
 			array('title', 'required', 'message' => 'You must enter at least a title'),
 			array('parent, seq', 'safe'),
@@ -49,8 +50,8 @@ class HelpTopic extends Help{
 		);
 	}
 
-	function beforeSave(){
-
+	public function beforeSave()
+	{
 		$this->userId = glue::user()->_id;
 
 		$this->normalisedTitle = strtolower(iconv('UTF-8', 'ASCII//TRANSLIT', trim(str_replace(' ', '-', strip_to_single(preg_replace("/[^a-zA-Z0-9\s]/", "", $this->title))))));
@@ -69,9 +70,10 @@ class HelpTopic extends Help{
 			// I do not use active record to keep this process as fast as possible
 			$helpItems = $this->getCollection()->find(array("path"=>new \MongoRegex("/^".$oldPath.",/"))); // Comma in regex denotes children
 			foreach($helpItems as $_id => $item){
-				$this->updateAll(array(
-					"_id"=>new \MongoId($_id)),
-					array("\$set"=>array("path"=>preg_replace("/".$oldPath."/i", $this->path, $item['path']))));
+				$this->updateAll(
+					array("_id"=>new \MongoId($_id)),
+					array("\$set"=>array("path"=>preg_replace("/".$oldPath."/i", $this->path, $item['path'])))
+				);
 				
 				glue::elasticSearch()->update(array(
     				'id' => $_id,
@@ -87,7 +89,8 @@ class HelpTopic extends Help{
 		return true;
 	}
 
-	function afterSave(){
+	public function afterSave()
+	{
 	    glue::elasticSearch()->index(array(
     	    'id' => strval($this->_id),
     	    'type' => 'help',
@@ -108,8 +111,8 @@ class HelpTopic extends Help{
 	 * (non-PHPdoc)
 	 * @see htdocs/glue/GModel::remove()
 	 */
-	function delete($method = 'concat'){
-
+	public function delete($method = 'concat')
+	{
 		if($method == 'scrub'){
 			$helpItems = $this->getCollection()->find(array(
 				"path"=>new \MongoRegex("/^".$this->path.",/"))
@@ -151,9 +154,9 @@ class HelpTopic extends Help{
 		return true;
 	}
 
-	static function getSelectBox_list($exclude = false){
-
-		$topics = self::find(array("type"=>"topic"))->sort(array("path"=>1));
+	public static function getSelectBox_list($exclude = false)
+	{
+		$topics = static::find(array("type"=>"topic"))->sort(array("path"=>1));
 		$ret = array();
 
 		if($topics->count() <= 0 || !$topics){

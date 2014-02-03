@@ -3,11 +3,11 @@
 namespace app\widgets;
 
 use glue;
+use glue\Widget;
 
-class highcharts extends \glue\Widget{
-
+class highcharts extends Widget
+{
 	public $chartName;
-
 	public $appendTo;
 
 	/**
@@ -18,7 +18,6 @@ class highcharts extends \glue\Widget{
 	 * @var array
 	 */
 	public $series = array();
-
 	public $type = 'line';
 
 	/**
@@ -31,12 +30,12 @@ class highcharts extends \glue\Widget{
 	 */
 	public $events = array();
 
-	function render(){
-		
-		list($name,$id)=$this->getAttributeNameId();
+	function render()
+	{
+		list($name, $id) = $this->getAttributeNameId();
 		
 		glue::controller()->jsFile('/js/highplot/js/highcharts.js');
-		glue::controller()->js('highcharts.'.$id, "
+		glue::controller()->js('highcharts.' . $id, "
 		var ".$this->chartName.";
 		$(function(){
 			".$this->chartName."= new Highcharts.Chart({

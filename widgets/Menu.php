@@ -2,12 +2,14 @@
 
 namespace app\widgets;
 
-use glue,
-	\glue\Html;
+use glue;
+use glue\Widget;
+use glue\Html;
 
-class Menu extends \glue\Widget{
-
-	function render(){ //var_dump(glue::user()); ?>
+class Menu extends Widget
+{
+	public function render()
+	{ ?>
 	
 <div class="menubar">
   <!-- Brand and toggle get grouped for better mobile display -->
@@ -30,7 +32,7 @@ class Menu extends \glue\Widget{
 	<div class="menubar-right">
 	  <div class="menubar-nav">
 		<?php if(glue::session()->authed){ ?>
-		<?php $newNotifications = \app\models\Notification::getNewCount_Notifications(); ?>
+		<?php $newNotifications = \app\models\Notification::getNewCountNotifications(); ?>
 	  	<a href="/stream/notifications" class="notification <?php if($newNotifications > 0): echo "new_notifications"; endif; ?>">
 	  		<?php if($newNotifications > 100){ ?>
 				100+

@@ -135,6 +135,6 @@ class UserController extends Controller
 	{
 		$user=app\models\User::find(array('nextBandwidthTopup' => array('$lt' => time())));
 		foreach($users as $k => $v)
-			$user->reset_upload_bandwidth();		
+			$user->resetUploadBandwidth();		
 	}
 }

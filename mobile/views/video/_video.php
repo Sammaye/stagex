@@ -20,7 +20,7 @@
 			<?php elseif($item->isProcessing()): ?>
 			 - <span class='currently_encoding'>Encoding In Progress</span>
 			<?php else: ?>
-			 - <span class="duration"><?php echo $item->get_time_string() ?></span>
+			 - <span class="duration"><?php echo $item->getTimeString() ?></span>
 			<?php endif; ?>
 		</div>
 	</div>

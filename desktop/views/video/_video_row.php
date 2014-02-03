@@ -33,7 +33,7 @@ if(!isset($model)||!$model){
 		<div class="expandable text-muted description"><?php echo $item->description ?></div>
 	</div>
 	<div class="uploader_info">
-		<span class="duration"><?php echo $item->get_time_string() ?></span><span class="sep">-</span>
+		<span class="duration"><?php echo $item->getTimeString() ?></span><span class="sep">-</span>
 		<a href="/user/view?id=<?php echo $item->author->_id ?>"><?php echo $item->author->username ?></a>
 	</div>		
 	<?php endif; ?>

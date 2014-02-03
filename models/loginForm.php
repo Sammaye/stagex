@@ -3,12 +3,13 @@
 namespace app\models;
 
 use glue;
+use glue\Model;
 
 /** Incase this is being used somewhere where it hasn't been included in the controller */
 glue::import('@app/widgets/reCaptcha/recaptchalib.php',true);
 
-class loginForm extends \glue\Model{
-
+class loginForm extends Model
+{
 	public $captchaError;
 	
 	public $email;
@@ -16,7 +17,8 @@ class loginForm extends \glue\Model{
 	public $hash;
 	public $remember;
 
-	public function rules(){
+	public function rules()
+	{
 		return array(
 			array('email, password', 'required', 'message' => 'You must enter a username and password to login'),
 			array('email', 'email', 'message' => 'You must enter a valid email'),
@@ -27,7 +29,8 @@ class loginForm extends \glue\Model{
 		);
 	}
 
-	function authenticate($field, $params){
+	public function authenticate($field, $params)
+	{
 		if($this->getScenario() == "captcha"){
 			if (isset($_POST["recaptcha_response_field"])) {
 				$resp = recaptcha_check_answer("6LfCNb0SAAAAAK1J8rPQeDaQvz_wpIaowBiYRB2D", $_SERVER["REMOTE_ADDR"], $_POST["recaptcha_challenge_field"], $_POST["recaptcha_response_field"]);

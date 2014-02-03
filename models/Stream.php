@@ -2,9 +2,10 @@
 namespace app\models;
 
 use glue;
+use glue\db\Document;
 
-class Stream extends \glue\db\Document{
-
+class Stream extends Document
+{
 	const VIDEO_UPLOAD = 1;
 	const VIDEO_RATE = 2;
 	const LIKE_PL = 3;
@@ -28,11 +29,13 @@ class Stream extends \glue\db\Document{
 	public $item_type;
 	public $like;
 
-	public static function collectionName(){
+	public static function collectionName()
+	{
 		return "stream";
 	}
 
-	function behaviours(){
+	public function behaviours()
+	{
 		return array(
 			'timestampBehaviour' => array(
 				'class' => 'glue\\behaviours\\Timestamp'
@@ -40,11 +43,8 @@ class Stream extends \glue\db\Document{
 		);
 	}
 
-	public static function model($className = __CLASS__){
-		return parent::model($className);
-	}
-
-	function relations(){
+	public function relations()
+	{
 		return array(
 			"video" => array('one', 'app\\models\\Video', "_id", 'on' => 'video_id'),
 			"original_comment" => array('one', 'app\\models\\VideoResponse', "_id", 'on' => 'comment_id'),
@@ -55,7 +55,8 @@ class Stream extends \glue\db\Document{
 		);
 	}
 
-	function getDateTime(){
+	public function getDateTime()
+	{
 		$today_start = mktime(0, 0, 0, date("n"), date("j")-1, date("Y"));
 		if($today_start < $this->created->sec){ // Older than a day
 			return date('g:i a', $this->created->sec);
@@ -64,8 +65,8 @@ class Stream extends \glue\db\Document{
 		}
 	}
 
-	function addUser($id){
-
+	public function addUser($id)
+	{
 		if($this->read){
 			$this->from_users = array();
 		}
@@ -86,7 +87,8 @@ class Stream extends \glue\db\Document{
 		return true;
 	}
 
-	function addItemBy_id($_id, $unique = true){
+	public function addItemById($_id, $unique = true)
+	{
 		if(is_array($this->items)){
 			if($unique){
 				foreach($this->items as $k => $f_id){
@@ -108,19 +110,23 @@ class Stream extends \glue\db\Document{
 		return true;
 	}
 
-	function removeAll_byid($id_array = array()){
+	public function removeAllById($id_array = array())
+	{
 		$this->Db()->remove(array('_id' => array('$in' => $id_array), 'user_id' => glue::session()->user->_id), array('safe' => true));
 	}
 
-	function removeAllByType($type){
+	public function removeAllByType($type)
+	{
 		$this->Db()->remove(array('type' => $type, 'user_id' => glue::session()->user->_id));
 	}
 
-	function removeAll(){
+	public function removeAll()
+	{
 		$this->Db()->remove(array('stream_type' => 'stream', 'user_id' => glue::session()->user->_id));
 	}
 
-	static function directlyMessageUser($user_id, $to_user, $text){
+	public static function directlyMessageUser($user_id, $to_user, $text)
+	{
 		$status = Stream::findOne(array('user_id' => $to_user, 'posted_by_id' => $user_id, 'message' => $text, 'type' => Stream::WALL_POST));
 
 		if($status){
@@ -136,7 +142,8 @@ class Stream extends \glue\db\Document{
 		return $status;
 	}
 
-	static function subscribedTo($user_id, $subscribed_user){
+	public static function subscribedTo($user_id, $subscribed_user)
+	{
 		$status = Stream::findOne(array('userId' => $user_id, 'subscribed_user_id' => $subscribed_user, 'type' => Stream::SUBSCRIBED_TO));
 
 		if($status){
@@ -150,7 +157,8 @@ class Stream extends \glue\db\Document{
 		}
 	}
 
-	static function videoWatch($user_id, $video_id){
+	public static function videoWatch($user_id, $video_id)
+	{
 		$status = Stream::findOne(array('user_id' => $user_id, 'video_id' => $video_id, 'type' => Stream::VIDEO_WATCHED));
 
 		if($status){
@@ -164,7 +172,8 @@ class Stream extends \glue\db\Document{
 		}
 	}
 
-	static function videoUpload($user_id, $video_id){
+	public static function videoUpload($user_id, $video_id)
+	{
 		$status = new static;
 		$status->user_id = $user_id;
 		$status->video_id = $video_id;
@@ -172,7 +181,8 @@ class Stream extends \glue\db\Document{
 		$status->save();
 	}
 
-	static function shareItem($user_id, $item_id, $item_type, $custom_text = null){
+	public static function shareItem($user_id, $item_id, $item_type, $custom_text = null)
+	{
 		$status = Stream::findOne(array('user_id' => $user_id, 'item_id' => $item_id, 'type' => Stream::ITEM_SHARED));
 
 		if($status){
@@ -189,7 +199,8 @@ class Stream extends \glue\db\Document{
 		}
 	}
 
-	static function videoLike($video_id, $user_id){
+	public static function videoLike($video_id, $user_id)
+	{
 		$status = Stream::findOne(array('user_id' => $user_id, 'video_id' => $video_id, 'type' => Stream::VIDEO_RATE));
 
 		if($status){
@@ -205,7 +216,8 @@ class Stream extends \glue\db\Document{
 		}
 	}
 
-	static function videoDislike($video_id, $user_id){
+	public static function videoDislike($video_id, $user_id)
+	{
 		$status = Stream::findOne(array('user_id' => $user_id, 'video_id' => $video_id, 'type' => Stream::VIDEO_RATE));
 
 		if($status){
@@ -221,39 +233,42 @@ class Stream extends \glue\db\Document{
 		}
 	}
 
-	static function commentedOn($user_id, $video_id, $comment_id){
+	public static function commentedOn($user_id, $video_id, $comment_id)
+	{
 		$status = Stream::findOne(array('user_id' => $user_id, 'video_id' => $video_id, 'type' => Stream::COMMENTED_ON));
 
 		if($status){
-			$status->addItemBy_id($comment_id);
+			$status->addItemById($comment_id);
 			$status->save();
 		}else{
 			$status = new Stream();
 			$status->user_id = $user_id;
 			$status->video_id = $video_id;
 			$status->type = Stream::COMMENTED_ON;
-			$status->addItemBy_id($comment_id);
+			$status->addItemById($comment_id);
 			$status->save();
 		}
 	}
 
-	public static function PlaylistAddVideo($user_id, $playlist_id, $video_id){
+	public static function PlaylistAddVideo($user_id, $playlist_id, $video_id)
+	{
 		$status = Stream::findOne(array('userId' => $user_id, 'itemId' => $playlist_id, 'type' => Stream::ADD_TO_PL));
 
 		if($status){
-			$status->addItemBy_id($video_id);
+			$status->addItemById($video_id);
 			$status->save();
 		}else{
 			$status = new Stream();
 			$status->user_id = $user_id;
 			$status->item_id = $playlist_id;
 			$status->type = Stream::ADD_TO_PL;
-			$status->addItemBy_id($video_id);
+			$status->addItemById($video_id);
 			$status->save();
 		}
 	}
 
-	public static function like_playlist($user_id, $playlist_id){
+	public static function like_playlist($user_id, $playlist_id)
+	{
 		$status = Stream::findOne(array('user_id' => $user_id, 'playlist_id' => $playlist_id, 'type' => Stream::LIKE_PL));
 
 		if($status){

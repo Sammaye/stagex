@@ -36,7 +36,7 @@ class VideoController extends Controller
 		$this->title = "Upload a new video - StageX";
 		$this->layout = 'user_section';
 
-		glue::user()->reset_upload_bandwidth();
+		glue::user()->resetUploadBandwidth();
 		if((!strstr($_SERVER['SERVER_NAME'], 'upload.')) && glue::$params['uploadBase'] == 'http://upload.stagex.co.uk/'){
 			glue::http()->redirect(glue::$params['uploadBase'].'video/upload');
 		}
@@ -515,7 +515,7 @@ class VideoController extends Controller
 		if($fromTs == $toTs){
 			$toTs = mktime(23, 0, 0, $split_to[1], $split_to[0], $split_to[2]);
 		}
-		$this->json_success(array('stats' => $model->getStatistics_dateRange($fromTs, $toTs)));
+		$this->json_success(array('stats' => $model->getStatisticsDateRange($fromTs, $toTs)));
 	}
 	
 	public function action_searchSuggestions()

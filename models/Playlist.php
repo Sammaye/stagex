@@ -2,11 +2,11 @@
 namespace app\models;
 
 use glue;
+use glue\db\Document;
 
-class Playlist extends \glue\db\Document{
-
+class Playlist extends Document
+{
 	public $userId;
-
 	public $title;
 	public $description;
 
@@ -26,11 +26,13 @@ class Playlist extends \glue\db\Document{
 
 	public $deleted = 0;
 
-	public static function collectionName(){
+	public static function collectionName()
+	{
 		return 'playlist';
 	}
 
-	function behaviours(){
+	public function behaviours()
+	{
 		return array(
 			'timestampBehaviour' => array(
 				'class' => 'glue\\behaviours\\Timestamp'
@@ -38,24 +40,22 @@ class Playlist extends \glue\db\Document{
 		);
 	}
 
-	function relations(){
+	public function relations()
+	{
 		return array(
 			"author" => array('one', 'app\\models\\User', "_id", 'on' => 'userId'),
 		);
 	}
 	
-	function defaultScope(){
+	public function defaultScope()
+	{
 		return array(
-			'condition' => array('deleted'=>array('$in'=>0,null))		
+			'condition' => array('deleted' => array('$in' => 0, null))
 		);
 	}
 
-	public static function model($class = __CLASS__){
-		return parent::model($class);
-	}
-
-	function getRandomVideoPic(){
-
+	public function getRandomVideoPic()
+	{
 		if(count($this->videos) <= 0){
 			if(isset(glue::$params['thumbnailBase'])){
 				return 'images.stagex.co.uk/videos/_w_138_h_77.png';
@@ -68,17 +68,19 @@ class Playlist extends \glue\db\Document{
 		return $video->getImage(138, 77);
 	}
 
-	function get4Pics($large_width=124,$large_height=69,$small_width=44,$small_height=26){
+	public function get4Pics($large_width=124,$large_height=69,$small_width=44,$small_height=26)
+	{
 		$pics = array(); $i = 0;
 
 		if(count($this->videos) > 0){
 			for($i, $size = count($this->videos) >= 4 ? 4 : count($this->videos); $i < $size; $i++){
 				$video = Video::findOne(array('_id' => $this->videos[$i]['_id']));
 
-				if(!$video)
+				if(!$video){
 					$video = new Video;
+				}
 
-				if($i==0){
+				if($i == 0){
 					$pics[] = $video->getImage($large_width, $large_height);
 				}else{
 					$pics[] = $video->getImage($small_width, $small_height);
@@ -87,37 +89,43 @@ class Playlist extends \glue\db\Document{
 		}
 
 		for($i; $i < 4; $i++){
-			if($i==0)
+			if($i==0){
 				$pics[] = "/image/video?id=&w=$large_width&h=$large_height";
-			else
+			}else{
 				$pics[] = "/image/video?id=&w=$small_width&h=$small_height";
+			}
 		}
-
 		return $pics;
 	}
 
-	function addVideo($_id){
+	public function addVideo($_id)
+	{
 		foreach($this->videos as $k=>$v){
-			if($v['_id'] == $_id)
+			if($v['_id'] == $_id){
 				return; // Bail if the video exists
+			}
 		}
 		$this->videos[] = array('_id' => $_id, 'pos' => count($this->videos));
 		$this->totalVideos++;
 	}
 
-	function add_video_at_pos($_id, $pos = 0){
+	public function addVideoAtPos($_id, $pos = 0)
+	{
 		$this->videos[] = array('_id' => $_id, 'pos' => $pos);
 	}
 
-	function videoAlreadyAdded($_id){
+	public function videoAlreadyAdded($_id)
+	{
 		foreach($this->videos as $k=>$v){
-			if($v['_id'] == $_id)
+			if($v['_id'] == $_id){
 				return true; // Bail if the video exists
+			}
 		}
 		return false;
 	}
 
-	function get_sorted_videos(){
+	public function getSortedVideos()
+	{
 		$videos = $this->videos;
 
 		foreach($videos as $k => $v){
@@ -129,7 +137,8 @@ class Playlist extends \glue\db\Document{
 		return $videos;
 	}
 
-	function like(){
+	public function like()
+	{
 		$like_row = glue::db()->playlist_likes->findOne(array('userId' => glue::user()->_id, 'item' => $this->_id));
 
 		if(!$like_row){
@@ -140,7 +149,8 @@ class Playlist extends \glue\db\Document{
 		return true;
 	}
 
-	function unlike(){
+	public function unlike()
+	{
 		$like_row = glue::db()->playlist_likes->findOne(array('userId' => glue::user()->_id, 'item' => $this->_id));
 
 		if($like_row){
@@ -151,15 +161,8 @@ class Playlist extends \glue\db\Document{
 		return true;
 	}
 
-	function current_user_likes(){
-		$like_row = glue::db()->playlist_likes->findOne(array('userId' => glue::session()->user->_id, 'item' => $this->_id));
-		if($like_row)
-			return true;
-
-		return false;
-	}
-
-	function rules(){
+	public function rules()
+	{
 		return array(
 			array('title', 'required', 'message' => 'You must enter a title for your playlist.', 'on' => 'insert'),
 			//array('description', 'safe'),
@@ -173,14 +176,16 @@ class Playlist extends \glue\db\Document{
 		);
 	}
 
-	function beforeSave(){
+	public function beforeSave()
+	{
 		if($this->getIsNewRecord() && !$this->userId){
 			$this->userId = glue::user()->_id;
 		}
 		return true;
 	}
 
-	function afterSave(){
+	public function afterSave()
+	{
 		//var_dump(strval($this->userId));
 		glue::elasticSearch()->index(array(
     		'id' => strval($this->_id),
@@ -200,7 +205,8 @@ class Playlist extends \glue\db\Document{
 		return true;
 	}
 
-	function delete(){
+	public function delete()
+	{
 		glue::elasticSearch()->delete(array(
 			'id' => $this->_id,
 			'type' => 'playlist'
@@ -214,7 +220,8 @@ class Playlist extends \glue\db\Document{
 		return true;
 	}
 	
-	function getSubscription($user){
+	public function getSubscription($user)
+	{
 		return glue::db()->playlist_subscription->findOne(array('user_id' => $user->_id, 'playlist_id' => $this->_id));
 	}
 }

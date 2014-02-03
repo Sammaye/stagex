@@ -2,14 +2,16 @@
 
 namespace app\widgets;
 
-use glue,
-	\glue\Html;
+use glue;
+use glue\Widget;
+use \glue\Html;
 
-class UserMenu extends \glue\Widget{
-
+class UserMenu extends Widget
+{
 	public $tab;
 	
-	function render(){ 
+	function render()
+	{ 
 		?><div class='user_side_menu'>
 		<?php if(glue::auth()->check(array('@'))){  ?>
 			<div>
@@ -30,7 +32,7 @@ class UserMenu extends \glue\Widget{
 			</li>
 			<li>
 				<a href='<?php echo glue::http()->url('/stream/notifications') ?>' <?php echo $this->tab == "notifications" ? "class='selected'" : "" ?>>Notifications
-				<span class="badge"><?php echo \app\models\Notification::getNewCount_Notifications() ?></span></a>
+				<span class="badge"><?php echo \app\models\Notification::getNewCountNotifications() ?></span></a>
 			</li>
 			<li><a href='<?php echo glue::http()->url('/user/view') ?>' <?php echo $this->tab == "profile" ? "class='selected'" : "" ?>>Profile</a></li>								
 			</ul>
@@ -44,8 +46,9 @@ class UserMenu extends \glue\Widget{
 			<li><a href='<?php echo glue::http()->url('/user/logout') ?>'>Logout</a></li>
 			</ul>
 			</div>
-		<?php }else 
-			echo "&nbsp;" ?>
+		<?php }else{
+			echo "&nbsp;";
+		} ?>
 		</div><?php 
 	}
 }

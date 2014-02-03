@@ -40,7 +40,7 @@ if(
 	<div class="info">
 		<span class='title'><a href="<?php echo $videoUrl ?>"><?php echo $item->title ?></a></span>
 		<div class="expandable text-muted description"><?php echo $item->description ?></div>
-		<span class="duration small text-muted"><?php echo $item->get_time_string() ?></span><span class="sep small text-muted"> - </span>
+		<span class="duration small text-muted"><?php echo $item->getTimeString() ?></span><span class="sep small text-muted"> - </span>
 		<a class="small" href="/user/view?id=<?php echo $item->author->_id ?>"><?php echo $item->author->username ?></a>		
 	</div>
 	<?php endif; ?>

@@ -431,7 +431,7 @@ $this->js('edit', "
 				</div>
 				<div id="chartdiv" style="height:200px;width:100%; position:relative; margin-top:20px;"></div>
 				<?php
-				$video_stats = $model->getStatistics_dateRange(mktime(0, 0, 0, date("m"), date("d")-7, date("Y")), mktime(0, 0, 0, date("m"), date("d"), date("Y")));
+				$video_stats = $model->getStatisticsDateRange(mktime(0, 0, 0, date("m"), date("d")-7, date("Y")), mktime(0, 0, 0, date("m"), date("d"), date("Y")));
 				echo app\widgets\highCharts::run(array(
 					'chartName' => 'video_views_plot',
 					'appendTo' => 'chartdiv',

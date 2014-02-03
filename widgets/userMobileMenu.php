@@ -10,7 +10,7 @@ class userMobileMenu extends Widget
 {
 	public $tab;
 	
-	function render()
+	public function render()
 	{
 		$menujs = <<<JS
 $('.user_menu_header .glyphicon').on('click', function(e){
@@ -28,7 +28,7 @@ JS;
 			<?php echo Html::encode(Glue::controller()->title) ?>
 			
 			<?php if(glue::session()->authed){ ?>
-			<?php $newNotifications = \app\models\Notification::getNewCount_Notifications(); ?>
+			<?php $newNotifications = \app\models\Notification::getNewCountNotifications(); ?>
 		  	<a href="/stream/notifications" class="notification right <?php if($newNotifications > 0): echo "new_notifications"; endif; ?>">
 		  		<?php if($newNotifications > 100){ ?>
 					100+

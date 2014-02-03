@@ -2,16 +2,16 @@
 
 namespace app\models;
 
+use glue;
+use glue\Model;
 use \glue\db\Document;
-use glue,
-	glue\Model,
-	app\models\Playlist,
-	glue\util\Crypt,
-	glue\Collection,
-	glue\Validation;
+use app\models\Playlist;
+use glue\util\Crypt;
+use glue\Collection;
+use glue\Validation;
 
-class User extends Document{
-
+class User extends Document
+{
 	/* ATM these are not being used
 	const AUTOPUBLISH_UPLOAD=1;
 	const AUTOPUBLISH_VRESPONSE=2;
@@ -122,7 +122,8 @@ class User extends Document{
 
 	public $accessToken;
 
-	function groups(){
+	public function groups()
+	{
 		return array(
 			1=>'user',
 			2=>'VIP',
@@ -133,11 +134,13 @@ class User extends Document{
 		);
 	}
 
-	public static function collectionName(){
+	public static function collectionName()
+	{
 		return "user";
 	}
 
-	function behaviours(){
+	public function behaviours()
+	{
 		return array(
 			'timestampBehaviour' => array(
 				'class' => 'glue\\behaviours\\Timestamp'
@@ -145,11 +148,8 @@ class User extends Document{
 		);
 	}
 
-	public static function model($className = __CLASS__){
-		return parent::model($className);
-	}
-
-	function relations(){
+	public function relations()
+	{
 		return array(
 			"following" => array('many', 'app\\models\\Follower', "fromId"),
 			"followers" => array('many', 'app\\models\\Follower', "toId"),
@@ -159,7 +159,8 @@ class User extends Document{
 		);
 	}
 
-	function beforeValidate(){
+	public function beforeValidate()
+	{
 		if($this->getScenario() == "updatePassword"){
 			if(Crypt::verify($this->oldPassword, $this->password)){
 				return true;
@@ -171,7 +172,8 @@ class User extends Document{
 		return true;
 	}
 
-	function rules(){
+	public function rules()
+	{
 		return array(
 		array('username, password, email', 'required', 'message' => 'You must fill in all of the fields'),
 
@@ -224,7 +226,8 @@ class User extends Document{
 		);
 	}
 
-	function validateBirthday($field, $params = array()){
+	public function validateBirthday($field, $params = array())
+	{
 		$filled_size = count(array_filter(array(
 			$this->isEmpty($this->birthDay) ? null : $this->birthDay,
 			$this->isEmpty($this->birthMonth) ? null : $this->birthMonth,
@@ -238,17 +241,17 @@ class User extends Document{
 		return true;
 	}
 
-	function validateExternalLinks(){
-
+	public function validateExternalLinks()
+	{
 		if(count($this->externalLinks) > 6){
 			$this->setError('externalLinks', 'You can only add 6 external links for the time being. Please make sure you have entered no more and try again.');
 			return false;
 		}
 
-		$valid=true;
+		$valid = true;
 		if(is_array($this->externalLinks)){
 			foreach($this->externalLinks as $k=>$v){
-				$m=new Model();
+				$m = new Model();
 				$m->setRules(array(
 						array('url', 'required', 'message' => 'One or more of the external links you entered were invalid URLs.'),
 						array('url', 'url', 'message' => 'One or more of the external links you entered were invalid URLs.'),
@@ -256,10 +259,10 @@ class User extends Document{
 						array('title', 'string', 'max' => 20, 'message' => 'The optional external URL caption field can only be 200 characters in length')
 				));
 				$m->setAttributes($v);
-				$valid=$m->validate()&&$valid;
-				$this->externalLinks[$k]=$m->getAttributes(null,true);
+				$valid = $m->validate()&&$valid;
+				$this->externalLinks[$k] = $m->getAttributes(null,true);
 			}
-			$this->externalLinks=array_values($this->externalLinks);
+			$this->externalLinks = array_values($this->externalLinks);
 		}
 
 		if(!$valid){
@@ -269,8 +272,8 @@ class User extends Document{
 		return true;
 	}
 
-	function beforeSave(){
-
+	public function beforeSave()
+	{
 		if($this->getIsNewRecord()){
 			$this->lastNotificationPull = new \MongoDate();
 			$this->nextBandwidthTopup = strtotime('+1 week', mktime(0, 0, 0, date('m'), date('d'), date('Y')));
@@ -278,8 +281,9 @@ class User extends Document{
 		}
 
 		if($this->getScenario() == "updatePassword" || $this->getScenario() == "recoverPassword" || $this->getIsNewRecord()){
-			if($this->getScenario() == "updatePassword")
+			if($this->getScenario() == "updatePassword"){
 				$this->password = $this->newPassword;
+			}
 			$this->textPassword=$this->password;
 			$this->password = Crypt::blowfish_hash($this->password);
 		}
@@ -299,8 +303,8 @@ class User extends Document{
 		return true;
 	}
 
-	function afterSave(){
-
+	public function afterSave()
+	{
 		if($this->getIsNewRecord()){
 			$watch_later = new Playlist();
 			$watch_later->title = "Watch Later";
@@ -355,10 +359,10 @@ class User extends Document{
 		return true;
 	}
 
-	function setAvatar(){
-
-	    $ref=array('type' => 'user', '_id' => $this->_id);
-		$bytes=file_get_contents($this->avatar->tmp_name);
+	public function setAvatar()
+	{
+	    $ref = array('type' => 'user', '_id' => $this->_id);
+		$bytes = file_get_contents($this->avatar->tmp_name);
 
 		if(
 			strlen($this->avatar->tmp_name) &&
@@ -375,7 +379,8 @@ class User extends Document{
 		return true;
 	}
 
-	function getAvatar($width, $height){
+	public function getAvatar($width, $height)
+	{
 		if(isset(glue::$params['imagesUrl'])){
 			return 'http://images.stagex.co.uk/user/'.strval($this->_id).'_w_'.$width.'_h_'.$height.'.png';
 		}else{
@@ -383,32 +388,38 @@ class User extends Document{
 		}
 	}
 
-	function getGroup(){
+	public function getGroup()
+	{
 		$groups = array_flip($this->groups());
 		if(array_key_exists((int)$this->group, $groups))
 			return $groups[$this->group];
 		return false;
 	}
 
-	function getUsername(){
+	public function getUsername()
+	{
 		return \glue\Html::encode($this->username);
 	}
 
-	function getAbout(){
+	public function getAbout()
+	{
 		return nl2br(\glue\Html::encode($this->about));
 	}
 	
-	function getBirthdayTime(){
+	public function getBirthdayTime()
+	{
 		if(isset($this->birthDay,$this->birthMonth,$this->birthYear)&&$this->birthMonth&&$this->birthDay&&$this->birthYear)
 			return mktime(0, 0, 0, $this->birthMonth, $this->birthDay, $this->birthYear);
 		return 0;
 	}
 
-	function get_allowed_bandwidth(){
+	public function getAllowedBandwidth()
+	{
 		return $this->allowedBandwidth > 0 ? $this->allowedBandwidth : glue::$params['defaultAllowedBandwidth'];
 	}
 
-	function reset_upload_bandwidth(){
+	public function resetUploadBandwidth()
+	{
 		if($this->nextBandwidthTopup < time()){
 			$this->nextBandwidthTopup = strtotime('+1 week', mktime(0, 0, 0, date('m'), date('d'), date('Y')));
 			$this->bandwidthLeft = $this->allowedBandwidth > 0 ? $this->allowedBandwidth : glue::$params['defaultAllowedBandwidth'];
@@ -416,14 +427,16 @@ class User extends Document{
 		}
 	}
 
-	function get_max_video_upload_size(){
+	public function getMaxVideoUploadSize()
+	{
 		if(isset($this->maxFileSize) && $this->maxFileSize != null){
 			return $this->maxFileSize;
 		}
 		return glue::$params['maxFileSize'];
 	}
 
-	function createUsernameFromSocialSignup($username){
+	public function createUsernameFromSocialSignup($username)
+	{
 		if($this->getCollection()->findOne(array('username' => $username))){
 			for($i=0;$i<5;$i++){
 				if($i == 3 || $i == 4){ // Lets go for even more unique and nuke the username
@@ -441,13 +454,15 @@ class User extends Document{
 		return $this->username=$username;
 	}
 	
-	function deactivate(){
+	public function deactivate()
+	{
 		$this->deleted=1;
 		$this->save();
 		glue::db()->delete_queue->insert(array('id' => $this->_id, 'type' => 'user', 'ts' => new \MongoDate()));		
 	}
 	
-	function autoPublishStreamItem(){
+	public function autoPublishStreamItem()
+	{
 		if(!glue::db()->auto_publish_queue->findOne(array('type'=>$type,'userId'=>$user_id,'videoId'=>$video_id,'playlistId'=>$playlist_id,'text'=>$text))){
 			glue::db()->auto_publish_queue->insert(array(
 				'type' => $type,
@@ -459,18 +474,21 @@ class User extends Document{
 		}		
 	}
 	
-	function watchLaterPlaylist(){
+	public function watchLaterPlaylist()
+	{
 		if(
-			$this->watchLater===null && 
-			($playlist=Playlist::findOne(array('title' => 'Watch Later', 'userId' => glue::user()->_id)))!==null
-		)
+			$this->watchLater === null && 
+			($playlist = Playlist::findOne(array('title' => 'Watch Later', 'userId' => glue::user()->_id)))!==null
+		){
 			$this->watchLater=$playlist;
-		elseif($this->watchLater===null)
-			$this->watchLater=new Playlist();
+		}elseif($this->watchLater===null){
+			$this->watchLater = new Playlist();
+		}
 		return $this->watchLater;
 	}
 	
-	function recordWatched($video){
+	public function recordWatched($video)
+	{
 		glue::db()->watched_history->update(array(
 			'user_id' => $this->_id, 'item' => $video->_id), array('$set' => array('ts' => new \MongoDate())), array('upsert' => true));
 	}

@@ -3,10 +3,11 @@
 namespace app\widgets;
 
 use glue;
+use glue\Widget;
 
-class Jqautocomplete extends \glue\Widget{
-
-	public $htmlOptions=array();
+class Jqautocomplete extends Widget
+{
+	public $htmlOptions = array();
 	
 	public $options = array();
 	public $renderItem;
@@ -14,34 +15,35 @@ class Jqautocomplete extends \glue\Widget{
 	
 	public $placeholder;
 
-	function render(){
+	public function render()
+	{
 		if(!$this->model){
 
 			$js = "$(function(){";
 
-				if($this->renderItem && !isset($this->options['select'])){
-					$this->options['select'] = "
-					function( event, ui ) {
-						$( '#".$this->attribute."' ).val( ui.item.label );
-						return false;
-					}";
-				}
+			if($this->renderItem && !isset($this->options['select'])){
+				$this->options['select'] = "
+				function( event, ui ) {
+					$( '#".$this->attribute."' ).val( ui.item.label );
+					return false;
+				}";
+			}
 
+			$js .= "
+				$('#".$this->attribute."').autocomplete(
+					" . js_encode($this->options) . "
+				)
+			";
+
+			if($this->renderItem){
 				$js .= "
-						$('#".$this->attribute."').autocomplete(
-							" . js_encode($this->options) . "
-						)
+					.data( 'uiAutocomplete' )._renderItem = function( ul, item ) {
+						" . $this->renderItem . "
+					};
 				";
-
-				if($this->renderItem){
-					$js .= "
-						.data( 'uiAutocomplete' )._renderItem = function( ul, item ) {
-							" . $this->renderItem . "
-						};
-					";
-				}else{
-					$js .= ";";
-				}
+			}else{
+				$js .= ";";
+			}
 
 			$js .= "});";
 

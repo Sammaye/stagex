@@ -2,9 +2,10 @@
 namespace app\models;
 
 use glue;
+use glue\db\Document;
 
-class Video extends \glue\Db\Document{
-	
+class Video extends Document
+{
 	/** @virtual */
 	public $response = array(); // I am unsure about this var. I don't like the way it stares at me
 	/** @virtual */
@@ -76,7 +77,8 @@ class Video extends \glue\Db\Document{
 
 	public $deleted = 0;
 
-	function behaviours(){
+	public function behaviours()
+	{
 		return array(
 			'timestampBehaviour' => array(
 				'class' => 'glue\\behaviours\\Timestamp'
@@ -84,11 +86,13 @@ class Video extends \glue\Db\Document{
 		);
 	}
 
-	public static function collectionName(){
+	public static function collectionName()
+	{
 		return "video";
 	}
 
-	function categories($pivot = 'all'){
+	public function categories($pivot = 'all')
+	{
 		$cats = array(
 			'cars' => array('Cars and Vehicles', 0),
 			'comedy' => array('Comedy', 1),
@@ -125,21 +129,25 @@ class Video extends \glue\Db\Document{
 		}
 	}
 
-	function licences($index=null){
+	public function licences($index = null)
+	{
 		
 		$d=array(
 			1 => "StageX Licence",
 			2 => "Creative Commons Licence (Re-use Allowed)"
 		);
-		if($index===null)
+		if($index === null){
 			return $d;
-		else
+		}else{
 			return isset($d[$index]) ? $d[$index] : null;
+		}
 	}
 
-	function response($k = null, $v = null){
-
-		if(!$this->response) $this->response = array();
+	public function response($k = null, $v = null)
+	{
+		if(!$this->response){
+			$this->response = array();
+		}
 
 		if($k && $v){
 			$this->response[$k] = $v;
@@ -149,34 +157,36 @@ class Video extends \glue\Db\Document{
 		return $this->response;
 	}
 
-	public static function model($className = __CLASS__){
-		return parent::model($className);
-	}
-
-	function isPublic(){
+	public function isPublic()
+	{
 		return $this->listing == 0;
 	}
 
-	function isUnlisted(){
+	public function isUnlisted()
+	{
 		return $this->listing == 1;
 	}
 
-	function isPrivate(){
+	public function isPrivate()
+	{
 		return $this->listing == 2;
 	}
 
-	function isProcessing(){
-		return $this->state == 'pending' || $this->state == 'submitting' || $this->state == 'transcoding';
+	public function isProcessing()
+	{
+		return $this->state === 'pending' || $this->state === 'submitting' || $this->state === 'transcoding';
 	}
 
-	function relations(){
+	public function relations()
+	{
 		return array(
 			"author" => array('one', 'app\models\User', "_id", 'on' => 'userId'),
 			"responses" => array('many', 'app\models\VideoResponse', "videoId", 'on' => '_id'),
 		);
 	}
 
-	function rules(){
+	public function rules()
+	{
 		return array(
 			array('title', 'required', 'message' => 'You must provide a title'),
 			array('title', 'string', 'max' => '75', 'message' => 'You can only write 75 characters for the title'),
@@ -193,18 +203,21 @@ class Video extends \glue\Db\Document{
 		);
 	}
 	
-	public function init(){
+	public function init()
+	{
 		$this->populateDefaults();
 	}
 
-	function afterFind(){
+	public function afterFind()
+	{
 		if(is_array($this->tags)){
 			$this->stringTags = implode(',', $this->tags);
 		}
 		return true;
 	}
 	
-	public function populateDefaults(){
+	public function populateDefaults()
+	{
 		if(glue::session()->authed){
 			$defaults=glue::user()->defaultVideoSettings;
 			
@@ -217,7 +230,8 @@ class Video extends \glue\Db\Document{
 		}
 	}
 	
-	function setImage($bytes){
+	public function setImage($bytes)
+	{
 		$ref=array('type' => 'video', '_id' => $this->_id);
 		if(
 			$bytes &&
@@ -233,7 +247,8 @@ class Video extends \glue\Db\Document{
 		return false;
 	}	
 
-	function getImage($width, $height){
+	public function getImage($width, $height)
+	{
 		if(isset(glue::$params['thumbnailBase'])){
 			return 'http://'.glue::$params['thumbnailBase'].strval($this->_id).'_w_'.$width.'_h_'.$height.'.png';
 		}else{
@@ -247,8 +262,8 @@ class Video extends \glue\Db\Document{
 
 	public function upload($id)
 	{
-		$file=new \glue\File(array('model'=>null,'id'=>$id));
-		if(strlen($file->tmp_name)<=0){
+		$file = new \glue\File(array('model' => null,'id' => $id));
+		if(strlen($file->tmp_name) <= 0){
 			$this->response("ERROR", "NOT_VALID");
 			return false;
 		}
@@ -275,7 +290,7 @@ class Video extends \glue\Db\Document{
 		 *	This takes the form from the upload page and places the data in
 		 */
 		if(isset($_SESSION['_upload'][$id]) && is_array($_SESSION['_upload'][$id])){
-			foreach($_SESSION['_upload'][$id] as $k=>$v){
+			foreach($_SESSION['_upload'][$id] as $k => $v){
 				$this->$k = $v;
 			}
 		}		
@@ -336,9 +351,8 @@ class Video extends \glue\Db\Document{
 		return true;
 	}
 
-	function afterSave()
+	public function afterSave()
 	{
-
 		if($this->state == 'finished' && !$this->deleted) // Only put it into the search index if it's done
         { 
 		    glue::elasticSearch()->index(array(
@@ -365,8 +379,8 @@ class Video extends \glue\Db\Document{
 		return true;
 	}
 	
-	function search($keyword='',$query=false){
-		
+	public function search($keyword='',$query=false)
+	{
 		$sphinx=glue::sphinx()
 				->index('main')
 				->match(array('title', 'description', 'tags', 'author_name'),glue::http()->param('q',$keyword))
@@ -381,10 +395,11 @@ class Video extends \glue\Db\Document{
 			$sphinx->filter('adult', array(1), true);
 		}				
 				
-		if($query)
+		if($query){
 			return $cursor=$sphinx->query();
-		else
+		}else{
 			return $sphinx;
+		}
 	}
 
 	/**
@@ -427,12 +442,12 @@ class Video extends \glue\Db\Document{
 	 *   day: 0
 	 * }
 	 */
-	function recordHit(){
-
+	public function recordHit()
+	{
 		if(!glue::http()->is_search_bot($_SERVER['HTTP_USER_AGENT'])){ // Is the user a search bot? is so we don't want to add them
 
 			$user = glue::session()->user;
-			$bname=glue::http()->getMajorBrowserName();
+			$bname = glue::http()->getMajorBrowserName();
 
 	        $age_key = 'u';
 	        if(glue::session()->authed){
@@ -454,9 +469,9 @@ class Video extends \glue\Db\Document{
 				"sid" => glue::user()->_id instanceof \MongoId ? glue::user()->_id : session_id(),
 				"vid" => $this->_id
 			), array('$setOnInsert'=>array('ts'=>new \MongoDate())), array('upsert'=>true));
-			$is_unique=!$resp['updatedExisting'];
+			$is_unique = !$resp['updatedExisting'];
 
-			$doc = array( '$inc' => array( 'hits' => 1 ) );
+			$doc = array('$inc' => array('hits' => 1));
 			if($is_unique){
 				$doc['$inc']['u_hits'] = 1;
 				$doc['$inc']['age.'.$age_key] = 1;
@@ -478,24 +493,30 @@ class Video extends \glue\Db\Document{
 			}
 
 			$doc['$inc']['hours.'.date('G').'.v'] = 1;
-			if($is_unique) $doc['$inc']['hours.'.date('G').'.u'] = 1;
+			if($is_unique){
+				$doc['$inc']['hours.'.date('G').'.u'] = 1;
+			}
 
-			glue::db()->video_statistics_day->update(array("day"=>new \MongoDate(mktime(0, 0, 0, date("m"), date("d"), date("Y"))), "vid"=>$this->_id), 
-				$doc, array("upsert"=>true));
+			glue::db()->video_statistics_day->update(array("day" => new \MongoDate(mktime(0, 0, 0, date("m"), date("d"), date("Y"))), "vid" => $this->_id), 
+				$doc, array("upsert" => true));
 
-			if($is_unique) $this->uniqueViews = $this->uniqueViews+1;
+			if($is_unique){
+				$this->uniqueViews = $this->uniqueViews + 1;
+			}
 			$this->views = $this->views+1;
 			$this->save();
 
 			// Now lets do some referers
 			$referer = glue::http()->getNormalisedReferer();
-			if($referer)
+			if($referer){
 				glue::db()->video_referers->update(array('video_id' => $this->_id, 'referer' => $referer), array('$inc' => array('c' => 1),
 					'$setOnInsert' => array('ts' => new \MongoDate())), array('upsert' => true));
+			}
 		}
 	}
 
-	function getStatistics_dateRange($fromTs /* d-m-Y */, $toTs /* d-m-Y */){
+	public function getStatisticsDateRange($fromTs /* d-m-Y */, $toTs /* d-m-Y */)
+	{
 //var_dump($toTs);
 		$unique_views_range = array();
 		$non_unique_views_range = array();
@@ -546,10 +567,12 @@ class Video extends \glue\Db\Document{
 			}
 		}
 
-		foreach(glue::db()->video_statistics_day->find(array(
-			"vid"=>$this->_id,
-			"day"=> array('$gte' => new \MongoDate($fromTs), '$lte' => new \MongoDate($toTs))
-		)) as $day){
+		foreach(
+			glue::db()->video_statistics_day->find(array(
+				"vid"=>$this->_id,
+				"day"=> array('$gte' => new \MongoDate($fromTs), '$lte' => new \MongoDate($toTs))
+			)) as $day
+		){
 			//var_dump($day);
 			if($fromTs < strtotime('-4 days', $toTs)){
 				$non_unique_views_range[$day['day']->sec] = !empty($day['hits']) ? $day['hits'] : 0;
@@ -624,15 +647,16 @@ class Video extends \glue\Db\Document{
 		);
 	}
 
-	function formatHighChart($seriesRanges = array()){
+	public function formatHighChart($seriesRanges = array())
+	{
 		$allSeries = array();
 //var_dump($non_unique_views_range);
 		if($seriesRanges){
 			foreach($seriesRanges as $seriesName => $series){
 				$seriesValues = array();
 
-				foreach($series as $key=>$entry){
-					$seriesValues[] = array($key*1000, $entry); // HighChart needs the ts in milliseconds
+				foreach($series as $key => $entry){
+					$seriesValues[] = array($key * 1000, $entry); // HighChart needs the ts in milliseconds
 				}
 
 				$allSeries[] = array(
@@ -644,11 +668,12 @@ class Video extends \glue\Db\Document{
 		return $allSeries;
 	}
 	
-	function formatHighChartsAgePie($data, $count){
-		if(count($data)<=0)
-			return array(array('None',100));
-		else{
-			$a=array();
+	public function formatHighChartsAgePie($data, $count)
+	{
+		if(count($data) <= 0){
+			return array(array('None', 100));
+		}else{
+			$a = array();
 			foreach($data as $k => $c){
 				if($k == '13_16'){
 					$label = '13-16';
@@ -658,41 +683,53 @@ class Video extends \glue\Db\Document{
 					$label = '26-35';
 				}elseif($k == '36_50'){
 					$label = '36-50';
-				}elseif($k == '50_plus')
+				}elseif($k == '50_plus'){
 					$label = '50+';
-				else
+				}else{
 					$label = 'Unknown';
+				}
 				//var_dump(($c/$count)*100);
-				$a[] = array($label, ($c/$count)*100,2);
+				$a[] = array($label, ($c/$count) * 100, 2);
 			}
 			return $a;
 		}		
 	}
 
-	function get_category_text(){
+	public function get_category_text()
+	{
 		$categories = $this->categories('selectBox');
 		return $categories[$this->category];
 	}
 
-	function userHasWatched(){
+	public function userHasWatched()
+	{
 		$r = glue::db()->watched_history->findOne(array('user_id' => glue::user()->_id, 'item' => $this->_id));
-		if($r) return true;
+		if($r){
+			return true;
+		}
 		return false;
 	}
 
-	function currentUserLikes(){
+	public function currentUserLikes()
+	{
 		$r = glue::db()->video_likes->findOne(array('user_id' => glue::user()->_id, 'item' => $this->_id, 'like' => 1));
-		if($r) return true;
+		if($r){
+			return true;
+		}
 		return false;
 	}
 
-	function currentUserDislikes(){
+	public function currentUserDislikes()
+	{
 		$r = glue::db()->video_likes->findOne(array('user_id' => glue::user()->_id, 'item' => $this->_id, 'like' => 0));
-		if($r) return true;
+		if($r){
+			return true;
+		}
 		return false;
 	}
 
-	function like(){
+	public function like()
+	{
 		glue::db()->video_likes->update(
 			array("user_id" => Glue::user()->_id, "item" => $this->_id),
 			array(
@@ -707,12 +744,13 @@ class Video extends \glue\Db\Document{
 		$this->likes = glue::db()->video_likes->find(array("item"=>$this->_id, "like"=>1))->count();
 		$this->dislikes = glue::db()->video_likes->find(array("item"=>$this->_id, "like"=>0))->count();
 
-		$this->record_statistic('video_likes');
+		$this->recordStatistic('video_likes');
 		$this->save();
 		return true;
 	}
 
-	function dislike(){
+	public function dislike()
+	{
 		glue::db()->video_likes->update(
 			array("user_id" => Glue::user()->_id, "item" => $this->_id),
 			array(
@@ -727,29 +765,28 @@ class Video extends \glue\Db\Document{
 		$this->likes = glue::db()->video_likes->find(array("item"=>$this->_id, "like"=>1))->count();
 		$this->dislikes = glue::db()->video_likes->find(array("item"=>$this->_id, "like"=>0))->count();
 
-		$this->record_statistic('video_dislikes');
+		$this->recordStatistic('video_dislikes');
 		$this->save();
 		return true;
 	}
 
-	function getLongAbstract(){
+	public function getLongAbstract()
+	{
 		return preg_replace('/[\'"]/', '', truncate_string(htmlspecialchars($this->description), 250));
 	}
 
-	function getHTML_safeTitle(){
-		return preg_replace('/[\'"]/', '', $this->title);
-	}
-
-	function report($reason){
+	public function report($reason)
+	{
 		glue::db()->report->update(array('ref' => \MongoDBRef::create($this->collectionName(), $this->_id), 'userId' => glue::user()->_id),
 			array('$setOnInsert' => array('reason' => $reason, 'ts' => new \MongoDate())), array('upsert' => true));
 		return true;
 	}
 
-	function get_time_string(){
-
-		if($this->duration<=0||!$this->duration)
+	public function getTimeString()
+	{
+		if($this->duration <= 0 || !$this->duration){
 			return '00:00:00';
+		}
 		
 		$time = $this->duration/1000;
 		//$time = 3600+(60*32)+(50);
@@ -787,12 +824,14 @@ class Video extends \glue\Db\Document{
 		return $time_string;
 	}
 
-	function record_statistic($field){
+	public function recordStatistic($field)
+	{
 		glue::db()->video_statistics_day->update(array("day"=>new \MongoDate(mktime(0, 0, 0, date("m"), date("d"), date("Y"))), "vid"=>$this->_id),
 			array('$inc' => array($field => 1)), array("upsert"=>true));
 	}
 	
-	function delete(){
+	public function delete()
+	{
 		foreach($video_rows as $video){
 			\app\models\VideoResponse::Db()->remove(array('$or' => array(
 			array('vid' => $video->_id), array('xtn_vid' => $video->_id)
@@ -804,7 +843,8 @@ class Video extends \glue\Db\Document{
 		glue::db()->video_likes->remove(array('item' => array('$in' => $video_ids))); // Same reason as above		
 	}
 	
-	function removeVideoResponses(){
+	public function removeVideoResponses()
+	{
 		$count=\app\models\VideoResponse::findAll(array('videoId' => $this->_id, 'type' => 'video'))->count();
 		\app\models\VideoResponse::deleteAll(array('videoId' => $this->_id, 'type' => 'video'));
 		$this->totalResponses = $this->totalResponses-$count;
@@ -812,11 +852,12 @@ class Video extends \glue\Db\Document{
 		$this->save();		
 	}
 	
-	function removeTextResponses(){
+	public function removeTextResponses()
+	{
 		$count = \app\models\VideoResponse::find(array('videoId' => $this->_id, 'type' => 'text'))->count();
 		\app\models\VideoResponse::deleteAll(array('videoId' => $this->_id, 'type' => 'text'));
 		$this->totalResponses = $this->totalResponses-$count;
 		$this->totalTextReponses = $this->totalTextReponses-$count;
-		$this->save();		
+		$this->save();
 	}
 }

@@ -246,7 +246,7 @@ $this->js('edit', "
 	<?php } ?>
 	<div class='video_list'>
 		<?php
-		$videos = $model->get_sorted_videos();
+		$videos = $model->getSortedVideos();
 		if(count($videos) > 0){ ?>
 			<ul class='sortable_list playlist_video_list'>
 			<?php foreach($videos as $k => $video){

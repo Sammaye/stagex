@@ -21,7 +21,7 @@
 		<h3 class='title'><a href="/video/watch?id=<?php echo strval($model->_id) ?>"><?php echo $model->title ?></a></h3>
 		<?php if($model->author): ?>
 			<div class='uploader'>
-				<span class="duration"><?php echo $model->get_time_string() ?></span>
+				<span class="duration"><?php echo $model->getTimeString() ?></span>
 				<a class="author" href="<?php echo glue::http()->url('/user/view', array('id' => $model->author->_id)) ?>"><?php echo $model->author->getUsername() ?></a>
 				<span class="uploaded"><?php echo date('j M Y',$model->getTs($model->created)) ?></span>
 			</div>
