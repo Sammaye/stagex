@@ -1,6 +1,7 @@
 <?php
 
-use \glue\Controller;
+use glue\Controller;
+use glue\Json;
 use app\models\Help;
 use app\models\HelpTopic;
 use app\models\HelpArticle;
@@ -25,13 +26,13 @@ class HelpController extends Controller
 		);		
 	}
 
-	function action_index()
+	public function action_index()
 	{
 		$this->title = 'StageX Help Center';
 		echo $this->render("help/index");
 	}
 
-	function action_view()
+	public function action_view()
 	{
 		$this->title = 'Help Content Not Found - StageX';
 		$this->layout = "help_layout";
@@ -56,149 +57,153 @@ class HelpController extends Controller
 		}
 	}
 
-	function action_search()
+	public function action_search()
 	{
 		$this->title = 'Search StageX Help';
-		echo $this->render("help/search", array( "sphinx" => Help::search() ));
+		echo $this->render("help/search", array( "sphinx" => Help::search(glue::http()->param('query')) ));
 	}
 
-	function action_viewTopics()
+	public function action_viewTopics()
 	{
 		$this->title = 'View Help Topics - StageX';
-
-		// Will list all help articles. But only for admins
-		echo $this->render('help/list_topics', array('items' => app\models\HelpTopic::fts(array('title', 'path'), glue::http()->param('query', ''), array('type' => 'topic'))) );
+		echo $this->render('help/list_topics', array(
+			'items' => app\models\HelpTopic::fts(
+				array('title', 'path'), 
+				glue::http()->param('query', ''), 
+				array('type' => 'topic')
+			)
+		));
 	}
 
-	function action_addTopic()
+	public function action_addTopic()
 	{
 		$this->title = 'Add Help Topic - StageX';
 		$model = new HelpTopic();
 
 		if(isset($_POST['HelpTopic'])){
-			$model->attributes=$_POST['HelpTopic'];
-			if($model->validate()){
-				$model->save();
+			$model->attributes = $_POST['HelpTopic'];
+			if($model->save()){
 				glue::http()->redirect('/help/viewTopics');
 			}
 		}
-		echo $this->render('help/manage_topic', array( 'model' => $model ));
+		echo $this->render('help/manage_topic', array('model' => $model));
 	}
 
-	function action_editTopic()
+	public function action_editTopic()
 	{
 		$this->title = 'Edit Help Topic - StageX';
-		$model = HelpTopic::findOne(array('_id' => new MongoId($_GET['id'])));
+		$model = HelpTopic::findOne(array('_id' => new MongoId(glue::http()->param('id'))));
 
 		if(isset($_POST['HelpTopic'])){
-			$model->attributes=$_POST['HelpTopic'];
-			if($model->validate()&&$model->save()){
+			$model->attributes = $_POST['HelpTopic'];
+			if($model->save()){
 				glue::http()->redirect('/help/viewTopics');
 			}
 		}
-		echo $this->render('help/manage_topic', array( 'model' => $model ));
+		echo $this->render('help/manage_topic', array('model' => $model));
 	}
 
-	function action_deleteTopic()
+	public function action_deleteTopic()
 	{
-		$this->title = 'Remove Help Topics - StageX';
-		if(!glue::http()->isAjax())
+		if(!glue::http()->isAjax()){
 			glue::trigger('404');
+		}
+		
+		$this->title = 'Remove Help Topics - StageX';
 
-		$method = glue::http()->param('method',null);
-		$model = HelpTopic::findOne(array('_id' => new MongoId(glue::http()->param('id',null))));
+		$method = glue::http()->param('method', null);
+		$model = HelpTopic::findOne(array('_id' => new MongoId(glue::http()->param('id'))));
 
-		if(!$model)
-			$this->json_error('That topic could no longer be found');
+		if(!$model){
+			Json::error('That topic could no longer be found');
+		}
 
-		if($method != 'concat' && $method != 'scrub')
-			$this->json_error('You supplied an invalid mode. Please specify one.');
+		if($method != 'concat' && $method != 'scrub'){
+			Json::error('You supplied an invalid mode. Please specify one.');
+		}
 
-		$model->delete($method);
-		$this->json_success('The topic you selected was removed');
+		if($model->delete($method)){
+			Json::success('The topic you selected was removed');
+		}else{
+			Json::error(Json::UNKNOWN);
+		}
 	}
 
-	function action_viewArticles()
+	public function action_viewArticles()
 	{
 		$this->title = 'View Help Articles - StageX';
-
-		// Will list all help articles. But only for admins
 		echo $this->render('help/list_articles', array(
-			'items' => HelpArticle::fts(array('title', 'content', 'path'), glue::http()->param('query', ''), array('type' => 'article'))) );
+			'items' => HelpArticle::fts(
+				array('title', 'content', 'path'), 
+				glue::http()->param('query', ''), 
+				array('type' => 'article')
+			)
+		));
 	}
 
-	function action_addArticle()
+	public function action_addArticle()
 	{
 		$this->title = 'Add New Help Article - StageX';
 
 		$model = new HelpArticle;
 		if(isset($_POST['HelpArticle'])){
-			$model->attributes=$_POST['HelpArticle'];
-			if($model->validate()&&$model->save()){
+			$model->attributes = $_POST['HelpArticle'];
+			if($model->save()){
 				glue::http()->redirect('/help/viewArticles');
 			}
 		}
-
-		echo $this->render('help/manage_article', array(
-			'model' => $model
-		));
+		echo $this->render('help/manage_article', array('model' => $model));
 	}
 
-	function action_editArticle()
+	public function action_editArticle()
 	{
 		$this->title = 'Edit Help Article - StageX';
 
-		$model = HelpArticle::findOne(array('_id' => new MongoId($_GET['id'])));
+		$model = HelpArticle::findOne(array('_id' => new MongoId(glue::http()->param('id'))));
 
 		if(isset($_POST['HelpArticle'])){
-			$model->attributes=$_POST['HelpArticle'];
-			if($model->validate()&&$model->save()){
+			$model->attributes = $_POST['HelpArticle'];
+			if($model->save()){
 				glue::http()->redirect('/help/viewArticles');
 			}
 		}
-
-		echo $this->render('help/manage_article', array(
-			'model' => $model
-		));
+		echo $this->render('help/manage_article', array('model' => $model));
 	}
 
-	function action_deleteArticle()
+	public function action_deleteArticle()
 	{
 		$this->title = 'Remove Help Article - StageX';
 
-		if(!glue::http()->isAjax())
+		if(!glue::http()->isAjax()){
 			glue::trigger('404');
+		}
 		
 		$model = HelpArticle::findOne(array('_id' => new MongoId(glue::http()->param('id'))));
-		if(!$model)
-			$this->json_error('That article could no longer be found');
-
-		$model->delete();
-		$this->json_success('The article you select was deleted');
-	}
-
-	function action_suggestions()
-	{
-		$this->title = 'Suggest Help Pages - StageX';
-		if(!glue::http()->isAjax())
-			glue::trigger('404');
-
-		$ret = array();
-
-		$sphinx = glue::sphinx()->getSearcher();
-		$sphinx->limit = 5;
-		$sphinx->query(array('select' => glue::http()->param('term', '')), "help");
-
-		if($sphinx->matches){
-			foreach($sphinx->matches as $item){
-				$ret[] = array(
-					'label' => $item->title,
-					'description' => '',
-					'image' => ''
-				);
-			}
+		if(!$model){
+			Json::error('That article could no longer be found');
 		}
 
-		echo json_encode($ret);
+		if($model->delete()){
+			Json::success('The article you select was deleted');
+		}else{
+			Json::error(Json::UNKNOWN);
+		}
+	}
+
+	public function action_suggestions()
+	{
+		if(!glue::http()->isAjax()){
+			glue::trigger('404');
+		}
+		
+		$ret = array();
+		foreach(Help::search(glue::http()->param('term', '')) as $item){
+			$ret[] = array(
+				'label' => $item->title,
+				'description' => '',
+				'image' => ''
+			);			
+		}
+		Json::success(array('results' => $ret));
 	}
 }

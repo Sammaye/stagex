@@ -5,7 +5,7 @@ namespace app\widgets;
 use glue;
 use glue\Widget;
 
-class Jqautocomplete extends Widget
+class Autocomplete extends Widget
 {
 	public $htmlOptions = array();
 	

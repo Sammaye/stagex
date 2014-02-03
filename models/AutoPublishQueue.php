@@ -50,7 +50,7 @@ class AutoPublishQueue extends Document
 		return "auto_publish_queue";
 	}
 
-	public static function add_to_qeue($type, $user_id, $video_id = null, $playlist_id = null, $text = null)
+	public static function qeue($type, $user_id, $video_id = null, $playlist_id = null, $text = null)
 	{
 		$oldDoc = AutoPublishQueue::findOne(array('type' => $type, 'userId' => $user_id, 'videoId' => $video_id, 'playlistId' => $playlist_id, 'text' => $text));
 

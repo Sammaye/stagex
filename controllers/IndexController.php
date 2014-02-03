@@ -17,13 +17,13 @@ class IndexController extends Controller
 		);
 	}
 
-    public function action_index()
-    {
-        $this->title = "Welcome to the StageX Beta";
-        if(glue::auth()->check('@')){
-            glue::runAction('stream/news');
-        }else{
-            echo $this->render('/index');
-        }
-    }
+	public function action_index()
+	{
+		$this->title = "Welcome to the StageX Beta";
+		if(glue::auth()->check('@')){
+			glue::runAction('stream/news');
+		}else{
+			echo $this->render('/index');
+		}
+	}
 }

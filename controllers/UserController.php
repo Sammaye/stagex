@@ -1,6 +1,7 @@
 <?php
 
 use glue\Controller;
+use glue\Json;
 use glue\Html;
 use glue\util\Crypt;
 use glue\components\Elasticsearch\Query;
@@ -34,7 +35,7 @@ class UserController extends Controller
 		);
 	}
 
-	function action_create()
+	public function action_create()
 	{
 		$this->title = 'Create a new StageX Account';
 
@@ -53,7 +54,7 @@ class UserController extends Controller
 		echo $this->render("create", array("model" => $model));
 	}
 
-	function action_login()
+	public function action_login()
 	{
 		$this->title = "Login to your StageX Account";
 
@@ -82,7 +83,7 @@ class UserController extends Controller
 		echo $this->render('user/login', array('model' => $model, 'attempts' => $loginAttempts['c']));
 	}
 
-	function action_fbLogin()
+	public function action_fbLogin()
 	{
 		$this->title = 'Logging into Stagex';
 
@@ -138,7 +139,7 @@ class UserController extends Controller
 		}
 	}
 
-	function action_googleLogin()
+	public function action_googleLogin()
 	{
 		$this->title = 'Logging into Stagex';
 
@@ -191,7 +192,7 @@ class UserController extends Controller
 		}
 	}
 
-	function action_recover()
+	public function action_recover()
 	{
 		$this->title = 'Recover your StageX Account';
 
@@ -213,7 +214,7 @@ class UserController extends Controller
 		echo $this->render('user/forgot_password', array('model' => $model));
 	}
 
-	function action_view()
+	public function action_view()
 	{ 
 		if(!glue::http()->param('id', null) && glue::auth()->check(array('@'))){
 			$user = glue::user();
@@ -239,7 +240,7 @@ class UserController extends Controller
 		echo $this->render('view_stream', array('user' => $user, 'page' => 'stream', 'cursor' => $streamController->loadStream(null, $user)));
 	}
 
-	function action_viewVideos()
+	public function action_viewVideos()
 	{
 		if(!glue::http()->param('id', null) && glue::auth()->check(array('@'))){
 			$user = glue::user();
@@ -259,7 +260,7 @@ class UserController extends Controller
 		$c->type = 'video';
 		$c->filtered = true;
 		if(glue::http()->param('query')){
-			$c->query()->multiPrefix(array('burb', 'title', 'tags', 'username'), glue::http()->param('query'));
+			$c->query()->multiPrefix(array('blurb', 'title', 'tags', 'username'), glue::http()->param('query'));
 		}
 		$c->filter()->and('term', array('userId' => strval($user->_id)))
 					->and('term', array('deleted' => 0));
@@ -271,8 +272,8 @@ class UserController extends Controller
 		$c->sort('created', 'desc');
 		$c->page(glue::http()->param('page', 1));
 		
-		$from_time = strtotime(str_replace('/','-',glue::http()->param('from_date')));
-		$to_time = strtotime(str_replace('/','-',glue::http()->param('to_date')));
+		$from_time = strtotime(str_replace('/', '-', glue::http()->param('from_date')));
+		$to_time = strtotime(str_replace('/', '-', glue::http()->param('to_date')));
 		
 		if($from_time > 0 || $to_time > 0){
 			if($from_time > 0 && $to_time <= 0){
@@ -294,7 +295,7 @@ class UserController extends Controller
 			'sphinx_cursor' => $cursor = glue::elasticSearch()->search($c, 'app\models\Video')));
 	}
 
-	function action_viewPlaylists()
+	public function action_viewPlaylists()
 	{
 		if(!glue::http()->param('id', null) && glue::auth()->check(array('@'))){
 			$user = glue::user();
@@ -314,7 +315,7 @@ class UserController extends Controller
 		$c->type = 'playlist';
 		$c->filtered = true;
 		if(glue::http()->param('query')){
-			$c->query()->multiPrefix(array('burb', 'title', 'username'), glue::http()->param('query'));
+			$c->query()->multiPrefix(array('blurb', 'title', 'username'), glue::http()->param('query'));
 		}
 		$c->filter()->and('term', array('userId' => strval($user->_id)))
 					->and('term', array('deleted' => 0));
@@ -328,7 +329,7 @@ class UserController extends Controller
 			'sphinx' => glue::elasticSearch()->search($c, 'app\models\Playlist')));
 	}
 
-	function action_videos()
+	public function action_videos()
 	{
 		$this->title = 'Your Videos - StageX';
 		$this->layout = 'user_section';
@@ -358,7 +359,7 @@ class UserController extends Controller
 		
 	}
 
-	function action_playlists()
+	public function action_playlists()
 	{
 		$this->title = 'Your Playlists - StageX';
 		$this->layout = 'user_section';
@@ -372,7 +373,7 @@ class UserController extends Controller
 		echo $this->render('playlists', array('playlist_rows' => $playlist_rows));
 	}
 
-	function action_watchLater()
+	public function action_watchLater()
 	{
 		$this->title = 'Watch Later - StageX';
 		$this->layout = 'user_section';
@@ -382,7 +383,7 @@ class UserController extends Controller
 		echo $this->render('user/watch_later', array('model' => $watch_later));
 	}
 
-	function action_following()
+	public function action_following()
 	{
 		$this->title = 'Your Subscriptions - StageX';
 		$this->layout = 'user_section';
@@ -463,13 +464,12 @@ class UserController extends Controller
 		$this->layout = 'user_section';
 		$this->tab = 'playlists';
 	
-		$_filter = isset($_GET['filter']) ? $_GET['filter'] : null;
-		$items= glue::db()->playlist_subscription->find(array('user_id' => glue::user()->_id))->sort(array('ts' => -1))->limit(20);
-	
-		echo $this->render('playlist_subscriptions', array('playlist_rows' => $items, '_filter' => $_filter));
+		echo $this->render('playlist_subscriptions', array(
+			'playlist_rows' => glue::db()->playlist_subscription->find(array('user_id' => glue::user()->_id))->sort(array('ts' => -1))->limit(20)
+		));
 	}
 	
-	function action_removeRated()
+	public function action_removeRated()
 	{
 		if(!glue::auth()->check('ajax','post')){
 			glue::trigger('404');
@@ -507,7 +507,7 @@ class UserController extends Controller
 		$this->json_success(array('message' => 'Videos deleted', 'updated' => $updated,'failed' => $failed));
 	}
 	
-	function action_removeWatched()
+	public function action_removeWatched()
 	{
 		if(!glue::auth()->check('ajax','post')){
 			glue::trigger('404');
@@ -526,7 +526,7 @@ class UserController extends Controller
 		$this->json_success('The history items you selected have been deleted');
 	}
 	
-	function action_clearWatched()
+	public function action_clearWatched()
 	{
 		if(!glue::auth()->check('ajax','post')){
 			glue::trigger('404');
@@ -536,7 +536,7 @@ class UserController extends Controller
 		$this->json_success('Your watch history has been cleared');
 	}	
 
-	function action_settings()
+	public function action_settings()
 	{
 		$this->title = 'Account Settings - StageX';
 		$this->layout = "user_section";
@@ -559,27 +559,19 @@ class UserController extends Controller
 				glue::http()->redirect("/user/settings");
 			}
 		}
-
-		echo $this->render(
-			"settings",
-			array("model"=>$model)
-		);
+		echo $this->render("settings", array("model"=>$model));
 	}
 
-	function action_activity()
+	public function action_activity()
 	{
 		$this->title = 'Account Activity - StageX';
 		$this->tab = 'activity';
 		$this->layout = "user_section";
 
-		$model = $this->loadModel();
-
-		echo $this->render('user/activity', array(
-			'model' => $model
-		));
+		echo $this->render('user/activity', array('model' => $this->loadModel()));
 	}
 
-	function action_removesession()
+	public function action_removesession()
 	{
 		$this->title = 'Remove Session - StageX';
 		if(!glue::http()->isAjax()){
@@ -590,19 +582,19 @@ class UserController extends Controller
 			$user = $this->loadModel();
 
 			if(!$user){
-				echo json_encode(array("success" => false));
+				Json::error();
 			}
 
 			unset($user->sessions[$_GET['id']]);
 			$user->save();
 
-			echo json_encode(array("success" => true));
+			Json::success();
 		}else{
-			echo json_encode(array("success" => false));
+			Json::error();
 		}
 	}
 
-	function action_profile()
+	public function action_profile()
 	{
 		$this->title = 'Profile Settings - StageX';
 		$this->layout = "user_section";
@@ -613,14 +605,14 @@ class UserController extends Controller
 			if(isset($_POST['User']['action'])){
 				$model->setScenario($_POST['User']['action']);
 			}
-			if($model->getScenario()=='updatePic'){
-				$model->avatar=new glue\File(array('model'=>$model,'id'=>'avatar'));
+			if($model->getScenario() == 'updatePic'){
+				$model->avatar = new glue\File(array('model'=>$model,'id'=>'avatar'));
 				if($model->validate() && $model->setAvatar()){
 					Html::setSuccessFlashMessage('Your profile picture has been changed');
 					glue::http()->redirect("/user/profile");
 				}
 			}else{
-				$model->attributes=$_POST['User'];
+				$model->attributes = $_POST['User'];
 				if($model->save()){
 					Html::setSuccessFlashMessage('Your profile settings have been saved');
 					glue::http()->redirect("/user/profile");
@@ -630,7 +622,7 @@ class UserController extends Controller
 		echo $this->render('user/profile_settings', array('model' => $model, 'success_message' => ''));
 	}
 
-	function action_follow()
+	public function action_follow()
 	{
 		$this->title = 'Subscribe To User - StageX';
 
@@ -640,7 +632,7 @@ class UserController extends Controller
 				($id = glue::http()->param('id', null)) === null ||
 				($user = User::findOne(array("_id" => new MongoId($id)))) === null
 			){
-				$this->json_error('User not found');
+				Json::error('User not found');
 			}
 
 			if(!Follower::findOne(array('fromId' => glue::user()->_id, 'toId' => $user->_id))){
@@ -650,35 +642,36 @@ class UserController extends Controller
 				$follower->save();
 
 				app\models\Stream::subscribedTo(glue::user()->_id, $user->_id);
-				$this->json_success('You are now following this user');
+				Json::success('You are now following this user');
 			} // Be silent about the relationship already existing
 		}else{
 			glue::trigger('404');
 		}
 	}
 
-	function action_unfollow()
+	public function action_unfollow()
 	{
 		$this->title = 'Unsubscribe From User - StageX';
 
 		if(glue::auth()->check('ajax','post')){
-			if(($id=glue::http()->param('id',null))===null)
-				$this->json_error('User not found');
+			if(($id = glue::http()->param('id')) === null){
+				Json::error('User not found');
+			}
 			
 			$user = User::findOne(array('_id' => new MongoId($id)));
 			$follow = Follower::findOne(array('fromId' => glue::user()->_id, 'toId' => new MongoId($id)));
 
 			if($follow && $user && $follow->delete()){
-				$this->json_success('You have unfollowed this user');
+				Json::success('You have unfollowed this user');
 			}else{
-				$this->json_error(self::UNKNOWN);
+				Json::error(Json::UNKNOWN);
 			}
 		}else{
 			glue::trigger('404');
 		}
 	}
 
-	function action_logout()
+	public function action_logout()
 	{
 		$this->title = 'Logout of StageX';
 
@@ -691,7 +684,7 @@ class UserController extends Controller
 		exit();
 	}
 
-	function action_deactivate()
+	public function action_deactivate()
 	{
 		$this->title = 'Deactivate Your StageX Account - StageX';
 		$this->layout = "blank_page";
@@ -768,25 +761,33 @@ class UserController extends Controller
 		}
 	}
 	
-	public function action_ajaxsearch()
+	public function action_suggestions()
 	{
 		if(!glue::http()->isAjax()){
 			glue::trigger('404');
 		}
-
-		$term = glue::http()->param('term');
-		$limit = glue::http()->param('limit');
-		$users = app\models\User::find(array('username'=>new MongoRegex("/$term/")))->limit($limit);		
 		
-		$suggestions=array();
-		foreach($users as $user){
-			$suggestions[]=array(
-				'_id' => $user->_id,
-				'username'=>$user->username
+		$ret = array();
+		
+		$c = new Query();
+		$c->type = 'user';
+		$c->filtered = true;
+		
+		if(glue::http()->param('term')){
+			$c->query()->multiPrefix(array('title'), glue::http()->param('term'));
+		}
+		$c->filter()->and('term', array('deleted' => 0));
+
+		$c->sort('created', 'desc');
+		$c->page(1);
+		
+		foreach(glue::elasticSearch()->search($c, '\app\models\User') as $item){
+			$ret[] = array(
+				'_id' => $item->_id,
+				'username' => $item->username
 			);
 		}
-		echo json_encode(array('users' => $suggestions));
-		exit();		
+		Json::success(array('users' => $ret));
 	}
 
 	/**

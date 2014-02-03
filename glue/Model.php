@@ -56,6 +56,19 @@ class Model extends Component
 		$this->onAfterConstruct();
 		parent::init();
 	}
+	
+	public static function create($attributes, $rules, $runValidation = true)
+	{
+		$model = new static;
+		$model->setRules($rules);
+		$model->setAttributes($attributes);
+		
+		if($runValidation){
+			$model->validate(false);
+		}
+		
+		return $model;		
+	}
 
 	/**
 	 * Gets the models scenario
@@ -250,15 +263,19 @@ class Model extends Component
 	public function getFirstError($field = null)
 	{
 		$errors = $this->getErrors();
-	
-		if(!is_array($errors))
+		if(!is_array($errors)){
 			return null;
+		}
 	
 		// If $field is not set it will take first global error
 		if(!$field && isset($errors['global'])){
 			return $errors['global'][0];
 		}elseif(isset($errors[$field])){
 			return $errors[$field][0];
+		}else{
+			foreach($errors as $field){
+				return $field[0];
+			}
 		}
 		return null;
 	}	
@@ -566,7 +583,7 @@ class Model extends Component
 		return true;
 	}
 	
-	public function objExist($field, $value, $params)
+	public function exists($field, $value, $params)
 	{
 		$params = array_merge(array(
 				'allowEmpty' => true,

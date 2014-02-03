@@ -1,7 +1,7 @@
 <?php
 
 use glue\Controller;
-use glue\Validation;
+use glue\Model;
 use glue\Json;
 use app\models\User;
 use app\models\Follower;
@@ -65,7 +65,7 @@ class StreamController extends Controller
 			glue::trigger('404');
 		}
 
-		$model = Validation::validate($_GET, array(
+		$model = Model::create($_GET, array(
 			array('type', 'in', 'range' => array('video', 'playlist')),
 			array('text', 'string', 'max' => 1500),
 			array('id', 'safe')
@@ -95,7 +95,7 @@ class StreamController extends Controller
 			glue::trigger('404');
 		}
 		
-		$model = Validation::validate($_POST, array(
+		$model = Model::create($_POST, array(
 			array('user_id', 'safe'),
 			array('text', 'required'),
 			array('text', 'string', 'max' => 1500)
@@ -131,7 +131,7 @@ class StreamController extends Controller
 		}
 		
 		$ids = glue::http()->param('ids');
-		if(!is_array($ids) || count($ids)<=0){
+		if(!is_array($ids) || count($ids) <= 0){
 			Json::error('No stream was selected for deletion');
 		}
 
@@ -143,7 +143,7 @@ class StreamController extends Controller
 		Json::success(array('message' => 'Stream items were deleted','updated' => count($mongoIds)));
 	}
 
-	function action_getStream()
+	public function action_getStream()
 	{
 		if(!glue::http()->isAjax()){
 			glue::trigger('404');
@@ -154,11 +154,11 @@ class StreamController extends Controller
 		),null));
 		
 		if($user){
-			$user = app\models\User::findOne(array('_id' => new MongoId($user)));
+			$user = User::findOne(array('_id' => new MongoId($user)));
 		}elseif(!$user && !$news){ // If I am not searching for news I don't need a user
-			Json::error(self::UNKNOWN);
+			Json::error(Json::UNKNOWN);
 		}elseif($news && !glue::session()->authed){ // If they want news they need to be logged in to get it
-			Json::error(self::LOGIN);
+			Json::error(Json::LOGIN);
 		}
 			
 		if($ts && !preg_match( '/^[1-9][0-9]*$/', $ts )){
@@ -181,7 +181,7 @@ class StreamController extends Controller
 			foreach($stream as $k => $item){
 				$html .= $this->renderPartial('stream/streamitem', array('item' => $item, 'hideDelete' => $hide_del));
 			}
-			Json::success(array('html'=>$html));
+			Json::success(array('html' => $html));
 		}else{
 			Json::error(array('remaining' => 0, 'initMessage' => 'No stream could be found', 'message' => 'There are no more stream items to load'));
 		}

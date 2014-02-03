@@ -97,7 +97,7 @@ $this->js('page', "
 		
 	$('#search_playlists').on('keyup', function(e){
 		if($(this).val().length>3){
-			$.get('/playlist/ajaxsearch',{term:$(this).val()},null,'json').done(function(data){
+			$.get('/playlist/suggestions',{term:$(this).val()},null,'json').done(function(data){
 				if(data.success){
 					var container=$('.playlists_content .results');
 					container.empty();

@@ -231,7 +231,7 @@ class VideoResponseController extends Controller
 		if($comment->validate() && $comment->save()){
 			$comment_html=$this->renderPartial('response/_response', array('item' => $comment, 'mode' => $mode));
 			if(glue::user()->autoshareResponses){
-				app\models\AutoPublishQueue::add_to_qeue(app\models\AutoPublishQueue::V_RES, glue::user()->_id, $video->_id, null, $comment->content);
+				app\models\AutoPublishQueue::queue(app\models\AutoPublishQueue::V_RES, glue::user()->_id, $video->_id, null, $comment->content);
 			}
 			//var_dump($comment->in_reply);
 			$this->json_success(array('success' => true, 'approved' => $comment->approved, 'html' => $comment_html));
@@ -464,31 +464,5 @@ class VideoResponseController extends Controller
 		}
 		// Now that I got all comments greater lets reset the session
 		$this->json_success(array('number_comments'=>$comments->count()));
-	}
-
-	function action_videosuggestions()
-	{
-		if(!glue::http()->isAjax()){
-			glue::route('error/notfound');
-		}
-
-		$ret = array();
-
-		$sphinx = glue::sphinx();
-		$sphinx->limit = 5;
-		//var_dump($_GET['term']);
-		$sphinx->query(array('select' => $_GET['term'], 'where' => array('type' => array('video'), 'uid' => array(strval(glue::session()->user->_id)))), "main");
-
-		if($sphinx->matches){
-			foreach($sphinx->matches as $item){
-				$ret[] = array(
-					'_id' => strval($item->_id),
-					'label' => $item->title,
-					'description' => $item->description,
-					'image_src' => $item->getImage(33, 18)
-				);
-			}
-		}
-		echo json_encode($ret);
 	}
 }

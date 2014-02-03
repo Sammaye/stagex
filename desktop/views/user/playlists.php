@@ -109,7 +109,7 @@ $this->js('new_playlist', "
 	<div class="header">
     		<div class='search form-search'>
 			<?php $form = Html::form(array('method' => 'get')); ?>
-				<?php echo app\widgets\Jqautocomplete::run(array(
+				<?php echo app\widgets\Autocomplete::run(array(
 					'attribute' => 'query',
 					'value' => urldecode(htmlspecialchars(isset($_GET['query']) ? $_GET['query'] : '')),
 					'placeholder' => 'Search Playlists',

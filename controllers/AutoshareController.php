@@ -22,12 +22,12 @@ class AutoshareController extends Controller
 		);
 	}	
 
-	function action_index()
+	public function action_index()
 	{
 		glue::trigger('404');
 	}
 
-	function getConnectedUser()
+	public function getConnectedUser()
 	{
 		$this->user = glue::user();
 
@@ -45,13 +45,12 @@ class AutoshareController extends Controller
 		}
 	}
 
-	function action_status()
+	public function action_status()
 	{
 		$this->title = 'Autoshare - StageX';
 		$this->getConnectedUser();
 
-		if(!$this->socialUser||isset($this->socialUser->errors)){
-
+		if(!$this->socialUser || isset($this->socialUser->errors)){
 			switch($_GET['network']){
 				case "fb":
 					echo json_encode(array(
@@ -86,7 +85,7 @@ class AutoshareController extends Controller
 		}
 	}
 
-	function action_connect()
+	public function action_connect()
 	{
 		$this->title = 'Autoshare - StageX';
 		$this->getConnectedUser();
@@ -109,7 +108,7 @@ class AutoshareController extends Controller
 		}
 	}
 
-	function action_auth()
+	public function action_auth()
 	{
 		$this->getConnectedUser(); ?>
 		<html>
@@ -136,7 +135,9 @@ class AutoshareController extends Controller
 						window.opener.location.reload();
 						window.close();
 					</script>
-				<?php }else{ ?>There was an unknown error when authorising your account<?php } ?>
+				<?php }else{ 
+					?>There was an unknown error when authorising your account<?php 
+				} ?>
 			</body>
 		</html>
 	<?php }

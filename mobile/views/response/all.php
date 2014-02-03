@@ -90,7 +90,7 @@ $this->js('admin', "
 		maximumSelectionSize: 5,
 		multiple: true,
 		ajax: { // instead of writing the function to execute the request we use Select2's convenient helper
-			url: '".glue::http()->url('/user/ajaxsearch')."',
+			url: '".glue::http()->url('/user/suggestions')."',
 			dataType: 'json',
 			data: function (term, page) {
 				return {

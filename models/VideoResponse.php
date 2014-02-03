@@ -112,7 +112,7 @@ class VideoResponse extends Document
 	{
 		return array(
 				array('videoId', 'required', 'message' => 'An unknown error occured. Try refreshing the page to fix this.'),
-				array('videoId', 'objExist',
+				array('videoId', 'exists',
 						'class'=>'app\\models\\Video',
 						'field'=>'_id',
 						'allowNull' => true, 'message' => 'The video you are replying to might no longer exist. Either way we cannot seem to find it now'
@@ -121,7 +121,7 @@ class VideoResponse extends Document
 				array('content', 'string', 'max' => '1500', 'message' => 'You can only write 1500 characters for a comment.'),
 
 				array('replyVideoId', 'required', 'on' => 'video_comment', 'message' => 'You must specify a video to repond with'),
-				array('replyVideoId', 'objExist',
+				array('replyVideoId', 'exists',
 						'class'=>'app\\models\\Video',
 						'field'=>'_id',
 						'allowNull' => true,
@@ -131,7 +131,7 @@ class VideoResponse extends Document
 				array('replyVideoId', 'check_same_video', 'message' => 'The same video being watched cannot be added as a reply.', 'on' => 'video_comment'),
 
 				array('threadParentUsername', 'safe', 'on' => 'text_comment'),
-				array('threadParentId', 'objExist',
+				array('threadParentId', 'exists',
 						'class'=>'app\\models\\VideoResponse',
 						'field'=>'_id',
 						'allowNull' => true,

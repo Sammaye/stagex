@@ -15,7 +15,7 @@ class ImageController extends Controller
 				'class' => 'glue\Auth',
 				'rules' => array(
 					array('allow', 'users' => array('*')),
-				)				
+				)
 			)
 		);
 	}

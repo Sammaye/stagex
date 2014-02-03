@@ -218,7 +218,7 @@ class VideoController extends Controller
 						// Send it all over the internet!!
 						app\models\Stream::videoUpload($video->author->_id, $video->_id);
 						if($video->author->autoshareUploads)
-							app\models\AutoPublishQueue::add_to_qeue(app\models\AutoPublishQueue::UPLOAD, $video->author->_id, $video->_id);					
+							app\models\AutoPublishQueue::queue(app\models\AutoPublishQueue::UPLOAD, $video->author->_id, $video->_id);					
 						if($video->isPublic())
 							glue::sitemap()->addUrl(glue::http()->url('/video/watch', array('id' => $video->_id)), 'hourly', '1.0');						
 						if($video->author->emailEncodingResult)

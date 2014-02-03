@@ -193,13 +193,13 @@ class User extends Document
 
 		array('country', 'in', 'range' => new Collection('countries', 'code'), 'message' => 'You supplied an invalid country.'),
 
-		array('username', 'objExist', 'class'=>'app\\models\\User', 'field'=>'username', 'notExist' => true, 'on'=>'insert, updateUsername',
+		array('username', 'exists', 'class'=>'app\\models\\User', 'field'=>'username', 'notExist' => true, 'on'=>'insert, updateUsername',
 				'message' => 'That username already exists please try another.'),
 
 		array('email,newEmail', 'email', 'message' => 'You must enter a valid Email Address'),
-		array('email', 'objExist', 'class'=>'app\\models\\User', 'field'=>'email', 'notExist' => true, 'on'=>'insert', 'message' =>
+		array('email', 'exists', 'class'=>'app\\models\\User', 'field'=>'email', 'notExist' => true, 'on'=>'insert', 'message' =>
 				'That email address already exists please try and login with it, or if you have forgotten your password try to recover your account.'),
-		array('newEmail', 'objExist', 'class'=>'app\\models\\User', 'field'=>'email', 'notExist' => true, 'message' =>
+		array('newEmail', 'exists', 'class'=>'app\\models\\User', 'field'=>'email', 'notExist' => true, 'message' =>
 				'That email address already exists please try and login with it, or if you have forgotten your password try to recover your account.'),				
 
 		array('safeSearch', 'in', 'range'=>array(0, 1, 2), 'message' => 'You enterd an invalid value for safe search'),

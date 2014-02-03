@@ -3,6 +3,7 @@ namespace app\models;
 
 use glue;
 use glue\db\Document;
+use glue\components\Elasticsearch\Query;
 
 class Help extends Document
 {
@@ -80,39 +81,24 @@ class Help extends Document
 		}		
 	}
 	
-	public function search($keywords='')
+	public function search($keywords = '')
 	{
-	    $search = array('type' => 'help', 'body' =>
-	        array('query' => array('filtered' => array(
-	            'query' => array()
-	        )))
-	    );
-	    
-	    if(glue::http()->param('query')){
-    	    $search['body']['query']['filtered']['query'] = array('bool' => array(
-    	            'should' => array(
-    	                    array('multi_match' => array(
-    	                            'query' => glue::http()->param('query',null),
-    	                            'fields' => array('title', 'blurb', 'tags', 'normalisedTitle', 'path')
-    	                    )),
-    	            )
-    	    ));
-
-	        $keywords = preg_split('/\s+/', glue::http()->param('query'));
-	        foreach($keywords as $keyword){
-	            $search['body']['query']['filtered']['query']['bool']['should'][]=array('prefix' => array('title' => $keyword));
-	            $search['body']['query']['filtered']['query']['bool']['should'][]=array('prefix' => array('tags' => $keyword));
-	            $search['body']['query']['filtered']['query']['bool']['should'][]=array('prefix' => array('normalisedTitle' => $keyword));
-	        }
-	    }
-	    
-	    $cursor = glue::elasticSearch()->search($search);
+		$c = new Query();
+		$c->type = 'help';
+		$c->filtered = true;
+		
+		if($keywords){
+			$c->query()->multiPrefix(array('blurb', 'title'), $keywords);
+		}
+	  
+		$cursor = glue::elasticSearch()->search($c);
 		$cursor->setIteratorCallback(function($doc){
-			if($doc['_source']['resourceType']=='article')
+			if($doc['_source']['resourceType'] == 'article'){
 				return HelpArticle::findOne(array('_id'=>new \MongoId($doc['_id'])));
-			elseif($doc['_source']['resourceType']=='topic')
+			}elseif($doc['_source']['resourceType'] == 'topic'){
 				return HelpTopic::findOne(array('_id'=>new \MongoId($doc['_id'])));
+			}
 		});
-		return $cursor;		
+		return $cursor;
 	}
 }

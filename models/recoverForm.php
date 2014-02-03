@@ -18,7 +18,7 @@ class recoverForm extends Model
 				array('email', 'required', 'message' => 'You must supply a valid email address'),
 				array("hash", "hash", 'message' => 'We could not verify the source of your post. Please use the submit button to submit the form.'),
 				array('email', 'email', 'message' => 'You must supply a valid email address'),
-				array('email', 'objExist',
+				array('email', 'exists',
 					'class'=>'app\\models\\User',
 					'field'=>'email', 'message' => 'This email does not exist on our records'
 				),

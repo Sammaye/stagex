@@ -114,7 +114,14 @@ class SearchController extends Controller
 			}
 		});		
 		
-		echo $this->render('search/search', array('sphinx' => $cursor, 'query' => $query, 'filter_type' => $filter_type, 'filter_time' => $filter_time, 
-			'filter_duration' => $filter_duration, 'filter_category' => $filter_category, 'orderby' => $orderby));
+		echo $this->render('search/search', array(
+			'sphinx' => $cursor,
+			'query' => $query,
+			'filter_type' => $filter_type,
+			'filter_time' => $filter_time,
+			'filter_duration' => $filter_duration,
+			'filter_category' => $filter_category,
+			'orderby' => $orderby
+		));
 	}
 }

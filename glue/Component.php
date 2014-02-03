@@ -56,6 +56,11 @@ class Component{
 	{
 	}
 	
+	public static function getClassName()
+	{
+		return get_called_class();
+	}
+	
 	public static function getName()
 	{
 		$class = get_called_class();

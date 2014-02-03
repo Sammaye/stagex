@@ -44,7 +44,7 @@ class HelpTopic extends Help
 		return array(
 			array('title', 'required', 'message' => 'You must enter at least a title'),
 			array('parent, seq', 'safe'),
-			array('parent', 'objExist',
+			array('parent', 'exists',
 				'class'=>'app\\models\\HelpTopic', 'field'=>'path', 'allowNull' => true, 'message' => 'That parent topic could not be found'
 			),
 		);

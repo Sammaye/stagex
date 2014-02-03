@@ -7,7 +7,7 @@
 		</ol>
 		<div class="form-search-lg help_search_large">
 			<?php $form = html::form(array('action' => '/help/search', 'method' => 'get')); ?>
-			<?php echo app\widgets\Jqautocomplete::run(array(
+			<?php echo app\widgets\Autocomplete::run(array(
 				'htmlOptions' => array(
 					'class' => 'form-search-input',
 				),
