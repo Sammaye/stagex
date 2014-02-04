@@ -59,8 +59,7 @@ class VideoController extends Controller
 		$video = new Video();
 		$video->populateDefaults();
 
-		echo json_encode(array(
-			'success' => true, 
+		Json::success(array(
 			'html' => $this->renderPartial('_upload', array( 'u_id' => strval(new MongoId()), 'model' => $video ))
 		));
 	}
@@ -95,7 +94,7 @@ class VideoController extends Controller
 								'left' => gmdate("H:i:s", $info['est_sec']), 'speed' => convert_size_human($info['speed_average']));
 			}
 		}
-		echo json_encode(array('success'=>true,'status'=>$ret));
+		Json::success(array('status' => $ret));
 	}
 
 	public function action_createUpload()
