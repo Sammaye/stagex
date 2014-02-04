@@ -59,7 +59,7 @@ class UserController extends Controller
 		$this->title = "Login to your StageX Account";
 
 		$model = new LoginForm();
-		$model->attributes=isset($_POST['loginForm']) ? $_POST['loginForm'] : array();
+		$model->attributes = isset($_POST['LoginForm']) ? $_POST['LoginForm'] : array();
 
 		/** Count how many times the user has logged in over 5 mins */
 		$loginAttempts = Glue::session()->getLogCollection()->findOne(array("email"=>$model->email, "ts"=>array("\$gt"=>new MongoDate(time()-(60*5)))));
@@ -67,7 +67,7 @@ class UserController extends Controller
 			$model->setScenario('captcha');
 		}
 
-		if(isset($_POST['loginForm'])){
+		if(isset($_POST['LoginForm'])){
 			if($model->validate()){
 				if(glue::session()->login($model->email, $model->password, $model->remember)){
 					if(isset($_GET['nxt'])){
@@ -197,8 +197,8 @@ class UserController extends Controller
 		$this->title = 'Recover your StageX Account';
 
 		$model = new RecoverForm;
-		if(isset($_POST['recoverForm'])){
-			$model->attributes = $_POST['recoverForm'];
+		if(isset($_POST['RecoverForm'])){
+			$model->attributes = $_POST['RecoverForm'];
 			if($model->validate()){
 				$user = User::findOne(array('email' => $model->email));
 				if($user){

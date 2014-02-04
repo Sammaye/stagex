@@ -3,15 +3,17 @@
 namespace app\widgets;
 
 use glue;
+use glue\Widget;
 
-class autoresizetextarea extends \glue\Widget{
-
+class autoresizetextarea extends Widget
+{
 	public $value;
 
 	public $style; // This should never be used unless your a cock
 	public $class;
 
-	function render(){
+	public function render()
+	{
 		if($this->model){
 			list($name, $id) = $this->getAttributeNameId();
 		}else{

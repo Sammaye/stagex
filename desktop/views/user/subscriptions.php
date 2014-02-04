@@ -31,7 +31,7 @@ $this->js('user.unsubscribe', "
 			act_page = page;
 		}
 		
-		$.get('/user/searchFollowers', {query: $('.form-search_subs .form-search-input').val(), page: act_page})
+		$.get('/user/searchFollowers', {query: $('.form-search_subs .form-search-input').val(), page: act_page}, null, 'json')
 		.done(function(data){
 			if(data.success){
 				$('.user_subscription_list').html(data.html);
