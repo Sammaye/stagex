@@ -10,7 +10,7 @@ glue::controller()->js('dfg', "
 		width:400,
 		multiple: false,
 		ajax: { // instead of writing the function to execute the request we use Select2's convenient helper
-			url: '".glue::http()->url('/user/suggestions')."',
+			url: '".glue::http()->url('/video/suggestions')."',
 			dataType: 'json',
 			data: function (term, page) {
 				return {
@@ -19,11 +19,10 @@ glue::controller()->js('dfg', "
 				};
 			},
 			results: function (data, page) {
-				$(data.users).each(function(i){
-					data.users[i]={id:this._id['\$id'],text:this.username};
+				$(data.results).each(function(i){
+					data.results[i]={id:this._id['\$id'],text:this.title};
 				});
-		console.log(data);
-				return {results: data.users};
+				return {results: data.results};
 			}
 		},
         initSelection: function(element, callback) {

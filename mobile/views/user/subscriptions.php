@@ -27,9 +27,16 @@ $this->js('user.unsubscribe', "
 
 	function search_subscriptions(refresh, page){
 		var act_page = 1;
-		if(!refresh)
+		if(!refresh){
 			act_page = page;
-		$('.user_subscription_list').load('/user/searchFollowers', { query: $('.form-search_subs .form-search-input').val(), page: act_page }, function(data){});
+		}
+		
+		$.get('/user/searchFollowers', {query: $('.form-search_subs .form-search-input').val(), page: act_page})
+		.done(function(data){
+			if(data.success){
+				$('.user_subscription_list').html(data.html);
+			}
+		});
 	}
 ");
 ?>

@@ -740,15 +740,15 @@ class UserController extends Controller
 
 	public function action_searchFollowers()
 	{
-		$this->title = 'Search Folllowers - StageX';
-
 		if(!glue::http()->isAjax()){
 			glue::trigger('404');
 		}
 		
-		extract(glue::http()->param(array('query','page')));
-		$users=app\models\Follower::search(glue::user()->_id,$query);
+		extract(glue::http()->param(array('query', 'page')));
+		$users = app\models\Follower::search(glue::user()->_id, $query);
 
+		ob_start();
+		ob_implicit_flush(false);
 		if(count($users) > 0){
 			echo glue\widgets\ListView::run(array(
 				'pageSize'	 => 20,
@@ -759,6 +759,7 @@ class UserController extends Controller
 		}else{
 			?><div class="no_results_found">No subscriptions were found</div><?php
 		}
+		Json::success(array('html' => ob_get_clean()));
 	}
 	
 	public function action_suggestions()
@@ -787,7 +788,7 @@ class UserController extends Controller
 				'username' => $item->username
 			);
 		}
-		Json::success(array('users' => $ret));
+		Json::success(array('results' => $ret));
 	}
 
 	/**

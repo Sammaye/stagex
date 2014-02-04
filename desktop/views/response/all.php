@@ -100,11 +100,10 @@ $this->js('admin', "
 				};
 			},
 			results: function (data, page) {
-				$(data.users).each(function(i){
-					data.users[i]={id:this._id['\$id'],text:this.username};
+				$(data.results).each(function(i){
+					data.results[i]={id:this._id['\$id'],text:this.username};
 				});
-		console.log(data);
-				return {results: data.users};
+				return {results: data.results};
 			}
 		},
         initSelection: function(element, callback) {
