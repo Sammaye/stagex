@@ -129,7 +129,7 @@ class Video extends Document
 		}
 	}
 
-	public function licences($index = null)
+	public static function licences($index = null)
 	{
 		
 		$d=array(
@@ -141,6 +141,20 @@ class Video extends Document
 		}else{
 			return isset($d[$index]) ? $d[$index] : null;
 		}
+	}
+	
+	public static function advancedSearchFields()
+	{
+		return array(
+			'title' => 'Title',
+			'description' => 'Description',
+			'tags' => 'Tags',
+			'licence' => 'Licence',
+			'category' => 'Category',
+			'listing' => 'Listing',
+			'mature' => 'Mature',
+			'created' => 'Created'
+		);
 	}
 
 	public function response($k = null, $v = null)
