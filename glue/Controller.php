@@ -32,10 +32,10 @@ class Controller extends Component
 
 	public $css;
 	public $cssFiles;
-	
+
 	public $js;
 	public $jsFiles;
-	
+
 	public $theme;
 
 	public function init()
@@ -49,7 +49,7 @@ class Controller extends Component
 		}
 		parent::init();
 	}
-	
+
 	public function run($action)
 	{
 		if($this->beforeAction($this, $action)){
@@ -57,12 +57,12 @@ class Controller extends Component
 			call_user_func_array(array($this,$action),array());
 		}
 		$this->afterAction($this, $action);
-	}	
+	}
 
 	public function cssFile($map, $path = null, $media = null)
 	{
 		if(is_array($map)){
-				
+
 			$path = is_null($path) ? $media : $path;
 			foreach($map as $k => $v){
 				if(is_numeric($k)){
@@ -71,8 +71,8 @@ class Controller extends Component
 					$this->cssFile($k, $v, $path);
 				}
 			}
-			
-		}else{		
+				
+		}else{
 			if($path === null){
 				$this->cssFiles[basename($map,'.css')] = Html::cssFile($map,$media);
 			}else{
@@ -89,7 +89,7 @@ class Controller extends Component
 	public function jsFile($map, $path = null, $pos = self::BODY_END)
 	{
 		if(is_array($map)){
-			
+				
 			$path = is_null($path) ? $pos : $path;
 			foreach($map as $k => $v){
 				if(is_numeric($k)){
@@ -98,7 +98,7 @@ class Controller extends Component
 					$this->jsFile($k, $v, $path);
 				}
 			}
-			
+				
 		}else{
 			if($path === null){
 				$this->jsFiles[$pos][basename($map,'.js')] = Html::jsFile($map);
@@ -126,7 +126,7 @@ class Controller extends Component
 			$this->linkTags[$name] = Html::linkTag($options);
 		}
 	}
-	
+
 	/**
 	 * Marks the beginning of an HTML page.
 	 */
@@ -135,32 +135,32 @@ class Controller extends Component
 		ob_implicit_flush(false);
 		$this->beforeRender($this, $this->action);
 	}
-	
+
 	public function head(){
 		echo $this->tplHead;
 	}
-	
+
 	public function beginBody(){
 		echo $this->tplBodyBegin;
 	}
-	
+
 	public function endBody(){
 		echo $this->tplBodyEnd;
 	}
-	
+
 	/**
 	 * Marks the ending of an HTML page.
 	 */
 	public function endPage(){
 		$this->afterRender($this, $this->action);
-	
+
 		$content = ob_get_clean();
 		echo strtr($content, array(
 				$this->tplHead => $this->renderHeadHtml(),
 				$this->tplBodyBegin => $this->renderBodyBeginHtml(),
 				$this->tplBodyEnd => $this->renderBodyEndHtml(),
 		));
-	
+
 		unset(
 				$this->metaTags,
 				$this->linkTags,
@@ -199,7 +199,7 @@ class Controller extends Component
 		}
 		return empty($lines) ? '' : implode("\n", $lines) . "\n";
 	}
-	
+
 	/**
 	 * Renders the content to be inserted at the beginning of the body section.
 	 * The content is rendered using the registered JS code blocks and files.
@@ -216,7 +216,7 @@ class Controller extends Component
 		}
 		return empty($lines) ? '' : implode("\n", $lines) . "\n";
 	}
-	
+
 	/**
 	 * Renders the content to be inserted at the end of the body section.
 	 * The content is rendered using the registered JS code blocks and files.
@@ -232,7 +232,7 @@ class Controller extends Component
 			$lines[] = Html::js(implode("\n", $this->js[self::BODY_END]));
 		}
 		return empty($lines) ? '' : implode("\n", $lines) . "\n";
-	}	
+	}
 
 	public function render($view, $params = array())
 	{
@@ -260,12 +260,12 @@ class Controller extends Component
 		require($_file_);
 		return ob_get_clean();
 	}
-	
+
 	public function getViewPath($path)
 	{
 		$path = strlen(pathinfo($path, PATHINFO_EXTENSION)) <= 0 ? $path.'.php' : $path;
 		$viewPaths = array();
-		
+
 		if(is_array(Glue::$theme)){
 			foreach(Glue::$theme as $p){
 				$viewPaths[] = glue::getPath($p);
@@ -274,14 +274,14 @@ class Controller extends Component
 		if($viewPaths === array()){
 			$viewPaths = array(glue::getPath('@views') ? glue::getPath('@views') : glue::getPath('@app/views'));
 		}
-		
+
 		foreach($viewPaths as $viewPath){
-			
+				
 			if(strpos($path, '../') === 0){
-	
+
 				// Then this should go from doc root
 				$fpath = str_replace('../', DIRECTORY_SEPARATOR, glue::getPath('@app').$path);
-	
+
 			}elseif(strpos($path, '/')!==false){
 
 				// Then this should go from views root (/application/views) because we have something like user/edit.php
@@ -291,7 +291,7 @@ class Controller extends Component
 				$fpath = str_replace('/', DIRECTORY_SEPARATOR, $viewPath.'/'.str_replace('Controller', '',
 						glue::controller() instanceof \glue\Controller ? get_class(glue::controller()) : 'siteController').'/'.$path);
 			}
-			
+				
 			if(file_exists($fpath)){
 				return $fpath;
 			}
@@ -317,79 +317,33 @@ class Controller extends Component
 		}
 	}
 
-	public function json_success($params,$exit=true)
-	{
-
-		$json='';
-		if(is_string($params)){
-			$json= json_encode(array('success' => true, 'message' => array($params)));
-		}else{
-			$json= json_encode(array_merge(array('success' => true), $params));
-		}
-
-		if($exit){
-			echo $json;
-			exit(0);
-		}
-		return $json;
-	}
-
-	public function json_error($params,$exit=true)
-	{
-		$json='';
-		switch(true){
-			case $params == self::DENIED:
-				$json= json_encode(array('success' => false, 'message' => 'Action not Permitted'));
-				break;
-			case $params == self::LOGIN:
-				$json= json_encode(array('success' => false, 'message' => 'You must login to continue'));
-				break;
-			case $params == self::UNKNOWN:
-				$json= json_encode(array('success' => false, 'message' => 'An unknown error was encountered'));
-				break;
-			default:
-				if(is_string($params)){
-					$json= json_encode(array('success' => false, 'message' => $params));
-				}else{
-					$json= json_encode(array_merge(array('success' => false), $params));
-				}
-				break;
-		}
-
-		if($exit){
-			echo $json;
-			exit(0);
-		}
-		return $json;
-	}
-	
 	public function logEvent($message)
 	{
 		echo '[ '.date('d-m-Y H:i:s').' '.microtime(true).' ] '.$message."\n";
-	}	
+	}
 
 	public function createUrl($path = '/', $params = array(), $host = '/', $scheme = 'http')
 	{
 		return glue::http()->url($path, $params, $host, $scheme);
 	}
-	
+
 	public function beforeAction($controller, $action)
 	{
 		return $this->trigger('beforeAction', array($controller, $action));
 	}
-	
+
 	public function afterAction($controller, $action)
 	{
 		return $this->trigger('afterAction', array($controller, $action));
 	}
-	
+
 	public function beforeRender($controller, $action)
 	{
 		return $this->trigger('beforeRender', array($controller, $action));
 	}
-	
+
 	public function afterRender($controller, $action)
 	{
 		return $this->trigger('afterRender', array($controller, $action));
-	}	
+	}
 }

@@ -477,7 +477,7 @@ class UserController extends Controller
 		
 		extract(glue::http()->param(array('ids')));
 		if(!$ids || (is_array($ids) && count($ids) <= 0)){
-			$this->json_error(self::UNKNOWN);
+			Json::error(Json::UNKNOWN);
 		}
 	
 		$mongoIds = array();
@@ -504,7 +504,7 @@ class UserController extends Controller
 		}
 		glue::db()->video_likes->remove(array('user_id'=>glue::user()->_id, "_id" => array('$in' => $mongoIds)));
 	
-		$this->json_success(array('message' => 'Videos deleted', 'updated' => $updated,'failed' => $failed));
+		Json::success(array('message' => 'Videos deleted', 'updated' => $updated,'failed' => $failed));
 	}
 	
 	public function action_removeWatched()
@@ -515,7 +515,7 @@ class UserController extends Controller
 		
 		$ids = glue::http()->param('ids');
 		if(!$ids || (is_array($ids) && count($ids) <= 0)){
-			$this->json_error(self::UNKNOWN);
+			Json::error(Json::UNKNOWN);
 		}
 	
 		$mongoIds = array();
@@ -523,7 +523,7 @@ class UserController extends Controller
 			$mongoIds[$k] = new MongoId($v);
 		}
 		glue::db()->watched_history->remove(array('_id' => array('$in' => $mongoIds), 'user_id' => glue::user()->_id));
-		$this->json_success('The history items you selected have been deleted');
+		Json::success('The history items you selected have been deleted');
 	}
 	
 	public function action_clearWatched()
@@ -533,7 +533,7 @@ class UserController extends Controller
 		}
 		
 		glue::db()->watched_history->remove(array('user_id' => glue::user()->_id));
-		$this->json_success('Your watch history has been cleared');
+		Json::success('Your watch history has been cleared');
 	}	
 
 	public function action_settings()

@@ -311,17 +311,17 @@ class VideoController extends Controller
 		){
 			$type=glue::http()->param('type',null);
 			if(!glue::auth()->check(array('^' => $video))){
-				$this->json_error(self::DENIED);
+				Json::error(Json::DENIED);
 			}
 			if($type='video'){
 				$video->removeVideoResponses();
-				$this->json_success('All video responses were deleted');
+				Json::success('All video responses were deleted');
 			}elseif($type='text'){
 				$video->removeTextResponses();
-				$this->json_success('All text responses were deleted');
+				Json::success('All text responses were deleted');
 			}
 		}
-		$this->json_error('Video could not be found');
+		Json::error('Video could not be found');
 	}
 
 	public function action_report()
@@ -398,7 +398,7 @@ class VideoController extends Controller
 		if($video = Video::findOne(array('_id' => new MongoId($id)))){
 			
 			if(!(bool)$video->voteable){
-				$this->json_error('Voting has been disabled on this video');
+				Json::error('Voting has been disabled on this video');
 			}
 			if(!$video->dislike()){
 				Json::error(Json::UNKNOWN);
@@ -467,7 +467,7 @@ class VideoController extends Controller
 		$id = glue::http()->param('id', null);
 		if(
 			$id === null ||
-			($video = Video::findOne(array('_id' => new MongoId($id), 'userId'=>glue::user()->_id))) === null
+			($video = Video::findOne(array('_id' => new MongoId($id), 'userId' => glue::user()->_id))) === null
 		){
 			Json::error(Json::UNKNOWN);
 		}
@@ -475,9 +475,9 @@ class VideoController extends Controller
 		$video->deleted = 0;
 		if($video->save()){
 			$video->author->saveCounters(array('totalUploads' => 1));
-			$this->json_success('Video Undeleted');
+			Json::success('Video Undeleted');
 		}
-		$this->json_error(self::UNKNOWN);
+		Json::error(Json::UNKNOWN);
 	}
 
 	public function action_analytics()

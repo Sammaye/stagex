@@ -1,6 +1,7 @@
 <?php
 
-use \glue\Controller;
+use glue\Controller;
+use glue\Json;
 use app\models\VideoResponse;
 use app\models\Video;
 
@@ -199,7 +200,7 @@ class VideoResponseController extends Controller
 			!$video || !$type || !glue::auth()->check(array('viewable' => $video))
 			|| ($type != 'text' && $type != 'video')
 		){
-			$this->json_error(self::DENIED);
+			Json::error(Json::DENIED);
 		}
 		$comment->videoId = $video->_id;
 		$comment->video = $video;
@@ -210,7 +211,7 @@ class VideoResponseController extends Controller
 		}
 		if($type == 'text'){
 			if(!$video->allowTextComments){
-				$this->json_error('Text responses have been disabled on this video');
+				Json::error('Text responses have been disabled on this video');
 			}
 			$comment->setScenario('text_comment');
 			if($parent_comment){ // Should be a truthy value
@@ -222,7 +223,7 @@ class VideoResponseController extends Controller
 			$comment->content = $_POST['content'];
 		}elseif($type == 'video'){
 			if(!$video->allowVideoComments){
-				$this->json_error('Video responses have been disabled on this video');
+				Json::error('Video responses have been disabled on this video');
 			}
 			$comment->setScenario('video_comment');
 			$comment->replyVideoId = new MongoId($reply_vid);
@@ -234,10 +235,10 @@ class VideoResponseController extends Controller
 				app\models\AutoPublishQueue::queue(app\models\AutoPublishQueue::V_RES, glue::user()->_id, $video->_id, null, $comment->content);
 			}
 			//var_dump($comment->in_reply);
-			$this->json_success(array('success' => true, 'approved' => $comment->approved, 'html' => $comment_html));
+			Json::success(array('approved' => $comment->approved, 'html' => $comment_html));
 		}else{
 			//var_dump($comment->getErrorMessages());
-			echo json_encode(array('success' => false, 'messages' => $comment->getErrors()));
+			Json::error(array('messages' => $comment->getErrors()));
 		}
 	}
 
@@ -251,10 +252,10 @@ class VideoResponseController extends Controller
 		
 		$video = app\models\Video::findOne(array('_id' => new MongoId($video_id)));
 		if(!$ids || !$video || (is_array($ids) && count($ids) <= 0)){
-			$this->json_error(self::UNKNOWN);
+			Json::error(Json::UNKNOWN);
 		}
 		if(!glue::auth()->check(array('^' => $video))){
-			$this->json_error(self::DENIED);
+			Json::error(Json::DENIED);
 		}
 		
 		$mongoIds = array();
@@ -267,7 +268,7 @@ class VideoResponseController extends Controller
 		foreach($comments as $comment){
 			$comment->approve();
 		}
-		$this->json_success(array('message'=>'The comments you specified were approved', 'total'=>count($mongoIds), 'updated'=>$row_count,
+		Json::success(array('message'=>'The comments you specified were approved', 'total'=>count($mongoIds), 'updated'=>$row_count,
 			'failed' => count($mongoIds)-$row_count));		
 	}
 
@@ -282,12 +283,12 @@ class VideoResponseController extends Controller
 		if($comment){
 
 			if(!(bool)$comment->video->voteableComments){
-				$this->json_error('Comment voting has currently been disabled on this video');
+				Json::error('Comment voting has currently been disabled on this video');
 			}
 			$comment->like();
-			echo json_encode(array("success"=>true));
+			Json::success();
 		}else{
-			echo json_encode(array('success' => false, 'messages' => 'An unknown error occured. Please try again later.'));
+			Json::error(array('messages' => 'An unknown error occured. Please try again later.'))
 		}
 	}
 
@@ -302,12 +303,12 @@ class VideoResponseController extends Controller
 		if($comment){
 
 			if(!(bool)$comment->video->voteableComments){
-				$this->json_error('Comment voting has currently been disabled on this video');
+				Json::error('Comment voting has currently been disabled on this video');
 			}
 			$comment->unlike();
-			echo json_encode(array("success"=>true));
+			Json::success();
 		}else{
-			echo json_encode(array("success"=>false, 'messages' => 'An unknown error occured. Please try again later.'));
+			Json::error(array('messages' => 'An unknown error occured. Please try again later.'));
 		}
 	}
 
@@ -322,7 +323,7 @@ class VideoResponseController extends Controller
 
 		$video = app\models\Video::findOne(array('_id' => new MongoId($video_id)));
 		if(!$ids || !$video || (is_array($ids) && count($ids) <= 0)){
-			$this->json_error(self::UNKNOWN);
+			Json::error(Json::UNKNOWN);
 		}
 
 		$mongoIds = array();
@@ -346,7 +347,7 @@ class VideoResponseController extends Controller
 		glue::db()->videoresponse_likes->remove(array("response_id" => array('$in' => $mongoIds)));
 		$video->saveCounters(array('totalResponses' => -$row_count,'totalTextResponses' => -$text_count,'totalVideoResponses' => -$video_count), 0);
 		
-		$this->json_success(array('message' => 'The comments you specified were deleted', 'total' => count($mongoIds), 'updated' => $row_count,
+		Json::success(array('message' => 'The comments you specified were deleted', 'total' => count($mongoIds), 'updated' => $row_count,
 			'failed' => count($mongoIds) - $row_count));
 	}
 
@@ -439,7 +440,7 @@ class VideoResponseController extends Controller
 		$html=ob_get_contents();
 		ob_end_clean();		
 
-		echo json_encode(array('success' => true, 'html' => $html));
+		Json::success(array('html' => $html));
 	}
 
 	/**
@@ -463,6 +464,6 @@ class VideoResponseController extends Controller
 			)->sort(array('ts' => -1));
 		}
 		// Now that I got all comments greater lets reset the session
-		$this->json_success(array('number_comments'=>$comments->count()));
+		Json::success(array('number_comments'=>$comments->count()));
 	}
 }
