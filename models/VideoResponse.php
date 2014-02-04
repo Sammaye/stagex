@@ -108,7 +108,7 @@ class VideoResponse extends Document
 		return true;
 	}
 
-	function rules()
+	public function rules()
 	{
 		return array(
 				array('videoId', 'required', 'message' => 'An unknown error occured. Try refreshing the page to fix this.'),
@@ -127,8 +127,8 @@ class VideoResponse extends Document
 						'allowNull' => true,
 						'on' => 'video_comment', 'message' => 'The video you selected cannot be validated. Please choose a different video.'
 				),
-				array('replyVideoId', 'check_already_reply', 'message' => 'This video has already been used as a reply on this one.', 'on' => 'video_comment'),
-				array('replyVideoId', 'check_same_video', 'message' => 'The same video being watched cannot be added as a reply.', 'on' => 'video_comment'),
+				array('replyVideoId', 'checkAlreadyReply', 'message' => 'This video has already been used as a reply on this one.', 'on' => 'video_comment'),
+				array('replyVideoId', 'checkSameVideo', 'message' => 'The same video being watched cannot be added as a reply.', 'on' => 'video_comment'),
 
 				array('threadParentUsername', 'safe', 'on' => 'text_comment'),
 				array('threadParentId', 'exists',
@@ -140,23 +140,23 @@ class VideoResponse extends Document
 		);
 	}
 
-	function check_already_reply($field, $value, $params = array())
+	public function checkAlreadyReply($field, $value, $params = array())
 	{
 		return !self::findOne(array('replyVideoId' => $value, 'videoId' => $this->videoId));
 	}
 
-	function check_same_video($field, $value, $params = array())
+	public function checkSameVideo($field, $value, $params = array())
 	{
 		return $this->replyVideoId != $this->videoId;
 	}
 
-	function getThread()
+	public function getThread()
 	{
 		/** $secondLevel = $this->Db()->find(array("path"=>new MongoRegex("/^".$path.",[^,]*,[^,]*$/")))->sort(array("seq"=>1)); // Second Level **/
 		return self::find(array("path"=>new \MongoRegex("/^".$this->path.",[^,]*$/")))->sort(array("ts"=>1)); // First Level
 	}
 
-	function beforeSave()
+	public function beforeSave()
 	{
 		if($this->getIsNewRecord()){
 			$this->userId = $this->userId?:glue::user()->_id;
@@ -184,7 +184,7 @@ class VideoResponse extends Document
 		return true;
 	}
 
-	function afterSave()
+	public function afterSave()
 	{
 		if($this->getIsNewRecord()){
 			$counters=array('totalResponses'=>1);
@@ -220,7 +220,7 @@ class VideoResponse extends Document
 		return true;
 	}
 
-	function approve()
+	public function approve()
 	{
 		if(!$this->approved){
 			$this->approved = true;
@@ -241,12 +241,12 @@ class VideoResponse extends Document
 		return false;
 	}
 
-	function currentUserLikes()
+	public function currentUserLikes()
 	{
 		return glue::db()->videoresponse_likes->findOne(array('userId' => glue::user()->_id, 'responseId' => $this->_id));
 	}
 
-	function like()
+	public function like()
 	{
 		glue::db()->videoresponse_likes->update(
 		array("userId"=>glue::user()->_id, "responseId"=>$this->_id),
@@ -259,7 +259,7 @@ class VideoResponse extends Document
 		return true;
 	}
 
-	function unlike()
+	public function unlike()
 	{
 		glue::db()->videoresponse_likes->remove(array("userId"=>glue::user()->_id, "responseId"=>$this->_id));
 		$this->likes = $this->likes-1;
@@ -267,7 +267,7 @@ class VideoResponse extends Document
 		return true;
 	}
 
-	function delete()
+	public function delete()
 	{
 		$this->video->saveCounters(array('totalResponses'=>-1),0);
 		glue::db()->videoresponse_likes->remove(array("responseId"=>$this->_id));

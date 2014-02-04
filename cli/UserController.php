@@ -8,7 +8,7 @@ use app\models\Playlist;
 
 class UserController extends Controller
 {
-	function action_publishStream()
+	public function action_publishStream()
 	{
 		// Get all jobs which are in progress or done
 		$cursor=AutoPublishQueue::findAll(array('processing' => 0, 'done' => 0))->sort(array('ts' => -1))->limit(100);
@@ -131,7 +131,7 @@ class UserController extends Controller
 		AutoPublishQueue::deleteAll(array('_id' => array('$in' => $_ids)));		
 	}
 	
-	function action_resetUploadBandwith()
+	public function action_resetUploadBandwith()
 	{
 		$user=app\models\User::find(array('nextBandwidthTopup' => array('$lt' => time())));
 		foreach($users as $k => $v)

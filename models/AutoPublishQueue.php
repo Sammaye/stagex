@@ -36,7 +36,7 @@ class AutoPublishQueue extends Document
 	protected $processing = 0;
 	protected $done = 0;
 
-	function behaviours()
+	public function behaviours()
 	{
 		return array(
 			'timestampBehaviour' => array(

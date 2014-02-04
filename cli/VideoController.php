@@ -1,9 +1,10 @@
 <?php
 
-include_once glue::getPath('@glue').'/components/phpthumb/ThumbLib.inc.php';
-
+use Glue;
 use app\models\Video;
-use \glue\Controller;
+use glue\Controller;
+
+include_once glue::getPath('@glue').'/components/phpthumb/ThumbLib.inc.php';
 
 class VideoController extends Controller
 {
@@ -75,7 +76,7 @@ class VideoController extends Controller
 		}		
 	}
 	
-	function action_consumeEncodingOutput()
+	public function action_consumeEncodingOutput()
 	{
 		// This function will be run every minute
 		

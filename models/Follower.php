@@ -48,7 +48,7 @@ class Follower extends Document
 		return self::findOne(array('fromId' => glue::user()->_id, 'toId' => $user_id)) != null;
 	}
 
-	function afterSave()
+	public function afterSave()
 	{
 		if($this->getIsNewRecord()){
 			$this->following->saveCounters(array('totalFollowers'=>1));
@@ -56,7 +56,7 @@ class Follower extends Document
 		}
 	}
 
-	function afterDelete()
+	public function afterDelete()
 	{
 		$this->following->saveCounters(array('totalFollowers'=>-1),0);
 		$this->follower->saveCounters(array('totalFollowing'=>-1),0);

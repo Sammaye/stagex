@@ -4,7 +4,7 @@ use \glue\Controller;
 
 class IndexController extends Controller
 {
-	function action_deleteObject()
+	public function action_deleteObject()
 	{
 		ini_set('error_reporting', E_ALL & ~E_NOTICE);
 		
@@ -101,7 +101,7 @@ class IndexController extends Controller
 		}		
 	}
 	
-	function action_submitSitemap()
+	public function action_submitSitemap()
 	{
 		/**
 		 * All this script does is cURL Google telling them we have changed our sitemap once every hour
@@ -114,5 +114,4 @@ class IndexController extends Controller
 		curl_close($ch);
 		echo $output;
 	}
-	
 }

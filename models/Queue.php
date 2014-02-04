@@ -12,7 +12,7 @@ class Queue extends Document
 	public $ref;
 	public $type;
 	
-	function behaviours()
+	public function behaviours()
 	{
 		return array(
 			'timestampBehaviour' => array(
