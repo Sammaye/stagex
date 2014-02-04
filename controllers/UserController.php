@@ -392,6 +392,14 @@ class UserController extends Controller
 		echo $this->render('user/subscriptions', array('model' => $this->loadModel()));
 	}
 	
+	public function action_followers()
+	{
+		$this->title = 'Your subscribers - StageX';
+		$this->layout = 'user_section';
+		$this->tab = 'subscribers';
+		echo $this->render('user/subscribers', array('model' => $this->loadModel));
+	}
+	
 	public function action_watched()
 	{
 		$this->title = 'Watched Videos - StageX';
@@ -738,7 +746,7 @@ class UserController extends Controller
 		}
 	}
 
-	public function action_searchFollowers()
+	public function action_searchFollowing()
 	{
 		if(!glue::http()->isAjax()){
 			glue::trigger('404');
@@ -761,6 +769,30 @@ class UserController extends Controller
 		}
 		Json::success(array('html' => ob_get_clean()));
 	}
+	
+	public function action_searchFollowers()
+	{
+		if(!glue::http()->isAjax()){
+			glue::trigger('404');
+		}
+	
+		extract(glue::http()->param(array('query', 'page')));
+		$users = app\models\Follower::searchFollowers(glue::user()->_id, $query);
+	
+		ob_start();
+		ob_implicit_flush(false);
+		if(count($users) > 0){
+			echo glue\widgets\ListView::run(array(
+				'pageSize' => 20,
+				'page' => $page,
+				'cursor' => $query ? new Collection($users) : $users,
+				'itemView' => 'user/_subscriber.php',
+			));
+		}else{
+			?><div class="no_results_found">No subscribers were found</div><?php
+		}
+		Json::success(array('html' => ob_get_clean()));
+	}	
 	
 	public function action_suggestions()
 	{

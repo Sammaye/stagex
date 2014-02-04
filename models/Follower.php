@@ -4,6 +4,7 @@ namespace app\models;
 
 use glue;
 use \glue\db\Document;
+use app\models\User;
 
 class Follower extends Document
 {
@@ -62,36 +63,61 @@ class Follower extends Document
 		$this->follower->saveCounters(array('totalFollowing'=>-1),0);
 	}
 	
-	public static function search($user_id, $term, $limit = 1000)
+	public static function search($userId, $term, $limit = 1000, $searchFollowers = false)
 	{
 		// We need to do a JOIN here...
 		$idRange = array();
 		if($term){
-			$users = iterator_to_array(\app\models\User::find(array('username'=>new \MongoRegex("/^$term/")))->sort(array('username'=>1))->limit($limit));
+			$users = iterator_to_array(User::find(array('username'=>new \MongoRegex("/^$term/")))->sort(array('username'=>1))->limit($limit));
 			$mongoIds = array();
 			foreach($users as $_id => $user){
 				$mongoIds[]=new \MongoId($_id);
 			}
-			$idRange = array('toId' => array('$in' => $mongoIds));
 			
-			$following=static::find(array_merge(array('fromId' => $user_id), $idRange));
+			if($searchFollowers){
+				$idRange = array('fromId' => array('$in' => $mongoIds));
+				$relations = static::find(array_merge(array('toId' => $userId), $idRange));				
+			}else{
+				$idRange = array('toId' => array('$in' => $mongoIds));
+				$relations = static::find(array_merge(array('fromId' => $userId), $idRange));
+			}
 			
-			$followedUsers=array();
-			foreach($following as $_id=>$follower){
-				if($user=$users[strval($follower->toId)]){
-					$followedUsers[strval($user->_id)]=$user;
+			$rUsers = array();
+			foreach($relations as $_id => $follower){
+				if($searchFollowers){
+					if($user = $users[strval($follower->fromId)]){
+						$rUsers[strval($user->_id)] = $user;
+					}
+				}else{
+					if($user = $users[strval($follower->toId)]){
+						$rUsers[strval($user->_id)] = $user;
+					}
 				}
 			}
-			return $followedUsers;			
+			return $rUsers;
 			
 		}else{
-			$following=static::find(array('fromId'=>$user_id))->limit(20);
-			$mongoIds = array();
-			foreach($following as $_id=>$follower){
-				$mongoIds[]=new \MongoId($follower->toId);
+			
+			if($searchFollowers){
+				$relations = static::find(array('toId' => $userId))->limit(20);
+			}else{
+				$relations = static::find(array('fromId' => $userId))->limit(20);
 			}
-			$users=\app\models\User::find(array('_id'=>array('$in'=>$mongoIds)))->sort(array('username'=>1));
+			$mongoIds = array();
+			foreach($relations as $_id => $follower){
+				if($searchFollowers){
+					$mongoIds[] = new \MongoId($follower->fromId);
+				}else{
+					$mongoIds[] = new \MongoId($follower->toId);
+				}
+			}
+			$users = User::find(array('_id' => array('$in' => $mongoIds)))->sort(array('username' => 1));
 			return $users;
 		}
+	}
+	
+	public static function searchFollowers($userId, $term, $limit = 1000)
+	{
+		return static::search($userId, $term, $limit, true);
 	}
 }

@@ -1,14 +1,11 @@
 <?php
 use glue\Html;
 
-$this->jsFile("/js/subscribeButton.js");
 $this->js('user.unsubscribe', "
 	
 	var preVal='',
 		t = setInterval(function(){ search(); },1000);
-		
-	$('.subscribe_widget').subscribeButton();
-		
+
 	function search(){
 		var term=$('.form-search_subs .form-search-input').val();
 		if(term!=preVal)
@@ -31,7 +28,7 @@ $this->js('user.unsubscribe', "
 			act_page = page;
 		}
 		
-		$.get('/user/searchFollowing', {query: $('.form-search_subs .form-search-input').val(), page: act_page}, null, 'json')
+		$.get('/user/searchFollowers', {query: $('.form-search_subs .form-search-input').val(), page: act_page}, null, 'json')
 		.done(function(data){
 			if(data.success){
 				$('.user_subscription_list').html(data.html);
@@ -45,21 +42,21 @@ $this->js('user.unsubscribe', "
     	<div class='search form-search form-search_subs'>
 		<?php $form = Html::form(array('method' => 'get', 'class' => 'form-inline')); ?>
 			<div class="form-group"><?php echo html::textfield('query',htmlspecialchars(glue::http()->param('query',null)),array(
-				'placeholder'=>'Search Subscriptions', 'autocomplete'=>'off', 'class'=>'form-search-input form-control')) ?></div>
+				'placeholder'=>'Search Subscribers', 'autocomplete'=>'off', 'class'=>'form-search-input form-control')) ?></div>
 			<button class="btn btn-default submit_search">Search</button>
 		<?php $form->end() ?>
-		</div>	
+		</div>
     </div>
 	<div class='user_subscription_list clearfix'>
-	<?php if(glue::user()->totalFollowing > 0){
+	<?php if(glue::user()->totalFollowers > 0){
 		echo glue\widgets\ListView::run(array(
 			'pageSize'	 => 20,
-			"cursor"	 => app\models\Follower::find(array('fromId'=>glue::user()->_id))->sort(array('username'=>-1)),
-			'itemView' => 'user/_subscription.php',
+			"cursor"	 => app\models\Follower::find(array('toId' => glue::user()->_id))->sort(array('username'=>-1)),
+			'itemView' => 'user/_subscriber.php',
 		));
 	}else{
 		?><div class='no_results_found'>
-			You have no Subscriptions! Subscribe to a user to keep upto date with that users activity.
+			You have no subscribers!
 		</div><?php
 	}
 	?></div>

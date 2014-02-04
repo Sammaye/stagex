@@ -85,6 +85,8 @@ JS;
 				</li>
 				<li <?php echo $this->tab == "subscriptions" ? "class='mm-selected'" : "" ?>>
 				<a href="<?php echo glue::http()->url('/user/following') ?>">Following</a></li>
+				<li <?php echo $this->tab == "subscribers" ? "class='mm-selected'" : "" ?>>
+				<a href="<?php echo glue::http()->url('/user/followers') ?>">Followers</a></li>				
 				<li <?php echo $this->tab == "notifications" ? "class='mm-selected'" : "" ?>>
 				<a href="<?php echo glue::http()->url('/stream/notifications') ?>">Notifications</a></li>
 				<li <?php echo $this->tab == "profile" ? "class='mm-selected'" : "" ?>>

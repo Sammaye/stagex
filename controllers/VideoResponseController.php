@@ -288,7 +288,7 @@ class VideoResponseController extends Controller
 			$comment->like();
 			Json::success();
 		}else{
-			Json::error(array('messages' => 'An unknown error occured. Please try again later.'))
+			Json::error(array('messages' => 'An unknown error occured. Please try again later.'));
 		}
 	}
 
