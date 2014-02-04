@@ -4,6 +4,7 @@ namespace app\widgets;
 
 use glue;
 use glue\Widget;
+use glue\Html;
 
 class Autocomplete extends Widget
 {
@@ -48,7 +49,12 @@ class Autocomplete extends Widget
 			$js .= "});";
 
 			glue::controller()->js('jqauto_complete_'.$this->attribute, $js);
-			echo \html::textfield($this->attribute, $this->value ? $this->value : null, array_merge(array('class' => $this->attribute, 'placeholder'=>$this->placeholder),$this->htmlOptions));
+			
+			echo Html::textfield(
+				$this->attribute, 
+				$this->value ? $this->value : null, 
+				array_merge(array('class' => $this->attribute, 'placeholder'=>$this->placeholder),$this->htmlOptions)
+			);
 		}
 	}
 }

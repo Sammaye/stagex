@@ -168,7 +168,7 @@ $this->js('videos', "
 		<?php $html = ob_get_contents();
 	ob_end_clean();
 
-	echo app\widgets\stickytoolbar::run(array(
+	echo app\widgets\Stickytoolbar::run(array(
 		"element" => '.grey_sticky_toolbar',
 		"options" => array(
 			'onFixedClass' => 'grey_sticky_bar-fixed'

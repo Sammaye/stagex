@@ -45,7 +45,7 @@ $video_stats = $model->getStatisticsDateRange(mktime(0, 0, 0, date("m"), date("d
 			</div>
 		</div>
 		<div id="chartdiv" style='height:250px; width:100%; margin-left:5px;'>
-			<?php echo app\widgets\highcharts::run(array(
+			<?php echo app\widgets\Highcharts::run(array(
 				'chartName' => 'video_views_plot',
 				'appendTo' => 'chartdiv',
 				'series' => $video_stats['hits']

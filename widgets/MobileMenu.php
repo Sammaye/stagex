@@ -6,7 +6,7 @@ use Glue;
 use glue\Widget;
 use glue\Html;
 
-class userMobileMenu extends Widget
+class MobileMenu extends Widget
 {
 	public $tab;
 	

@@ -44,7 +44,7 @@ $this->js('ca_script', $ca_js . "(function() {
 </head>
 <body>
 <?php $this->beginBody() ?>
-	<?php echo app\widgets\userMobileMenu::run(array('tab' => $this->tab)) ?>
+	<?php echo app\widgets\MobileMenu::run(array('tab' => $this->tab)) ?>
 	<?php echo $content ?>
 	<div id="mainSearch_results"></div>
 	<script src="/js/jquery.js"></script>

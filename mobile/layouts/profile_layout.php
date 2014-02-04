@@ -46,7 +46,7 @@ $this->beginPage() ?>
 
 
 
-	<?php echo app\widgets\userMobileMenu::run(array('tab' => $this->tab)) ?>
+	<?php echo app\widgets\MobileMenu::run(array('tab' => $this->tab)) ?>
 	<div class="container">
 	<div class="col-md-12">
 				<div class='profile_page grid-col-41'>

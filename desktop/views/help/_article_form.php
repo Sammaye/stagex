@@ -7,7 +7,7 @@
 		<div class='form_row'><?php echo html::label("Title:", 'title') ?><?php echo $form->textfield($model, 'title') ?></div>
 		<div class='form_row'><?php echo html::label('Parent topic:', 'parent') ?><?php echo $form->selectbox($model, 'parent', app\models\HelpTopic::getSelectBox_list())?></div>
 		<div class='ckeditor_content' style='margin:10px 0;'>
-			<?php echo app\widgets\ckeditor::run(array(
+			<?php echo app\widgets\CkEditor::run(array(
 				'model' => $model,
 				'attribute' => 'content',
 				'config' => array(

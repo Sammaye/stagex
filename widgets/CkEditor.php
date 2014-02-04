@@ -5,7 +5,7 @@ namespace app\widgets;
 use glue;
 use glue\Widget;
 
-class CKEditor extends Widget
+class CkEditor extends Widget
 {
 	public $config;
 

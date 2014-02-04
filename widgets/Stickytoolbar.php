@@ -4,7 +4,7 @@ namespace app\widgets;
 use glue;
 use glue\Widget;
 
-class stickytoolbar extends Widget
+class Stickytoolbar extends Widget
 {
 	public $element;
 	public $options = array();

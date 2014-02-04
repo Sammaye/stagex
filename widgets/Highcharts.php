@@ -5,7 +5,7 @@ namespace app\widgets;
 use glue;
 use glue\Widget;
 
-class highcharts extends Widget
+class Highcharts extends Widget
 {
 	public $chartName;
 	public $appendTo;

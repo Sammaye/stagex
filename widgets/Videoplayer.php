@@ -5,7 +5,7 @@ namespace app\widgets;
 use glue;
 use glue\Widget;
 
-class videoPlayer extends Widget
+class Videoplayer extends Widget
 {
 	public $width;
 	public $height;

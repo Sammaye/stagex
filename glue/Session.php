@@ -168,7 +168,7 @@ class Session extends Component
 			// If successful I wanna remove the users row so they don't get caught by it again
 			$this->getLogCollection()->remove(array('email' => $email));
 		}else{
-			$response = $this->getLogCollection()->findOne(
+			$response = $this->getLogCollection()->update(
 				array('email' => $email, 'ts' => new \MongoDate(time()-(60*5))), 
 				array('$inc' => array('c' => 1), '$set' => array('ts' => new \MongoDate())),
 				array('upsert' => 1)
