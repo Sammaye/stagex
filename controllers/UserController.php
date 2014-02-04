@@ -58,7 +58,7 @@ class UserController extends Controller
 	{
 		$this->title = "Login to your StageX Account";
 
-		$model = new loginForm();
+		$model = new LoginForm();
 		$model->attributes=isset($_POST['loginForm']) ? $_POST['loginForm'] : array();
 
 		/** Count how many times the user has logged in over 5 mins */
@@ -196,7 +196,7 @@ class UserController extends Controller
 	{
 		$this->title = 'Recover your StageX Account';
 
-		$model = new recoverForm;
+		$model = new RecoverForm;
 		if(isset($_POST['recoverForm'])){
 			$model->attributes = $_POST['recoverForm'];
 			if($model->validate()){

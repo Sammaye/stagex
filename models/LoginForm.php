@@ -8,7 +8,7 @@ use glue\Model;
 /** Incase this is being used somewhere where it hasn't been included in the controller */
 glue::import('@app/widgets/recaptcha/recaptchalib.php',true);
 
-class loginForm extends Model
+class LoginForm extends Model
 {
 	public $captchaError;
 	

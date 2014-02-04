@@ -6,7 +6,7 @@ use glue\Model;
 
 glue::import('@app/widgets/recaptcha/recaptchalib.php', true);
 
-class recoverForm extends Model
+class RecoverForm extends Model
 {
 	public $captchaError;
 	public $email;
