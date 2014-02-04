@@ -199,9 +199,8 @@ class HelpController extends Controller
 		$ret = array();
 		foreach(Help::search(glue::http()->param('term', '')) as $item){
 			$ret[] = array(
-				'label' => $item->title,
-				'description' => '',
-				'image' => ''
+				'title' => $item->title,
+				'content' => $item->content,
 			);			
 		}
 		Json::success(array('results' => $ret));

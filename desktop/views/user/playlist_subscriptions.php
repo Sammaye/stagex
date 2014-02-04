@@ -66,24 +66,8 @@ $this->js('page', "
 <div class="header">
 <div class='search form-search'>
 	<?php $form = html::form(array('method' => 'get')); ?>
-		<?php echo app\widgets\Autocomplete::run(array(
-			'attribute' => 'query',
-			'value' => urldecode(htmlspecialchars(isset($_GET['query']) ? $_GET['query'] : '')),
-			'placeholder' => 'Search Playlists',
-			'htmlOptions' => array(
-				'class' => 'form-search-input col-38'
-			),
-			'options' => array(
-				'appendTo' => '#user_video_results',
-				'source' => '/user/video_search_suggestions',
-				'minLength' => 2,
-			),
-			'renderItem' => "
-				return $( '<li></li>' )
-					.data( 'item.autocomplete', item )
-					.append( '<a class=\'content\'><span>' + item.label + '</span></div></a>' )
-					.appendTo( ul );
-		"))  ?><button class="btn submit_search"><span>&nbsp;</span></button>
+		<?php echo $form->textField('query', glue::http()->param('query'), array('placeholder' => 'Search playlists', 'class' => 'form-control')) ?>
+		<button class="btn submit_search"><span>&nbsp;</span></button>
 	<?php $form->end() ?>
 </div>    	
 </div>	

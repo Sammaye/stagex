@@ -5,10 +5,9 @@ namespace app\widgets;
 use glue;
 use glue\Widget;
 
-class autoresizetextarea extends Widget
+class AutosizeTextarea extends Widget
 {
 	public $value;
-
 	public $style; // This should never be used unless your a cock
 	public $class;
 

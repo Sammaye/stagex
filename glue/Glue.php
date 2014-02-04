@@ -181,9 +181,9 @@ class Glue
 			return false;
 		}
 		
-		list($controller,$action)=$controller;
+		list($controller,$action) = $controller;
 
-		if(!is_callable(array($controller,$action))){
+		if(!method_exists($controller,$action)){
 			return false;
 		}
 

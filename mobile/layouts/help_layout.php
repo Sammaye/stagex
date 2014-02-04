@@ -10,6 +10,7 @@ $this->beginPage() ?>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
 <link rel="shortcut icon" href="/images/favicon.ico" />
 <link href="/css/bootstrap.min.css" rel="stylesheet">
+<link type="text/css" rel="stylesheet" href="/css/jquery-ui/jquery-ui.css" />
 <link type="text/css" rel="stylesheet" href="/css/mmenu.css" />
 <link type="text/css" rel="stylesheet" href="/css/mobile.css" />
 <!--[if lt IE 9]>
@@ -35,7 +36,35 @@ $this->beginPage() ?>
 			
     		<div class='search col-md-3 row'>
 			<?php $form = Html::form(array('method' => 'get', 'action'=>glue::http()->url('/help/search'))); ?>
-				<div class="col-md-10 form-group"><?php echo $form->textField('query', glue::http()->param('query'), 'form-control') ?></div>
+				<div class="col-md-10 form-group"><?php echo app\widgets\Autocomplete::run(array(
+					'attribute' => 'query',
+					'value' => urldecode(htmlspecialchars(isset($_GET['query']) ? $_GET['query'] : '')),
+					'placeholder' => 'Search Help',
+					'htmlOptions' => array(
+						'class' => 'form-control'
+					),
+					'options' => array(
+						'appendTo' => '#mainSearch_results',
+						'source' => "js:function(request, response){
+						$.get('/help/suggestions', {term: request.term}, null, 'json')
+						.done(function(data){
+							ret = [];
+							if(data.success){
+								$.each(data.results, function(k, v){
+									ret[ret.length] = {label: v.title};
+								});
+							}
+							response(ret);
+						});
+						}",
+						'minLength' => 2,
+					),
+					'renderItem' => "
+						return $( '<li></li>' )
+							.data( 'item.autocomplete', item )
+							.append( '<a class=\'content\'><span>' + item.label + '</span></div></a>' )
+							.appendTo( ul );
+				"))  ?></div>
 				<div class="col-md-2 form-group"><button class="btn btn-primary submit_search">Search</button></div>
 			<?php $form->end() ?>
 			</div>

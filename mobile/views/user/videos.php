@@ -80,36 +80,11 @@ $this->js('videos', "
 	<div class="header">
     		<div class='search form-search'>
 			<?php $form = Html::form(array('method' => 'get')); ?>
-				<div class="form-group"><?php echo app\widgets\Autocomplete::run(array(
-					'attribute' => 'query',
-					'value' => urldecode(htmlspecialchars(isset($_GET['query']) ? $_GET['query'] : '')),
-					'placeholder' => 'Search Uploads',
-					'htmlOptions' => array(
-						'class' => 'form-search-input form-control'
-					),
-					'options' => array(
-						'appendTo' => '#mainSearch_results',
-						'source' => "js:function(request, response){
-						$.get('/video/suggestions', {term: request.term}, null, 'json')
-						.done(function(data){
-							ret = [];
-							if(data.success){
-								$.each(data.results, function(k, v){
-									ret[ret.length] = {label: v.title};
-								});
-							}
-							response(ret);
-						});
-						}",
-						'minLength' => 2,
-					),
-					'renderItem' => "
-						return $( '<li></li>' )
-							.data( 'item.autocomplete', item )
-							.append( '<a class=\'content\'><span>' + item.label + '</span></div></a>' )
-							.appendTo( ul );
-				"))  ?></div><button class="btn btn-default submit_search">Search</button>
+				<div class="form-group">
+				<?php echo $form->textField('query', glue::http()->param('query'), array('placeholder' => 'Search your videos', 'class' => 'form-control')) ?>
+				</div><button class="btn btn-default submit_search">Search</button>
 				
+			<a class="btn  btn-link" href="#">Advanced Search</a>
 			<div class="btn-group">
 				<button type="button" class="btn btn-link dropdown-toggle"
 					data-toggle="dropdown">
