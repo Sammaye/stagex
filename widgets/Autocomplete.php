@@ -23,8 +23,7 @@ class Autocomplete extends Widget
 			$js = "$(function(){";
 
 			if($this->renderItem && !isset($this->options['select'])){
-				$this->options['select'] = "
-				function( event, ui ) {
+				$this->options['select'] = "js:function( event, ui ) {
 					$( '#".$this->attribute."' ).val( ui.item.label );
 					return false;
 				}";

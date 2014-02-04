@@ -22,7 +22,7 @@ class VideoController extends Controller
 							'deleteResponses', 'delete', 'report', 'like', 'dislike', 'analytics', 'getAnalytics', 'undoDelete', 'batchSave' ),
 						"users"=>array("@*")
 					),
-					array('allow', 'actions' => array('index', 'watch', 'embedded')),
+					array('allow', 'actions' => array('index', 'watch', 'embedded', 'suggestions')),
 					array("deny", "users"=>array("*")),
 				)
 			)
@@ -540,7 +540,7 @@ class VideoController extends Controller
 		$ret = array();
 		
 		$c = new Query();
-		$c->type = 'playlist';
+		$c->type = 'video';
 		$c->filtered = true;
 		
 		if(glue::http()->param('term')){

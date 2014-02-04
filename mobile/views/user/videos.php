@@ -88,8 +88,19 @@ $this->js('videos', "
 						'class' => 'form-search-input form-control'
 					),
 					'options' => array(
-						'appendTo' => '#user_video_results',
-						'source' => '/user/video_search_suggestions',
+						'appendTo' => '#mainSearch_results',
+						'source' => "js:function(request, response){
+						$.get('/video/suggestions', {term: request.term}, null, 'json')
+						.done(function(data){
+							ret = [];
+							if(data.success){
+								$.each(data.results, function(k, v){
+									ret[ret.length] = {label: v.title};
+								});
+							}
+							response(ret);
+						});
+						}",
 						'minLength' => 2,
 					),
 					'renderItem' => "

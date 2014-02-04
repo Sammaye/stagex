@@ -109,9 +109,20 @@ $this->js('new_playlist', "
 						'class' => 'form-search-input form-control'
 					),
 					'options' => array(
-						'appendTo' => '#user_video_results',
-						'source' => '/user/video_search_suggestions',
-						'minLength' => 2,
+						'appendTo' => '#mainSearch_results',
+						'source' => "js:function(request, response){
+						$.get('/playlist/suggestions', {term: request.term}, null, 'json')
+						.done(function(data){
+							ret = [];
+							if(data.success){
+								$.each(data.results, function(k, v){
+									ret[ret.length] = {label: v.title};
+								});
+							}
+							response(ret);
+						});
+						}",
+						'minLength' => 2
 					),
 					'renderItem' => "
 						return $( '<li></li>' )
