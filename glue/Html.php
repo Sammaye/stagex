@@ -288,11 +288,19 @@ class Html{
 			$select .= "<option value='{$options['head'][0]}'>{$options['head'][1]}</option>";
 		}
 
-		foreach($items as $value=>$caption){
+		foreach($items as $value => $caption){
+			
+			$options = array();
+			if(is_array($caption)){
+				$options = $caption;
+				$caption = $options[0];
+				unset($options[0]);
+			}
+			
 			if((string)$selectedValue === (string)$value){
-				$select .= "<option value='{$value}' selected='selected'>{$caption}</option>";
+				$select .= "<option value='{$value}' selected='selected' ".(implode(' ', static::formOptions($options))).">{$caption}</option>";
 			}else{
-				$select .= "<option value='{$value}'>{$caption}</option>";
+				$select .= "<option value='{$value}' ".(implode(' ', static::formOptions($options))).">{$caption}</option>";
 			}
 		}
 		return $select.'</select>';

@@ -349,12 +349,25 @@ class UserController extends Controller
 				$filter_obj = array('listing' => 3);
 				break;
 		}
-
+/*
+		$query = new AdvancedQuery();
+		$query->fields(array(
+			'title' => array('match' => 'regex', 'deliminator' => '\s+'),
+			'description' => array('match' => 'regex', 'deliminator' => '\s+'),
+			'tags' => array('match' => 'exact', 'deliminator' => '\s+'),
+			'licence' => array('match' => 'exact', 'deliminator' => ','),
+			'category' => array('match' => 'exact', 'deliminator' => ','),
+			'listing' => array('match' => 'exact', 'deliminator' => ','),
+			'mature' => array('match' => 'exact', 'split' => ','),
+			'created' => array('match' => 'exact', 'type' => 'range', 'split' => '')
+		));
+		$query->parse(glue::http()->param('query'));
+	*/	
 		$video_rows = Video::fts(
 			array('title', 'description', 'tags'), isset($_GET['query']) ? $_GET['query'] : '', array_merge(
 				array('userId' => glue::user()->_id, 'deleted' => 0), $filter_obj))
 			->sort(array('created' => -1));
-
+var_dump($_GET);
 		echo $this->render('videos', array('video_rows' => $video_rows, 'filter' => $filter));
 		
 	}

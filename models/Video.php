@@ -146,14 +146,14 @@ class Video extends Document
 	public static function advancedSearchFields()
 	{
 		return array(
-			'title' => 'Title',
-			'description' => 'Description',
-			'tags' => 'Tags',
-			'licence' => 'Licence',
-			'category' => 'Category',
-			'listing' => 'Listing',
-			'mature' => 'Mature',
-			'created' => 'Created'
+			'title' => array('Title', 'data-search_type' => 'singlevalue-field', 'data-value_type' => 'textvalue-value'),
+			'description' => array('Description', 'data-search_type' => 'singlevalue-field', 'data-value_type' => 'textvalue-value'),
+			'tags' => array('Tags', 'data-search_type' => 'singlevalue-field', 'data-value_type' => 'textvalue-value'),
+			'licence' => array('Licence', 'data-search_type' => 'singlevalue-field', 'data-value_type' => 'licencevalue-value'),
+			'category' => array('Category', 'data-search_type' => 'singlevalue-field', 'data-value_type' => 'categoryvalue-value'),
+			'listing' => array('Listing', 'data-search_type' => 'singlevalue-field', 'data-value_type' => 'listingvalue-value'),
+			'mature' => array('Mature', 'data-search_type' => 'singlevalue-field', 'data-value_type' => 'yesnovalue-value'),
+			'created' => array('Created', 'data-search_type' => 'rangevalue-field', 'data-value_type' => 'datevalue-value')
 		);
 	}
 

@@ -73,6 +73,10 @@ $this->js('videos', "
 	function reset_checkboxes(){
 		$('.selectAll_input').prop('checked',true).trigger('click');
 	}
+		
+	$(document).on('click', '.condition_row .condition_remove', function(event){
+		$(this).parents('.condition_row').remove();
+	});
 ");
 ?>
 <div class="user_videos_body">
@@ -116,20 +120,22 @@ $this->js('videos', "
 					<li role="presentation"><a role="menuitem" tabindex="-1" href="<?php echo glue::http()->url(array('sorton'=>'views','orderby'=>1)) ?>">Least Viewed</a></li>
 				</ul>
 			</div><span class='text-muted small amount_found'><?php echo $video_rows->count() ?> found</span>
-			<div>
-				<div><?php echo $form->selectbox('field', app\models\Video::advancedSearchFields(), null, array('class' => 'form-control')) ?>
-				<div class="multivalue-field"><?php echo $form->selectbox('search_op', array('in' => 'In', 'not_in' => 'Not In'), null, array('class' => 'form-control')) ?></div>
-				<div class="singlevalue-field"><?php echo $form->selectbox('search_op', array('is' => 'Is', 'is_not' => 'Is Not', 'empty' => 'Is Empty'), 
-					null, array('class' => 'form-control')) ?></div>
-				<div class="datevalue-field"><?php echo $form->selectbox('search_op', array('between' => 'Between', 'not_between' => 'Not Between'), 
-					null, array('class' => 'form-control')) ?></div>
-				<div class="textvalue-value"><?php echo $form->textfield('vlaue', null, 'form-control') ?></div>
-				<div class="datevalue-value"><?php echo $form->textfield('from_value', null, 'form-control') . ' ' . $form->textfield('to_value', null, 'form-control') ?></div>
-				<div class="yesnovalue-value"><?php echo $form->selectbox('value', array('No', 'Yes'), null, array('class' => 'form-control')) ?></div>
-				<div class="licencevalue-value"><?php echo $form->selectbox('value', app\models\Video::licences(), null, array('class' => 'form-control')) ?></div>
-				<div class="categoryvalue-value"><?php echo $form->selectbox('value', app\models\Video::categories('selectBox'), null, array('class' => 'form-control'))?></div>
-				<div class="listingvalue-value"><?php echo $form->selectBox('value', array('Public', 'Unlisted', 'Private'), null, array('class' => 'form-control')) ?></div>
+			<div class="advnaced_search">
+				<div class="row condition_row">
+				<div class="form-group col-md-3 col-sm-3 col-xs-6 condition_field"><?php echo $form->selectbox('field[]', app\models\Video::advancedSearchFields(), null, array('class' => 'form-control')) ?></div>
+				<div class="form-group col-md-2 col-sm-2 col-xs-6 condition_type">
+				<div class="rangevalue-field"><?php echo $form->selectbox('search_op[]', array('=' => '=', '>' => '>', '>=' => '>=', '<' => '<', '<=' => '<=', '!=' => '!=', 
+					'in' => 'IN', 'not_in' => 'NOT IN', 'null' => 'Is Empty'), null, array('class' => 'form-control')) ?></div>
 				</div>
+				<div class="form-group col-md-3 col-sm-3 col-xs-6 condition_value">
+				<div class="textvalue-value"><?php echo $form->textfield('vlaue[]', null, 'form-control') ?></div>
+				</div>
+				<div class="form-group col-md-2 col-sm-2 col-xs-4 condition_operand">
+				<?php echo $form->selectbox('operand[]', array('and' => 'AND', 'or' => 'OR', 'and_or' => 'AND OR'), null, array('class' => 'form-control')) ?>
+				</div>
+				<div class="form-group col-md-1 col-sm-1 col-xs-2"><a class="condition_remove" href="#">Remove</a></div>
+				</div>
+				<div><a href="#" class="btn btn-link">Add condition</a></div>
 			</div>
 			<?php $form->end() ?>
 			</div>    	
