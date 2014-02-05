@@ -14,16 +14,20 @@ $this->beginPage() ?>
 		<title><?php echo Html::encode($this->title) ?></title>
 
 		<?php
-			echo Html::jsFile('/js/jquery.js');
-			echo Html::jsFile('/js/jquery-ui.js');
-
-			echo Html::jsFile('/js/bootstrap.js');
-			echo Html::jsFile('/js/common.js');
-
-			echo Html::cssFile("/css/bootstrap.css");
-			echo Html::cssFile("/css/springhare.css");
-			echo Html::cssFile("/css/jquery-ui/jquery-ui.css");
-
+		
+		$this->jsFile(array(
+			'/js/jquery.js',
+			'/js/jquery-ui.js',
+			'/js/bootstrap.js',
+			'/js/common.js',
+		), self::HEAD);
+			
+		$this->cssFile(array(
+			'/css/springhare.css',
+			'/css/jquery-ui/jquery-ui.css',
+			'/css/main.css'
+		));
+		
 			$this->js('ga_script', "var _gaq = _gaq || [];
 			  _gaq.push(['_setAccount', 'UA-31049834-1']);
 			  _gaq.push(['_trackPageview']);
@@ -33,13 +37,6 @@ $this->beginPage() ?>
 			    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
 			    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
 		  	})();", self::HEAD);
-
-			$this->js('gplus_one', "(function() {
-		    	var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
-		    	po.src = 'https://apis.google.com/js/plusone.js';
-		    	var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
-		  	})();");
-
 			$this->head();
 		?>
 	</head>

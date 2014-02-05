@@ -137,7 +137,7 @@ $this->js('edit', "
 			<div class='alert'></div>
 			<input type="button" class="btn btn-primary btn_save" value="Save Changes"/>
 			<div class="btn-group">
-			<button type="button" id="settings_tab" class="btn btn-white btn-tab">Settings</button>
+			<button type="button" id="settings_tab" class="btn btn-default btn-tab">Settings</button>
 			</div>
 			<button type="button" class='btn btn-danger btn_delete'>Delete</button>
 			

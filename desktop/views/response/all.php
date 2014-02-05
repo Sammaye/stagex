@@ -160,7 +160,7 @@ $this->js('admin', "
 					<button class='btn-danger btn selected_actions btn_delete'>Delete</button>
 					<?php endif; ?>
 					<div class="dropdown-group btn_sort">
-						<button class='btn btn-white dropdown-anchor'>Sort<?php
+						<button class='btn btn-default dropdown-anchor'>Sort<?php
 						if(glue::http()->param('sorton')=='created'){
 							if(glue::http()->param('orderby')==-1)
 								echo ': Newest';

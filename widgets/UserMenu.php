@@ -31,6 +31,9 @@ class UserMenu extends Widget
 				<span class="badge"><?php echo glue::user()->totalFollowing ?></span></a>
 			</li>
 			<li>
+				<a href="<?php echo glue::http()->url('/user/followers') ?>" <?php echo $this->tab == "subscribers" ? "class='selected'" : "" ?>>Followers</a>
+			</li>			
+			<li>
 				<a href='<?php echo glue::http()->url('/stream/notifications') ?>' <?php echo $this->tab == "notifications" ? "class='selected'" : "" ?>>Notifications
 				<span class="badge"><?php echo \app\models\Notification::getNewCountNotifications() ?></span></a>
 			</li>

@@ -1,13 +1,10 @@
 <?php
 use glue\Html;
 
-$this->jsFile("/js/subscribeButton.js");
 $this->js('user.unsubscribe', "
 	
 	var preVal='',
 		t = setInterval(function(){ search(); },1000);
-		
-	$('.subscribe_widget').subscribeButton();
 		
 	function search(){
 		var term=$('.form-search_subs .form-search-input').val();
@@ -31,7 +28,7 @@ $this->js('user.unsubscribe', "
 			act_page = page;
 		}
 		
-		$.get('/user/searchFollowing', {query: $('.form-search_subs .form-search-input').val(), page: act_page}, null, 'json')
+		$.get('/user/searchFollowers', {query: $('.form-search_subs .form-search-input').val(), page: act_page}, null, 'json')
 		.done(function(data){
 			if(data.success){
 				$('.user_subscription_list').html(data.html);
@@ -53,8 +50,8 @@ $this->js('user.unsubscribe', "
 	<?php if(glue::user()->totalFollowing > 0){
 		echo glue\widgets\ListView::run(array(
 			'pageSize'	 => 20,
-			"cursor"	 => app\models\Follower::find(array('fromId'=>glue::user()->_id))->sort(array('username'=>-1)),
-			'itemView' => 'user/_subscription.php',
+			"cursor"	 => app\models\Follower::find(array('toId' => glue::user()->_id))->sort(array('username' => -1)),
+			'itemView' => 'user/_subscriber.php',
 		));
 	}else{
 		?><div class='no_results_found'>

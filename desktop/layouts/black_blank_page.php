@@ -21,9 +21,9 @@ $this->beginPage() ?>
 		), self::HEAD);
 			
 		$this->cssFile(array(
-			'/css/bootstrap.css',
+			'/css/springhare.css',
 			'/css/jquery-ui/jquery-ui.css',
-			'/css/springhare.css'
+			'/css/main.css'
 		));
 
 		$this->head();

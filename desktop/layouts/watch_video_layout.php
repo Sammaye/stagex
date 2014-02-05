@@ -14,15 +14,20 @@ $this->beginPage() ?>
 		<title><?php echo Html::encode($this->title) ?></title>
 
 		<?php
-			echo Html::jsFile('/js/jquery.js')."\n";
-			echo Html::jsFile('/js/jquery-ui.js')."\n";
+		
+		$this->jsFile(array(
+			'/js/jquery.js',
+			'/js/jquery-ui.js',
+			'/js/bootstrap.js',
+			'/js/common.js',
+		), self::HEAD);
 			
-			echo Html::jsFile('/js/bootstrap.js')."\n";
-			echo Html::jsFile('/js/common.js')."\n";
+		$this->cssFile(array(
+			'/css/springhare.css',
+			'/css/jquery-ui/jquery-ui.css',
+			'/css/main.css'
+		));
 
-			echo Html::cssFile("/css/bootstrap.css")."\n";
-			echo Html::cssFile("/css/springhare.css")."\n";
-			
 			$this->js('ga_script', "var _gaq = _gaq || [];
 			  _gaq.push(['_setAccount', 'UA-31049834-1']);
 			  _gaq.push(['_trackPageview']);

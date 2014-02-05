@@ -67,7 +67,7 @@ if($item->type == "text"){ ?>
 			<div class="form-group"><?php echo html::textarea('reply_comment_content', null, array('class' => 'reply_comment_content form-control')) ?></div>
 			<div class='reply_footer'>
 			<input type="button" class="btn btn-success btn_post_reply" value="Post" style='float:left;'/>
-			<input type="button" class="btn btn-white btn_cancel" value="Cancel" style='float:left; margin-left:25px;'/>
+			<input type="button" class="btn btn-default btn_cancel" value="Cancel" style='float:left; margin-left:25px;'/>
 			</div>
 		</div>
 		<div class="clear"></div>

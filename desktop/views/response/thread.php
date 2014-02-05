@@ -96,7 +96,7 @@ glue::controller()->js('thread', "
 				</div>
 				<div class='reply_footer clearfix'>
 					<button type="button" class="btn btn-success btn_post_reply">Post</button>
-					<button type="button" class="btn btn-white btn_cancel">Cancel</button>
+					<button type="button" class="btn btn-default btn_cancel">Cancel</button>
 				</div>
 			</div>
 			<div class='thread_video'>

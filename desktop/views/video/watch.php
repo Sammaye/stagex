@@ -245,8 +245,8 @@ $this->js('edit', "
 			<div class='alert'></div>
 			<input type="button" class="btn btn-primary save_video" value="Save Changes"/>
 			<div class="btn-group">
-			<button type="button" id="settings_tab" class="btn btn-white btn-tab">Settings</button>
-			<button type="button" id="details_tab" class="btn btn-white btn-tab">Details</button>
+			<button type="button" id="settings_tab" class="btn btn-default btn-tab">Settings</button>
+			<button type="button" id="details_tab" class="btn btn-default btn-tab">Details</button>
 			</div>
 			<button type="button" class='delete_video btn btn-danger'>Delete</button>
 			<a href='<?php echo glue::http()->url('/video/analytics', array('id' => $model->_id)) ?>' class='btn btn-link'>Analytics</a>
@@ -296,8 +296,8 @@ $this->js('edit', "
 					<label class='checkbox'><?php echo $form->checkbox($model, "allowTextComments", 1) ?><span>Allow text responses</span></label>
 				</div>
 				<div class='button_group'>
-					<div class='btn btn-white delete_all_responses' data-type='video'>Delete all video responses</div>
-					<div class='btn btn-white delete_all_responses' data-type='text'>Delete all text responses</div>
+					<div class='btn btn-default delete_all_responses' data-type='video'>Delete all video responses</div>
+					<div class='btn btn-default delete_all_responses' data-type='text'>Delete all text responses</div>
 				</div>
 				<div class="clear"></div>
 				</div>

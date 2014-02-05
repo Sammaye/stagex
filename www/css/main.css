@@ -1078,8 +1078,8 @@ input.date{
 	float:right;
 }
 
-.user_playlists_page .mass_edit_form .header .btn-white,
-.user_videos_body .mass_edit_form .header .btn-white{
+.user_playlists_page .mass_edit_form .header .btn-default,
+.user_videos_body .mass_edit_form .header .btn-default{
 	float:right; margin-right:15px;
 }
 

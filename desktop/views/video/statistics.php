@@ -39,7 +39,7 @@ $video_stats = $model->getStatisticsDateRange(mktime(0, 0, 0, date("m"), date("d
 			<label for="from">Date range:</label>
 			<input type="text" id="from" name="from" class="form-control col-5" value='<?php echo date("d/m/Y") ?>'/><span class="sep">-</span>
 			<input type="text" id="to" name="to" class="form-control col-5" value='<?php echo date('d/m/Y') ?>'/>
-			<input type="button" class="btn btn-white apply_range" value="Apply"/>
+			<input type="button" class="btn btn-default apply_range" value="Apply"/>
 		</div>
 		<div id="chartdiv" style='height:250px; width:780px; margin-left:5px;'>
 			<?php echo app\widgets\Highcharts::run(array(

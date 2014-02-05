@@ -45,7 +45,7 @@ $this->js('page', "
 	<div class='search_filter_bar clearfix'>
 
 	<div class="dropdown-group">
-	<button class='btn btn-white dropdown-anchor'>Type<?php
+	<button class='btn btn-default dropdown-anchor'>Type<?php
 		if($filter_type==='video'){
 			echo ': Video';
 		}elseif($filter_type==='playlist')
@@ -64,7 +64,7 @@ $this->js('page', "
 	</div>		
 
 	<div class="dropdown-group">
-	<button class='btn btn-white dropdown-anchor'>Time<?php
+	<button class='btn btn-default dropdown-anchor'>Time<?php
 		if($filter_time==='today'){
 			echo ': Today';
 		}elseif($filter_time==='week')
@@ -84,7 +84,7 @@ $this->js('page', "
 
 	<?php if($filter_type == 'video' || $filter_type == 'all'){ ?>
 	<div class="dropdown-group">
-	<button class='btn btn-white dropdown-anchor'>Category<?php
+	<button class='btn btn-default dropdown-anchor'>Category<?php
 	
 		$categories=app\models\Video::categories('selectBox');
 	
@@ -102,7 +102,7 @@ $this->js('page', "
 	</div>	
 	
 	<div class="dropdown-group">
-	<button class='btn btn-white dropdown-anchor'>Length<?php
+	<button class='btn btn-default dropdown-anchor'>Length<?php
 		if($filter_duration==='short'){
 			echo ': Short';
 		}elseif($filter_duration==='long')
@@ -118,7 +118,7 @@ $this->js('page', "
 	</div>		
 
 	<div class="dropdown-group">
-	<button class='btn btn-white dropdown-anchor'>Sort<?php
+	<button class='btn btn-default dropdown-anchor'>Sort<?php
 		if($orderby==='upload_date'){
 			echo ': Upload Date';
 		}elseif($orderby==='views')

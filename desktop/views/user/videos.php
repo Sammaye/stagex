@@ -164,7 +164,7 @@ $this->js('videos', "
 	   	<div class="header clearfix">
     		<h3>Edit Videos</h3>
     		<button type="button" class="btn btn-success save">Save</button>
-    		<button type="button" class="btn btn-white cancel">Cancel</button>
+    		<button type="button" class="btn btn-default cancel">Cancel</button>
     	</div>    	
     	
     	<div class='alert'></div>
@@ -279,10 +279,10 @@ $this->js('videos', "
 			<div class='stickytoolbar-bar'>
 				<div class='inner_bar'>
 					<div class='checkbox_button checkbox_input'><?php echo Html::checkbox('selectAll', 1, 0, array('class' => 'selectAll_input')) ?></div>
-					<button class='btn btn-white selected_actions edit_videos_button'>Edit</button>
+					<button class='btn btn-default selected_actions edit_videos_button'>Edit</button>
 					<button class='btn btn-danger selected_actions btn_delete'>Delete</button>
 					<div class="dropdown-group playlist-dropdown">
-						<button class='btn btn-white add_to_playlist dropdown-anchor'>Add To <span class="caret"></span></button>
+						<button class='btn btn-default add_to_playlist dropdown-anchor'>Add To <span class="caret"></span></button>
 						<div class="dropdown-menu">
 							<div class="playlists-panel">
 								<div class="head_ribbon">
