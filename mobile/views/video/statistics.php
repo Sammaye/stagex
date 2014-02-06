@@ -30,8 +30,7 @@ $video_stats = $model->getStatisticsDateRange(mktime(0, 0, 0, date("m"), date("d
 			<div class="stats_block"><?php echo $model->uniqueViews ?> unique views</div>
 			<div class="stats_block likes"><?php echo $model->likes ?> likes</div>
 			<div class="stats_block dislikes"><?php echo $model->dislikes ?> dislikes</div>
-			<div class="stats_block response first"><?php echo $model->totalTextReponses ?> text responses</div>
-			<div class="stats_block response"><?php echo $model->totalVideoResponses ?> video responses</div>
+			<div class="stats_block response first"><?php echo $model->totalTextResponses ?> text responses</div>
 			<div class="clear"></div>
 		</div>
 		<div class="clear"></div>
@@ -266,7 +265,6 @@ $video_stats = $model->getStatisticsDateRange(mktime(0, 0, 0, date("m"), date("d
 		</div>
 		<div class="clear"></div>
 		<div class="stats_period_caption">
-			<div class='stats_block'><span class="video_comments_count"><?php echo $video_stats['video_comments']?></span> Video Responses</div>
 			<div class='stats_block'><span class="text_comments_count"><?php echo $video_stats['text_comments']?></span> Text Responses</div>
 			<div class='stats_block likes' ><span class="likes_count"><?php echo $video_stats['video_likes']?></span> Likes</div>
 			<div class='stats_block dislikes'><span class="dislikes_count"><?php echo $video_stats['video_dislikes']?></span> Dislikes</div>

@@ -31,7 +31,6 @@ class Video extends Document
 	public $embeddable = 1;
 	public $moderated = 0;
 	public $voteableComments = 1;
-	public $allowVideoComments = 1;
 	public $allowTextComments = 1;
 	public $privateStatistics = 0;
 	public $mature = 0;
@@ -44,8 +43,7 @@ class Video extends Document
 	public $likes = 0;
 	public $dislikes = 0;
 	public $totalResponses = 0;
-	public $totalVideoResponses = 0;
-	public $totalTextReponses = 0;
+	public $totalTextResponses = 0;
 
 	public $md5;
 	public $jobId;
@@ -211,7 +209,7 @@ class Video extends Document
 			array('licence', 'in', 'range' => array(1, 2), 'message' => 'You must provide a licence type'),
 				
 			array('listing', 'in', 'range' => array(0, 1, 2), 'message' => 'You must select a valid listing of either public, unlisted or private'),
-			array('voteable, embeddable, privateStatistics, voteableComments, allowVideoComments, allowTextComments, mature, moderated', 'boolean', 'allowNull' => true),
+			array('voteable, embeddable, privateStatistics, voteableComments, allowTextComments, mature, moderated', 'boolean', 'allowNull' => true),
 			
 			array('stringTags', 'tokenized', 'max' => 10, 'message' => 'You can add upto 10 tags, no more')
 		);
@@ -650,7 +648,6 @@ class Video extends Document
 			)),
 			'browsers' => $browsers_highCharts_array,
 			'ages' => $this->formatHighChartsAgePie($sum_ages, $total_ages),
-			'video_comments' => $sum_video_comments,
 			'text_comments' => $sum_text_comments,
 			'video_likes' => $sum_video_likes,
 			'video_dislikes' => $sum_video_dislikes,
@@ -857,21 +854,12 @@ class Video extends Document
 		glue::db()->video_likes->remove(array('item' => array('$in' => $video_ids))); // Same reason as above		
 	}
 	
-	public function removeVideoResponses()
-	{
-		$count=\app\models\VideoResponse::findAll(array('videoId' => $this->_id, 'type' => 'video'))->count();
-		\app\models\VideoResponse::deleteAll(array('videoId' => $this->_id, 'type' => 'video'));
-		$this->totalResponses = $this->totalResponses-$count;
-		$this->totalVideoResponses = $this->totalVideoResponses-$count;
-		$this->save();		
-	}
-	
 	public function removeTextResponses()
 	{
 		$count = \app\models\VideoResponse::find(array('videoId' => $this->_id, 'type' => 'text'))->count();
 		\app\models\VideoResponse::deleteAll(array('videoId' => $this->_id, 'type' => 'text'));
 		$this->totalResponses = $this->totalResponses-$count;
-		$this->totalTextReponses = $this->totalTextReponses-$count;
+		$this->totalTextResponses = $this->totalTextResponses-$count;
 		$this->save();
 	}
 }

@@ -176,7 +176,6 @@ $this->js('autosharesettings', '
 				<label class='checkbox'><?php echo $form->checkbox($model, "defaultVideoSettings[embeddable]", 1) ?>Allow embedding of my video</label>
 				<label class='checkbox'><?php echo $form->checkbox($model, "defaultVideoSettings[moderated]", 1) ?>Moderate Responses</label>
 				<label class='checkbox'><?php echo $form->checkbox($model, "defaultVideoSettings[voteableComments]", 1) ?>Allow users to vote on responses</label>
-				<label class='checkbox'><?php echo $form->checkbox($model, "defaultVideoSettings[allowVideoComments]", 1) ?>Allow video responses</label>
 				<label class='checkbox'><?php echo $form->checkbox($model, "defaultVideoSettings[allowTextComments]", 1) ?>Allow text responses</label>
 				<label class='checkbox'><?php echo $form->checkbox($model, "defaultVideoSettings[voteable]", 1) ?>Allow users to vote on this video</label>
 				<label class='checkbox'><?php echo $form->checkbox($model, "defaultVideoSettings[privateStatistics]", 1) ?>Make my statistics private</label>

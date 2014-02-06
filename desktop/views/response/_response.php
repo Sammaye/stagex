@@ -7,8 +7,7 @@ if(!glue::auth()->check(array('viewable' => $item))){
 	$item->author->username = '[Deleted]';
 	$item->content = '[Deleted]';
 }
-
-if($item->type == "text"){ ?>
+?>
 <div class='response video_text_response_item <?php if($view == 'thread' && (count(preg_split('/,/', $item->path)) > 1)): echo " thread_comment"; endif; ?>'
 	data-id='<?php echo $item->_id ?>' style='margin-bottom:15px;'>
 
@@ -86,34 +85,3 @@ if($item->type == "text"){ ?>
 			</div>
 		<?php endif; ?>
 	</div>
-<?php }elseif($item->type == "video"){ ?>
-	<div class='video_response_item video_video_response_item' data-id='<?php echo $item->_id ?>'>
-		<?php if(glue::auth()->check(array('^' => $item->video)) && $mode == 'admin'){ ?>
-			<div class='comment_select'><?php echo html::checkbox('selected_comment', strval($item->_id), 0, array('class' => 'response_selector')) ?></div>
-		<?php } ?>
-		<div>
-			<?php if($item->reply_video && !(bool)$item->deleted){ ?>
-				<div class='vid_img'><a href='<?php echo glue::http()->url('/video/watch', array('id' => strval($item->reply_video->_id))) ?>'><img alt='thumbnail' src="<?php echo $item->reply_video->getImage(124, 69) ?>"/></a></div>
-				<div class='video_response_right'>
-					<div class='title'><a href='<?php echo glue::http()->url('/video/watch', array('id' => strval($item->reply_video->_id))) ?>'><?php echo $item->reply_video->title ?></a></div>
-					<a href='<?php echo glue::http()->url('/user/view', array('id' => strval($item->author->_id))) ?>'><?php echo "@".$item->author->getUsername() ?></a> <?php echo $item->ago($item->created) ?>
-					<?php if($item->approved && (glue::auth()->check(array('^' => $item)) || glue::auth()->check(array('^' => $item->video)))){ ?>
-						&nbsp;-&nbsp;<a href='#' class='delete_button'>Delete</a>
-					<?php } ?>
-					<?php if(!(bool)$item->approved){ ?>
-						<div class='warning_message'>Comment Awaiting Moderation</div>
-					<?php } ?>
-				</div>
-				<div class="clear"></div>
-				<?php if(!$item->approved && glue::auth()->check(array('^' => $item->video))){ ?>
-					<div class="moderate_response_actions">
-						<div class='grey_button_left delete_button'>Remove</div>
-						<div class='green_button_right approve_button'>Approve</div>
-					</div>
-				<?php } ?>
-			<?php }else{ ?>
-				<span class='small'><i>This response has been deleted</i></span>
-			<?php } ?>
-		</div>
-	</div>
-<?php } ?>

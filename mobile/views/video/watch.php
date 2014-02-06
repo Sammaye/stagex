@@ -290,11 +290,9 @@ $this->js('edit', "
 				<div class='col-md-4'>
 					<label class='checkbox'><?php echo $form->checkbox($model, "moderated", 1) ?><span>Moderate responses</span></label>
 					<label class='checkbox'><?php echo $form->checkbox($model, "voteableComments", 1) ?><span>Allow users to vote on responses</span></label>
-					<label class='checkbox'><?php echo $form->checkbox($model, "allowVideoComments", 1) ?><span>Allow video responses</span></label>
 					<label class='checkbox'><?php echo $form->checkbox($model, "allowTextComments", 1) ?><span>Allow text responses</span></label>
 				</div>
 				<div class='button_group col-md-3'>
-					<div class='btn btn-default delete_all_responses' data-type='video'>Delete all video responses</div>
 					<div class='btn btn-default delete_all_responses' data-type='text'>Delete all text responses</div>
 				</div>
 				<div class="clear"></div>

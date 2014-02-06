@@ -240,7 +240,7 @@ class VideoController extends Controller
 			$this->title = 'Video Not Found - StageX';
 			$this->render('deleted', array('video'=>$video));
 			glue::end();
-		}		
+		}
 
 		$video->recordHit();
 		if(glue::session()->authed){
@@ -312,13 +312,8 @@ class VideoController extends Controller
 			if(!glue::auth()->check(array('^' => $video))){
 				Json::error(Json::DENIED);
 			}
-			if($type='video'){
-				$video->removeVideoResponses();
-				Json::success('All video responses were deleted');
-			}elseif($type='text'){
-				$video->removeTextResponses();
-				Json::success('All text responses were deleted');
-			}
+			$video->removeTextResponses();
+			Json::success('All text responses were deleted');
 		}
 		Json::error('Video could not be found');
 	}

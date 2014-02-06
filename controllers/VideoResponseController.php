@@ -46,14 +46,6 @@ class VideoResponseController extends Controller
 		$this->layout='user_section';
 		
 		$query = array();
-		if($filter_type = glue::http()->param('filter-type')){
-			if($filter_type == 'text'){
-				$query['type']='text';
-			}
-			if($filter_type == 'video'){
-				$query['type']='video';
-			}
-		}
 		
 		if(($keywords = glue::http()->param('filter-keywords')) && strlen(trim($keywords)) > 0){
 			$keywords = preg_split('/\s/', trim($keywords));
@@ -106,14 +98,6 @@ class VideoResponseController extends Controller
 		$this->layout = 'user_section';
 		
 		$query = array();
-		if($filter_type = glue::http()->param('filter-type')){
-			if($filter_type == 'text'){
-				$query['type'] = 'text';
-			}
-			if($filter_type == 'video'){
-				$query['type'] = 'video';
-			}
-		}
 		
 		if(($keywords = glue::http()->param('filter-keywords')) && strlen(trim($keywords)) > 0){
 			$keywords = preg_split('/\s/', trim($keywords));
@@ -192,42 +176,33 @@ class VideoResponseController extends Controller
 			glue::trigger('404');
 		}
 		
-		extract(glue::http()->param(array('video_id', 'type', 'mode', 'reply_vid', 'parent_comment')), null);
+		extract(glue::http()->param(array('video_id', 'mode', 'reply_vid', 'parent_comment')), null);
 
 		$comment = new VideoResponse();
 		$video = Video::findOne(array('_id' => new MongoId($video_id)));
 		if(
-			!$video || !$type || !glue::auth()->check(array('viewable' => $video))
-			|| ($type != 'text' && $type != 'video')
+			!$video || !glue::auth()->check(array('viewable' => $video))
 		){
 			Json::error(Json::DENIED);
 		}
 		$comment->videoId = $video->_id;
 		$comment->video = $video;
-		$comment->type = $type;
 		
 		if(!glue::auth()->check(array('^' => $comment->video)) && $mode == 'admin'){
 			$mode = null;
 		}
-		if($type == 'text'){
-			if(!$video->allowTextComments){
-				Json::error('Text responses have been disabled on this video');
-			}
-			$comment->setScenario('text_comment');
-			if($parent_comment){ // Should be a truthy value
-				$comment->threadParentId = new MongoId($parent_comment);
-				if($comment->thread_parent instanceof app\models\VideoResponse && $comment->thread_parent->author instanceof app\models\User){
-					$comment->threadParentUsername = $comment->thread_parent->author->getUsername();
-				}
-			}
-			$comment->content = $_POST['content'];
-		}elseif($type == 'video'){
-			if(!$video->allowVideoComments){
-				Json::error('Video responses have been disabled on this video');
-			}
-			$comment->setScenario('video_comment');
-			$comment->replyVideoId = new MongoId($reply_vid);
+
+		if(!$video->allowTextComments){
+			Json::error('Text responses have been disabled on this video');
 		}
+		$comment->setScenario('text_comment');
+		if($parent_comment){ // Should be a truthy value
+			$comment->threadParentId = new MongoId($parent_comment);
+			if($comment->thread_parent instanceof app\models\VideoResponse && $comment->thread_parent->author instanceof app\models\User){
+				$comment->threadParentUsername = $comment->thread_parent->author->getUsername();
+			}
+		}
+		$comment->content = $_POST['content'];
 
 		if($comment->validate() && $comment->save()){
 			$comment_html=$this->renderPartial('response/_response', array('item' => $comment, 'mode' => $mode));
@@ -340,12 +315,9 @@ class VideoResponseController extends Controller
 		$comments = app\models\VideoResponse::findAll($condition)->limit(1000); 
 		$row_count = $comments->count();
 		
-		$text_count=app\models\VideoResponse::findAll(array_merge($condition, array('type' => 'text')))->limit(1000)->count();
-		$video_count=app\models\VideoResponse::findAll(array_merge($condition, array('type' => 'video')))->limit(1000)->count();
-		
 		app\models\VideoResponse::deleteAll($condition);
 		glue::db()->videoresponse_likes->remove(array("response_id" => array('$in' => $mongoIds)));
-		$video->saveCounters(array('totalResponses' => -$row_count,'totalTextResponses' => -$text_count,'totalVideoResponses' => -$video_count), 0);
+		$video->saveCounters(array('totalResponses' => -$row_count,'totalTextResponses' => -$row_count), 0);
 		
 		Json::success(array('message' => 'The comments you specified were deleted', 'total' => count($mongoIds), 'updated' => $row_count,
 			'failed' => count($mongoIds) - $row_count));

@@ -77,8 +77,16 @@ class User extends Document
 	 */
 	public $listing = 0;
 
-	public $defaultVideoSettings = array('listing' => 0, 'voteable' => true, 'embeddable' => true, 'moderated' => 0,
-			'voteableComments' => true, 'allowVideoComments' => true, 'allowTextComments' => true, 'privateStatistics' => false, 'licence' => 1);
+	public $defaultVideoSettings = array(
+		'listing' => 0,
+		'voteable' => true,
+		'embeddable' => true,
+		'moderated' => 0,
+		'voteableComments' => true,
+		'allowTextComments' => true,
+		'privateStatistics' => false,
+		'licence' => 1
+	);
 
 	public $emailVideoResponses = 0;
 	//public $emailVideoResponseReplies = 0;
@@ -220,7 +228,7 @@ class User extends Document
 		array('defaultVideoSettings', 'glue\\db\\Subdocument', 'type' => 'one', 'rules' => array(
 			array('listing', 'in', 'range' => array(0, 1, 2), 'message' => 'Please enter a valid value for listing'),
 			array('moderated', 'in', 'range' => array(0, 1), 'message' => 'Please enter a valid value for all comment options'),
-			array('voteable, embeddable, voteableComments, allowVideoComments, allowTextComments, privateStatistics', 'boolean', 'allowNull' => true),
+			array('voteable, embeddable, voteableComments, allowTextComments, privateStatistics', 'boolean', 'allowNull' => true),
 			array('licence', 'in', 'range' => array(1, 2), 'message' => 'Please enter a valid value for licence')
 		))
 		);

@@ -89,25 +89,6 @@ class VideoResponse extends Document
 		}
 	}
 
-	public function beforeValidate()
-	{
-		// Custom error handling which makes sure we are actually allowed to post comments to this video before we do.
-		if($this->getIsNewRecord()){
-			// 			if($this->getScenario() == 'video_comment'){
-			// 				if(!$this->video->allowVideoComments){
-			// 					$this->addError('Video responses are currently disabled for this video');
-			// 					return false;
-			// 				}
-			// 			}elseif($this->getScenario() == 'text_comment'){
-			// 				if(!$this->video->allowTextComments){
-			// 					$this->addError('Text responses are currently disabled for this video');
-			// 					return false;
-			// 				}
-			// 			}
-		}
-		return true;
-	}
-
 	public function rules()
 	{
 		return array(
@@ -161,25 +142,22 @@ class VideoResponse extends Document
 		if($this->getIsNewRecord()){
 			$this->userId = $this->userId?:glue::user()->_id;
 
-			if($this->video->moderated)
+			if($this->video->moderated){
 				$this->approved = !glue::auth()->check(array('^' => $this->video)) ? false : true;
-			else
+			}else{
 				$this->approved = true;
-			if($this->getScenario() == 'video_comment'){
-				$this->type = 'video';
-			}elseif($this->getScenario() == 'text_comment'){
-				$this->type = 'text';
 			}
-
+			$this->type = 'text';
 			$this->content = trim($this->content);
 
 			// Build a path. There are some bugs in my active record stopping this from working in a better way
 			$this->_id = new \MongoId(); // Set the id here since we don't actually have it yet, we'll send it down with the rest of the record
 				
-			if($this->thread_parent instanceof \app\models\VideoResponse)
+			if($this->thread_parent instanceof \app\models\VideoResponse){
 				$this->path = rtrim($this->thread_parent->path.','.strval($this->_id),',');
-			else
+			}else{
 				$this->path = rtrim(strval($this->_id),',');
+			}
 		}
 		return true;
 	}
@@ -187,14 +165,8 @@ class VideoResponse extends Document
 	public function afterSave()
 	{
 		if($this->getIsNewRecord()){
-			$counters=array('totalResponses'=>1);
-			if($this->getScenario() == 'video_comment')
-				$counters['totalVideoResponses']=1;
-			if($this->getScenario() == 'text_comment')
-				$counters['totalTextResponses']=1;
-			$this->video->saveCounters($counters);
-				
-			$this->video->recordStatistic($this->getScenario() == 'video_comment' ? 'video_comment' : 'text_comment');
+			$this->video->saveCounters(array('totalResponses' => 1, 'totalTextResponses' => 1));
+			$this->video->recordStatistic('text_comments');
 			
 			if($this->video->listing != 1 && $this->video->listing != 2){
 				\app\models\Stream::commentedOn($this->userId, $this->videoId, $this->_id);
@@ -228,7 +200,7 @@ class VideoResponse extends Document
 
 			if($this->threadParentId){
 
-				if(!glue::auth()->check(array('^' => $this->video)) && $this->thread_parent->author->email_vid_response_replies){
+				if(!glue::auth()->check(array('^' => $this->video)) && $this->thread_parent->author->emailVideoResponses){
 					glue::mailer()->mail($this->thread_parent->author->email, array('no-reply@stagex.co.uk', 'StageX'), 'Someone replied to one of you comments on StageX',
 					"videos/new_comment_reply.php", array( 'username' => $this->thread_parent->author->username,
 					'comment' => $this, 'from' => $this->author, 'video' => $this->video ));

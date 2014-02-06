@@ -292,11 +292,9 @@ $this->js('edit', "
 				<div class='left'>
 					<label class='checkbox'><?php echo $form->checkbox($model, "moderated", 1) ?><span>Moderate responses</span></label>
 					<label class='checkbox'><?php echo $form->checkbox($model, "voteableComments", 1) ?><span>Allow users to vote on responses</span></label>
-					<label class='checkbox'><?php echo $form->checkbox($model, "allowVideoComments", 1) ?><span>Allow video responses</span></label>
 					<label class='checkbox'><?php echo $form->checkbox($model, "allowTextComments", 1) ?><span>Allow text responses</span></label>
 				</div>
 				<div class='button_group'>
-					<div class='btn btn-default delete_all_responses' data-type='video'>Delete all video responses</div>
 					<div class='btn btn-default delete_all_responses' data-type='text'>Delete all text responses</div>
 				</div>
 				<div class="clear"></div>
@@ -442,10 +440,6 @@ $this->js('edit', "
 					<?php $textResponseCount = $model->getRelated('responses', array('type' => 'text'))->count() ?>
 					<?php echo $textResponseCount ?> text <?php if($textResponseCount > 1): echo "responses"; else: echo "response"; endif ?>
 					</div>
-					<div class="video_responses stats_block">
-					<?php $videoResponseCount = $model->getRelated('responses', array('type' => 'video', 'deleted' => 0))->count() ?>
-					<?php echo $videoResponseCount ?> video <?php if($videoResponseCount > 1): echo "responses"; else: echo "response"; endif ?>					
-					</div>
 				</div>
 				<div id="chartdiv" style="height:200px;width:800px; position:relative; margin-top:20px;"></div>
 				<?php
@@ -470,7 +464,7 @@ $this->js('edit', "
 
 		</div>		
 
-		<?php if($model->allowTextComments||$model->allowVideoComments): ?>
+		<?php if($model->allowTextComments): ?>
 		<div class="video_comments">
 			<div class="head"><?php echo $model->totalResponses ?> responses</div>
 			<a class='view_all' href="<?php echo glue::http()->url("/videoresponse/list", array("id"=>$model->_id)) ?>">View All Responses</a>

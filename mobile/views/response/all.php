@@ -183,9 +183,6 @@ $this->js('admin', "
 						<li role="presentation"><a role="menuitem" tabindex="-1" href="<?php echo glue::http()->url(array('sorton'=>'likes','orderby'=>1)) ?>">Disliked</a></li>
 						</ul>
 				</div>
-				<a class="btn btn-link btn_sort <?php echo glue::http()->param('filter-type')=='video'?'active':'' ?>" href="<?php echo glue::http()->url(array('filter-type'=>'video')) ?>">Video</a>
-				<a class="btn btn-link btn_sort <?php echo glue::http()->param('filter-type')=='text'?'active':'' ?>" href="<?php echo glue::http()->url(array('filter-type'=>'text')) ?>">Text</a>
-				<a class="btn btn-link btn_sort" href="<?php echo glue::http()->url(array('filter-type'=>'all')) ?>">All</a>
 				</div>
 				</div>
 				<div class="alert block-alert"></div>
