@@ -35,23 +35,17 @@
 		-->
 		
 		<div class='infocons'>
-	
 			<span class="length"><?php echo $item->getTimeString() ?></span>
-			<span class='listing'>
-				<?php if($item->isUnlisted()){ ?>
-					<img alt='Unlisted' src='/images/unlisted_icon.png'/>
-				<?php }elseif($item->isPrivate()){ ?>
-					<img alt='Private' src='/images/private_icon.png'/>
-				<?php } ?>
-			</span>	
-	
-			<span class='comments'>
-				<?php if(!$item->allowTextComments && !$item->allowVideoComments){ ?>
-					<img alt='Comments Allowed' src='/images/comments_disabled_icon.png'/>
-				<?php }elseif($item->moderated){ ?>
-					<img alt='Moderated' src='/images/moderated_icon.png'/>
-				<?php } ?>
-			</span>	
+			<?php if($item->isUnlisted()){ ?>
+			<span class="listing unlisted-setting-icon"></span>
+			<?php }elseif($item->isPrivate()){ ?>
+			<span class="listing private-setting-icon"></span>
+			<?php } ?>
+			<?php if(!$item->allowTextComments && !$item->allowVideoComments){ ?>
+			<span class="comments comments-disabled-setting-icon"></span>
+			<?php }elseif($item->moderated){ ?>
+			<span class="comments moderated-setting-icon"></span>
+			<?php } ?>
 		</div>		
 	<?php endif; ?>
 	<div class="clear"></div>

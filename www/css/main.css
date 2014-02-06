@@ -638,10 +638,10 @@ input.date{
 	float:left;
 }
 
-.social_logins_outer li span{
+.social_logins_outer li .caption{
 	float:left;
 	display:block;
-	margin:8px 0 0;
+	margin:6px 0 0 10px;
 	cursor:pointer;
 }
 
@@ -978,7 +978,7 @@ input.date{
 }
 
 .video .infocons .comments{
-	margin-right:25px;
+	margin-right:10px;
 }
 
 .watchedcon{
@@ -1581,7 +1581,7 @@ input.date{
 }
 
 .watch_page .video_body .details .right .infocons{
-	float:right;
+	float:left; margin-left:15px;
 }
 
 .watch_page .video_actions .actions_menu{
@@ -1974,11 +1974,10 @@ input.date{
 }
 
 .playlist_bar_outer{
-	position:fixed; bottom:0; width:100%; z-index:20000000;
 }
 
 .playlist_bar_outer .playlist_bar_head{
-	height:40px; background:#333333; color:#fff; line-height:17px;
+	background:#333333; color:#fff; line-height:17px;
 }
 
 .playlist_bar_outer .playlist_bar_head a{
@@ -1986,20 +1985,11 @@ input.date{
 }
 
 .playlist_bar_outer .playlist_bar_head .head_left{
-	margin:12px 0 10px 10px;
+	margin:16px 0 10px 10px;
 }
 
-.playlist_bar_outer .view_all_videos{
-	cursor:pointer;
-	margin:8px 10px 0 0; color:#fff;
-    background: none repeat scroll 0 0 #232323;
-    border: 1px solid #000000;
-    border-radius: 3px 3px 3px 3px;
-    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.8);
-    background: none repeat scroll 0 0 #232323;
-    box-shadow: 0 1px 0 rgba(101, 101, 101, 0.1) inset;
-    color: rgba(255, 255, 255, 0.8);
-	padding:5px; font-size:11px;
+.playlist_bar_outer .view_all_videos{;
+	margin:8px 10px 8px 0; float:right;
 }
 
 .playlist_bar_outer .playlist_content{
@@ -2055,7 +2045,7 @@ input.date{
 }
 
 .user_playlist_item .infocons .listing{
-	margin-top:0;
+	margin-top:5px;
 }
 
 .user_playlist_item{
@@ -2699,4 +2689,98 @@ input.date{
 
 .stream_item_user .username{
     margin:8px 0 0 10px;float:left;font-size:14px;
+}
+
+.facebook-social-icon{
+    background:url(/images/social_icons.png) 0 0 no-repeat;
+    width:32px;
+    height:32px;
+    float:left;
+    vertical-align:middle;
+}
+
+.twitter-social-icon{
+    background:url(/images/social_icons.png) -32px 0 no-repeat;
+    width:32px;
+    height:32px;
+    float:left;
+    vertical-align:middle;  
+}
+
+.google-social-icon{
+    background:url(/images/social_icons.png) -64px 0 no-repeat;
+    width:32px;
+    height:32px;
+    float:left;
+    vertical-align:middle;
+}
+
+.reddit-social-icon{
+    background:url(/images/social_icons.png) -128px 0 no-repeat;
+    width:32px;
+    height:32px;
+    float:left;
+    vertical-align:middle;
+}
+
+.tumblr-social-icon{
+    background:url(/images/social_icons.png) -160px 0 no-repeat;
+    width:32px;
+    height:32px;
+    float:left;
+    vertical-align:middle;
+}
+
+.private-setting-icon{
+    background:url(/images/settings_icons.png) 0 0 no-repeat;
+    width:14px;
+    height:18px;
+    display:block;
+    float:left;
+    vetical-align:middle;
+}
+
+.public-setting-icon{
+    background:url(/images/settings_icons.png) -15px 0 no-repeat;
+    width:15px;
+    height:18px;
+    display:block;
+    float:left;
+    vetical-align:middle;   
+}
+
+.unlisted-setting-icon{
+    background:url(/images/settings_icons.png) -31px 0 no-repeat;
+    width:18px;
+    height:18px;
+    display:block;
+    float:left;
+    vetical-align:middle;
+}
+
+.moderated-setting-icon{
+    background:url(/images/settings_icons.png) -50px 0 no-repeat;
+    width:21px;
+    height:18px;
+    display:block;
+    float:left;
+    vetical-align:middle;
+}
+
+.comments-disabled-setting-icon{
+    background:url(/images/settings_icons.png) -72px 0 no-repeat;
+    width:21px;
+    height:18px;
+    display:block;
+    float:left;
+    vetical-align:middle;
+}
+
+.likes-disabled-setting-icon{
+    background:url(/images/settings_icons.png) -94px 0 no-repeat;
+    width:21px;
+    height:18px;
+    display:block;
+    float:left;
+    vetical-align:middle;
 }

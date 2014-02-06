@@ -26,9 +26,9 @@
 	<div class='social_logins_outer'>
 		<ul>
 			<li class="first"><a href='<?php echo glue::facebook()->getLoginUrl(array( "scope"=>"email" )) ?>'>
-				<img src='/images/fb_large.png'/><span>Login with Facebook</span></a></li>
+				<span class="facebook-social-icon"></span><span class="caption">Login with Facebook</span></a></li>
 			<li style='margin-left:45px;'><a href='<?php echo glue::google()->getLoginURI(array('email', 'profile')) ?>'>
-				<img src='/images/google_large.png'/><span>Login with Google Accounts</span></a></li>
+				<span class="google-social-icon"></span><span class="caption">Login with Google Accounts</span></a></li>
 		</ul>
 		<div class='clearer'></div>
 	</div>

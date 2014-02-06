@@ -4,7 +4,7 @@ if (isset($_SERVER['HTTP_CF_CONNECTING_IP'])){
 }
 
 return array(
-	"debug"=>true,
+	"debug" => true,
 
 	'theme' => array(
 		'@views',

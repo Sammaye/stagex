@@ -18,13 +18,11 @@
 		<?php echo count($item->videos) ?> videos
 	</div>
 	<div class='infocons'>
-		<span class='listing'>
-			<?php if($item->listing == 1){ ?>
-				<img alt='unlisted' src='/images/unlisted_icon.png'/>
-			<?php }elseif($item->listing == 2){ ?>
-				<img alt='private' src='/images/private_icon.png'/>
-			<?php } ?>
-		</span>
+		<?php if($item->listing === 1){ ?>
+		<span class="listing unlisted-setting-icon"></span>
+		<?php }elseif($item->listing === 2){ ?>
+		<span class="listing private-setting-icon"></span>
+		<?php } ?>
 	</div>
 	<div class='clear'></div>
 </div>

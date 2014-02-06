@@ -345,20 +345,16 @@ $this->js('edit', "
 			<div class='right'>
 				<div class="views"><?php echo !$model->privateStatistics ? '<strong>'.$model->uniqueViews.'</strong> views' : '' ?></div>
 				<div class='infocons'>
-					<span class='listing'>
-						<?php if($model->isUnlisted()){ ?>
-							<img alt='Unlisted' src='/images/unlisted_icon.png'/>
-						<?php }elseif($model->isPrivate()){ ?>
-							<img alt='Private' src='/images/private_icon.png'/>
-						<?php } ?>
-					</span>	
-					<span class='comments'>
-						<?php if(!$model->allowTextComments && !$model->allowVideoComments){ ?>
-							<img alt='Comments Allowed' src='/images/comments_disabled_icon.png'/>
-						<?php }elseif($model->moderated){ ?>
-							<img alt='Moderated' src='/images/moderated_icon.png'/>
-						<?php } ?>
-					</span>	
+					<?php if($model->isUnlisted()){ ?>
+						<span class="listing unlisted-setting-icon"></span>
+					<?php }elseif($model->isPrivate()){ ?>
+						<span class="listing private-setting-icon"></span>
+					<?php } ?>
+					<?php if(!$model->allowTextComments && !$model->allowVideoComments){ ?>
+						<span class="comments comments-disabled-setting-icon"></span>
+					<?php }elseif($model->moderated){ ?>
+						<span class="comments moderated-setting-icon"></span>
+					<?php } ?>				
 				</div>					
 			</div>			
 			<div class="clear"></div>
@@ -396,10 +392,11 @@ $this->js('edit', "
 		<div class="share_other">
 			<p>Share Elsewhere</p>
 			<ul class="network_bc">
-				<li><a rel='new_window' href="http://www.facebook.com/sharer.php?u=<?php echo urlencode(glue::http()->url("/video/watch", array("id"=>$model->_id))) ?>"><img alt='fb' src="/images/fb_large.png"/></a></li>
-				<li><a rel='new_window' href="http://twitter.com/share?url=<?php echo urlencode(glue::http()->url("/video/watch", array("id"=>$model->_id))) ?>"><img alt='twt' src="/images/twt_large.png"/></a></li>
-				<li><a rel='new_window' href="http://www.plurk.com/?status=<?php echo urlencode(glue::http()->url("/video/watch", array("id"=>$model->_id))) ?>"><img alt='plurk' src="/images/plurk_large.png"/></a></li>
-				<li><g:plusone size="medium" annotation="inline" href="<?php echo glue::http()->url('/video/watch', array('id' => $model->_id)) ?>"></g:plusone></li>
+				<li><a rel='new_window' class="facebook-social-icon" href="http://www.facebook.com/sharer.php?u=<?php echo urlencode(glue::http()->url("/video/watch", array("id"=>$model->_id))) ?>"></a></li>
+				<li><a rel='new_window' class="twitter-social-icon" href="http://twitter.com/share?url=<?php echo urlencode(glue::http()->url("/video/watch", array("id"=>$model->_id))) ?>"></a></li>
+				<li><a rel='new_window' class="tumblr-social-icon" href="http://tumblr.com/share?s=&v=3&t=<?php echo urlencode($this->title) ?>&u=<?php echo urlencode(glue::http()->url("/video/watch", array("id"=>$model->_id))) ?>"></a></li>
+				<li><a rel='new_window' class="reddit-social-icon" href="http://reddit.com/submit?url=<?php echo urlencode(glue::http()->url("/video/watch", array("id"=>$model->_id))) ?>"></a></li>
+				<li><a rel='new_window' class="google-social-icon" href="https://plus.google.com/u/0/share?url=<?php echo urlencode(glue::http()->url("/video/watch", array("id"=>$model->_id))) ?>"></a></li>
 			</ul>		
 			<div class="clear"></div>
 			<input type="text" class="select_all_onfoc form-control" value="<?php echo glue::http()->url("/video/watch", array("id"=>$model->_id)) ?>" />
@@ -462,7 +459,22 @@ $this->js('edit', "
 		</div>
 		<?php endif; ?>
 
-		</div>		
+		</div>
+<?php if(glue::auth()->check(array('viewable' => $playlist))){ ?>
+<div class="playlist_bar_outer" data-id='<?php echo $playlist->_id ?>'>
+	<div class='playlist_bar_head clearfix'>
+		<div class='head_left' style='float:left;'>Playlist: <a href='<?php echo glue::http()->url('/playlist/view', array('id' => $playlist->_id)) ?>'><?php echo html::encode($playlist->title) ?></a> (<?php echo count($playlist->videos) ?> Videos)
+		- By <b><a href='<?php echo glue::http()->url('/user/view', array('id' => $playlist->userId)) ?>'><?php echo $playlist->author->getUsername(); ?></a></b></div>
+		<button class='view_all_videos btn btn-primary btn-sm'>View All Videos</button>
+	</div>
+	<div class='playlist_content'>
+		<button class='move_left'></button>
+		<button class='move_right'></button>
+		<div class='playlist_video_list'>
+			<div class='tray_content'>Loading</div></div>
+	</div>
+</div>
+<?php } ?>		
 
 		<?php if($model->allowTextComments): ?>
 		<div class="video_comments">
@@ -480,18 +492,3 @@ $this->js('edit', "
 <div id='video_response_options' style='width:200px;'></div>
 <div id='videoResponse_results' class=''></div>
 
-<?php if(glue::auth()->check(array('viewable' => $playlist))){ ?>
-<div class="playlist_bar_outer" data-id='<?php echo $playlist->_id ?>'>
-	<div class='playlist_bar_head'>
-		<div class='head_left' style='float:left;'>Playlist: <a href='<?php echo glue::http()->url('/playlist/view', array('id' => $playlist->_id)) ?>'><?php echo html::encode($playlist->title) ?></a> (<?php echo count($playlist->videos) ?> Videos)
-		- By <b><a href='<?php echo glue::http()->url('/user/view', array('id' => $playlist->userId)) ?>'><?php echo $playlist->author->getUsername(); ?></a></b></div>
-		<button class='view_all_videos' style='float:right;'>View All Videos</button>
-	</div>
-	<div class='playlist_content'>
-		<button class='move_left'></button>
-		<button class='move_right'></button>
-		<div class='playlist_video_list'>
-			<div class='tray_content'>Loading</div></div>
-	</div>
-</div>
-<?php } ?>

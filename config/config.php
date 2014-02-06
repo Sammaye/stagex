@@ -26,6 +26,7 @@ return array(
 		'defaultAllowedBandwidth' => 4294967296,
 		'uploadBase' => '/',
 		'maxFileSize' => 524288000,
+		'mobileUrl' => 'http://m.stagex-local.co.uk'
 	),
 
 	// load startup components. These components will be loaded at the start and always required before execution of any script.
@@ -366,7 +367,12 @@ return array(
 		/**
 		 * Hooks for before page load and after page load
 		 */
-		'beforeRequest' => function(){},
+		'beforeRequest' => function(){
+			$detect = new \glue\components\mobiledetect\Detect();
+			if($detect->isMobile() || $detect->isTablet() && isset(glue::$params['mobileUrl'])){
+				header('Location: '.glue::$params['mobileUrl']);
+			}
+		},
 		'afterRequest' => function(){
 			if(!glue::http()->isAjax()&&php_sapi_name() != 'cli'){
 				$size = memory_get_peak_usage(true);
