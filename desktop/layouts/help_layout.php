@@ -64,7 +64,7 @@ $this->beginPage() ?>
 							.data( 'item.autocomplete', item )
 							.append( '<a class=\'content\'><span>' + item.label + '</span></div></a>' )
 							.appendTo( ul );
-				"))  ?><button class="btn submit_search"><span>&nbsp;</span></button>
+				"))  ?><button class="btn submit_search"><span class="search-dark-icon">&nbsp;</span></button>
 			<?php $form->end() ?>
 			<div class="clear"></div>
 			<p class='ask'><a href='https://getsatisfaction.com/stagex'>Ask a Question on the Forums</a></p>

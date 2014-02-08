@@ -41,7 +41,7 @@ class Subdocument extends Validator
 			$c->setRules($this->rules);
 		}
 		
-		$valid=true;
+		$valid = true;
 
 		if(is_object($this->scenario) && ($this->scenario instanceof Closure)){
 			$c->setScenario($this->scenario($object));
@@ -73,9 +73,9 @@ class Subdocument extends Validator
 					
 					// Lets get the field value again to apply filters etc
 					if($this->preserveKeys){
-						$newFieldValue[$index] = $c->getRawDocument();
+						$newFieldValue[$index] = $c->getAttributes(null, true);
 					}else{
-						$newFieldValue[] = $c->getRawDocument();
+						$newFieldValue[] = $c->getAttributes(null, true);
 					}
 				}
 
@@ -89,7 +89,7 @@ class Subdocument extends Validator
 				}
 
 				// Strip the models etc from the field value
-				$object->$attribute = $fieldValue instanceof $c ? $row->getAttributes(null,true) : $fieldValue;
+				$object->$attribute = $newFieldValue;
 			}
 		}else{
 			$c->clean();
@@ -97,19 +97,15 @@ class Subdocument extends Validator
 			$c->setAttributes($fieldValue);
 			
 			if(!$c->validate()){
-				$valid=false;
-				if($this->message!==null){
-					$object->setError($attribute,$this->message);
-				}elseif(sizeof($c->getErrors())>0){
+				$valid = false;
+				if($this->message !== null){
+					$object->setError($attribute, $this->message);
+				}elseif(sizeof($c->getErrors()) > 0){
 					$object->setAttributeErrors($attribute, $c->getErrors());
 				}
 			}
-			
 			// Lets get the field value again to apply filters etc
-			$fieldValue = $c->getRawDocument();			
-
-			// Strip the models etc from the field value
-			$object->$attribute = $fieldValue instanceof $c ? $row->getAttributes(null,true) : $fieldValue;
+			$object->$attribute = $c->getAttributes(null, true);			
 		}
 		
 		if($valid){

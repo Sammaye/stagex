@@ -10,7 +10,7 @@ $this->JsFile("/js/jquery.expander.js");
 
 $this->js('page', "
 		
-	$.playlist_bar();
+	$.playlist_bar({url: '/playlist/renderMobileBar'});
 	var video_id = '". $model->_id ."';
 		
 	$('.expandable').expander();
@@ -460,8 +460,6 @@ $this->js('edit', "
 			</div>
 		</div>
 		<div class='playlist_content'>
-			<button class='move_left hidden-xs hidden-sm'></button>
-			<button class='move_right hidden-xs hidden-sm'></button>
 			<div class='playlist_video_list'>
 				<div class='tray_content'>Loading</div></div>
 		</div>

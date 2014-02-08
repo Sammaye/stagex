@@ -1,10 +1,15 @@
 (function( $ ){
 	var options = {
+		url: '/playlist/renderBar',
+		container: '.playlist_bar_outer'
 	},
 	methods = {
-		init : function( settings ) {
+		init: function( settings ){
+			
+			var opts = $.extend({}, options, settings);
+			
 			if($('.playlist_bar_outer').length > 0){ // If it is on the page
-				$.getJSON('/playlist/renderBar', { id: $('.playlist_bar_outer').data().id }, function(data){
+				$.getJSON(opts.url, {id: $('.playlist_bar_outer').data().id}, function(data){
 					$('.playlist_bar_outer .playlist_video_list .tray_content').html(data.html);
 				});
 			}

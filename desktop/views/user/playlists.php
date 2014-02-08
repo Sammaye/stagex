@@ -106,7 +106,7 @@ $this->js('new_playlist', "
 		<a class="btn btn-success btn-upload" data-toggle="modal" data-target="#myModal">Add New Playlist</a>
 	</div>	
 
-	<div class="header">
+	<div class="header clearfix">
     		<div class='search form-search'>
 			<?php $form = Html::form(array('method' => 'get')); ?>
 				<?php echo app\widgets\Autocomplete::run(array(
@@ -126,9 +126,32 @@ $this->js('new_playlist', "
 							.data( 'item.autocomplete', item )
 							.append( '<a class=\'content\'><span>' + item.label + '</span></div></a>' )
 							.appendTo( ul );
-				"))  ?><button class="btn submit_search"><span>&nbsp;</span></button>
-			<?php $form->end() ?>
-			</div>    	
+				"))  ?><button class="btn submit_search"><span class="search-dark-icon">&nbsp;</span></button>
+			<?php $form->end() ?><span class='text-muted small amount_found'><?php echo $playlist_rows->count() ?> found</span>
+			</div>
+			<div class="btn-group">
+				<button type="button" class="btn btn-link dropdown-toggle"
+					data-toggle="dropdown">
+					Sort<?php if(glue::http()->param('sorton') == 'created'){
+						if(glue::http()->param('orderby') == -1)
+							echo ': Newest';
+						elseif(glue::http()->param('orderby') == 1)
+							echo ": Oldest";
+					}elseif(glue::http()->param('sorton') == 'followers'){
+						echo ': Followers';
+					}elseif(glue::http()->param('sorton') == 'totalVideos'){
+						echo ': Videos';
+					} ?>
+					<span class="caret"></span>
+				</button>
+				<ul class="dropdown-menu" role="menu"
+					aria-labelledby="dropdownMenu1">
+					<li role="presentation"><a role="menuitem" tabindex="-1" href="<?php echo glue::http()->url(array('sorton'=>'created','orderby'=>-1)) ?>">Newest</a></li>
+					<li role="presentation"><a role="menuitem" tabindex="-1" href="<?php echo glue::http()->url(array('sorton'=>'created','orderby'=>1)) ?>">Oldest</a></li>
+					<li role="presentation"><a role="menuitem" tabindex="-1" href="<?php echo glue::http()->url(array('sorton'=>'followers','orderby'=>-1)) ?>">Followers</a></li>
+					<li role="presentation"><a role="menuitem" tabindex="-1" href="<?php echo glue::http()->url(array('sorton'=>'totalVideos','orderby'=>-1)) ?>">Videos</a></li>
+				</ul>
+			</div>
     </div>	
     
     <div class="mass_edit_form">
@@ -207,6 +230,7 @@ $this->js('new_playlist', "
 	<div class='playlist_list'>
 	<?php if($playlist_rows->count() > 0){
 		echo glue\widgets\ListView::run(array(
+			'sortableAttributes' => array('followers', 'totalVideos', 'created'),
 			'pageSize'	 => 20,
 			'page' 		 => glue::http()->param('page',1),
 			"cursor"	 => $playlist_rows,

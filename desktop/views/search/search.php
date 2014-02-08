@@ -20,11 +20,11 @@ $this->js('page', "
 ") ?>
 <div class='search_main_head'>
 <div class="grid-container">
-	<div style='padding:30px 0 30px 160px;'>
+	<div>
 	<div class="form-search-lg help_search_large">
 		<?php $form = html::form(array('action' => '/search', 'method' => 'get')); ?>
 		<?php echo $form->textField('query', glue::http()->param('query'), array('class' => 'form-search-input', 'placeholder' => 'Search StageX')) ?>			
-		<button type="submit" class="btn btn-primary btn-search-icon"><span>&nbsp;</span></button>
+		<button type="submit" class="btn btn-primary btn-search-icon"><span class="search-white-icon">&nbsp;</span></button>
 		<?php $form->end() ?>
 	</div>
 	<div class='text-muted'><?php echo $sphinx->totalFound ?> results found 

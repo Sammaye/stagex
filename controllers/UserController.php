@@ -570,7 +570,7 @@ var_dump($_GET);
 				unset($_POST['User']['action']);
 			}
 
-			$model->attributes=$_POST['User'];
+			$model->attributes = $_POST['User'];
 			if($model->save()){
 				if($model->getScenario()=='updateEmail'){
 					Html::setSuccessFlashMessage('An email has been sent asking for confirmation of your new address');

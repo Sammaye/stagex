@@ -45,7 +45,7 @@ $this->js('user.unsubscribe', "
     	<div class='search form-search form-search_subs'>
 		<?php $form = Html::form(array('method' => 'get')); ?>
 			<?php echo html::textfield('query',htmlspecialchars(glue::http()->param('query',null)),array('placeholder'=>'Search Subscribers', 'autocomplete'=>'off', 'class'=>'form-search-input col-38')) ?>
-			<button class="btn submit_search"><span>&nbsp;</span></button>
+			<button class="btn submit_search"><span class="search-dark-icon">&nbsp;</span></button>
 		<?php $form->end() ?>
 		</div>	
     </div>

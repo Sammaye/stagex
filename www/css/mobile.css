@@ -1697,7 +1697,7 @@ input.date{
 }
 
 .playlist_bar_outer .playlist_content{
-    border-top:1px solid #181818; background:#000; height:69px; padding:10px 0; display:none; overflow:hidden;
+    border-top:1px solid #181818; background:#000; height:80px; padding:10px 0; display:none; overflow:hidden;
 }
 
 .playlist_bar_outer .playlist_video_list{

@@ -21,7 +21,7 @@ class Menu extends Widget
   <form class="menubar-form" action="<?php echo glue::http()->url('/search') ?>">
 	<div class="form-search">
 		<input type="text" name="query" class="form-search-input"/>
-		<button type="submit" class="btn btn-primary"><span>&nbsp;</span></button>
+		<button type="submit" class="btn btn-primary"><span class="search-white-icon">&nbsp;</span></button>
 	</div>
   </form>
   <div class="menubar-nav">

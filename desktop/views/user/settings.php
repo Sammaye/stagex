@@ -159,7 +159,7 @@ $this->js('autosharesettings', '
 		any videos previously uploaded, only future uploads.</p>
 		<div class="upload_settings row">
 			<div class="left col-md-3">
-				<h5>Listing</h5>
+				<h5 class="listing">Listing</h5>
 				<?php $group = $form->radio_group($model, "defaultVideoSettings[listing]") ?>
 				<label class="radio"><?php echo $group->add(0) ?>Public</label>
 				<label class="radio"><?php echo $group->add(1) ?>Unlisted</label>

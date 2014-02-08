@@ -23,7 +23,7 @@ class PlaylistController extends Controller
 							'clear', 'subscribe', 'unsubscribe'),
 						"users"=>array("@*")
 					),
-					array('allow', 'actions' => array('index', 'view', 'renderBar')),
+					array('allow', 'actions' => array('index', 'view', 'renderBar', 'renderMobileBar')),
 					array("deny", "users"=>array("*")),
 				)
 			)
@@ -384,7 +384,7 @@ class PlaylistController extends Controller
 		Json::success(array('results' => $ret));
 	}	
 
-	public function action_renderBar()
+	public function action_renderBar($smallImages = false)
 	{
 		if(!glue::http()->isAjax()){
 			glue::trigger('404');
@@ -431,7 +431,7 @@ class PlaylistController extends Controller
 					<li class='playlist_video_item'>
 						<?php if(glue::auth()->check(array('viewable' => $video))){ ?>
 						<span class='vieo_image'><a href='<?php echo glue::http()->url('/video/watch', array('id' => $video->_id, 'playlist_id' => $playlist->_id)) ?>'>
-						<img src='<?php echo $video->getImage(88, 49) ?>' alt='thumbnail'/></a></span>
+						<img src='<?php echo $smallImages ? $video->getImage(88, 49) : $video->getImage(124, 69) ?>' alt='thumbnail'/></a></span>
 						<span class='info_pane'>
 							<a href='<?php echo glue::http()->url('/video/watch', array('id' => $video->_id, 'playlist_id' => $playlist->_id)) ?>'>
 								<?php echo strlen($video->title) > 100 ? html::encode(substr_replace(substr($video->title, 0, 50), '...', -3)) : html::encode($video->title) ?></a>
@@ -454,5 +454,10 @@ class PlaylistController extends Controller
 			ob_end_clean();
 			Json::error(array('html'=>$html));
 		}
+	}
+	
+	public function action_renderMobileBar()
+	{
+		$this->action_renderBar(true);
 	}
 }

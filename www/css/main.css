@@ -61,18 +61,8 @@ input.date{
 }
 
 .form-search button span{
-	background:url(/images/search_icon_small_white.png) no-repeat 2px 2px;
-	width:20px;
-	display:block;	
-}
-
-.form-search .submit_search span{
-	background:url(/images/search_icon_small.png) no-repeat 1px 3px;
-	/*
-	margin:0 0 0 3px;
-	width:20px;
-	display:block;
-	*/
+	margin:3px 5px 0 5px;
+	height:17px;
 }
 
 .form-search .submit_search{
@@ -119,10 +109,7 @@ input.date{
 }
 
 .hero-search .submit_search span{
-	background:url(/images/search_icon_small.png) no-repeat 0 0;
-	margin:0 0 0 3px;
-	width:20px;
-	display:block;
+	margin:0 5px;
 }
 
 .hero-search .submit_search{
@@ -148,14 +135,11 @@ input.date{
 }
 
 .btn-search-icon span{
-	background:url(/images/search_icon_small_white.png) no-repeat 0 0;
-	margin:0 0 0 3px;
-	width:20px;
+	margin:5px 0 5px 3px;
 	display:block;	
 }
 
 .form-search-lg .btn-search-icon span{
-	background:url(/images/search_icon_small_white.png) no-repeat 2px 4px;
 	width:20px;
 	display:block;	
 }
@@ -704,6 +688,10 @@ input.date{
 	float:left;
 }
 
+.account_settings_body .upload_settings h5.listing{
+	margin-top:0;
+}
+
 .account_settings_body .upload_settings .right{
 	margin-left:320px;	
 }
@@ -1035,6 +1023,7 @@ input.date{
 	width:300px;
 }
 
+.user_playlists_page .header,
 .user_videos_body .header{
 	margin:10px 0 10px 0;
 }
@@ -1047,6 +1036,7 @@ input.date{
 	float:right;
 }
 
+.user_playlists_page .header .amount_found,
 .user_videos_body .header .amount_found{
 	float:left; display:block; margin:10px 15px 0 15px;
 }
@@ -1056,6 +1046,11 @@ input.date{
 
 .mass_edit_form .alert{
 	margin:0 0 10px 0;
+}
+
+.user_playlists_page .header .form-search,
+.user_videos_body .header .form-search{
+	float:left; width:80%;
 }
 
 .user_playlists_page .mass_edit_form,
@@ -2089,7 +2084,6 @@ input.date{
 }
 
 .user_playlists_page .form-search{
-	margin:10px 0 10px 0;
 }
 
 .create_playlist_modal{
@@ -2783,4 +2777,28 @@ input.date{
     display:block;
     float:left;
     vetical-align:middle;
+}
+
+.search-dark-icon{
+	float:left;
+	height:14px;
+	width:14px;
+	vertical-align:middle;
+	background:url(/images/search_icon_small.png) 0 0 no-repeat;
+}
+
+.search-white-icon{
+    float:left;
+    height:14px;
+    width:14px;
+    vertical-align:middle;
+    background:url(/images/search_icon_small.png) -15px 0 no-repeat;	
+}
+
+.search_main_head > .grid-container > div{
+	padding:30px 0 30px 160px;
+}
+
+.btn-group.open .dropdown-toggle{
+	box-shadow:none;
 }

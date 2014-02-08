@@ -24,7 +24,7 @@
 						.append( '<a class=\'content\'>' + item.label + '</a>' )
 						.appendTo( ul );
 			")) ?>			
-			<button type="submit" class="btn btn-primary btn-search-icon"><span>&nbsp;</span></button>
+			<button type="submit" class="btn btn-primary btn-search-icon"><span class="search-white-icon">&nbsp;</span></button>
 			<?php $form->end() ?>
 		</div>				
 		</div>		

@@ -3,7 +3,7 @@
 	<?php $form = html::form(array('method' => 'get')); ?>
 		<?php echo html::hiddenfield('id',$user->_id) ?>
 		<?php echo html::textfield('query',htmlspecialchars(glue::http()->param('query',null)),array('placeholder'=>'Search Playlists', 'autocomplete'=>'off', 'class'=>'form-search-input col-40')) ?>
-		<button class="btn submit_search"><span>&nbsp;</span></button>
+		<button class="btn submit_search"><span class="search-dark-icon">&nbsp;</span></button>
 	<?php $form->end() ?>
 	</div>	
 	<div class='playlists_list'>

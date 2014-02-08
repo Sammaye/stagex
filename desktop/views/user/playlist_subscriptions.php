@@ -67,7 +67,7 @@ $this->js('page', "
 <div class='search form-search'>
 	<?php $form = html::form(array('method' => 'get')); ?>
 		<?php echo $form->textField('query', glue::http()->param('query'), array('placeholder' => 'Search playlists', 'class' => 'form-search-input col-38')) ?>
-		<button class="btn submit_search"><span>&nbsp;</span></button>
+		<button class="btn submit_search"><span class="search-dark-icon">&nbsp;</span></button>
 	<?php $form->end() ?>
 </div>    	
 </div>	

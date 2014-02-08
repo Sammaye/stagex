@@ -14,7 +14,7 @@
 						.data( 'item.autocomplete', item )
 						.append( '<a class=\'content\'>' + item.label + '</a>' )
 						.appendTo( ul );
-			")) ?></div><button class="submit_search"><span>&nbsp;</span></button>
+			")) ?></div><button class="submit_search"><span class="search-dark-icon">&nbsp;</span></button>
 		<?php $form->end() ?>
 	</div> 	
 	<div class='clear'></div>
