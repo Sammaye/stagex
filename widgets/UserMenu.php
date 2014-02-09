@@ -27,11 +27,11 @@ class UserMenu extends Widget
 				<span class="badge"><?php echo glue::user()->totalPlaylists ?></span></a>
 			</li>
 			<li>
-				<a href='<?php echo glue::http()->url('/user/following') ?>' <?php echo $this->tab == "subscriptions" ? "class='selected'" : "" ?>>Following
+				<a href='<?php echo glue::http()->url('/user/subscriptions') ?>' <?php echo $this->tab == "subscriptions" ? "class='selected'" : "" ?>>Subscriptons
 				<span class="badge"><?php echo glue::user()->totalFollowing ?></span></a>
 			</li>
 			<li>
-				<a href="<?php echo glue::http()->url('/user/followers') ?>" <?php echo $this->tab == "subscribers" ? "class='selected'" : "" ?>>Followers
+				<a href="<?php echo glue::http()->url('/user/subscribers') ?>" <?php echo $this->tab == "subscribers" ? "class='selected'" : "" ?>>Subscribers
 				<span class="badge"><?php echo glue::user()->totalFollowers ?></span></a>
 			</li>			
 			<li>

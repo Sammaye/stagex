@@ -9,6 +9,7 @@ $this->beginPage() ?>
 <title><?php echo Html::encode($this->title) ?></title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
 <link rel="shortcut icon" href="/images/favicon.ico" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
 <link href="/css/bootstrap.min.css" rel="stylesheet">
 <link type="text/css" rel="stylesheet" href="/css/jquery-ui/jquery-ui.css" />
 <link type="text/css" rel="stylesheet" href="/css/mmenu.css" />

@@ -396,7 +396,7 @@ var_dump($_GET);
 		echo $this->render('user/watch_later', array('model' => $watch_later));
 	}
 
-	public function action_following()
+	public function action_subscriptions()
 	{
 		$this->title = 'Your Subscriptions - StageX';
 		$this->layout = 'user_section';
@@ -405,7 +405,7 @@ var_dump($_GET);
 		echo $this->render('user/subscriptions', array('model' => $this->loadModel()));
 	}
 	
-	public function action_followers()
+	public function action_subscribers()
 	{
 		$this->title = 'Your subscribers - StageX';
 		$this->layout = 'user_section';
