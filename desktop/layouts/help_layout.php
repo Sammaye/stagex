@@ -47,6 +47,7 @@ $this->beginPage() ?>
 			
     		<div class='search form-search'>
 			<?php $form = Html::form(array('method' => 'get', 'action'=>glue::http()->url('/help/search'))); ?>
+				<label class="sr-only" for="query">Help Search</label>
 				<?php echo app\widgets\Autocomplete::run(array(
 					'attribute' => 'query',
 					'value' => urldecode(htmlspecialchars(isset($_GET['query']) ? $_GET['query'] : '')),
@@ -55,9 +56,20 @@ $this->beginPage() ?>
 						'class' => 'form-search-input'
 					),
 					'options' => array(
-						'appendTo' => '#help_search_results',
-						'source' => '/help/suggestions',
-						'minLength' => 2,
+					'appendTo' => '#help_search_results',
+					'source' => "js:function(request, response){
+					$.get('/help/suggestions', {term: request.term}, null, 'json')
+					.done(function(data){
+						ret = [];
+						if(data.success){
+							$.each(data.results, function(k, v){
+								ret[ret.length] = {label: v.title};
+							});
+						}
+						response(ret);
+					});
+					}",
+					'minLength' => 2,
 					),
 					'renderItem' => "
 						return $( '<li></li>' )
@@ -82,7 +94,7 @@ $this->beginPage() ?>
 			        <li><a href='https://getsatisfaction.com/stagex'>Ask A Question</a></li>
 				</ul>
 			</div>
-			<div class='body'><?php echo $content ?></div>
+			<div class='body' id="content"><?php echo $content ?></div>
 	    	<div class='clear'></div>
 	    </div>	
 	    </div>

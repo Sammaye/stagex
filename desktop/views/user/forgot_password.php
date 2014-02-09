@@ -11,8 +11,8 @@
 
 			<?php echo $form->hiddenField($model, "hash", array('value'=>glue::http()->getCsrfToken())) ?>
 			<div class="form-group email_address">
-				<?php echo html::label("Email Address:", "email") ?>
-				<?php echo $form->textField($model, "email",array('class'=>'form-control')) ?>
+				<?php echo $form->label($model, 'email', "Email Address:") ?>
+				<?php echo $form->textField($model, "email", 'form-control') ?>
 			</div>
 
 			<div class="password-Captcha">

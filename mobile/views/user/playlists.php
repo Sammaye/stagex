@@ -101,6 +101,7 @@ $this->js('new_playlist', "
 	<div class="header">
     		<div class='search form-search'>
 			<div class="form-group"><?php $form = Html::form(array('method' => 'get')); ?>
+			<label class="sr-only" for="query">Search Query:</label>
 				<?php echo $form->textField('query', glue::http()->param('query'), array('placeholder' => 'Search your playlists', 'class' => 'form-control')) ?>
 			</div><button class="btn btn-default submit_search">Search</button>
 			<div class="btn-group">
@@ -173,8 +174,8 @@ $this->js('new_playlist', "
       <div class="modal-body create_playlist_form row clearfix">
 		<div class="alert"></div>
 		<div class="col-md-6">
-			<div class="form-group"><?php echo html::label('Title', 'title') ?><?php echo html::activeTextField($model, 'title', 'form-control') ?></div>
-			<div class="form-group"><?php echo html::label('Description', 'description')?><?php echo html::activeTextarea($model, 'description', 'form-control') ?></div>			
+			<div class="form-group"><?php echo $form->label($model, 'title', 'Title') ?><?php echo html::activeTextField($model, 'title', 'form-control') ?></div>
+			<div class="form-group"><?php echo $form->label($model, 'description', 'Description') ?><?php echo html::activeTextarea($model, 'description', 'form-control') ?></div>			
 		</div>
 		<div class='col-md-6'>
 			<h4>Listing</h4>

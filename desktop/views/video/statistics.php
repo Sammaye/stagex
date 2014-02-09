@@ -35,8 +35,10 @@ $video_stats = $model->getStatisticsDateRange(mktime(0, 0, 0, date("m"), date("d
 		</div>
 		<div class="clear"></div>
 		<div class='stats_filter_bar'>
-			<label for="from">Date range:</label>
+			<label for="date">Date range:</label>
+			<label class="sr-only" for="from">From Date</label>
 			<input type="text" id="from" name="from" class="form-control col-5" value='<?php echo date("d/m/Y") ?>'/><span class="sep">-</span>
+			<label class="sr-only" for="to">To Date</label>
 			<input type="text" id="to" name="to" class="form-control col-5" value='<?php echo date('d/m/Y') ?>'/>
 			<input type="button" class="btn btn-default apply_range" value="Apply"/>
 		</div>

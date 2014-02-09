@@ -86,8 +86,11 @@ $this->js('watched_page', "
 	<div class="advanced_filter_header">
     	<div class='search clearfix row'>
 		<?php $form = Html::form(array('method' => 'get', 'class' => '')); ?>
+		<label class="sr-only" for="query">Search Query</label>
 			<div class="col-md-6 form-inline-col"><?php echo html::textfield('query',htmlspecialchars(glue::http()->param('query',null)),array('placeholder'=>'Enter keywords to search by', 'autocomplete'=>'off', 'class'=>'search form-control')) ?></div>
-			<div class="col-md-3 form-inline-col"><input type="text" id="from" class="date form-control" name="from_date" placeholder="Enter start date" value="<?php echo htmlspecialchars(glue::http()->param('from_date',null)) ?>"/> <span class="sep">-</span> 
+			<label class="sr-only" for="from_date">From Date</label>
+			<div class="col-md-3 form-inline-col"><input type="text" id="from" class="date form-control" name="from_date" placeholder="Enter start date" value="<?php echo htmlspecialchars(glue::http()->param('from_date',null)) ?>"/> <span class="sep">-</span>
+			<label class="sr-only" for="to_date">To Date</label> 
 			<input type="text" id="to" class="date form-control" name="to_date" placeholder="Enter end date" value="<?php echo htmlspecialchars(glue::http()->param('to_date',null)) ?>"/></div>
 			<div class="col-md-2 form-inline-col"><button class="btn btn-default">Search</button></div>
 			<?php $form->end() ?>

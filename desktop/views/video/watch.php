@@ -214,7 +214,7 @@ $this->js('edit', "
 	});
 "); ?>
 
-<div class="watch_page">
+<div class="watch_page" id="content">
 
 	<?php if(!glue::auth()->check(array('^'=>$model))){ ?>
 <div class="author_top_bar">
@@ -256,12 +256,13 @@ $this->js('edit', "
 			<?php $form = html::activeForm(array('action' => '')) ?>
 				<div class='edit_settings pane' id="settings_content">
 				<div class="left">
-					<div class="form-group"><?php echo html::label('Title', 'title') ?><?php echo html::activeTextField($model, 'title',array('class'=>'form-control')) ?></div>
-					<div class="form-group"><?php echo html::label('Description', 'description')?><?php echo html::activeTextarea($model, 'description',array('class'=>'form-control')) ?></div>
-					<div class="form-group"><?php echo html::label('Tags', 'stringTags') ?><?php echo html::activeTextField($model, 'stringTags',array('class'=>'form-control')) ?></div>			
+					<div class="form-group"><?php echo $form->label($model, 'title', 'Title') ?><?php echo html::activeTextField($model, 'title',array('class'=>'form-control')) ?></div>
+					<div class="form-group"><?php echo $form->label($model, 'description', 'Description')?><?php echo html::activeTextarea($model, 'description',array('class'=>'form-control')) ?></div>
+					<div class="form-group"><?php echo $form->label($model, 'stringTags', 'Tags') ?><?php echo html::activeTextField($model, 'stringTags',array('class'=>'form-control')) ?></div>			
 				</div>
 				<div class='right'>
-					<h4>Category</h4><?php echo html::activeSelectbox($model, 'category', $model->categories('selectBox'),array('class'=>'form-control')) ?>
+					<h4>Category</h4><?php echo $form->label($model, 'category', 'Category:', 'sr-only') . 
+					html::activeSelectbox($model, 'category', $model->categories('selectBox'),array('class'=>'form-control')) ?>
 					<h4 class="adult">Adult Content</h4>
 					<label class="checkbox"><?php echo $form->checkbox($model, 'mature', 1) ?>This video is not suitable for family viewing</label>
 					<h4>Listing</h4>
@@ -453,7 +454,8 @@ $this->js('edit', "
 		<div class="playlists_content playlists_pane video_actions_pane">
 			<div class='search'>
 				<a href="#" class="playlist_item watch_later" data-id="<?php echo glue::user()->watchLaterPlaylist()->_id ?>">Add to Watch Later</a>
-				<input id="search_playlists" type="text" class="form-control" placeholder="Enter a search term for playlists"/>
+				<label class="sr-only" for="search_playlists">Search Query</label>
+				<input id="search_playlists" name="search_playlists" type="text" class="form-control" placeholder="Enter a search term for playlists"/>
 			</div>
 			<div class="results"><div class="no_results_found">Search for a playlist</div></div>
 		</div>

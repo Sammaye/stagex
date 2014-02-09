@@ -123,7 +123,7 @@ $this->beginPage() ?>
 						</div>							
 					</div>
 				</div>		
-				<div class="user_profile_tabs">
+				<div class="user_profile_tabs" id="content">
 					<ul class="nav nav-tabs">
 					<li class="<?php echo $page=='stream'?'active':'' ?>"><?php echo html::a(array('href'=>array('/user/view','id'=>$user->_id),'text'=>'Stream')) ?></li>
 					<li class="<?php echo $page=='videos'?'active':'' ?>"><a href="<?php echo glue::http()->url('/user/viewVideos',array('id'=>$user->_id)) ?>">Videos <span class="badge"><?php echo $user->totalUploads ?></span></a></li>

@@ -10,6 +10,7 @@ class Menu extends Widget
 {
 	public function render()
 	{ ?>
+	<a href="#content" class="sr-only">Skip to main content</a>
 <div class="menubar">
   <!-- Brand and toggle get grouped for better mobile display -->
   <div class="grid-container">
@@ -19,7 +20,8 @@ class Menu extends Widget
 	<?php if(glue::http()->path()!=='search'){ ?>
   <form class="menubar-form" action="<?php echo glue::http()->url('/search') ?>">
 	<div class="form-search">
-		<input aria-label="Site Search" type="text" name="query" class="form-search-input"/>
+	<label class="sr-only" for="query">Site Search</label>
+		<input type="text" name="query" class="form-search-input"/>
 		<button type="submit" class="btn btn-primary"><span class="search-white-icon">&nbsp;</span></button>
 	</div>
   </form>

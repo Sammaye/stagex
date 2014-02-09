@@ -37,7 +37,9 @@ $this->beginPage() ?>
 			
     		<div class='search col-md-3 row'>
 			<?php $form = Html::form(array('method' => 'get', 'action'=>glue::http()->url('/help/search'))); ?>
-				<div class="col-md-10 form-group"><?php echo app\widgets\Autocomplete::run(array(
+				<div class="col-md-10 form-group">
+				<label class="sr-only" for="query">Help Search</label>
+				<?php echo app\widgets\Autocomplete::run(array(
 					'attribute' => 'query',
 					'value' => urldecode(htmlspecialchars(isset($_GET['query']) ? $_GET['query'] : '')),
 					'placeholder' => 'Search Help',
@@ -81,7 +83,7 @@ $this->beginPage() ?>
 			        <li><a href='https://getsatisfaction.com/stagex'>Ask A Question</a></li>
 				</ul>
 			</div>
-			<div class='body col-md-9 col-sm-9'><?php echo $content ?></div>
+			<div class='body col-md-9 col-sm-9' id="content"><?php echo $content ?></div>
 	    	<div class='clear'></div>
 	    </div>	
 	    </div>		

@@ -2,12 +2,24 @@
 	<h1 class="hero">Support</h1>
     <div class='search hero-search'>
 		<?php $form = html::form(array('action' => '/help/search', 'method' => 'get')); ?><div class="search_input">
+		<label class="sr-only" for="query">Help Search</label>
 			<?php echo app\widgets\Autocomplete::run(array(
 				'attribute' => 'query',
 				'options' => array(
 					'appendTo' => '#help_search_results',
-					'source' => '/help/suggestions',
-					'minLength' => 2,
+					'source' => "js:function(request, response){
+					$.get('/help/suggestions', {term: request.term}, null, 'json')
+					.done(function(data){
+						ret = [];
+						if(data.success){
+							$.each(data.results, function(k, v){
+								ret[ret.length] = {label: v.title};
+							});
+						}
+						response(ret);
+					});
+					}",
+					'minLength' => 2,						
 				), 'placeholder' => 'Type in your question and search',
 				'renderItem' => "
 					return $( '<li></li>' )

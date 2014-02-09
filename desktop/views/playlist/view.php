@@ -129,7 +129,7 @@ $this->js('edit', "
 	});		
 ");
 ?>
-<div class='edit_playlist_body'>
+<div class='edit_playlist_body' id="content">
 <?php if(glue::auth()->check(array('^'=>$model))){ ?>
 <div class="top_grey_bar">
 	<div class='edit_ribbon_menu grid-container'>
@@ -147,8 +147,8 @@ $this->js('edit', "
 			<?php $form = html::activeForm(array('action' => '')) ?>
 				<div class='edit_settings pane' id="settings_content">
 				<div class="left">
-					<div class="form-group"><?php echo html::label('Title', 'title') ?><?php echo html::activeTextField($model, 'title',array('class'=>'form-control')) ?></div>
-					<div class="form-group"><?php echo html::label('Description', 'description')?><?php echo html::activeTextarea($model, 'description',array('class'=>'form-control')) ?></div>			
+					<div class="form-group"><?php echo $form->label($model, 'title', 'Title') ?><?php echo html::activeTextField($model, 'title',array('class'=>'form-control')) ?></div>
+					<div class="form-group"><?php echo $form->label($model, 'description', 'Description') ?><?php echo html::activeTextarea($model, 'description',array('class'=>'form-control')) ?></div>			
 				</div>
 				<div class='right'>
 					<h4>Listing</h4>

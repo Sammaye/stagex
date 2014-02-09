@@ -213,7 +213,7 @@ $this->js('edit', "
 		});
 	});
 "); ?>
-<div class="watch_page">
+<div class="watch_page" id="content">
 	<?php if(!glue::auth()->check(array('^'=>$model))){ ?>
 <div class="author_top_bar">
 <div class="container">
@@ -255,12 +255,13 @@ $this->js('edit', "
 			<?php $form = html::activeForm(array('action' => '')) ?>
 				<div class='edit_settings pane clearfix' id="settings_content">
 				<div class="col-md-8">
-					<div class="form-group"><?php echo html::label('Title', 'title') ?><?php echo html::activeTextField($model, 'title',array('class'=>'form-control')) ?></div>
-					<div class="form-group"><?php echo html::label('Description', 'description')?><?php echo html::activeTextarea($model, 'description',array('class'=>'form-control')) ?></div>
-					<div class="form-group"><?php echo html::label('Tags', 'stringTags') ?><?php echo html::activeTextField($model, 'stringTags',array('class'=>'form-control')) ?></div>			
+					<div class="form-group"><?php echo $form->label($model, 'title', 'Title') ?><?php echo html::activeTextField($model, 'title',array('class'=>'form-control')) ?></div>
+					<div class="form-group"><?php echo $form->label($model, 'description', 'Description')?><?php echo html::activeTextarea($model, 'description',array('class'=>'form-control')) ?></div>
+					<div class="form-group"><?php echo $form->label($model, 'stringTags', 'Tags') ?><?php echo html::activeTextField($model, 'stringTags',array('class'=>'form-control')) ?></div>			
 				</div>
 				<div class='col-md-4'>
-					<h4>Category</h4><?php echo html::activeSelectbox($model, 'category', $model->categories('selectBox'),array('class'=>'form-control')) ?>
+					<h4>Category</h4><?php echo $form->label($model, 'category', 'Category') . 
+					html::activeSelectbox($model, 'category', $model->categories('selectBox'),array('class'=>'form-control')) ?>
 					<h4 class="adult">Adult Content</h4>
 					<label class="checkbox"><?php echo $form->checkbox($model, 'mature', 1) ?>This video is not suitable for family viewing</label>
 					<h4>Listing</h4>

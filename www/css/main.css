@@ -90,7 +90,7 @@ input.date{
 
 .hero-search .search_input{
 	float:left;
-	padding:10px 7px 0 7px;
+	padding:12px 7px 0 7px;
 	height:32px;
 	border:1px solid #BBBBBB;
 	border-right:0;
@@ -2654,7 +2654,7 @@ input.date{
 }
 
 .video_tile_item{
-	width:180px; margin-left:20px;
+	width:180px; margin-left:19px;
 }
 
 .video_tile_item .video_thumbnail{

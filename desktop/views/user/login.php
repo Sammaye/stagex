@@ -8,11 +8,11 @@
 		<div class="form">
 			<?php echo $form->hiddenField($model, 'hash', array('value' => glue::http()->getCsrfToken())) ?>
 			<div class="form-group">
-				<?php echo html::label("Email Address:", "email") ?>
+				<?php echo $form->label($model, 'email', "Email Address:") ?>
 				<?php echo $form->textField($model, "email", array('class' => 'form-control input-lg')) ?>
 			</div>
 			<div class="form-group">
-				<?php echo html::label("Password:", "password") ?>
+				<?php echo $form->label($model, 'password', "Password:") ?>
 				<?php echo $form->passwordfield($model, "password", array('class' => 'form-control input-lg')) ?>
 			</div>
 			<div class="checkbox">

@@ -6,7 +6,10 @@
 		</ol>
 		<div class="help_search_large row">
 			<?php $form = html::form(array('action' => '/help/search', 'method' => 'get')); ?>
-			<div class="col-md-10 form-group"><?php echo $form->textField('query', glue::http()->param('query'), 'form-control input-lg')?></div>
+			<div class="col-md-10 form-group">
+			<label class="sr-only" for="query">Help Search</label>
+			<?php echo $form->textField('query', glue::http()->param('query'), 'form-control input-lg')?>
+			</div>
 			<div class="col-md-2 form-group"><button type="submit" class="btn btn-primary btn-lg btn-search-icon">Search</button></div>
 			<?php $form->end() ?>
 		</div>

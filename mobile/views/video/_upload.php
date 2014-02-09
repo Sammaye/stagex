@@ -28,12 +28,13 @@
 				<?php $form = html::activeForm(array('action' => '')) ?>
 					<div class="row">
 					<div class="col-md-6">
-						<div class="form-group"><?php echo html::label('Title', 'title') ?><?php echo html::activeTextField($model, 'title',array('class' => 'form-control')) ?></div>
-						<div class="form-group"><?php echo html::label('Description', 'description')?><?php echo html::activeTextarea($model, 'description',array('class' => 'form-control')) ?></div>
-						<div class="form-group last"><?php echo html::label('Tags', 'stringTags') ?><?php echo html::activeTextField($model, 'string_tags',array('class' => 'form-control')) ?></div>			
+						<div class="form-group"><?php echo $form->label($model, 'title', 'Title') ?><?php echo html::activeTextField($model, 'title',array('class' => 'form-control')) ?></div>
+						<div class="form-group"><?php echo $form->label($model, 'description', 'Description')?><?php echo html::activeTextarea($model, 'description',array('class' => 'form-control')) ?></div>
+						<div class="form-group last"><?php echo $form->label($model, 'stringTags', 'Tags') ?><?php echo html::activeTextField($model, 'string_tags',array('class' => 'form-control')) ?></div>			
 					</div>
 					<div class='col-md-6'>
-						<h4>Category</h4><?php echo html::activeSelectbox($model, 'category', $model->categories('selectBox'),array('class' => 'form-control')) ?>
+						<h4>Category</h4><?php echo $form->label($model, 'category', 'Category') . 
+						html::activeSelectbox($model, 'category', $model->categories('selectBox'),array('class' => 'form-control')) ?>
 						<h4 class="adult">Adult Content</h4>
 						<label class="checkbox"><?php echo $form->checkbox($model, 'mature', 1) ?>This video is not suitable for family viewing</label>
 						<h4>Listing</h4>

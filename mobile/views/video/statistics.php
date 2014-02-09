@@ -35,11 +35,15 @@ $video_stats = $model->getStatisticsDateRange(mktime(0, 0, 0, date("m"), date("d
 		</div>
 		<div class="clear"></div>
 		<div class='stats_filter_bar row'>
-			<div class="form-group"><label for="from">Date range:</label></div>
+			<div class="form-group"><label for="date">Date range:</label></div>
 			<div class="row">
-			<div class="col-xs-6 col-sm-3 col-md-2 form-group"><input type="text" id="from" name="from" class="form-control col-5" value='<?php echo date("d/m/Y") ?>'/></div>
+			<div class="col-xs-6 col-sm-3 col-md-2 form-group">
+			<label class="sr-only" for="from">From Date</label>
+			<input type="text" id="from" name="from" class="form-control col-5" value='<?php echo date("d/m/Y") ?>'/></div>
 			<div class="hidden-sm hidden-xs col-md-1 sep_outer"><span class="sep">-</span></div>
-			<div class="col-xs-6 col-sm-3 col-md-2 form-group"><input type="text" id="to" name="to" class="form-control col-5" value='<?php echo date('d/m/Y') ?>'/></div>
+			<div class="col-xs-6 col-sm-3 col-md-2 form-group">
+			<label class="sr-only" for="to">To Date</label>
+			<input type="text" id="to" name="to" class="form-control col-5" value='<?php echo date('d/m/Y') ?>'/></div>
 			<div class="col-xs-2 col-sm-2 col-md-2 form-group"><input type="button" class="btn btn-default apply_range" value="Apply"/></div>
 			</div>
 		</div>

@@ -61,6 +61,7 @@ $this->js('page', "
 <div class='search form-search'>
 	<?php $form = html::form(array('method' => 'get')); ?>
 	<div class="form-group">
+	<label class="sr-only" for="query">Search Query:</label>
 	<input class="form-control" placeholder="Search Playlists" type="text" name="query" value="<?php echo urldecode(htmlspecialchars(glue::http()->param('query', ''))) ?>"/>
 	</div><button class="btn btn-default submit_search">Search</button>
 	<?php $form->end() ?>

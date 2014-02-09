@@ -23,6 +23,7 @@ $this->js('page', "
 	<div>
 	<div class="form-search-lg help_search_large">
 		<?php $form = html::form(array('action' => '/search', 'method' => 'get')); ?>
+		<label class="sr-only" for="query">Site Search</label>
 		<?php echo $form->textField('query', glue::http()->param('query'), array('class' => 'form-search-input', 'placeholder' => 'Search StageX')) ?>			
 		<button type="submit" class="btn btn-primary btn-search-icon"><span class="search-white-icon">&nbsp;</span></button>
 		<?php $form->end() ?>

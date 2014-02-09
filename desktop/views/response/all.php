@@ -142,9 +142,15 @@ $this->js('admin', "
     	<div class='search clearfix'>
 		<?php $form = Html::form(array('method' => 'get')); ?>
 			<?php echo $form->hiddenField('id',$model->_id) ?>
-			<div style='margin-bottom:10px;'><?php echo html::textfield('filter-keywords',htmlspecialchars(glue::http()->param('filter-keywords',null)),array('placeholder'=>'Enter keywords to search by', 'autocomplete'=>'off', 'class'=>'search form-control', 'style' => 'width:790px; display:block; float:none;')) ?></div>
-			<div style='float:left; width:400px; margin-right:50px;'><input type="hidden" id="filter-username" name="filter-username" style='float:left;' value="<?php echo $username_filter_string ?>"/></div>
-			<input type="text" id="from" class="date form-control" name="from_date" placeholder="Enter start date" value="<?php echo htmlspecialchars(glue::http()->param('from_date',null)) ?>"/> <span class="sep">-</span> 
+			<div style='margin-bottom:10px;'>
+			<label class="sr-only" for="filter-keywords">Filter Keywords</label>
+			<?php echo html::textfield('filter-keywords',htmlspecialchars(glue::http()->param('filter-keywords',null)),array('placeholder'=>'Enter keywords to search by', 'autocomplete'=>'off', 'class'=>'search form-control', 'style' => 'width:790px; display:block; float:none;')) ?></div>
+			<div style='float:left; width:400px; margin-right:50px;'>
+			<label class="sr-only" for="filter-username">Filter Usernames</label>
+			<input type="hidden" id="filter-username" name="filter-username" style='float:left;' value="<?php echo $username_filter_string ?>"/></div>
+			<label class="sr-only" for="from_date">From Date</label>
+			<input type="text" id="from" class="date form-control" name="from_date" placeholder="Enter start date" value="<?php echo htmlspecialchars(glue::http()->param('from_date',null)) ?>"/> <span class="sep">-</span>
+			<label class="sr-only" for="to_date">To Date</label>  
 			<input type="text" id="to" class="date form-control" name="to_date" placeholder="Enter end date" value="<?php echo htmlspecialchars(glue::http()->param('to_date',null)) ?>"/>	<button class="btn btn-default">Search</button>
 			<?php $form->end() ?>
 		</div>		

@@ -49,7 +49,7 @@ $this->beginPage() ?>
 	<body>
 		<?php $this->beginBody() ?>
 			<?php echo app\widgets\Menu::run() ?>
-			<?php echo $content ?>
+			<div id="content"><?php echo $content ?></div>
 			<div id="mainSearch_results"></div>
 		<?php $this->endBody() ?>
 	</body>

@@ -85,6 +85,7 @@ $this->js('videos', "
     		<div class='search form-search'>
 			<?php $form = Html::form(array('method' => 'get')); ?>
 				<div class="form-group">
+				<label class="sr-only" for="query">Search Query</label>
 				<?php echo $form->textField('query', glue::http()->param('query'), array('placeholder' => 'Search your videos', 'class' => 'form-control')) ?>
 				</div><button class="btn btn-default submit_search">Search</button>
 				

@@ -22,6 +22,7 @@ $('.user_menu_header .glyphicon').on('click', function(e){
 });
 JS;
 		glue::controller()->js('menu', $menujs); ?>
+		<a href="#content" class="sr-only">Skip to main content</a>
 		<div class="user_menu_header">
 			<a class="menu_toggle" href="#menu"></a>
 			<span class="glyphicon glyphicon-search"></span>

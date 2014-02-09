@@ -32,8 +32,12 @@ glue::controller()->js('page',"
 	<div class="advanced_filter_header user_profile_main_nav">   
     	<div class='search clearfix'>
 		<?php $form = html::form(array('method' => 'get')); ?>
+			<?php echo $form->hiddenField('id', glue::http()->param('id'))?>
+			<label class="sr-only" for="query">Search Query:</label>
 			<?php echo html::textfield('query',htmlspecialchars(glue::http()->param('query',null)),array('placeholder'=>'Enter keywords to search by', 'autocomplete'=>'off', 'class'=>'search form-control')) ?>
-			<input type="text" id="from" class="date form-control" name="from_date" placeholder="Enter start date" value="<?php echo htmlspecialchars(glue::http()->param('from_date',null)) ?>"/> <span class="sep">-</span> 
+			<label class="sr-only" for="from_date">Form Date:</label>
+			<input type="text" id="from" class="date form-control" name="from_date" placeholder="Enter start date" value="<?php echo htmlspecialchars(glue::http()->param('from_date',null)) ?>"/> <span class="sep">-</span>
+			<label class="sr-only" for="to_date">To Date:</label> 
 			<input type="text" id="to" class="date form-control" name="to_date" placeholder="Enter end date" value="<?php echo htmlspecialchars(glue::http()->param('to_date',null)) ?>"/>	<button class="btn btn-default">Search</button>
 			<?php $form->end() ?>
 		</div>		

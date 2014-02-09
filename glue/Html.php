@@ -182,6 +182,11 @@ class Html{
 	public static function label($label, $for = '', $options = array()){
 		return "<label ".implode(" ", self::formOptions($options))." for='{$for}'>{$label}</label>";
 	}
+	
+	public static function activeLabel($model, $attribute, $text, $options = array())
+	{
+		return self::label($text, self::getAttributeName($attribute, $model), $options);
+	}
 
 	/**
 	 * Builds a non-activeRecord text field element and returns it with specific options
@@ -841,6 +846,11 @@ class activeFormhtml extends form_base{
 	public function radio_group($model, $attribute, $options = array()){
 		return html::activeRadio_group($model, $attribute, $options);
 	}
+	
+	public function label($model, $attribute, $text, $options = array())
+	{
+		return html::activeLabel($model, $attribute, $text, $options);
+	} 
 }
 
 /**

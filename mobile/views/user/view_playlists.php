@@ -1,7 +1,8 @@
 <div class='profile_playlists_body'>
     <div class='search form-search form-search_subs user_profile_main_nav'>
 	<?php $form = html::form(array('method' => 'get', 'class' => 'form-inline')); ?>
-		<?php echo html::hiddenfield('id',$user->_id) ?>
+		<?php echo html::hiddenfield('id', $user->_id) ?>
+		<label class="sr-only" for="query">Search Query:</label>
 		<div class="form-group"><?php echo html::textfield('query',htmlspecialchars(glue::http()->param('query',null)),array('placeholder'=>'Search Playlists', 'autocomplete'=>'off', 'class'=>'form-control')) ?></div>
 		<button class="btn btn-default submit_search">Search</button>
 	<?php $form->end() ?>

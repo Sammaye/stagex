@@ -109,6 +109,7 @@ $this->js('new_playlist', "
 	<div class="header clearfix">
     		<div class='search form-search'>
 			<?php $form = Html::form(array('method' => 'get')); ?>
+			<label class="sr-only" for="query">Search Query:</label>
 				<?php echo app\widgets\Autocomplete::run(array(
 					'attribute' => 'query',
 					'value' => urldecode(htmlspecialchars(isset($_GET['query']) ? $_GET['query'] : '')),
@@ -251,8 +252,8 @@ $this->js('new_playlist', "
       <div class="modal-body create_playlist_form clearfix">
 		<div class="alert"></div>
 		<div class="form_left">
-			<div class="form-group"><?php echo html::label('Title', 'title') ?><?php echo html::activeTextField($model, 'title', 'form-control') ?></div>
-			<div class="form-group"><?php echo html::label('Description', 'description')?><?php echo html::activeTextarea($model, 'description', 'form-control') ?></div>			
+			<div class="form-group"><?php echo $form->label($model, 'title', 'Title') ?><?php echo html::activeTextField($model, 'title', 'form-control') ?></div>
+			<div class="form-group"><?php echo $form->label($model, 'description', 'Description') ?><?php echo html::activeTextarea($model, 'description', 'form-control') ?></div>			
 		</div>
 		<div class='form_right'>
 			<h4>Listing</h4>

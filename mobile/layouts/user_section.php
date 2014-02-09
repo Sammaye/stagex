@@ -24,7 +24,7 @@ $this->beginPage() ?>
 <?php $this->beginBody() ?>
 	<?php echo app\widgets\MobileMenu::run(array('tab' => $this->tab)) ?>
 	<div class="container">
-	<div class="col-md-12 user_section_main_content">
+	<div class="col-md-12 user_section_main_content" id="content">
 	<?php echo $content ?>
 	</div>
 	</div>

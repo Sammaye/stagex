@@ -4,8 +4,8 @@
 
 <div class='form form-vertical'>
 	<?php $form = html::activeForm() ?>
-		<div class='form_row'><?php echo html::label("Title:", 'title') ?><?php echo $form->textfield($model, 'title') ?></div>
-		<div class='form_row'><?php echo html::label('Parent topic:', 'parent') ?><?php echo $form->selectbox($model, 'parent', app\models\HelpTopic::getSelectBox_list())?></div>
+		<div class='form_row'><?php echo $form->label($model, "title", 'Title') ?><?php echo $form->textfield($model, 'title') ?></div>
+		<div class='form_row'><?php echo $form->label($model, 'parent', 'Parent Topic') ?><?php echo $form->selectbox($model, 'parent', app\models\HelpTopic::getSelectBox_list())?></div>
 		<div class='ckeditor_content' style='margin:10px 0;'>
 			<?php echo app\widgets\CkEditor::run(array(
 				'model' => $model,
@@ -24,8 +24,8 @@
 					)
 			)) ?>
 		</div>
-		<div class='form_row'><?php echo html::label('Tags:', 'tagString') ?><?php echo $form->textfield($model, 'tagString') ?></div>
-		<div class='form_row'><?php echo html::label('Position:', 'seq').$form->textfield($model, 'seq') ?></div>
+		<div class='form_row'><?php echo $form->label($model, 'tagString', 'Tags:') ?><?php echo $form->textfield($model, 'tagString') ?></div>
+		<div class='form_row'><?php echo $form->label($model, 'seq', 'Position:').$form->textfield($model, 'seq') ?></div>
 		<div class="submit_row"><?php echo html::submitButton($model->getIsNewRecord()?'Add Article':'Save Article',array('class' => 'btn-success')) ?></div>
 	<?php $form->end() ?>
 </div>

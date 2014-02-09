@@ -63,9 +63,10 @@ $this->js('page', "
 <a class="btn btn-success btn-upload" data-toggle="modal" data-target="#myModal">Add New Playlist</a>
 </div>
 
-<div class="header">
+<div class="header clearfix">
 <div class='search form-search'>
 	<?php $form = html::form(array('method' => 'get')); ?>
+		<label class="sr-only" for="query">Search Query:</label>
 		<?php echo $form->textField('query', glue::http()->param('query'), array('placeholder' => 'Search playlists', 'class' => 'form-search-input col-38')) ?>
 		<button class="btn submit_search"><span class="search-dark-icon">&nbsp;</span></button>
 	<?php $form->end() ?>

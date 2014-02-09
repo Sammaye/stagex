@@ -23,7 +23,10 @@ $this->js('page', "
 <div style='padding:30px 0 30px 0px;'>
 <div class="form-search-lg form-inline">
 	<?php $form = html::form(array('action' => '/search', 'method' => 'get')); ?>
-	<div class="form-group form-search-group"><?php echo $form->textField('query', glue::http()->param('query'), array('class' => 'form-search-input input-lg form-control', 'placeholder' => 'Search StageX')) ?></div>
+	<div class="form-group form-search-group">
+	<label class="sr-only" for="query">Site Search</label>
+	<?php echo $form->textField('query', glue::http()->param('query'), array('class' => 'form-search-input input-lg form-control', 'placeholder' => 'Search StageX')) ?>
+	</div>
 	<div class="form-group"><button type="submit" class="btn btn-primary btn-lg btn-search-icon">Search</button></div>
 	<?php $form->end() ?>
 </div>

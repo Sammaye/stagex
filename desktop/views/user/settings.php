@@ -98,7 +98,7 @@ $this->js('autosharesettings', '
 		<div class="form">
 			<?php $form = html::activeForm() ?>
 				<p><b>Note:</b> Verfication email will need to be confirmed before change takes effect.</p>
-				<div class="form-group"><?php echo html::label("Email Address:", "newEmail",'grid-col-10') ?>
+				<div class="form-group"><?php echo $form->label($model, 'mewEmail', "Email Address:", 'grid-col-10') ?>
 					<?php echo $form->textField($model, "newEmail", array('value'=>$model->email, 'class'=>'form-control grid-col-20')) ?></div>
 				<?php echo html::submitbutton("Change Email Address", array('class' => 'btn btn-success')) ?>
 			<?php $form->end() ?>
@@ -113,11 +113,11 @@ $this->js('autosharesettings', '
 		<div class="clear"></div>
 		<div class="form">
 			<?php $form = html::activeForm() ?>
-					<div class="form-group"><?php echo html::label("Old Password:", "oldPassword", 'grid-col-10') ?>
+					<div class="form-group"><?php echo $form->label($model, 'oldPassword', "Old Password:", 'grid-col-10') ?>
 						<?php echo $form->passwordField($model, "oldPassword", array('class'=>'form-control grid-col-20')) ?></div>
-					<div class="form-group"><?php echo html::label("New Password:", "newPassword", 'grid-col-10') ?>
+					<div class="form-group"><?php echo $form->label($model, 'newPassword', "New Password:", 'grid-col-10') ?>
 						<?php echo $form->passwordField($model, "newPassword", array('class'=>'form-control grid-col-20')) ?></div>
-					<div class="form-group"><?php echo html::label("Confirm Password:", "confirmPassword", 'grid-col-10') ?>
+					<div class="form-group"><?php echo $form->label($model, 'confirmPassword', "Confirm Password:", 'grid-col-10') ?>
 						<?php echo $form->passwordField($model, "confirmPassword", array('class'=>'form-control grid-col-20')) ?></div>
 					<?php echo $form->hiddenField($model, "action", array("value"=>"updatePassword")) ?>
 					<?php echo html::submitbutton("Change Password", array('class' => 'btn btn-success')) ?>
@@ -129,7 +129,7 @@ $this->js('autosharesettings', '
 	<div class='hr'>&nbsp;</div>
 	
 	<?php $form = html::activeForm() ?>
-		<?php echo html::submitbutton("Save Account Settings",array('class'=>'btn btn-success')) ?>
+		<?php echo html::submitbutton("Save Account Settings", 'btn btn-success') ?>
 		
 		<h3 class='section_head'>Security</h3>
 		<label class='checkbox'><?php echo $form->checkbox($model, "singleSignOn", 1) ?>Allow single sign-on</label>
@@ -152,7 +152,8 @@ $this->js('autosharesettings', '
 
 		<h3 class='section_head'>Analytics</h3>
 		<p>Entering your Clicky site ID will allow you to track via Clicky. Enter a site ID to start tracking:</p>
-		<div class="row"><div class="form-group col-md-4"><label class="grid-col-10">Clicky Site ID:</label> <?php echo $form->textfield($model, 'clickyUid','form-control grid-col-10') ?></div></div>
+		<div class="row"><div class="form-group col-md-4"><?php echo $form->label($model, 'clickyUid', 'Clicky Site ID:', 'grid-col-10') .
+		 $form->textfield($model, 'clickyUid','form-control grid-col-10') ?></div></div>
 
 		<h3 class='section_head'>Default Video Settings</h3>
 		<p>These settings change what options, by default, any uploaded videos will get. Please be aware that changing these settings will not change the settings of
