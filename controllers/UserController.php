@@ -354,7 +354,7 @@ class UserController extends Controller
 		$query = glue::http()->param('query');
 		
 		if(preg_match_all('/([a-z]+:\(.[^\)]*\)(\s+OR\s+|\s+or\s+)?)/', $query, $matches) > 0){
-			
+			var_dump($matches[0]);
 		}
 /*
 		$query = new AdvancedQuery();
