@@ -349,6 +349,13 @@ class UserController extends Controller
 				$filter_obj = array('listing' => 3);
 				break;
 		}
+		
+		$matches = array();
+		$query = glue::http()->param('query');
+		
+		if(preg_match_all('/([a-z]+:\(.[^\)]*\)(\s+OR\s+|\s+or\s+)?)/', $query, $matches) > 0){
+			
+		}
 /*
 		$query = new AdvancedQuery();
 		$query->fields(array(

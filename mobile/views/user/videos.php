@@ -73,10 +73,6 @@ $this->js('videos', "
 	function reset_checkboxes(){
 		$('.selectAll_input').prop('checked',true).trigger('click');
 	}
-		
-	$(document).on('click', '.condition_row .condition_remove', function(event){
-		$(this).parents('.condition_row').remove();
-	});
 ");
 ?>
 <div class="user_videos_body">
@@ -121,23 +117,6 @@ $this->js('videos', "
 					<li role="presentation"><a role="menuitem" tabindex="-1" href="<?php echo glue::http()->url(array('sorton'=>'views','orderby'=>1)) ?>">Least Viewed</a></li>
 				</ul>
 			</div><span class='text-muted small amount_found'><?php echo $video_rows->count() ?> found</span>
-			<div class="advnaced_search">
-				<div class="row condition_row">
-				<div class="form-group col-md-2 col-sm-2 col-xs-6 condition_field"><?php echo $form->selectbox('field[]', app\models\Video::advancedSearchFields(), null, array('class' => 'form-control')) ?></div>
-				<div class="form-group col-md-2 col-sm-2 col-xs-6 condition_type" style='width:140px;'>
-				<?php echo $form->selectbox('search_op[]', array('=' => '=', '>' => '>', '>=' => '>=', '<' => '<', '<=' => '<=', '!=' => '!=', 
-					'in' => 'IN', 'not_in' => 'NOT IN', 'like' => 'LIKE', 'not_like' => 'NOT LIKE', 'null' => 'Is Empty'), null, array('class' => 'form-control')) ?>
-				</div>
-				<div class="form-group col-md-5 col-sm-5 col-xs-7 condition_value">
-				<div class="textvalue-value"><?php echo $form->textfield('value[]', null, array('placeholder' => 'Enter Search Query', 'class' => 'form-control')) ?></div>
-				</div>
-				<div class="form-group col-md-2 col-sm-2 col-xs-3 condition_operand" style='width:140px;'>
-				<?php echo $form->selectbox('operand[]', array('and' => 'AND', 'or' => 'OR', 'and_or' => 'AND OR'), null, array('class' => 'form-control')) ?>
-				</div>
-				<div class="form-group col-md-1 col-sm-1 col-xs-2"><a class="condition_remove" href="#">Remove</a></div>
-				</div>
-				<div><a href="#" class="btn btn-link">Add condition</a></div>
-			</div>
 			<?php $form->end() ?>
 			</div>    	
     	<div class="clear"></div>
