@@ -687,7 +687,81 @@ class Document extends Model
     	// TODO Add relevancy sorting
     	$result = static::find($query);
     	return $result;
-    }    
+    }
+    
+    public function advancedSearch($sQuery, $query = array())
+    {
+    	if(!method_exists($this, 'advancedSearchRules') || !is_array($this->advancedSearchRules())){
+    		return false;
+    	}
+    	$fieldsRegex = array_keys($this->advancedSearchRules());
+    	
+    	if(preg_match_all('/(('.implode('|', $fieldsRegex).'):\(.[^\)]*\)(\s+OR\s+|\s+or\s+)?)/', $sQuery, $matches) <= 0){
+    		return false;
+    	}
+
+    	$rules = $this->advancedSearchRules();
+    	$i = 0;
+    	$lastWasOr = false;
+    	$dQuery = array();
+    	
+    	foreach($matches[0] as $match){
+    		
+    		$matchParts = preg_split('/:\(/', $match);
+    		$field = strtolower(trim(preg_replace('/(?:\s\s+|\n|\t)/', '', $matchParts[0])));
+
+    		$matchParts = preg_split('/\)/', $matchParts[1]);
+    		$value = trim(preg_replace('/(?:\s\s+|\n|\t)/', '', $matchParts[0]));
+    		
+    		$optional = '';
+    		if(isset($matchParts[1])){
+    			$optional = strtolower(trim(preg_replace('/(?:\s\s+|\n|\t)/', '', $matchParts[1])));
+    		}
+    		
+    		if(!isset($rules[$field])){
+    			continue;
+    		}
+    		
+    		$rule = $rules[$field];
+    		list($type, $split) = $rule;
+    		
+    		var_dump($field);
+    		var_dump($value);
+    		var_dump($optional);
+    		
+    		$query_part = array();
+    		
+    		if($type === 'string'){
+    			
+    		}
+    		if($type === 'int'){
+    			
+    		}
+    		if($type === 'date'){
+    			
+    		}
+    		
+    		if($optional === 'or' && count($matches[0]) > $i){
+    			
+    			$lastWasOr = true;
+    		}elseif($lastWasOr){
+    			
+    			$lastWasOr = false;
+    		}else{
+    			$dQuery[] = array('$or' => $query_part);
+    		}
+    		
+    		$sQuery = str_replace($match, '', $sQuery);
+    		$i++;
+    	}
+    	$dQuery = array('$and' => $dQuery);
+    	
+    	// Finally finish up with using the left overs as keywords...maybe
+    	
+    	var_dump($matches[0]);
+    	$result = static::find(array_merge($query, $dQuery));
+    	return $result;
+    }
     
     public function trace($func)
     {

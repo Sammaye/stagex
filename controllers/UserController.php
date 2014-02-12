@@ -335,47 +335,21 @@ class UserController extends Controller
 		$this->layout = 'user_section';
 		$this->tab = 'videos';
 		
-		$filter = isset($_GET['filter']) ? $_GET['filter'] : null;
-
-		$filter_obj = array();
-		switch($filter){
-			case "listed":
-				$filter_obj = array('listing' => 1);
-				break;
-			case "unlisted":
-				$filter_obj = array('listing' => 2);
-				break;
-			case "private":
-				$filter_obj = array('listing' => 3);
-				break;
+		$video = new Video;
+		if(
+			!($video_rows = $video->advancedSearch(
+				glue::http()->param('query'), 
+				array('userId' => glue::user()->_id, 'deleted' => 0)
+			))
+		){
+			$video_rows = Video::fts(
+				array('title', 'description', 'tags'), isset($_GET['query']) ? $_GET['query'] : '',
+				array('userId' => glue::user()->_id, 'deleted' => 0)
+			)->sort(array('created' => -1));
 		}
 		
-		$matches = array();
-		$query = glue::http()->param('query');
-		
-		if(preg_match_all('/([a-z]+:\(.[^\)]*\)(\s+OR\s+|\s+or\s+)?)/', $query, $matches) > 0){
-			var_dump($matches[0]);
-		}
-/*
-		$query = new AdvancedQuery();
-		$query->fields(array(
-			'title' => array('match' => 'regex', 'deliminator' => '\s+'),
-			'description' => array('match' => 'regex', 'deliminator' => '\s+'),
-			'tags' => array('match' => 'exact', 'deliminator' => '\s+'),
-			'licence' => array('match' => 'exact', 'deliminator' => ','),
-			'category' => array('match' => 'exact', 'deliminator' => ','),
-			'listing' => array('match' => 'exact', 'deliminator' => ','),
-			'mature' => array('match' => 'exact', 'split' => ','),
-			'created' => array('match' => 'exact', 'type' => 'range', 'split' => '')
-		));
-		$query->parse(glue::http()->param('query'));
-	*/	
-		$video_rows = Video::fts(
-			array('title', 'description', 'tags'), isset($_GET['query']) ? $_GET['query'] : '', array_merge(
-				array('userId' => glue::user()->_id, 'deleted' => 0), $filter_obj))
-			->sort(array('created' => -1));
 var_dump($_GET);
-		echo $this->render('videos', array('video_rows' => $video_rows, 'filter' => $filter));
+		echo $this->render('videos', array('video_rows' => $video_rows));
 		
 	}
 
