@@ -347,10 +347,7 @@ class UserController extends Controller
 				array('userId' => glue::user()->_id, 'deleted' => 0)
 			)->sort(array('created' => -1));
 		}
-		
-var_dump($_GET);
 		echo $this->render('videos', array('video_rows' => $video_rows));
-		
 	}
 
 	public function action_playlists()
@@ -358,12 +355,19 @@ var_dump($_GET);
 		$this->title = 'Your Playlists - StageX';
 		$this->layout = 'user_section';
 		$this->tab = 'playlists';
-
-		$playlist_rows = Playlist::fts(
-			array('title', 'description'), glue::http()->param('query',''), 
+		
+		$playlist = new Playlist;
+		if(
+			!($playlist_rows = $playlist->advancedSearch(
+				glue::http()->param('query'),
+				array('userId' => glue::user()->_id, 'title' => array('$ne' => 'Watch Later'), 'deleted' => 0)
+			))
+		){
+			$playlist_rows = Playlist::fts(
+				array('title', 'description'), glue::http()->param('query',''), 
 				array('userId' => glue::user()->_id, 'title' => array('$ne' => 'Watch Later'), 'deleted' => 0)
 			)->sort(array('created' => -1));
-
+		}		
 		echo $this->render('playlists', array('playlist_rows' => $playlist_rows));
 	}
 

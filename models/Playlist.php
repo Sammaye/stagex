@@ -53,6 +53,16 @@ class Playlist extends Document
 			'condition' => array('deleted' => array('$in' => 0, null))
 		);
 	}
+	
+	public static function advancedSearchRules()
+	{
+		return array(
+			'title' => array('string', '\s+'),
+			'description' => array('string', '\s+'),
+			'listing' => array('int', ','),
+			'created' => array('date', '\s+(TO|to)\s+')
+		);
+	}	
 
 	public function getRandomVideoPic()
 	{

@@ -110,24 +110,8 @@ $this->js('new_playlist', "
     		<div class='search form-search'>
 			<?php $form = Html::form(array('method' => 'get')); ?>
 			<label class="sr-only" for="query">Search Query:</label>
-				<?php echo app\widgets\Autocomplete::run(array(
-					'attribute' => 'query',
-					'value' => urldecode(htmlspecialchars(isset($_GET['query']) ? $_GET['query'] : '')),
-					'placeholder' => 'Search Playlists',
-					'htmlOptions' => array(
-						'class' => 'form-search-input col-38'
-					),
-					'options' => array(
-						'appendTo' => '#user_video_results',
-						'source' => '/user/video_search_suggestions',
-						'minLength' => 2,
-					),
-					'renderItem' => "
-						return $( '<li></li>' )
-							.data( 'item.autocomplete', item )
-							.append( '<a class=\'content\'><span>' + item.label + '</span></div></a>' )
-							.appendTo( ul );
-				"))  ?><button class="btn submit_search"><span class="search-dark-icon">&nbsp;</span></button>
+<?php echo $form->textField('query', glue::http()->param('query'), array('placeholder' => 'Search your playlists', 'class' => 'form-search-input col-37')) ?>
+<button class="btn submit_search"><span class="search-dark-icon">&nbsp;</span></button>
 			<?php $form->end() ?><span class='text-muted small amount_found'><?php echo $playlist_rows->count() ?> found</span>
 			</div>
 			<div class="btn-group">

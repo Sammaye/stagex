@@ -702,7 +702,7 @@ class Document extends Model
 
     	$rules = $this->advancedSearchRules();
     	$i = 0;
-    	$lastWasOr = false;
+    	$lastOr = false;
     	$dQuery = array();
     	
     	foreach($matches[0] as $match){
@@ -725,41 +725,60 @@ class Document extends Model
     		$rule = $rules[$field];
     		list($type, $split) = $rule;
     		
-    		var_dump($field);
-    		var_dump($value);
-    		var_dump($optional);
-    		
     		$query_part = array();
     		
     		if($type === 'string'){
-    			
+    			$split_values = preg_split("/$rule[1]/", $value);
+    			$query_part = array($field => new \MongoRegex('/('.implode('|', $split_values).')/i'));;
     		}
     		if($type === 'int'){
-    			
+    			$in_values = explode($rule[1], $value);
+    			array_walk($in_values, function(&$n) {
+    				$n = intval($n);
+    			});
+    			$query_part = array($field => array('$in' => $in_values));
     		}
     		if($type === 'date'){
     			
+    			$range_parts = preg_split("/$rule[1]/", $value);
+    			$matches = array();
+    			$dates = array();
+    			
+    			foreach($range_parts as $date){
+    				if(preg_match('/^([0-9]{2,})([0-9]{2,})([0-9]{4,})$/', $date, $matches)){
+    					array_shift($matches);
+    					list($day, $month, $year) = $matches;
+    					$dates[] = new \MongoDate(strtotime($day.'-'.$month.'-'.$year));
+    				}
+    			}
+    			
+    			if(empty($dates)){
+    				continue;
+    			}
+    			
+    			if(count($dates) > 1){
+    				$query_part = array($field => array('$gte' => $dates[0], '$lte' => $dates[1]));
+    			}else{
+    				$query_part = array($field => $dates[0]);
+    			}
     		}
-    		
     		if($optional === 'or' && count($matches[0]) > $i){
-    			
-    			$lastWasOr = true;
-    		}elseif($lastWasOr){
-    			
-    			$lastWasOr = false;
+    			$lastOr['$or'][] = $query_part;
+    		}elseif(!empty($lastOr)){
+    			$lastOr['$or'][] = $query_part;
+    			$dQuery['$and'][] = $lastOr;
+    			$lastOr = array();
     		}else{
-    			$dQuery[] = array('$or' => $query_part);
+    			$dQuery['$and'][] = $query_part;
     		}
     		
     		$sQuery = str_replace($match, '', $sQuery);
     		$i++;
     	}
-    	$dQuery = array('$and' => $dQuery);
     	
     	// Finally finish up with using the left overs as keywords...maybe
     	
-    	var_dump($matches[0]);
-    	$result = static::find(array_merge($query, $dQuery));
+    	$result = static::find(array_merge($dQuery, $query));
     	return $result;
     }
     

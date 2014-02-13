@@ -84,8 +84,6 @@ $this->js('videos', "
 				<label class="sr-only" for="query">Search Query</label>
 				<?php echo $form->textField('query', glue::http()->param('query'), array('placeholder' => 'Search your videos', 'class' => 'form-control')) ?>
 				</div><button class="btn btn-default submit_search">Search</button>
-				
-			<a class="btn  btn-link" href="#">Advanced Search</a>
 			<div class="btn-group">
 				<button type="button" class="btn btn-link dropdown-toggle"
 					data-toggle="dropdown">
