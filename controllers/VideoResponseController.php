@@ -333,7 +333,7 @@ class VideoResponseController extends Controller
 		// At the moment the approved sort is only availble to admins of the video but in time it might be available to normal users too.
 
 		if(!glue::http()->isAjax()){
-			gkue::trigger('404');
+			glue::trigger('404');
 		}
 		
 		extract(glue::http()->param(array('user_id', 'id', 'sort', 'mode', 'pagesize', 'page')));
@@ -400,14 +400,16 @@ class VideoResponseController extends Controller
 		
 		ob_start();
 		echo glue\widgets\ListView::run(array(
-		'pageSize'	 => 1,
 		'page' 		 => $page?:1,
 		"cursor"	 => $comments,
 		'template' 	 => $template,
 		'data' 		 => array('mode' => $mode),
-		'enableAjaxPagination' => true,
 		'itemView' => 'response/_response.php',
-		'pagerCssClass' => 'grid_list_pager'
+		'pagination' => array(
+			'enableAjaxPagination' => true,
+			'cssClass' => 'video-responses-pager',
+			'pageSize'	 => $pagesize?:20,
+		)
 		));
 		$html=ob_get_contents();
 		ob_end_clean();		

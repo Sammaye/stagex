@@ -484,7 +484,7 @@ $this->js('edit', "
 			<a class='view_all' href="<?php echo glue::http()->url("/videoresponse/list", array("id"=>$model->_id)) ?>">View All Responses</a>
 			<?php echo $this->renderPartial('response/list', array('model' => $model, 'comments' => 
 					app\models\VideoResponse::find(array('videoId'=>$model->_id))->visible($model)->sort(array('created'=>-1))
-			, 'pageSize' => 10, 'ajaxPagination'=>true)) ?>
+			, 'pageSize' => 20, 'ajaxPagination'=>true)) ?>
 		</div>
 		<?php endif ?>
 	</div>

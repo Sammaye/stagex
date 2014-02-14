@@ -82,8 +82,9 @@ class Pagination extends Widget
 	
 	public function render()
 	{
-		if($this->getPageSize() < 1)
+		if($this->getPageSize() <= 0){
 			return; // Infinite
+		}
 		$page = $this->getPage();
 		$pageCount = $this->getPageCount();
 
@@ -142,7 +143,7 @@ class Pagination extends Widget
 	
 	function getSkip()
 	{
-		if($this->getPageSize() > 1){
+		if($this->getPageSize() > 0){
 			return ($this->getPage() - 1) * $this->getPageSize();
 		}
 		return 0;
@@ -150,7 +151,7 @@ class Pagination extends Widget
 	
 	function getLimit()
 	{
-		if($this->getPageSize() > 1){
+		if($this->getPageSize() > 0){
 			return $this->getPageSize();
 		}
 		return null;

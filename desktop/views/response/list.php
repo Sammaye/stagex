@@ -177,7 +177,7 @@ glue::controller()->js('list', "
 if(isset($ajaxPagination)&&$ajaxPagination){
 	glue::controller()->js('paging', "
 		// Paging
-		$(document).on('click', '.video_response_list .list .ListView_Pager a', function(event){
+		$(document).on('click', '.video_response_list .list .video-responses-pager a', function(event){
 			event.preventDefault();
 			refresh_video_response_list($(this).attr('href').replace(/#page_/, ''));
 		});
@@ -192,8 +192,8 @@ if(isset($ajaxPagination)&&$ajaxPagination){
 			if(page == null){
 				page = 1;
 			}else if(page == 'current'){
-				if($('.video_response_list .list .ListView_Pager li.active').length > 0){
-					page = $('.video_response_list .list .ListView_Pager li.active').data().page
+				if($('.video_response_list .list .video-responses-pager li.active').length > 0){
+					page = $('.video_response_list .list .video-responses-pager li.active').data().page
 				}
 			}
 			if(refresh == null) refresh = 0;
@@ -203,7 +203,7 @@ if(isset($ajaxPagination)&&$ajaxPagination){
 				responses_per_page = $('.video_response_list').data('responses_per_page') == null ? '' : $('.video_response_list').data('responses_per_page');
 	
 			$.post('/videoresponse/getmore', { id: '".strval($model->_id)."', page: page, sort: sort, mode: mode,
-				responses_per_page: responses_per_page, refresh: refresh }, function(data){
+				pagesize: responses_per_page, refresh: refresh }, function(data){
 	
 				if(data.success){
 					$('.video_response_list .list').html(data.html);
@@ -230,13 +230,15 @@ echo $this->renderPartial('response/_selector',array('model'=>$model));
 		ob_end_clean();
 		
 		echo glue\widgets\ListView::run(array(
-				'pageSize'	 => 1,
-				"cursor"	 => $comments,
-				'template' 	 => $template,
-				'sortableAttributes' => array('likes','created'),
-				'data' 		 => array('mode' => isset($mode) ? $mode : ''),
-				'enableAjaxPagination' => $ajaxPagination?:false,				
-				'itemView' => 'response/_response.php',
-				'pagerCssClass' => 'grid_list_pager'
+			"cursor"	 => $comments,
+			'template' 	 => $template,
+			'sortableAttributes' => array('likes','created'),
+			'data' 		 => array('mode' => isset($mode) ? $mode : ''),
+			'pagination' => array(
+				'pageSize'	 => $pageSize?:20,
+				'enableAjaxPagination' => $ajaxPagination?:false,
+				'cssClass' => 'video-responses-pager'
+			),
+			'itemView' => 'response/_response.php',
 		));	 ?>
 </div>
