@@ -16,7 +16,18 @@
 				'value' => htmlspecialchars(glue::http()->param('query', '')),				
 				'options' => array(
 					'appendTo' => '#help_search_results',
-					'source' => '/help/suggestions',
+					'source' => "js:function(request, response){
+					$.get('/help/suggestions', {term: request.term}, null, 'json')
+					.done(function(data){
+						ret = [];
+						if(data.success){
+							$.each(data.results, function(k, v){
+								ret[ret.length] = {label: v.title};
+							});
+						}
+						response(ret);
+					});
+					}",
 					'minLength' => 2,
 				), 'placeholder' => 'Type in your question and search',
 				'renderItem' => "
