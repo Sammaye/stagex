@@ -8,20 +8,23 @@ if(!glue::auth()->check(array('viewable' => $item))){
 	$item->content = '[Deleted]';
 }
 ?>
-<div class='response video_text_response_item <?php if($view == 'thread' && (count(preg_split('/,/', $item->path)) > 1)): echo " thread_comment"; endif; ?>'
-	data-id='<?php echo $item->_id ?>'>
+<div class='response video_text_response_item 
+	<?php if($view == 'thread' && (count(preg_split('/,/', $item->path)) > 1)): echo " thread_comment"; endif; ?>
+	<?php if($view == 'ajaxthread') echo ' ajax_thread_comment'; ?>'
+	data-id='<?php echo $item->_id ?>'
+>
 
 	<?php if(glue::auth()->check(array('^' => $item->video)) && $mode == 'admin'){ ?>
 		<div class='checkbox_col'><div class="checkbox_input" style=''><?php echo html::checkbox('comment_id[]', strval(isset($custid) ? $custid : $item->_id), 0, 
 				array('class' => 'response_selector')) ?></div></div>
 	<?php } ?>
 	
-	<div class="content" style='<?php if(glue::auth()->check(array('^' => $item->video)) && $mode == 'admin'){ echo "margin-left:15px;"; } ?>float:left;'>
-	<a href='<?php echo glue::http()->url('/user/view', array('id' => strval($item->author->_id))) ?>' class='author'><?php echo $item->author->getUsername() ?></a>
+	<div class="content" style='<?php if(glue::auth()->check(array('^' => $item->video)) && $mode == 'admin'){ echo "margin-left:15px;"; } ?> float:left;'>
+	<a class="author" href='<?php echo glue::http()->url('/user/view', array('id' => strval($item->author->_id))) ?>' class='author'><?php echo $item->author->getUsername() ?></a>
 	<span class="date_created"><?php echo $item->ago($item->created) ?></span>
 	<div class='response_content'>
 		<?php if($item->thread_parent instanceof app\models\VideoResponse): 
-			echo \html::a(array('href'=>glue::http()->url('/user/view', array('id' => strval($item->thread_parent->author->_id))),'text'=>"@".$item->thread_parent->author->getUsername()));
+			echo \html::a(array('href'=>glue::http()->url('/user/view', array('id' => strval($item->thread_parent->author->_id))),'text'=>"@".$item->thread_parent->author->getUsername(), 'class' => 'load_comment_thread'));
 		elseif($item->threadParentId instanceof \MongoId):
 			echo "@".$item->threadParentUsername;
 		endif;
@@ -72,16 +75,5 @@ if(!glue::auth()->check(array('viewable' => $item))){
 		<div class="clear"></div>
 	</div>
 	<?php } ?>
-
-	<?php if($item->thread_parent): ?>
-		<div class='thread_parent_viewer' style='display:none;'>
-		<div class='indented_bar'><div>&nbsp;</div></div>
-		<?php if($item->thread_parent->deleted == 1 || !$item->thread_parent){ ?>
-			<i>This comment has since been removed</i>
-		<?php }else{ ?>
-			<div class='parent_content' style=''><span class='caption'><?php echo html::a(array('href' => glue::http()->url('/user/view', array('id' => strval($item->thread_parent->author->_id))),
-			'text' => $item->thread_parent->author->getUsername()))." said: "; ?></span><?php echo html::encode($item->thread_parent->content); ?></div>
-		<?php } ?>
-		</div>
-	<?php endif; ?>
+	<div class="thread_content"></div>
 	</div>

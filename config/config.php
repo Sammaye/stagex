@@ -370,7 +370,7 @@ return array(
 		'beforeRequest' => function(){
 			$detect = new \glue\components\mobiledetect\Detect();
 			if($detect->isMobile() || $detect->isTablet() && isset(glue::$params['mobileUrl'])){
-				header('Location: '.glue::$params['mobileUrl']);
+				//header('Location: '.glue::$params['mobileUrl']);
 			}
 		},
 		'afterRequest' => function(){

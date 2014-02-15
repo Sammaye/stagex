@@ -2537,6 +2537,34 @@ input.date{
     float:left; margin-left:25px;
 }
 
+.video_text_response_item.expanded_thread{
+    border:1px solid #dddddd;
+    border-radius: 3px;
+    margin-bottom: 15px;
+}
+
+.video_text_response_item.expanded_thread .content{
+    padding:10px;
+}
+
+.video_text_response_item .thread_content{
+    background:#f7f7f7;
+    padding:10px;
+    display:none;
+}
+
+.video_text_response_item.expanded_thread .thread_content{
+    display:block;
+}
+
+.video_text_response_item.ajax_thread_comment .thread_content{
+    display:none;   
+}
+
+.video_text_response_item .thread_list .video_text_response_item:last-child{
+    margin-bottom:0;
+}
+
 .ui-autocomplete {
   position: absolute;
   top: 100%;

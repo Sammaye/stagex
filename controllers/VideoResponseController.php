@@ -16,7 +16,7 @@ class VideoResponseController extends Controller
 				'class' => 'glue\Auth',
 				'rules' => array(
 					array('allow',
-						'actions' => array('getMore', 'getNew', 'index', 'list', 'thread'),
+						'actions' => array('getMore', 'getNew', 'index', 'list', 'thread', 'loadThread'),
 						'users' => array('*')
 					),
 					array('allow', 'users' => array('@*')),
@@ -439,5 +439,39 @@ class VideoResponseController extends Controller
 		}
 		// Now that I got all comments greater lets reset the session
 		Json::success(array('number_comments'=>$comments->count()));
+	}
+	
+	public function action_loadThread()
+	{
+		if(!glue::http()->isAjax()){
+			glue::trigger('404');
+		}		
+		if(
+			(($id = glue::http()->param('id')) === null) ||
+			($response = VideoResponse::findOne(array('_id' => new \MongoId($id)))) === null
+		){
+			Json::error(Json::UNKNOWN);
+		}
+
+		$parents = explode(',', $response->path);
+		array_walk($parents, function(&$n){
+			$n = new \MongoId($n);
+		});
+		array_pop($parents);
+		
+		ob_start();
+		?><div><a class="close_thread" href="#">Close thread</a></div>
+		<div class="thread_list">
+		<?php foreach(
+			VideoResponse::find(array('_id' => array('$in' => $parents)))->sort(array('created' => -1)) as $parent
+		){ ?>
+			<?php echo $this->renderPartial('response/_response', array('view' => 'ajaxthread', 'item' => $parent)) ?>
+		<?php } ?>
+		</div>
+		<?php
+		$html = ob_get_contents();
+		ob_clean();
+		
+		Json::success(array('html' => $html));
 	}
 }
