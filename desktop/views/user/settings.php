@@ -21,67 +21,6 @@ $('.account_settings_part').on('click','.cancel_edit',function(e){
 
 JS;
 $this->js('accountsettings',$js);
-
-$this->js('autosharesettings', '
-	var wins = [], unauth_window;
-
-	$(document).ready(function(){
-		getAccountStatus("fb");
-		getAccountStatus("twt");
-		//getAccountStatus("lnkd");
-
-		$(".submit_changes").click(function(event){
-			event.preventDefault();
-			$(".invisible_submit").trigger("click");
-		});
-	});
-
-	function rebind_auth_window(){
-		$(".authSocialAccount").unbind("click");
-		$(".openNewWindow").unbind("click");
-
-		$(".authSocialAccount").click(function(event){
-			event.preventDefault();
-			openAuthWindow($(this).attr("id"), $(this).attr("href"));
-		});
-
-		$(".openNewWindow").click(function(event){
-			event.preventDefault();
-			openWindow($(this).attr("href"));
-		});
-	}
-
-	function openAuthWindow($i, $url){
-		if(wins[$i] == null || wins[$i].closed){
-			wins[$i] = window.open($url, "Authorise Account", "location=1,status=1,scrollbars=1,width=500,height=400");
-		}else{
-			wins[$i].focus();
-		}
-		return false;
-	}
-
-	function openWindow($url){
-		unauth_window = window.open($url, "Connected Account", "location=1,status=1,scrollbars=1,width=500,height=400");
-		return false;
-	}
-
-	function getAccountStatus($type){
-		$.getJSON("/autoshare/status", {"network": $type, "action": "status" }, function(data){
-			switch($type){
-				case "fb":
-					$(".fb_acc_status").html(data.response);
-					break;
-				case "twt":
-					$(".twt_acc_status").html(data.response);
-					break;
-				case "lnkd":
-					$(".lnkd_acc_status").html(data.response);
-					break;
-			}
-			rebind_auth_window();
-		});
-	}'
-);
 ?>
 
 <div class="account_settings_body">
@@ -183,36 +122,7 @@ $this->js('autosharesettings', '
 			</div>
 		</div>			
 		<div class="clear"></div>
-
-		<h3 class='section_head'>Auto-Sharing</h3>
-		<p>Auto-sharing allows you to connect your favourite social networks directly to your profile. When connected your social actions across this site will be
-		echoed onto your social profiles allowing your friends to join in with the fun.</p>
-
-		<div class="autoshare_settings row">
-		<div class="left col-md-3">
-			<p>Include the following actions in my feed:</p>
-			<label class="checkbox"><?php echo $form->checkbox($model, "autoshareUploads", 1) ?>Upload a video</label>
-			<label class="checkbox"><?php echo $form->checkbox($model, "autoshareAddToPlaylist", 1) ?>Add a video to playlist</label>
-			<label class="checkbox"><?php echo $form->checkbox($model, "autoshareLikes", 1) ?>Like or dislike something</label>
-			<label class="checkbox"><?php echo $form->checkbox($model, "autoshareResponses", 1) ?>Comment on a video</label>
-		</div>
-		<div class="right autoshare_networks col-md-4">
-			<p>Automatically share my feed with these sites:</p>
-			<div class="facebook">
-				<span><b>Facebook</b></span>
-				<span class="fb_acc_status"><img alt='loading' src="/images/ajax_loader.gif"/></span>
-				<!--  AJAX -->
-			</div>
-			<div class="twitter">
-				<span><b>Twitter</b></span>
-				<span class="twt_acc_status"><img alt='loading' src="/images/ajax_loader.gif"/></span>
-				<!-- AJAX -->
-			</div>
-		</div>
-		</div>
-		<div class="clear"></div>
 		<div class="footer_submit"><?php echo html::submitbutton("Save Account Settings", array('class' => 'btn btn-success')) ?></div>
-
 	<?php $form->end() ?>
 	<a class="deactivate btn btn-danger" href="<?php echo glue::http()->url("/user/deactivate") ?>">Deactivate Account</a>
 </div>

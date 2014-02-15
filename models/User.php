@@ -96,13 +96,6 @@ class User extends Document
 	public $autoplayVideos = 1;
 	public $useDivx = 0;
 
-	public $autoshareUploads=0;
-	public $autoshareResponses=0;
-	public $autoshareLikes=0;
-	public $autoshareAddToPlaylist=0;
-	public $autoshareFb;
-	public $autoshareTwitter;
-
 	public $maxFileSize;
 	public $allowedBandwidth;
 	public $bandwidthLeft;
@@ -467,19 +460,6 @@ class User extends Document
 		$this->deleted=1;
 		$this->save();
 		glue::db()->delete_queue->insert(array('id' => $this->_id, 'type' => 'user', 'ts' => new \MongoDate()));		
-	}
-	
-	public function autoPublishStreamItem()
-	{
-		if(!glue::db()->auto_publish_queue->findOne(array('type'=>$type,'userId'=>$user_id,'videoId'=>$video_id,'playlistId'=>$playlist_id,'text'=>$text))){
-			glue::db()->auto_publish_queue->insert(array(
-				'type' => $type,
-				'userId' => $user_id,
-				'videoId' => $video_id,
-				'playlistId' => $playlist_id,
-				'text' => $text
-			));
-		}		
 	}
 	
 	public function watchLaterPlaylist()
