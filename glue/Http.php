@@ -4,12 +4,14 @@ namespace glue;
 
 use Glue;
 use \glue\Component;
+use glue\util\Crypt;
 
 class Http extends Component
 {
 	private $_scriptUrl;
 	private $_baseUrl;
 	private $_pathInfo;
+	private $_csrfToken;
 	private $_argv = array();
 
 	function userAgent()
@@ -442,6 +444,37 @@ class Http extends Component
 	    }else{
 	        return utf8_encode($pathInfo);
 	    }
+	}
+	
+	public function getCsrfToken()
+	{
+		$csrfToken = glue::session()->csrf;
+		if(is_array($csrfToken)){
+			$this->_csrfToken = $csrfToken['token'];
+		}
+		if($this->_csrfToken === null || $csrfToken['expires'] < time()){
+			$chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-.';
+			$mask = substr(str_shuffle(str_repeat($chars, 5)), 0, 14);
+			$this->_csrfToken = base64_encode($mask . microtime(true) . Crypt::AES_encrypt256($mask));
+			glue::session()->csrf = array('token' => $this->_csrfToken, 'expires' => time()+(60*60)); // Once an hour
+		}
+		return $this->_csrfToken;
+	}
+	
+	public function validateCsrfToken($token)
+	{
+		$csrfToken = glue::session()->csrf;
+		
+		if(!is_array($csrfToken)){
+			return false;
+		}
+		if($csrfToken['expires'] < time()){
+			return false;
+		}
+		if($csrfToken['token'] !== $token){
+			return false;
+		}
+		return true;
 	}
 
 	function arg($f)

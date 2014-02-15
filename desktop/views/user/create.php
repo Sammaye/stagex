@@ -5,7 +5,7 @@
 		)) ?>
 	<h1>Register for a StageX account</h1>
 	<?php $form = html::activeForm(array('class'=>'')); ?>
-		<?php echo $form->hiddenfield($model, "hash", array("value"=>glue::http()->getCsrfToken())) ?>
+		<?php echo $form->hiddenfield($model, "csrfToken", array("value"=>glue::http()->getCsrfToken())) ?>
 		<div class="form">
 			<div class="form-group">
 				<?php echo $form->label($model, 'username', "Username:"); echo $form->textfield($model, "username", array('class' => 'form-control input-lg')) ?>

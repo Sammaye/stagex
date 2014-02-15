@@ -6,7 +6,7 @@
 		)) ?>
 
 		<div class="form">
-			<?php echo $form->hiddenField($model, 'hash', array('value' => glue::http()->getCsrfToken())) ?>
+			<?php echo $form->hiddenField($model, 'csrfToken', array('value' => glue::http()->getCsrfToken())) ?>
 			<div class="form-group">
 				<?php echo $form->label($model, 'email', "Email Address:") ?>
 				<?php echo $form->textField($model, "email", 'form-control input-lg') ?>

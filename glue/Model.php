@@ -916,9 +916,8 @@ class Model extends Component
 		return false;
 	}
 	
-	public function hash($field, $value, $params = array())
+	public function csrf($field, $value, $params = array())
 	{
-		return true;
 		if(glue::http()->validateCsrfToken($value)){
 			return true;
 		}

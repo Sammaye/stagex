@@ -3,7 +3,7 @@
 	'errorHead' => '<h4>Could not complete registration</h4>Your account could not be created because:'
 	)) ?>
 	<?php $form = html::activeForm(); ?>
-		<?php echo $form->hiddenfield($model, "hash", array("value"=>glue::http()->getCsrfToken())) ?>
+		<?php echo $form->hiddenfield($model, "csrfToken", array("value"=>glue::http()->getCsrfToken())) ?>
 		<div class="form">
 		<div class="form-group">
 		<?php echo $form->label($model, "username", "Username"); echo $form->textfield($model, "username", array('class' => 'form-control input-lg')) ?>

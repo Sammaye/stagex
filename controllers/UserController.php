@@ -41,10 +41,10 @@ class UserController extends Controller
 
 		$model = new User;
 		if(isset($_POST['User'])){
-			$model->setRule(array('hash', 'hash', 'message' => 'CSRF not valid'));
+			$model->setRule(array('csrfToken', 'csrf', 'message' => 'We could not verify the source of your post. Please use the submit button to submit the form.'));
 			$model->attributes=$_POST['User'];
 			if($model->validate()&&$model->save()){
-				if(glue::user()->login($model->email,'',true,false)){
+				if(glue::session()->login($model->email, '', true, false)){
 					glue::http()->redirect("/user");
 				}else{
 					$model->setError("Login failed, however, it seems you are saved to our system so please try to login manually.");

@@ -9,7 +9,7 @@
 			<h1 class='head'>Password Recovery</h1>
 			<p>Forgotten your password? No problem just fill in the email address you used to register with and the Re-captcha below and we send you a new password straight to your inbox.</p>
 
-			<?php echo $form->hiddenField($model, "hash", array('value'=>glue::http()->getCsrfToken())) ?>
+			<?php echo $form->hiddenField($model, "csrfToken", array('value'=>glue::http()->getCsrfToken())) ?>
 			<div class="form-group email_address">
 				<?php echo $form->label($model, 'email', "Email Address:") ?>
 				<?php echo $form->textField($model, "email", 'form-control') ?>
