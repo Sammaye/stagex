@@ -181,7 +181,7 @@ class Glue
 			return false;
 		}
 		
-		list($controller,$action) = $controller;
+		list($controller, $action) = $controller;
 
 		if(!method_exists($controller,$action)){
 			return false;
@@ -204,6 +204,7 @@ class Glue
 	 */
 	public static function createController($route)
 	{
+		$route = trim($route, '/');
 		if($route === ''||$route === null){
 			$route = self::$defaultController;
 		}

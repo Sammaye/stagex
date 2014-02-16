@@ -6,6 +6,13 @@ include_once "../glue/glue.php";
 $config = require dirname(__DIR__) . '/config/config.php';
 $configLive = require dirname(__DIR__) . '/config/config-live.php';
 $configMobile = require dirname(__DIR__) . '/config/config_mobile.php';
+$configMobileLive = require dirname(__DIR__) . '/config/config_mobile-live.php';
 
-glue::run(isset($_GET['url']) ? $_GET['url'] : null, $config, $configLive, $configMobile);
+glue::run(
+	isset($_GET['url']) ? $_GET['url'] : null, 
+	$config, 
+	$configLive, 
+	$configMobile, 
+	$configMobileLive
+);
 /** EOF **/
