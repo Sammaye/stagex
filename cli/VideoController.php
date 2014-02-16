@@ -1,6 +1,6 @@
 <?php
 
-use Glue;
+//use glue;
 use app\models\Video;
 use glue\Controller;
 
@@ -141,7 +141,7 @@ class VideoController extends Controller
 						$job['image'] = $message->url;
 						$obj = glue::aws()->S3GetObject(pathinfo($job['image'], PATHINFO_BASENAME));
 						if($obj != null){
-							$thumb = PhpThumbFactory::create($obj->getpath('Body'), array(), true); // This will need some on spot caching soon
+							$thumb = PhpThumbFactory::create((string)$obj->getpath('Body'), array(), true); // This will need some on spot caching soon
 							$thumb->adaptiveResize(800, 600);
 							$job['image_src'] = new MongoBinData($thumb->getImageAsString(),2);
 							$job['img_state'] = 'finished';

@@ -75,13 +75,13 @@ class ImageController extends Controller
 			}elseif($original_image = $video->image){ // last resort
 			    $obj = glue::aws()->S3GetObject(pathinfo($original_image, PATHINFO_BASENAME));
 			    if($obj != null){
-			        $thumb = PhpThumbFactory::create($obj->getpath('Body'), array(), true); // This will need some on spot caching soon
+			        $thumb = PhpThumbFactory::create((string)$obj->getpath('Body'), array(), true); // This will need some on spot caching soon
 			        $thumb->adaptiveResize(800, 600);
 			        $video->setImage($thumb->getImageAsString());
 			    }
 			}
 		}
-		
+
 		$thumb = PhpThumbFactory::create($bytes, array(), true); // This will need some on spot caching soon
 		if($resize) $thumb->adaptiveResize($width, $height);
 		

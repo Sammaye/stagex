@@ -9,7 +9,7 @@ class mailer extends \glue\Component{
 
 	private $_mailer;
 
-	public $viewPath = 'views/mail';
+	public $viewPath = 'mail';
 
 	function init(){ $this->_mailer = new \PHPMailer(); }
 

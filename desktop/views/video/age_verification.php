@@ -6,7 +6,7 @@
 		<p>If you are sure you wish to proceed you can click the "Watch Video" button below otherwise please click the "Cancel" link or press back in your browser.</p>
 		<p>To stop this message from showing in the future please turn off your safe search.</p>
 		<div class='options'>
-			<a href="<?php echo Glue::url()->create("/video/watch", array("id"=>$video->_id, "av"=>1)) ?>" class='grey_css_button float_right'>Watch Video</a>
+			<a href="<?php echo glue::http()->url("/video/watch", array("id"=>$video->_id, "av"=>1)) ?>" class='grey_css_button float_right'>Watch Video</a>
 			<a href="/" onclick="history.back(); return false;" class='back_link'>Cancel</a>
 		</div>
 	</div>

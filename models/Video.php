@@ -245,11 +245,13 @@ class Video extends Document
 	public function setImage($bytes)
 	{
 		$ref=array('type' => 'video', '_id' => $this->_id);
+
 		if(
 			$bytes &&
 			Image::saveAsSize($ref, $bytes, 800, 600, true) &&
 			Image::saveAsSize($ref, $bytes, 33, 18) &&
 			Image::saveAsSize($ref, $bytes, 44, 26) &&
+			Image::saveAsSize($ref, $bytes, 88, 49) &&
 			Image::saveAsSize($ref, $bytes, 124, 69) &&
 			Image::saveAsSize($ref, $bytes, 138, 77) &&
 			Image::saveAsSize($ref, $bytes, 234, 130)

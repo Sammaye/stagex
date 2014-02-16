@@ -18,14 +18,18 @@ class Image extends Document
 		$thumb = \PhpThumbFactory::create($bytes, array(), true); // This will need some on spot caching soon
 		$thumb->adaptiveResize($width, $height);
 
-		$m = new Image;
-		return $m->setAttributes(array(
+		return static::updateAll(array(
+			'ref.type' => $ref['type'], 
+			'ref._id' => $ref['_id'], 
+			'width' => $width, 
+			'height' => $height
+		), array('$set' => array(
 			'ref' => $ref,
 			'bytes' => new \MongoBinData($thumb->getImageAsString(),2),
 			'width' => $width,
 			'height' => $height,
 			'original' => $original,
 			'created' => new \MongoDate()
-		), false)->upsert(array('ref.type' => $ref['type'], 'ref._id' => $ref['_id'], 'width' => $width, 'height' => $height));
+		)), array('upsert' => true));
 	}
 }
