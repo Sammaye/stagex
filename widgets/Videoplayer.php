@@ -92,7 +92,7 @@ class Videoplayer extends Widget
 		?>
 		<div class="video_element_inner" style="width:<?php echo $this->width . 'px' ?>; height:<?php echo $this->height . 'px' ?>;">
 		<video style="width:100%;height:100%;" <?php if((glue::user()->autoplayVideos || !glue::session()->authed) && !$this->embedded): echo "autoplay"; endif; ?> controls="controls" preload="none">
-		    <source type="video/mp4" src="<?php echo$this->mp4 ?>" />
+		    <source type="video/mp4" src="<?php echo $this->mp4 ?>" />
 		    <source type="video/ogg" src="<?php echo $this->ogg ?>" />
 		    <object width="320" height="240" type="application/x-shockwave-flash" data="/js/MediaElement/flashmediaelement.swf">
 		        <param name="movie" value="/js/MediaElement/flashmediaelement.swf" />

@@ -1,9 +1,11 @@
 <?php
 /**
  * Main configuration
- *
- * This file denotes the configuration for most parts of the framework
  */
+
+if (isset($_SERVER['HTTP_CF_CONNECTING_IP'])){
+	$_SERVER['REMOTE_ADDR'] = $_SERVER['HTTP_CF_CONNECTING_IP'];  // If from cloudflare lets switch it all
+}
 
 return array(
 
@@ -298,33 +300,12 @@ return array(
 			}
 		),
 		
-		'facebook' => array(
-				'class' => 'glue\\components\\facebook\\Session',
-				'appId' => '455165987850786',
-				'secret' => '6c6336958eec554bfb2326e6824ea427',
-				'redirect_uri' => 'http://www.stagex.co.uk/user/fbLogin'
-		),
-
-		'twitter' => array(
-				'class' => 'glue\\components\\twitter\\Session',
-				'consumer_key' => "E1uIs3dzvlrodsj4R3I8w",
-				'secret_key' => "HxbMV2giKXekGI41TXp2A2rJh9P5OroGCSxlEYPogwc",
-				'callback' => "http://stagex.co.uk/autoshare/auth?network=twt"
-		),
-		
 		'elasticSearch' => array(
 		    'class' => 'glue\\components\\Elasticsearch\\Client',
 		    'index' => 'main',
 		    'params' => array()
 		),
-
-		'google' => array(
-				'class' => 'glue\\components\\google\\Session',
-				'client_id' => '170938211589.apps.googleusercontent.com',
-				'client_secret' => 'lTJpybuvyAD-zWTBI-mnyT1Q',
-				'callback_uri' => 'http://stagex-local.co.uk/user/googleLogin'
-		),
-
+		
 		'aws' => array(
 			'class' => 'glue\\components\\aws\\Bootstrap',
 			'key' => 'AKIAICYRUYXAXE3MTUXA',
@@ -333,6 +314,20 @@ return array(
 			'input_queue' => 'https://us-west-2.queue.amazonaws.com/663341881510/stagex-uploadsQueue',
 			'output_queue' => 'https://us-west-2.queue.amazonaws.com/663341881510/stagex-outputsQueue'
 		),
+		
+		'facebook' => array(
+			'class' => 'glue\\components\\facebook\\Session',
+			'appId' => '455165987850786',
+			'secret' => '6c6336958eec554bfb2326e6824ea427',
+			'redirect_uri' => 'http://www.stagex.co.uk/user/fbLogin'
+		),
+		
+		'google' => array(
+			'class' => 'glue\\components\\google\\Session',
+			'client_id' => '170938211589.apps.googleusercontent.com',
+			'client_secret' => 'lTJpybuvyAD-zWTBI-mnyT1Q',
+			'callback_uri' => 'http://stagex-local.co.uk/user/googleLogin'
+		),		
 
 		'mailer' => array(
 				'class' => 'glue\\components\\phpmailer\\mailer'
@@ -370,7 +365,7 @@ return array(
 		'beforeRequest' => function(){
 			$detect = new \glue\components\mobiledetect\Detect();
 			if($detect->isMobile() || $detect->isTablet() && isset(glue::$params['mobileUrl'])){
-				//header('Location: '.glue::$params['mobileUrl']);
+				header('Location: '.glue::$params['mobileUrl']);
 			}
 		},
 		'afterRequest' => function(){

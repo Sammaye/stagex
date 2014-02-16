@@ -5,17 +5,10 @@
 
 cluster.name: stagex_search
 
-#################################### Node #####################################
-
-# Node names are generated dynamically on startup, so you're relieved
-# from configuring them manually. You can tie this node to a specific name:
-#
-node.name: stage_search-01
-
 #################################### Index ####################################
 
 index.number_of_shards: 5
-index.number_of_replicas: 2
+index.number_of_replicas: 1
 
 ################################### Memory ####################################
 
@@ -31,19 +24,8 @@ index.number_of_replicas: 2
 ################################## Discovery ##################################
 # http://elasticsearch.org/guide/en/elasticsearch/reference/current/modules-discovery-zen.html
 
-discovery.zen.minimum_master_nodes: 2
-discovery.zen.ping.timeout: 3s
-
 discovery.zen.ping.multicast.enabled: false
-# discovery.zen.ping.unicast.hosts: ["host1", "host2:port"]
-
-#cloud:
-#    aws:
-#        access_key: AKIAICYRUYXAXE3MTUXA
-#        secret_key: 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
-#        region: us-west-2
-#discovery:
-#    type: ec2
+discovery.zen.ping.unicast.hosts: ["localhost"]
 
 ################################## Slow Log ##################################
 
@@ -63,3 +45,5 @@ discovery.zen.ping.multicast.enabled: false
 #index.indexing.slowlog.threshold.index.info: 5s
 #index.indexing.slowlog.threshold.index.debug: 2s
 #index.indexing.slowlog.threshold.index.trace: 500ms
+
+script.disable_dynamic: true

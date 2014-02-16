@@ -1,8 +1,10 @@
 <?php
 
-function p($message){
+function p($message)
+{
 	print $message . "\n";
 }
+
 require '../glue/components/vendor/autoload.php';
 
 $client = new Elasticsearch\Client();
@@ -29,7 +31,7 @@ if(!$client->indices()->exists(array('index' => 'main')) || in_array('--reindex'
 		'body' => array(
 			'settings' => array(
 				'number_of_shards' => 5,
-				'number_of_replicas' => 2,
+				'number_of_replicas' => 1,
 				'analysis' => array(
 					'analyzer' => array(
 					'noStopFilter' => array(
