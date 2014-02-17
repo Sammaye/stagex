@@ -45,6 +45,7 @@ if(!glue::auth()->check(array('viewable' => $item))){
 			<span class='likes'><?php if($item->likes > 0): echo "+".$item->likes; endif ?></span>
 			</span>
 		<?php endif; ?>
+		<?php if($view === 'ajaxthread'){ ?>
 		<?php if($item->video->allowTextComments && !glue::auth()->check(array('^' => $item))){ ?><a href='#' class='btn_reply footer_block'>Reply</a><?php } ?>
 		</span>	
 		<?php if(!$item->approved): ?><span class='btn_pending footer_block'>Pending 
@@ -55,7 +56,8 @@ if(!glue::auth()->check(array('viewable' => $item))){
 		<?php }
 		if($item->thread_parent):
 			echo "<a href='".glue::http()->url('/videoresponse/thread', array('id' => $item->_id))."' class='footer_block' target='_blank'>View thread</a> ";
-		endif; ?>			
+		endif; ?>
+		<?php } ?>
 	</div>
 	<?php endif; ?>	
 	</div>
