@@ -133,10 +133,16 @@ return array(
 				),
 
 				'stream' => array(
-					array('stream_type' => 1, 'user_id' => 1, 'type' => 1),
-					array('stream_type' => 1, 'user_id' => 1, 'type' => 1, 'ts' => 1),
-					array('_id' => 1, 'user_id' => 1),
-					array('user_id' => 1)
+					array('user_id' => 1, 'type' => 1),
+					array('stream_type' => 1, 'user_id' => 1),
+					array('type' => 1),
+					array('user_id' => 1),
+					array('user_id' => 1, 'type' => 1, 'created' => -1),
+					array('user_id' => 1, 'posted_by_id' => 1, 'type' => 1),
+					array('user_id' => 1, 'subscribed_user_id' => 1, 'type' => 1),
+					array('user_id' => 1, 'video_id' => 1, 'type' => 1),
+					array('user_id' => 1, 'playlist_id' => 1, 'type' => 1),
+					array('user_id' => 1, 'item_id' => 1, 'type' => 1),
 				),
 					
 				'notification' => array(
