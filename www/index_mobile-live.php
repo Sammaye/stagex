@@ -5,8 +5,8 @@ include_once "../glue/glue.php";
 /** Run the framework */
 $config = require dirname(__DIR__) . '/config/config.php';
 $configLive = require dirname(__DIR__) . '/config/config-live.php';
-$configMobile = require dirname(__DIR__) . '/config/config_mobile.php';
-$configMobileLive = require dirname(__DIR__) . '/config/config_mobile-live.php';
+$configMobile = require dirname(__DIR__) . '/config/mobile.php';
+$configMobileLive = require dirname(__DIR__) . '/config/mobile-live.php';
 
 glue::run(
 	isset($_GET['url']) ? $_GET['url'] : null, 

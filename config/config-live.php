@@ -2,7 +2,7 @@
 return array(
 
 	// This switches the debug mode
-	"debug"=>false,
+	"debug" => false,
 
 	"minify" => true,
 
