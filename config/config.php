@@ -66,9 +66,9 @@ return array(
 					array('email' => 1, 'ts' => 1)
 				),
 			
-				app\models\User::collectionName() => array(
-					array(array('email' => 1), array('unique' => true)),
-					array(array('username' => 1), array('unique' => true)),
+				'user' => array(
+					array(array('email' => 1)/*, array('unique' => true, 'sparse' => true)*/),
+					array(array('username' => 1)/*, array('unique' => true, 'sparse' => true)*/),
 					array('_id' => 1, 'username' => 1),
 					array('username' => 1),
 					array('fbUid' => 1),
@@ -76,18 +76,18 @@ return array(
 					array('nextBandwidthTopup' => 1),
 				),
 
-				app\models\Follower::collectionName() => array(
+				'follower' => array(
 					array('fromId' => 1, 'toId' => 1),
 					array('toId' => 1),
 					array('fromId' => 1)
 				),
 					
-				app\models\Image::collectionName() => array(
+				'image' => array(
 					array('ref.type' => 1, 'ref.id' => 1),
 					array('ref.type' => 1, 'ref.id' => 1, 'original' => 1)
 				),
 
-				app\models\Video::collectionName() => array(
+				'video' => array(
 					array('jobId' => 1),
 					array('title' => 1),
 					array('title' => 1, 'tags' => 1, 'created' => -1),
@@ -106,7 +106,7 @@ return array(
 					array('ref' => 1, 'userId' => 1)
 				),
 
-				app\models\VideoResponse::collectionName() => array(
+				'videoresponse' => array(
 					array('videoId' => 1),
 					array('videoId' => 1, 'created' => -1),
 					array('videoId' => 1, 'deleted' => 1, 'approved' => 1),
@@ -124,7 +124,7 @@ return array(
 					array('videoId' => 1)
 				),
 					
-				app\models\Playlist::collectionName() => array(
+				'playlist' => array(
 					array('_id' => 1, 'deleted' => 1),
 					array('_id' => 1, 'title' => 1),
 					array('_id' => 1, 'userId' => 1, 'deleted' => 1),
@@ -132,18 +132,18 @@ return array(
 					array('userId' => 1, 'deleted' => 1, 'title' => 1, 'created' => -1)
 				),
 
-				app\models\Stream::collectionName() => array(
+				'stream' => array(
 					array('stream_type' => 1, 'user_id' => 1, 'type' => 1),
 					array('stream_type' => 1, 'user_id' => 1, 'type' => 1, 'ts' => 1),
 					array('_id' => 1, 'user_id' => 1),
 					array('user_id' => 1)
 				),
 					
-				app\models\Notification::collectionName() => array(
+				'notification' => array(
 					array('userId' => 1, 'created' => 1)
 				),
 
-				app\models\Help::collectionName() => array(
+				'help' => array(
 					array('normalisedTitle' => 1),
 					array('title' => 1, 'path' => 1, 'type' => 1),
 					array('path' => 1),
@@ -159,7 +159,7 @@ return array(
 					array('user_id' => 1, 'ts' => 1),
 				),
 					
-				app\models\Queue::collectionName() => array(
+				'queue' => array(
 					array('ts' => -1)
 				),
 			)

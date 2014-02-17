@@ -17,6 +17,8 @@ class Client extends Component
     public $defaultDatabaseName;
 
     public $mongoClient;
+    
+    public $indexes = array();
 
     private $_databases = array();
 
