@@ -144,7 +144,7 @@ class Stream extends Document
 
 	public static function subscribedTo($user_id, $subscribed_user)
 	{
-		$status = Stream::findOne(array('userId' => $user_id, 'subscribed_user_id' => $subscribed_user, 'type' => Stream::SUBSCRIBED_TO));
+		$status = Stream::findOne(array('user_id' => $user_id, 'subscribed_user_id' => $subscribed_user, 'type' => Stream::SUBSCRIBED_TO));
 
 		if($status){
 			$status->save();
@@ -252,7 +252,7 @@ class Stream extends Document
 
 	public static function PlaylistAddVideo($user_id, $playlist_id, $video_id)
 	{
-		$status = Stream::findOne(array('userId' => $user_id, 'itemId' => $playlist_id, 'type' => Stream::ADD_TO_PL));
+		$status = Stream::findOne(array('user_id' => $user_id, 'item_id' => $playlist_id, 'type' => Stream::ADD_TO_PL));
 
 		if($status){
 			$status->addItemById($video_id);

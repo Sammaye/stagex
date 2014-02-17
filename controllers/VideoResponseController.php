@@ -156,10 +156,10 @@ class VideoResponseController extends Controller
 
 		if(glue::auth()->check(array('^' => $comment->video))){
 			$thread_parent = VideoResponse::findOne(array('_id' => new MongoId($path_segs[0]), 'deleted' => 0));
-			$thread = VideoResponse::find(array('path' => new MongoRegex('/'.$path_segs[0].',/'), 'deleted' => 0))->sort(array('ts' => -1));
+			$thread = VideoResponse::find(array('path' => new MongoRegex('/'.$path_segs[0].',/'), 'deleted' => 0))->sort(array('created' => -1));
 		}else{
 			$thread_parent = VideoResponse::find(array('_id' => new MongoId($path_segs[0]), 'deleted' => 0))->visible()->one();
-			$thread = VideoResponse::find(array('path' => new MongoRegex('/'.$path_segs[0].',/'), 'deleted' => 0))->visible()->sort(array('ts' => -1));
+			$thread = VideoResponse::find(array('path' => new MongoRegex('/'.$path_segs[0].',/'), 'deleted' => 0))->visible()->sort(array('created' => -1));
 		}
 
 		if(!glue::auth()->check(array('viewable' => $thread_parent))){
@@ -316,7 +316,7 @@ class VideoResponseController extends Controller
 		$row_count = $comments->count();
 		
 		app\models\VideoResponse::deleteAll($condition);
-		glue::db()->videoresponse_likes->remove(array("response_id" => array('$in' => $mongoIds)));
+		glue::db()->videoresponse_likes->remove(array("responseId" => array('$in' => $mongoIds)));
 		$video->saveCounters(array('totalResponses' => -$row_count,'totalTextResponses' => -$row_count), 0);
 		
 		Json::success(array('message' => 'The comments you specified were deleted', 'total' => count($mongoIds), 'updated' => $row_count,

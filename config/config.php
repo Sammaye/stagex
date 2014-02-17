@@ -58,85 +58,110 @@ return array(
 			 */
 			"indexes" => array(
 				'session' => array(
-					array(array('session_id' => 1), array("unique" => true))
+					array(array('session_id' => 1), array("unique" => true)),
+					array('expires' => 1)
 				),
 				
 				'session_log' => array(
-					array(array('email' => 1, 'ts' => 1))
+					array('email' => 1, 'ts' => 1)
 				),
 			
-				'users' => array(
-					array(array('email' => 1)),
-					array(array('_id' => 1, 'username' => 1)),
-					array(array('fb_uid' => 1)),
-					array(array('username' => 1))
+				app\models\User::collectionName() => array(
+					array(array('email' => 1), array('unique' => true)),
+					array(array('username' => 1), array('unique' => true)),
+					array('_id' => 1, 'username' => 1),
+					array('username' => 1),
+					array('fbUid' => 1),
+					array('googleUid' => 1),
+					array('nextBandwidthTopup' => 1),
 				),
 
-				'subscription' => array(
-					array(array('from_id' => 1, 'to_id' => 1)),
-					array(array('to_id' => 1)),
-					array(array('from_id' => 1))
+				app\models\Follower::collectionName() => array(
+					array('fromId' => 1, 'toId' => 1),
+					array('toId' => 1),
+					array('fromId' => 1)
+				),
+					
+				app\models\Image::collectionName() => array(
+					array('ref.type' => 1, 'ref.id' => 1),
+					array('ref.type' => 1, 'ref.id' => 1, 'original' => 1)
 				),
 
-				'videos' => array(
-					array(array('title' => 1, 'user_id' => 1)),
-					array(array('user_id' => 1)),
-					array(array('file' => 1, 'user_id' => 1)),
-					array(array('state' => 1))
+				app\models\Video::collectionName() => array(
+					array('jobId' => 1),
+					array('title' => 1),
+					array('title' => 1, 'tags' => 1, 'created' => -1),
+					array('uploadId' => 1),
+					array('userId' => 1),
+					array('uploadId' => 1, 'userId' => 1),
+				),
+					
+				'video_likes' => array(
+					array('item' => 1),
+					array('user_id' => 1, 'item' => 1),
+					array('user_id' => 1, 'ts' => -1)
+				),
+					
+				'report' => array(
+					array('ref' => 1, 'userId' => 1)
 				),
 
-				'videoresponse' => array(
-					array(array('vid' => 1)),
-					array(array('vid' => 1, 'ts' => 1)),
-					array(array('path' => 1)),
-					array(array('vid' => 1, 'path' => 1))
+				app\models\VideoResponse::collectionName() => array(
+					array('videoId' => 1),
+					array('videoId' => 1, 'created' => -1),
+					array('videoId' => 1, 'deleted' => 1, 'approved' => 1),
+					array('_id' => 1, 'videoId' => 1),
+					array('_id' => 1, 'deleted' => 1),
+					array('userId' => 1),
+					array('approved' => 1),
+					array('replyVideoId' => 1, 'videoId' => 1),
+					array('path' => 1, 'created' => 1)
 				),
 
 				'videoresponse_likes' => array(
-					array(array('user_id' => 1, 'response_id' => 1)),
-					array(array('video_id' => 1))
+					array('userId' => 1, 'responseId' => 1),
+					array('responseId' => 1),
+					array('videoId' => 1)
+				),
+					
+				app\models\Playlist::collectionName() => array(
+					array('_id' => 1, 'deleted' => 1),
+					array('_id' => 1, 'title' => 1),
+					array('_id' => 1, 'userId' => 1, 'deleted' => 1),
+					array('userId' => 1, 'title' => 1),
+					array('userId' => 1, 'deleted' => 1, 'title' => 1, 'created' => -1)
 				),
 
-				'stream' => array(
-					array(array('stream_type' => 1, 'user_id' => 1, 'type' => 1)),
-					array(array('stream_type' => 1, 'user_id' => 1, 'type' => 1, 'ts' => 1)),
-					array(array('_id' => 1, 'user_id' => 1)),
-					array(array('user_id' => 1))
+				app\models\Stream::collectionName() => array(
+					array('stream_type' => 1, 'user_id' => 1, 'type' => 1),
+					array('stream_type' => 1, 'user_id' => 1, 'type' => 1, 'ts' => 1),
+					array('_id' => 1, 'user_id' => 1),
+					array('user_id' => 1)
+				),
+					
+				app\models\Notification::collectionName() => array(
+					array('userId' => 1, 'created' => 1)
 				),
 
-				'help' => array(
-					array(array('t_normalised' => 1)),
-					array(array('title' => 1, 'path' => 1, 'type' => 1)),
-					array(array('title' => 1, 'path' => 1, 'type' => 1))
-				),
-
-				'video_likes' => array(
-					array(array('user_id' => 1, 'item' => 1))
-				),
-
-				'report.video' => array(
-					array(array('vid' => 1, 'uid' => 1))
-				),
-
-				'playlists' => array(
-					array(array('_id' => 1, 'title' => 1)),
-					array(array('_id' => 1, 'user_id' => 1, 'title' => 1)),
-					array(array('title' => 1)),
-					array(array('user_id' => 1)),
+				app\models\Help::collectionName() => array(
+					array('normalisedTitle' => 1),
+					array('title' => 1, 'path' => 1, 'type' => 1),
+					array('path' => 1),
+					array('path' => 1, 'seq' => 1)
 				),
 
 				'playlist_likes' => array(
-					array(array('user_id' => 1, 'item' => 1))
+					array('userId' => 1, 'item' => 1)
 				),
 
 				'watched_history' => array(
-					array(array('user_id' => 1)),
-					array(array('user_id' => 1, 'item' => 1))
+					array('user_id' => 1, 'ts' => -1),
+					array('user_id' => 1, 'ts' => 1),
 				),
-
-				'image_cache' => array(
-					array(array('object_id' => 1, 'width' => 1, 'height' => 1, 'type' => 1))
-				)
+					
+				app\models\Queue::collectionName() => array(
+					array('ts' => -1)
+				),
 			)
 		),
 
@@ -327,14 +352,14 @@ return array(
 			'client_id' => '170938211589.apps.googleusercontent.com',
 			'client_secret' => 'lTJpybuvyAD-zWTBI-mnyT1Q',
 			'callback_uri' => 'http://stagex-local.co.uk/user/googleLogin'
-		),		
+		),
 
 		'mailer' => array(
-				'class' => 'glue\\components\\phpmailer\\mailer'
+			'class' => 'glue\\components\\phpmailer\\mailer'
 		),
 
 		'sitemap' => array(
-				'class' => 'glue\\components\\sitemap\\sitemap'
+			'class' => 'glue\\components\\sitemap\\sitemap'
 		),
 	),
 
@@ -349,14 +374,15 @@ return array(
 		'404' => function(){
 			if(php_sapi_name() == 'cli'){
 				print 'That action/controller was not found';
-			}else
-				glue::route('error/notfound');
+			}else{
+				glue::runAction('error/notfound');
+			}
 		},
 		'403' => function(){
-			glue::route('error/forbidden');
+			glue::runAction('error/forbidden');
 		},
 		'500' => function(){
-			glue::route('error');
+			glue::runAction('error');
 		},
 
 		/**

@@ -134,7 +134,7 @@ class VideoResponse extends Document
 	public function getThread()
 	{
 		/** $secondLevel = $this->Db()->find(array("path"=>new MongoRegex("/^".$path.",[^,]*,[^,]*$/")))->sort(array("seq"=>1)); // Second Level **/
-		return self::find(array("path"=>new \MongoRegex("/^".$this->path.",[^,]*$/")))->sort(array("ts"=>1)); // First Level
+		return self::find(array("path"=>new \MongoRegex("/^".$this->path.",[^,]*$/")))->sort(array("created"=>1)); // First Level
 	}
 
 	public function beforeSave()

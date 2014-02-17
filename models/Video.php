@@ -846,13 +846,11 @@ class Video extends Document
 	public function delete()
 	{
 		foreach($video_rows as $video){
-			\app\models\VideoResponse::Db()->remove(array('$or' => array(
-			array('vid' => $video->_id), array('xtn_vid' => $video->_id)
-			)), array('safe' => true));
+			\app\models\VideoResponse::deleteAll(array('replyVideoId' => $video->_id));
 			$video->deleted = 1;
 			$video->save();
 		}
-		glue::db()->videoresponse_likes->remove(array("video_id"=>array('$in' => $video_ids)));
+		glue::db()->videoresponse_likes->remove(array("videoId"=>array('$in' => $video_ids)));
 		glue::db()->video_likes->remove(array('item' => array('$in' => $video_ids))); // Same reason as above		
 	}
 	

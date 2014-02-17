@@ -154,7 +154,7 @@ class UserController extends Controller
 				$x_un = explode('@', $g_user->email);
 				$username = $x_un[0];
 				$user = User::findOne(array('$or' => array(
-					array('google_uid' => $g_user->id), array('email' => array('$in' => array($username.'@googlemail.com', $username.'@gmail.com')))
+					array('googleUid' => $g_user->id), array('email' => array('$in' => array($username.'@googlemail.com', $username.'@gmail.com')))
 				)));
 
 				if(!$user){
