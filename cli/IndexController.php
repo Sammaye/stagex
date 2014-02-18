@@ -117,13 +117,12 @@ class IndexController extends Controller
 	
 	public function action_migrateHelp(){
 		foreach(app\models\Help::find()->all() as $doc){
-			$doc->normalisedTitle = $doc->normalisedTile;
+			$doc->normalisedTitle = $doc->t_normalised;
 			$doc->keywords = $doc->t_keyword;
 			$doc->published = $doc->publishtime;
 			$doc->created = $doc->createtime;
 			$doc->userId = $doc->author;
 			
-			unset($doc->normalisedTile);
 			unset($doc->t_normalised);
 			unset($doc->t_keyword);
 			unset($doc->publishtime);
