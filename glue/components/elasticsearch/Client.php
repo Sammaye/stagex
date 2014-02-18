@@ -1,9 +1,9 @@
 <?php
 
-namespace glue\components\Elasticsearch;
+namespace glue\components\elasticsearch;
 
 use glue;
-use \glue\components\Elasticsearch\Cursor;
+use \glue\components\elasticsearch\Cursor;
 
 require glue::getPath('@glue').'/components/vendor/autoload.php';
 

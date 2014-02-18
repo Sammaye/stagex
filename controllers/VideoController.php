@@ -3,7 +3,7 @@
 use glue\Controller;
 use glue\Json;
 use glue\Model;
-use glue\components\Elasticsearch\Query;
+use glue\components\elasticsearch\Query;
 use app\models\Video;
 use app\models\Queue;
 

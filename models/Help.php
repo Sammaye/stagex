@@ -3,7 +3,7 @@ namespace app\models;
 
 use glue;
 use glue\db\Document;
-use glue\components\Elasticsearch\Query;
+use glue\components\elasticsearch\Query;
 
 class Help extends Document
 {

@@ -4,7 +4,7 @@ use \glue\Controller;
 use app\models\Video;
 use app\models\Playlist;
 use app\models\User;
-use glue\components\Elasticsearch\Query;
+use glue\components\elasticsearch\Query;
 
 class SearchController extends Controller
 {

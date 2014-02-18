@@ -1,5 +1,5 @@
 <?php
-namespace glue\components\Elasticsearch;
+namespace glue\components\elasticsearch;
 
 class Query{
 

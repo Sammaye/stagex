@@ -2,7 +2,7 @@
 
 use glue\Controller;
 use glue\Json;
-use glue\components\Elasticsearch\Query;
+use glue\components\elasticsearch\Query;
 use app\models\AutoPublishQueue;
 use app\models\Video;
 use app\models\Playlist;

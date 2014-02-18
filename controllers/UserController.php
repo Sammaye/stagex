@@ -4,7 +4,7 @@ use glue\Controller;
 use glue\Json;
 use glue\Html;
 use glue\util\Crypt;
-use glue\components\Elasticsearch\Query;
+use glue\components\elasticsearch\Query;
 use app\models\loginForm;
 use app\models\recoverForm;
 use app\models\User;
