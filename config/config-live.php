@@ -14,15 +14,13 @@ return array(
 		),
 
 		'facebook' => array(
-			'class' => 'facebook_session',
-			'path' => 'glue/plugins/facebook/facebook_session.php',
+			'class' => 'glue\\components\\facebook\\Session',
 		  	'appId' => '153062384724422',
 		  	'secret' => '36e823e43433b6630e827d9cce49cf5d',
 		),
 
 		'google' => array(
-			'class' => 'google_session',
-			'path' => 'glue/plugins/googleapi/google_session.php',
+			'class' => 'glue\\components\\google\\Session',
 			'client_id' => '1084037742147.apps.googleusercontent.com',
 			'client_secret' => 'xKZbxkiUoWrTZV5T423zqbj2',
 			'callback_uri' => 'http://www.stagex.co.uk/user/google_login'
