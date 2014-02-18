@@ -29,7 +29,7 @@ class Client extends \glue\Component{
     
     public function connect()
     {
-        return $this->client = new \elasticsearch\Client($this->params);
+        return $this->client = new static($this->params);
     }
     
     public function getClient()
