@@ -216,7 +216,7 @@ class Glue
 			$route = '';
 		}
 
-		$controllerName = preg_replace('/\{name\}/', $id, static::$controllerName);
+		$controllerName = preg_replace('/\{name\}/', ucfirst($id), static::$controllerName);
 		if(php_sapi_name() == 'cli'){
 			$controllerFile = ( self::getPath('@cli') !== null ? 
 				self::getPath('@cli') : 
