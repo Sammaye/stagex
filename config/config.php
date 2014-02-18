@@ -332,7 +332,7 @@ return array(
 		),
 		
 		'elasticSearch' => array(
-		    'class' => 'glue\\components\\Elasticsearch\\Client',
+		    'class' => 'glue\\components\\elasticsearch\\Client',
 		    'index' => 'main',
 		    'params' => array()
 		),
