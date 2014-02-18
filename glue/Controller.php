@@ -288,15 +288,15 @@ class Controller extends Component
 				$fpath = str_replace('/', DIRECTORY_SEPARATOR, $viewPath.'/'.$path);
 			}else{
 				// Then lets attempt to get the cwd from the controller. If the controller is not set we use siteController as default. This can occur for cronjobs
-				$fpath = str_replace('/', DIRECTORY_SEPARATOR, $viewPath.'/'.str_replace('Controller', '',
-						glue::controller() instanceof \glue\Controller ? strtolower(get_class(glue::controller())) : 'siteController').'/'.$path);
+				$fpath = str_replace('/', DIRECTORY_SEPARATOR, $viewPath.'/'.strtolower(str_replace('Controller', '',
+						glue::controller() instanceof \glue\Controller ? get_class(glue::controller()) : 'siteController')).'/'.$path);
 			}
 				
 			if(file_exists($fpath)){
 				return $fpath;
 			}
 		}
-		throw new Exception('Could not find view: '.$path);
+		throw new Exception('Could not find view: '.$fpath);
 	}
 
 	public function getLayoutPath($path)
