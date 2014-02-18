@@ -1,7 +1,7 @@
 <?php
 
 /** Include the main point of entry */
-include "glue/glue.php";
+include "glue/Glue.php";
 
 /** Run the framework */
 $config=require 'config/config.php';
