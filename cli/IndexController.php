@@ -114,4 +114,23 @@ class IndexController extends Controller
 		curl_close($ch);
 		echo $output;
 	}
+	
+	public function action_migrateHelp(){
+		foreach(app\models\Help::find()->all() as $doc){
+			$doc->normalisedTitle = $doc->normalisedTile;
+			$doc->keywords = $doc->t_keyword;
+			$doc->published = $doc->publishtime;
+			$doc->created = $doc->createtime;
+			$doc->userId = $doc->author;
+			
+			unset($doc->normalisedTile);
+			unset($doc->t_normalised);
+			unset($doc->t_keyword);
+			unset($doc->publishtime);
+			unset($doc->createtime);
+			unset($doc->author);			
+			
+			$doc->save();
+		}
+	}
 }

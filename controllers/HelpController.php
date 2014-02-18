@@ -16,10 +16,10 @@ class HelpController extends Controller
 			'auth' => array(
 				'class' => 'glue\Auth',
 				'rules' => array(
-//					array("allow",
-//						"actions"=>array('view_topics', 'add_topic', 'edit_topic', 'remove_topics', 'view_articles', 'add_article', 'edit_article', 'remove_articles'),
-//						"users"=>array("@*", '^@')
-//					),						
+					array("allow",
+						"actions"=>array('viewTopics', 'addTopic', 'editTopic', 'removeTopics', 'viewArticles', 'addArticle', 'editArticle', 'removeArticles'),
+						"users"=>array("@*", '^@')
+					),						
 					array('allow', 'users' => array('*')),
 				)
 			)
