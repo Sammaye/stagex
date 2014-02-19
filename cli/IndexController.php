@@ -1,5 +1,7 @@
 <?php
 
+use app\models\HelpArticle;
+
 use \glue\Controller;
 
 class IndexController extends Controller
@@ -116,7 +118,17 @@ class IndexController extends Controller
 	}
 	
 	public function action_migrateHelp(){
+		
 		foreach(app\models\Help::find()->all() as $doc){
+			
+			if($doc->type === 'topic'){
+				$doc = app\models\HelpTopic::populate($doc->getRawDocument());
+			}elseif($doc->type === 'article'){
+				$doc = app\models\HelpArticle::populate($doc->getRawDocument());
+			}
+			
+			//var_dump($doc);
+			
 			//$doc->normalisedTitle = $doc->t_normalised;
 			/*
 			$doc->keywords = $doc->t_keyword;
@@ -130,7 +142,12 @@ class IndexController extends Controller
 			unset($doc->author);
 			*/
 			//unset($doc->t_normalised);
-			$doc->save();
+			if(!$doc->save()){
+				var_dump($doc);
+				var_dump($doc->getErrors());
+				
+			}
+			
 		}
 	}
 }
