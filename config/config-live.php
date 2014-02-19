@@ -33,8 +33,9 @@ return array(
 		'imagesUrl' => 'images.stagex.co.uk/',
 		'thumbnailBase' => 'images.stagex.co.uk/videos/',
 		'uploadBase' => 'upload.stagex.co.uk',
+		'mobileUrl' => 'http://m.stagex.co.uk'
 	),
-		
+	
 	/**
 	 * These events are bound at startup to the framework
 	 */

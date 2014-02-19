@@ -53,8 +53,8 @@
 
     "AWSRegionArch2AMI" : {
       "us-east-1"      : { "32" : "NOT_YET_SUPPORTED", "64" : "NOT_YET_SUPPORTED", "64HVM" : "NOT_YET_SUPPORTED" },
-      "us-west-2"      : { "32" : "NOT_YET_SUPPORTED", "64" : "ami-fc2ba7cc", "64HVM" : "NOT_YET_SUPPORTED" },
-      "us-west-1"      : { "32" : "NOT_YET_SUPPORTED", "64" : "ami-fc2ba7cc", "64HVM" : "NOT_YET_SUPPORTED" },
+      "us-west-2"      : { "32" : "NOT_YET_SUPPORTED", "64" : "ami-bc5f328c", "64HVM" : "NOT_YET_SUPPORTED" },
+      "us-west-1"      : { "32" : "NOT_YET_SUPPORTED", "64" : "ami-bc5f328c", "64HVM" : "NOT_YET_SUPPORTED" },
       "eu-west-1"      : { "32" : "NOT_YET_SUPPORTED", "64" : "NOT_YET_SUPPORTED", "64HVM" : "NOT_YET_SUPPORTED" },
       "ap-southeast-1" : { "32" : "NOT_YET_SUPPORTED", "64" : "NOT_YET_SUPPORTED", "64HVM" : "NOT_YET_SUPPORTED" },
       "ap-northeast-1" : { "32" : "NOT_YET_SUPPORTED", "64" : "NOT_YET_SUPPORTED", "64HVM" : "NOT_YET_SUPPORTED" },
