@@ -7,7 +7,7 @@ function p($message)
 
 require '../glue/components/vendor/autoload.php';
 
-$client = new elasticsearch\Client();
+$client = new Elasticsearch\Client();
 $init = false;
 
 p("OK! Setting up Elastic Search, I guess");
