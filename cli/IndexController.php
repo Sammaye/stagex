@@ -116,7 +116,7 @@ class IndexController extends Controller
 		curl_close($ch);
 		echo $output;
 	}
-	
+	/*
 	public function action_migrateHelp(){
 		
 		foreach(app\models\Help::find()->all() as $doc){
@@ -130,7 +130,6 @@ class IndexController extends Controller
 			//var_dump($doc);
 			
 			//$doc->normalisedTitle = $doc->t_normalised;
-			/*
 			$doc->keywords = $doc->t_keyword;
 			$doc->published = $doc->publishtime;
 			$doc->created = $doc->createtime;
@@ -140,7 +139,7 @@ class IndexController extends Controller
 			unset($doc->publishtime);
 			unset($doc->createtime);
 			unset($doc->author);
-			*/
+			
 			//unset($doc->t_normalised);
 			if(!$doc->save()){
 				var_dump($doc);
@@ -150,4 +149,5 @@ class IndexController extends Controller
 			
 		}
 	}
+	*/
 }
