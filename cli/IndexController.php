@@ -117,7 +117,7 @@ class IndexController extends Controller
 	
 	public function action_migrateHelp(){
 		foreach(app\models\Help::find()->all() as $doc){
-			$doc->normalisedTitle = $doc->t_normalised;
+			//$doc->normalisedTitle = $doc->t_normalised;
 			/*
 			$doc->keywords = $doc->t_keyword;
 			$doc->published = $doc->publishtime;
@@ -129,7 +129,7 @@ class IndexController extends Controller
 			unset($doc->createtime);
 			unset($doc->author);
 			*/
-			unset($doc->t_normalised);
+			//unset($doc->t_normalised);
 			$doc->save();
 		}
 	}
