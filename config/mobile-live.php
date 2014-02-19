@@ -1,4 +1,8 @@
 <?php
 return array(
-	"debug" => false
+	"debug" => false,
+		
+		'params' => array(
+			'uploadBase' => 'm.upload.stagex.co.uk',
+		),
 );

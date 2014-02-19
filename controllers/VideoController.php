@@ -40,7 +40,10 @@ class VideoController extends Controller
 		$this->layout = 'user_section';
 
 		glue::user()->resetUploadBandwidth();
-		if((!strstr($_SERVER['SERVER_NAME'], 'upload.')) && glue::$params['uploadBase'] == 'http://upload.stagex.co.uk/'){
+		if(
+			(!strstr($_SERVER['SERVER_NAME'], 'upload.')) && 
+			(glue::$params['uploadBase'] == 'upload.stagex.co.uk' || glue::$params['uploadBase'] == 'm.upload.stagex.co.uk')
+		){
 			glue::http()->redirect(glue::$params['uploadBase'].'video/upload');
 		}
 		if(glue::user()->canUpload){

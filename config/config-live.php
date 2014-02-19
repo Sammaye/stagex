@@ -1,6 +1,8 @@
 <?php
 return array(
 
+	'www' => 'www.stagex.co.uk',
+		
 	// This switches the debug mode
 	"debug" => false,
 
