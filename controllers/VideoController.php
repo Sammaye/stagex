@@ -44,7 +44,7 @@ class VideoController extends Controller
 			(!strstr($_SERVER['SERVER_NAME'], 'upload.')) && 
 			(glue::$params['uploadBase'] == 'upload.stagex.co.uk' || glue::$params['uploadBase'] == 'm.upload.stagex.co.uk')
 		){
-			glue::http()->redirect(glue::$params['uploadBase'].'video/upload');
+			glue::http()->redirect('video/upload', array(), glue::$params['uploadBase']);
 		}
 		if(glue::user()->canUpload){
 			echo $this->render('upload', array('model'=>glue::user()));
