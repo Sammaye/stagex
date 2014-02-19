@@ -33,5 +33,12 @@ return array(
 		'imagesUrl' => 'images.stagex.co.uk/',
 		'thumbnailBase' => 'images.stagex.co.uk/videos/',
 		'uploadBase' => 'upload.stagex.co.uk',
-	)
+	),
+		
+	/**
+	 * These events are bound at startup to the framework
+	 */
+	'events' => array(
+		'afterRequest' => function(){}
+	),	
 );
