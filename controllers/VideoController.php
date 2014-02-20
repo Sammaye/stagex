@@ -252,7 +252,7 @@ class VideoController extends Controller
 			}
 			glue::user()->recordWatched($video);
 		}		
-		$this->render('embedded', array('model' => $video));
+		echo $this->render('embedded', array('model' => $video));
 	}
 	
 	public function action_save()

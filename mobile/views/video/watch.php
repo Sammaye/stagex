@@ -408,7 +408,7 @@ $this->js('edit', "
 				<li><a rel='new_window' class="google-social-icon" href="https://plus.google.com/u/0/share?url=<?php echo urlencode(glue::http()->url("/video/watch", array("id"=>$model->_id))) ?>"></a></li>
 			</ul>		
 			<div class="clear"></div>
-			<input type="text" class="select_all_onfoc form-control" value="<?php echo glue::http()->url("/video/watch", array("id"=>$model->_id)) ?>" />
+			<input type="text" class="select_all_onfoc form-control" value="<?php echo glue::http()->url("/video/embedded", array("id"=>$model->_id)) ?>" />
 			<div class="clear"></div>	
 			<?php if($model->embeddable){ ?>
 			<p class="embed">Embed:</p>
