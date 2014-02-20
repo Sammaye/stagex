@@ -93,7 +93,7 @@ class UserController extends Controller
 		}
 
 		if(!$fb_user['verified']){
-			$this->render('unverified_login');
+			echo $this->render('unverified_login');
 			exit();
 		}
 
@@ -119,12 +119,12 @@ class UserController extends Controller
 		$user->save();
 
 		if($user->banned){
-			$this->render('banned_login');
+			echo $this->render('banned_login');
 			exit();
 		}
 
 		if($user->deleted){
-			$this->render('deleted_login');
+			echo $this->render('deleted_login');
 			exit();
 		}
 
@@ -168,12 +168,12 @@ class UserController extends Controller
 				$user->save();
 
 				if($user->banned){
-					$this->render('banned_login');
+					echo $this->render('banned_login');
 					exit();
 				}
 
 				if($user->deleted){
-					$this->render('deleted_login');
+					echo $this->render('deleted_login');
 					exit();
 				}
 
