@@ -128,7 +128,7 @@ class UserController extends Controller
 			exit();
 		}
 
-		if($user->login($user->email, '', false, false)){
+		if(glue::session()->login($user->email, '', false, false)){
 			if(isset($_GET['nxt'])){
 				glue::http()->redirect(glue::http()->param('nxt'));
 			}else{

@@ -350,7 +350,7 @@ return array(
 			'class' => 'glue\\components\\facebook\\Session',
 			'appId' => '455165987850786',
 			'secret' => '6c6336958eec554bfb2326e6824ea427',
-			'redirect_uri' => 'http://www.stagex.co.uk/user/fbLogin'
+			'redirect_uri' => 'http://stagex-local.co.uk/user/fbLogin'
 		),
 		
 		'google' => array(
