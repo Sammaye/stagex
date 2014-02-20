@@ -30,7 +30,8 @@ class VideoController extends Controller
 			
 			$updateObj = array();
 			
-			$file_path = rtrim(sys_get_temp_dir(), '/') . '/' . $job['file_name'];
+			$upload_tmp_dir = ini_get('upload_tmp_dir') ?: sys_get_temp_dir();
+			$file_path = rtrim($upload_tmp_dir, '/') . '/' . $job['file_name'];
 			
 			if(!$s3_submit){
 				if(glue::aws()->S3Upload($job['file_name'], array('Body' => fopen($file_path, 'r+')))){
