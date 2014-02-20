@@ -33,7 +33,7 @@ return array(
 	'params' => array(
 		'rootUrl' => 'www.stagex.co.uk',
 		'imagesUrl' => 'images.stagex.co.uk/',
-		'thumbnailBase' => 'images.stagex.co.uk/videos/',
+		'thumbnailBase' => 'images.stagex.co.uk/video/',
 		'uploadBase' => 'upload.stagex.co.uk',
 		'mobileUrl' => 'http://m.stagex.co.uk'
 	),
