@@ -19,7 +19,7 @@ class VideoController extends Controller
 		
 		glue::db()->encoding_jobs->update(array('_id' => array('$in' => $ids)), array('$set' => array('state' => 'submitting')), array('multiple' => true));
 
-		$this->logEvent('Running Job as: '.posix_getpwuid(posix_geteuid()));
+		$this->logEvent('Running Job as: '.print_r(posix_getpwuid(posix_geteuid())));
 		
 		foreach($jobs as $job){
 			
