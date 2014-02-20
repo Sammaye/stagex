@@ -25,7 +25,7 @@ return array(
 			'class' => 'glue\\components\\google\\Session',
 			'client_id' => '1084037742147.apps.googleusercontent.com',
 			'client_secret' => 'xKZbxkiUoWrTZV5T423zqbj2',
-			'callback_uri' => 'http://www.stagex.co.uk/user/google_login'
+			'callback_uri' => 'http://www.stagex.co.uk/user/googleLogin'
 		),
 	),
 
