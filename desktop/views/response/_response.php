@@ -13,7 +13,6 @@ if(!glue::auth()->check(array('viewable' => $item))){
 	<?php if($view == 'ajaxthread') echo ' ajax_thread_comment'; ?>'
 	data-id='<?php echo $item->_id ?>'
 >
-
 	<?php if(glue::auth()->check(array('^' => $item->video)) && $mode == 'admin'){ ?>
 		<div class='checkbox_col'><div class="checkbox_input" style=''><?php echo html::checkbox('comment_id[]', strval(isset($custid) ? $custid : $item->_id), 0, 
 				array('class' => 'response_selector')) ?></div></div>
@@ -45,10 +44,13 @@ if(!glue::auth()->check(array('viewable' => $item))){
 			<span class='likes'><?php if($item->likes > 0): echo "+".$item->likes; endif ?></span>
 			</span>
 		<?php endif; ?>
-		<?php if($view === 'ajaxthread'){ ?>
+		<?php if($view !== 'ajaxthread'){ ?>
+		<?php if($view !== 'thread' && $item->replies > 0){
+			?><span><a href="">View all <?= $item->replies ?> replies</a></span><?php 
+		} ?>
 		<?php if($item->video->allowTextComments && !glue::auth()->check(array('^' => $item))){ ?><a href='#' class='btn_reply footer_block'>Reply</a><?php } ?>
 		</span>	
-		<?php if(!$item->approved): ?><span class='btn_pending footer_block'>Pending 
+		<?php if(!$item->approved): ?><span class='btn_pending footer_block'><pan class="text-warning">Pending</pan> 
 			<?php if(glue::auth()->check(array('^' => $item->video))): ?><a href="#" class="btn_approve">Approve</a><?php endif; ?></span><?php endif; ?>
 
 		<?php if(glue::auth()->check(array('^' => $item)) || glue::auth()->check(array('^' => $item->video))){ ?>
@@ -78,4 +80,4 @@ if(!glue::auth()->check(array('viewable' => $item))){
 	</div>
 	<?php } ?>
 	<div class="thread_content"></div>
-	</div>
+</div>

@@ -383,12 +383,15 @@ return array(
 			}else{
 				glue::runAction('error/notfound');
 			}
+			exit();
 		},
 		'403' => function(){
 			glue::runAction('error/forbidden');
+			exit();
 		},
 		'500' => function(){
 			glue::runAction('error');
+			exit();
 		},
 
 		/**

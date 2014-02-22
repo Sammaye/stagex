@@ -84,7 +84,7 @@ $this->js('admin', "
 		$('.selectAll_input').prop('checked',true).trigger('click');
 	}		
 		
-	$('#filter-username').select2({
+	$('#usernames').select2({
 		placeholder: 'Search upto 5 usernames',
 		minimumInputLength: 3,
 		maximumSelectionSize: 5,
@@ -124,9 +124,6 @@ $this->js('admin', "
 
 <div class='list_responses_body'>
 	<h3 style='margin:0 0 20px 0;'>Responses to <a href='<?php echo glue::http()->url('/video/watch', array('id' => $model->_id)) ?>'><?php echo html::encode($model->title) ?></a></h3>
-	
-	<?php //echo $this->renderPartial('response/_selector',array('model'=>$model)); ?>
-	
 	<?php if(glue::auth()->check(array('^'=>$model))){ ?>
 	<div class="videos_nav_top">
 		<ul class="nav nav-tabs">
@@ -142,11 +139,11 @@ $this->js('admin', "
 		<?php $form = Html::form(array('method' => 'get', 'class' => '')); ?>
 			<?php echo $form->hiddenField('id',$model->_id) ?>
 			<div class='col-md-3 long_input form-inline-col'>
-			<label class="sr-only" for="filter-keywords">Filter Keywords</label>
-			<?php echo html::textfield('filter-keywords',htmlspecialchars(glue::http()->param('filter-keywords',null)),array('placeholder'=>'Enter keywords to search by', 'autocomplete'=>'off', 'class'=>'search form-control')) ?></div>
+			<label class="sr-only" for="keywords">Filter Keywords</label>
+			<?php echo html::textfield('keywords',htmlspecialchars(glue::http()->param('keywords',null)),array('placeholder'=>'Enter keywords to search by', 'autocomplete'=>'off', 'class'=>'search form-control')) ?></div>
 			<div class='col-md-3 long_input form-inline-col'>
-			<label class="sr-only" for="filter-username">Filter Usernames</label>
-			<input type="hidden" id="filter-username" name="filter-username" value="<?php echo $username_filter_string ?>" style="width:100%;"/></div>
+			<label class="sr-only" for="usernames">Filter Usernames</label>
+			<input type="hidden" id="usernames" name="usernames" value="<?php echo $username_filter_string ?>" style="width:100%;"/></div>
 			<div class="col-md-3 form-inline-col">
 			<label class="sr-only" for="from_date">From Date</label>
 			<input type="text" id="from" class="date form-control" name="from_date" placeholder="Enter start date" value="<?php echo htmlspecialchars(glue::http()->param('from_date',null)) ?>"/> <span class="sep">-</span>

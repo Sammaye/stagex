@@ -33,7 +33,7 @@
 						<div class="form-group last"><?php echo $form->label($model, 'stringTags', 'Tags') ?><?php echo html::activeTextField($model, 'string_tags',array('class' => 'form-control')) ?></div>			
 					</div>
 					<div class='col-md-6'>
-						<h4>Category</h4><?php echo $form->label($model, 'category', 'Category') . 
+						<h4>Category</h4><?php echo $form->label($model, 'category', 'Category', 'sr-only') . 
 						html::activeSelectbox($model, 'category', $model->categories('selectBox'),array('class' => 'form-control')) ?>
 						<h4 class="adult">Adult Content</h4>
 						<label class="checkbox"><?php echo $form->checkbox($model, 'mature', 1) ?>This video is not suitable for family viewing</label>

@@ -34,7 +34,7 @@ class VideoResponseController extends Controller
 		glue::trigger('404');
 	}
 
-	public function action_list()
+	public function action_list($pending = false)
 	{
 		$video = Video::findOne(array('_id' => new MongoId(glue::http()->param('id',''))));
 		if(!glue::auth()->check(array('viewable' => $video))){
@@ -45,15 +45,14 @@ class VideoResponseController extends Controller
 		$this->title = 'View All Responses for '.$video->title.' - StageX';
 		$this->layout='user_section';
 		
-		$query = array();
+		$query = array('videoId' => $video->_id);
 		
-		if(($keywords = glue::http()->param('filter-keywords')) && strlen(trim($keywords)) > 0){
+		if(($keywords = glue::http()->param('keywords')) && strlen(trim($keywords)) > 0){
 			$keywords = preg_split('/\s/', trim($keywords));
-			$formed_keywords = array();
-			foreach($keywords as $k){
-				$formed_keywords[] = new \MongoRegex("/$k/");
-			}
-			$query['content'] = array('$in' => $formed_keywords);
+			array_walk($keywords, function(&$n){
+				$n = new \MongoRegex("/$n/");
+			});
+			$query['content'] = array('$in' => $keywords);
 		}
 		
 		if($from_date = glue::http()->param('from_date')){
@@ -64,13 +63,13 @@ class VideoResponseController extends Controller
 		}
 		
 		$usernames_string = '';
-		if($usernames = glue::http()->param('filter-username')){
-			$usernames = preg_split('/,/',$usernames);
-			foreach($usernames as $k => $v){
-				$usernames[$k] = new MongoId($v);
-			}
+		if($usernames = glue::http()->param('usernames')){
+			$usernames = preg_split('/,/', $usernames);
+			array_walk($usernames, function(&$n){
+				$n = new \MongoId($n);
+			});
 			$query['userId'] = array('$in' => $usernames);
-			$users = iterator_to_array(app\models\User::find(array('_id' => array('$in' => $usernames))));
+			$users = iterator_to_array(app\models\User::find(array('_id' => array('$in' => $usernames)))->limit(10));
 			
 			// Once again just to formulate the users
 			foreach($usernames as $k => $v){
@@ -79,63 +78,28 @@ class VideoResponseController extends Controller
 			$usernames_string = rtrim($usernames_string, ',');
 		}
 		
-		$now = new MongoDate();
-		$_SESSION['lastCommentPull'] = serialize($now);
-		echo $this->render('response/all', array('model' => $video, 'pending' => false, 'username_filter_string' => $usernames_string, 'comments' => glue::auth()->check(array("^"=>$video)) ? 
-			app\models\VideoResponse::find(array_merge(array('videoId'=>$video->_id),$query))->sort(array('created'=>-1)) :
-			app\models\VideoResponse::find(array_merge(array('videoId'=>$video->_id),$query))->visible()->sort(array('created'=>-1))
+		$_SESSION['lastCommentPull'] = serialize(new \MongoDate());
+		if($pending){
+			$comments = VideoResponse::find(array_merge($query, array('approved' => false)));
+		}else{
+			$comments = VideoResponse::find($query)->visible();
+		}
+		
+		echo $this->render('response/all', array(
+			'model' => $video, 
+			'pending' => $pending, 
+			'username_filter_string' => $usernames_string, 
+			'comments' => $comments->sort(array('created'=>-1))
 		)); 
 	}
 	
 	public function action_pending()
 	{
-		$video = Video::findOne(array('_id' => new MongoId(glue::http()->param('id',''))));
+		$video = Video::findOne(array('_id' => new \MongoId(glue::http()->param('id'))));
 		if(!glue::auth()->check(array('^' => $video))){
-			glue::trigger('404');
-		}
-		
-		$this->title = 'Moderate Responses for '.$video->title.' - StageX';
-		$this->layout = 'user_section';
-		
-		$query = array();
-		
-		if(($keywords = glue::http()->param('filter-keywords')) && strlen(trim($keywords)) > 0){
-			$keywords = preg_split('/\s/', trim($keywords));
-			$formed_keywords = array();
-			foreach($keywords as $k){
-				$formed_keywords[] = new \MongoRegex("/$k/");
-			}
-			$query['content']=array('$in' => $formed_keywords);
-		}
-		
-		if($from_date = glue::http()->param('from_date')){
-			$query['created']['$gte'] = new MongoDate(strtotime(str_replace('/', '-', $from_date)));
-		}
-		if($to_date = glue::http()->param('to_date')){
-			$query['created']['$lt'] = new MongoDate(strtotime(str_replace('/', '-', $to_date . ' +1 day')));
-		}
-		
-		$usernames_string = '';
-		if($usernames = glue::http()->param('filter-username')){
-			$usernames = preg_split('/,/', $usernames);
-			foreach($usernames as $k => $v){
-				$usernames[$k] = new MongoId($v);
-			}
-			$query['userId'] = array('$in' => $usernames);
-			$users = iterator_to_array(app\models\User::find(array('_id' => array('$in' => $usernames))));
-				
-			// Once again just to formulate the users
-			foreach($usernames as $k => $v){
-				$usernames_string .= (string)$v . ':' . $users[(string)$v]->getUsername() . ',';
-			}
-			$usernames_string = rtrim($usernames_string, ',');
+			return glue::trigger('404');
 		}		
-		
-		$now = new MongoDate();
-		$_SESSION['lastCommentPull'] = serialize($now);
-		echo $this->render('response/all', array('model' => $video, 'pending' => true, 'username_filter_string' => $usernames_string, 'comments' => 
-			app\models\VideoResponse::find(array('videoId'=>$video->_id, 'approved'=>false))->sort(array('created'=>-1)) 
-		));		
+		echo $this->action_list(true);
 	}
 
 	public function action_thread()
@@ -148,7 +112,7 @@ class VideoResponseController extends Controller
 			!glue::auth()->check(array('viewable' => $comment)) || 
 			!glue::auth()->check(array('viewable' => $comment->video))
 		){
-			glue::trigger('404');
+			return glue::trigger('404');
 		}
 
 		$path = $comment->path;
@@ -163,7 +127,7 @@ class VideoResponseController extends Controller
 		}
 
 		if(!glue::auth()->check(array('viewable' => $thread_parent))){
-			glue::trigger('404');
+			return glue::trigger('404');
 		}
 
 		echo $this->render('response/thread', array('thread_parent' => $thread_parent, 'thread' => $thread, 'video' => $comment->video));

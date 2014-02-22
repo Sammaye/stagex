@@ -2229,7 +2229,7 @@ input.date{
 }
 
 .response .date_created{
-	font-size:11px;margin-left:15px;line-height:20px;
+	margin-left:15px;
 }
 
 .streamitem .sent_date{
