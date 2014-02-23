@@ -23,6 +23,46 @@ $this->js('videos', "
 				$('.video_list input:checkbox').prop('checked', true).trigger('click');
 			}
 		});
+		
+		$(document).on('click', '.edit_videos_button', function(){
+			$('.mass_edit_form').css({display:'block'});
+		});
+		
+		$(document).on('click', '.mass_edit_block .edit', function(e){
+			e.preventDefault();
+			$(this).parents('.mass_edit_block').addClass('active').find('.form').css({display:'block'});
+			$(this).css({display:'none'});
+		});
+		
+		$(document).on('click', '.mass_edit_block .remove', function(e){
+			e.preventDefault();
+			$(this).parents('.form').css({display:'none'});
+			$(this).parents('.mass_edit_block').removeClass('active').find('.edit').css({display:'block'});
+		});			
+		
+		$(document).on('click', '.mass_edit_form .cancel', function(){
+			$('.mass_edit_form').css({display:'none'});
+		});
+		
+		$(document).on('click', '.mass_edit_form .save', function(){
+			var params = $(this).parents('.mass_edit_form').find('\
+				.mass_edit_block.active input,.mass_edit_block.active textarea,.mass_edit_block.active select\
+			').serializeArray();
+		
+			id_length=0;
+			$('.video_list .video .checkbox_col input:checked').each(function(i,item){
+				params[params.length]={name:['ids['+id_length+']'],value:$(item).val()};
+				id_length++;
+			});		
+		
+			$.post('/video/batchSave', params, null, 'json').done(function(data){
+				if(data.success){
+					$('.mass_edit_form .alert').summarise('set', 'success', data.updated + ' of ' + data.total + ' of the videos you selected were saved');
+				}else{
+					$('.mass_edit_form .alert').summarise('set', 'error', 'The videos you selected could not be saved');
+				}
+			});
+		});		
 
 		$(document).on('click', '.grey_sticky_toolbar .btn_delete', function(){
 			params={'ids[]':[]};
@@ -119,12 +159,132 @@ $this->js('videos', "
 			</div>    	
     	<div class="clear"></div>
     </div>
+    
+    <div class="mass_edit_form">
+    	<?php $form=Html::activeForm(); 
+    	
+    	$vModel=new app\models\Video();
+    	$vModel->populateDefaults(); 
+    	
+    	?>
+	   	<div class="header clearfix">
+    		<h3>Edit Videos</h3>
+    		<button type="button" class="btn btn-success save">Save</button>
+    		<button type="button" class="btn btn-default cancel">Cancel</button>
+    	</div>    	
+    	
+    	<div class='alert'></div>
+    	
+    	<div class="mass_edit_block form-stacked">
+    		<a href="#" class="edit">+ Edit Title</a>
+    		<div class="form clearfix">
+    		<a href="#" class="remove">Remove</a>
+    		<div class="right">    	
+    		<label>Title:</label><?php echo $form->textField($vModel,'title',array('class'=>'form-control')) ?>
+    		</div></div>
+    	</div>
+    	<div class="mass_edit_block form-stacked">
+    		<a href="#" class="edit">+ Edit Description</a>
+    		<div class="form clearfix">
+    		<a href="#" class="remove">Remove</a>
+    		<div class="right">
+    		<label>Description:</label><?php echo $form->textArea($vModel,'description',array('class'=>'form-control')) ?>
+    		</div></div>
+    	</div>
+    	<div class="mass_edit_block form-stacked">
+    		<a href="#" class="edit">+ Edit Tags</a>
+    		<div class="form clearfix">
+    		<a href="#" class="remove">Remove</a>
+    		<div class="right">
+			<label>Tags:</label>
+    	    <?php echo html::activeTextField($vModel, 'stringTags',array('class'=>'form-control')) ?>	
+			</div></div>
+    	</div>     	
+    	<div class="mass_edit_block form-stacked">
+    		<a href="#" class="edit">+ Edit Category</a>
+    		<div class="form clearfix">
+    		<a href="#" class="remove">Remove</a>
+    		<div class="right">
+			<label>Category:</label><?php echo html::activeSelectbox($vModel, 'category', $vModel->categories('selectBox'),array('class'=>'form-control')) ?>
+			</div></div>
+    	</div>    	
+    	<div class="mass_edit_block">
+    		<a href="#" class="edit">+ Edit Listing</a>
+    		<div class="form clearfix">
+    		<a href="#" class="remove">Remove</a>
+    		<div class="right">
+			<?php $grp = html::activeRadio_group($vModel, 'listing') ?>
+			<label class="radio"><?php echo $grp->add(0) ?>Listed</label>
+			<p class='light'>Your video is public to all users of StageX</p>
+			<label class="radio"><?php echo $grp->add(1) ?>Unlisted</label>
+			<p class='light'>Your video is hidden from listings but can still be accessed directly using the video URL</p>
+			<label class="radio"><?php echo $grp->add(2) ?>Private</label>
+			<p class='light'>No one but you can access this video</p>
+			</div>
+			</div>
+    	</div>
+    	<div class="mass_edit_block form-stacked">
+    		<a href="#" class="edit">+ Edit Licence</a>
+    		<div class="form clearfix">
+    		<a href="#" class="remove">Remove</a>
+    		<div class="right">
+    	    <?php $grp = html::activeRadio_group($vModel, 'licence') ?>
+			<label class="radio"><?php echo $grp->add('1') ?>Standard StageX Licence</label>
+			<label class="radio"><?php echo $grp->add('2') ?>Creative Commons Licence</label>
+			</div>			
+			</div>
+    	</div>     	
+    	<div class="mass_edit_block">
+    		<a href="#" class="edit">+ Edit Mature Rating</a>
+    		<div class="form clearfix">
+    		<a href="#" class="remove">Remove</a>
+    		<div class="right">    	
+    		<label class="checkbox"><?php echo $form->checkbox($vModel, 'mature', 1) ?>This video is not suitable for family viewing</label>
+    		</div></div>
+    	</div>    	
+    	<div class="mass_edit_block">
+    		<a href="#" class="edit">+ Edit Statistics</a>
+    		<div class="form clearfix">
+    		<a href="#" class="remove">Remove</a>
+    		<div class="right">    	
+    		<label class="checkbox"><?php echo $form->checkbox($vModel,'privateStatistics', 1) ?>Make my statistics private</label>
+    		</div></div>
+    	</div>
+    	<div class="mass_edit_block">
+    		<a href="#" class="edit">+ Edit Voting</a>
+    		<div class="form clearfix">
+    		<a href="#" class="remove">Remove</a>
+    		<div class="right">    	
+    		<label class='checkbox'><?php echo $form->checkbox($vModel, "voteable", 1) ?>Allow users to vote on this video</label>
+    		</div></div>
+    	</div>
+    	<div class="mass_edit_block">
+    		<a href="#" class="edit">+ Edit Embedding</a>
+    		<div class="form clearfix">
+    		<a href="#" class="remove">Remove</a>
+    		<div class="right">    	
+    		<label class="checkbox"><?php echo $form->checkbox($vModel,'embeddable', 1) ?>Allow my video to be embedded</label>
+    		</div></div>
+    	</div>
+    	<div class="mass_edit_block">
+    		<a href="#" class="edit">+ Edit Comments</a>
+    		<div class="form clearfix">
+    		<a href="#" class="remove">Remove</a>
+    		<div class="right">    	
+			<label class='checkbox'><?php echo $form->checkbox($vModel, "moderated", 1) ?>Moderate Responses</label>
+			<label class='checkbox'><?php echo $form->checkbox($vModel, "voteableComments", 1) ?>Allow users to vote on responses</label>
+			<label class='checkbox'><?php echo $form->checkbox($vModel, "allowTextComments", 1) ?>Allow text responses</label>
+			</div></div>
+    	</div>
+    	<?php $form->end(); ?>
+    </div>    
 
 	<?php ob_start(); ?>
 		<div class='stickytoolbar-placeholder grey_sticky_toolbar'>
 			<div class='stickytoolbar-bar'>
 				<div class='inner_bar'>
 					<div class='checkbox_button checkbox_input'><?php echo Html::checkbox('selectAll', 1, 0, array('class' => 'selectAll_input')) ?></div>
+					<button class='btn btn-default selected_actions edit_videos_button'>Edit</button>
 					<button class='btn btn-danger selected_actions btn_delete'>Delete</button>
 					<div class="dropdown-group playlist-dropdown">
 						<button class='btn btn-default add_to_playlist dropdown-anchor'>Add To <span class="caret"></span></button>

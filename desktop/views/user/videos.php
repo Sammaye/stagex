@@ -284,7 +284,6 @@ $this->js('videos', "
     		<div class="right">    	
 			<label class='checkbox'><?php echo $form->checkbox($vModel, "moderated", 1) ?>Moderate Responses</label>
 			<label class='checkbox'><?php echo $form->checkbox($vModel, "voteableComments", 1) ?>Allow users to vote on responses</label>
-			<label class='checkbox'><?php echo $form->checkbox($vModel, "allowVideoComments", 1) ?>Allow video responses</label>
 			<label class='checkbox'><?php echo $form->checkbox($vModel, "allowTextComments", 1) ?>Allow text responses</label>
 			</div></div>
     	</div>

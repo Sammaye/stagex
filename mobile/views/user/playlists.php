@@ -131,11 +131,65 @@ $this->js('new_playlist', "
 			</div>    	
     </div>	
     
+    <div class="mass_edit_form">
+    	<?php $form=Html::activeForm(); 
+    	$pModel=new app\models\Playlist(); ?>
+	   	<div class="header clearfix">
+    		<h3>Edit Playlists</h3>
+    		<button type="button" class="btn btn-success save">Save</button>
+    		<button type="button" class="btn btn-default cancel">Cancel</button>
+    	</div>    	
+    	
+    	<div class='alert'></div>
+    	
+    	<div class="mass_edit_block form-stacked clearfix">
+    		<a href="#" class="edit">+ Edit Title</a>
+    		<div class="form">
+    		<a href="#" class="remove">Remove</a>
+    		<div class="right">    	
+    		<label>Title:</label><?php echo $form->textField($pModel,'title','form-control') ?>
+    		</div></div>
+    	</div>
+    	<div class="mass_edit_block form-stacked clearfix">
+    		<a href="#" class="edit">+ Edit Description</a>
+    		<div class="form">
+    		<a href="#" class="remove">Remove</a>
+    		<div class="right">
+    		<label>Description:</label><?php echo $form->textArea($pModel,'description','form-control') ?>
+    		</div></div>
+    	</div>
+    	<div class="mass_edit_block clearfix">
+    		<a href="#" class="edit">+ Edit Listing</a>
+    		<div class="form">
+    		<a href="#" class="remove">Remove</a>
+    		<div class="right">
+			<?php $grp = html::activeRadio_group($pModel, 'listing') ?>
+			<label class="radio"><?php echo $grp->add(0) ?>Listed</label>
+			<p class='text-muted'>Your video is public to all users of StageX</p>
+			<label class="radio"><?php echo $grp->add(1) ?>Unlisted</label>
+			<p class='text-muted'>Your video is hidden from listings but can still be accessed directly using the video URL</p>
+			<label class="radio"><?php echo $grp->add(2) ?>Private</label>
+			<p class='text-muted'>No one but you can access this video</p>
+			</div>
+			</div>
+    	</div>
+    	<div class="mass_edit_block clearfix">
+    		<a href="#" class="edit">+ Edit Followable</a>
+    		<div class="form">
+    		<a href="#" class="remove">Remove</a>
+    		<div class="right">    	
+    		<label class="checkbox"><?php echo $form->checkbox($pModel,'allowFollowers', 1) ?>Allow users to follow my playlist</label>
+    		</div></div>
+    	</div>
+    	<?php $form->end(); ?>
+    </div>     
+    
 	<?php ob_start(); ?>
 		<div class='stickytoolbar-placeholder grey_sticky_toolbar'>
 			<div class='stickytoolbar-bar'>
 				<div class='inner_bar'>
 					<div class='checkbox_button checkbox_input'><?php echo Html::checkbox('selectAll', 1, 0, array('class' => 'selectAll_input')) ?></div>
+					<button class='btn btn-default selected_actions edit_videos_button'>Edit</button>
 					<button class='btn btn-danger selected_actions btn_delete'>Delete</button>
 				</div>
 				<div class="alert block-alert" style='display:none;'></div>

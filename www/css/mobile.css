@@ -784,8 +784,8 @@ input.date{
     float:right;
 }
 
-.user_playlists_page .mass_edit_form .header .btn-white,
-.user_videos_body .mass_edit_form .header .btn-white{
+.user_playlists_page .mass_edit_form .header .btn-default,
+.user_videos_body .mass_edit_form .header .btn-default{
     float:right; margin-right:15px;
 }
 
@@ -796,12 +796,11 @@ input.date{
 
 .user_playlists_page .mass_edit_block.form-stacked textarea,
 .user_videos_body .mass_edit_block.form-stacked textarea{
-    width:400px; height:120px;
+	height:120px;
 }
 
 .user_playlists_page .mass_edit_block.form-stacked input[type="text"],
 .user_videos_body .mass_edit_block.form-stacked input[type="text"]{
-    width:400px;
 }
 
 .user_playlists_page .mass_edit_block.form-stacked label.radio,
@@ -829,7 +828,7 @@ input.date{
 
 .user_playlists_page .mass_edit_block .right,
 .user_videos_body .mass_edit_block .right{
-    float:left;
+    float:left; width:80%;
 }
 
 .user_playlists_page .form-search .btn-group,
