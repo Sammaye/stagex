@@ -2,7 +2,7 @@
 
 	<div class="upload_form">
 		<?php $form = html::activeForm(array(
-				'action' => $this->createUrl('/video/createUpload', array('id' => $u_id), glue::$params['uploadBase']), 
+				'action' => $this->createUrl('/video/createUpload', array('id' => $u_id, 'X-Progress-ID' => $u_id), glue::$params['uploadBase']), 
 				'method' => 'post', 'enctype' => 'multipart/form-data', 'target' => "u_ifr$u_id"
 		)) ?>
 			<a href="javascript: void(0)" class='add_upload'>Click here to Upload a Video

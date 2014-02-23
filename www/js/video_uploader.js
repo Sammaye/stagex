@@ -95,7 +95,6 @@ function add_upload(){
 		var e = $(".upload").last().find("input[name=UPLOAD_IDENTIFIER]").val();
 		$(".upload").last().find('.upload_details').children('.alert').summarise({tpl_close:''});
 		$('.upload').last().find('.edit_information .alert').summarise();
-		console.log($('.upload').last().find('.edit_information .alert').data());
 		count_ids = u_ids.length;
 		u_ids[count_ids] = e;
 		
@@ -106,36 +105,32 @@ function add_upload(){
 
 function get_upload_progress(){
 	if(u_ids.length>0){
-		$.getJSON('/video/getUploadStatus', {ids: u_ids}, function(data){
-			// Scrolls through the IDs assigning the information.
+		
+		$.each(u_ids, function(i, id){
 			
-			if(data.success)
-				info=data.status;
-			else
-				return;
+			var el = $('.upload[data-id='+id+']');
 			
-			for(i = 0; i < info.length; i++){
-	
-				// Sometimes uploadprogress can return null for a upload
-				if(info[i] != null){
-					// Ascertain the IDs for the elements needing change
-					
-					var el = $('.upload[data-id='+info[i].id+']');
-	
-					if(info[i].hasOwnProperty('message')){
-						// Change the width of the progress bar to match done and set a message for the upload status
-						el.find('.progress_bar .progress').css("width", 90+"%");
-						el.find('.upload_details .status').html('90% - '+info[i]['message']);
+			$.get('/progress', {'X-Progress-ID': id}, function(data){
+				// Scrolls through the IDs assigning the information.
+				var upload = eval(data);
+				/* change the width if the inner progress-bar */
+				if (upload.state == 'done' || upload.state == 'uploading') {
+					w = Math.floor(100 * parseInt(upload.received) / parseInt(upload.size));
+					if(w == 100){
+						el.find('.progress_bar .progress').css("width", "90%");
+						el.find('.upload_details .status').html('Finalising');						
 					}else{
-						// Calculate how much has been uploaded
-						var done = Math.floor(100 * parseInt(info[i].uploaded) / parseInt(info[i].total));
-	
-						// Change the width of the progress bar to match done and set a message for the upload status
-						el.find('.progress_bar .progress').css("width", done+"%");
-						el.find('.upload_details .status').html(done+'% - '+"Estimated Time Left: "+info[i].left+" at "+info[i].speed+"ps");
+						el.find('.progress_bar .progress').css("width", w + "%");
+						el.find('.upload_details .status').html(w + '%');
 					}
+					
 				}
-			}
+				/* we are done, stop the interval */
+				if (upload.state == 'done') {
+					el.find('.progress_bar .progress').css("width", "90%");
+					el.find('.upload_details .status').html('Finalising');
+				}
+			});
 		});
 	}
 	upload_timer = setTimeout("get_upload_progress()", timeout);

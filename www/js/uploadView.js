@@ -3,7 +3,7 @@
 	var ts,
 		count = 0,
 		list = [],
-		timer = setTimeout("get_upload_progress()", timeout);
+		timer = setTimeout("getProgess()", timeout);
 	
 	Uploader.el='.file_list';
 	Uploader.timeout=10000;
