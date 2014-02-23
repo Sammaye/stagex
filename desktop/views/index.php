@@ -45,4 +45,8 @@
 			searching for a video called "20111_445" with the query "2011" in your library on Youtube and Vimeo and finding god damn nothing when the video is right there in front of you!</p>
 		</div></div>			
 	</div>
+	<div class='clearfix feature_list'>
+		<h3>Fully featured mobile ready</h3>
+		<p>Try it out!</p>
+	</div>
 </div>

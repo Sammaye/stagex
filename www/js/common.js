@@ -1,3 +1,4 @@
+/*
 $(document).on('click', '.radio,.checkbox', function(e){
 	e.preventDefault(); // Whatever default there may be
 	input = $(this).find('input:checkbox,input:radio');
@@ -8,7 +9,7 @@ $(document).on('click', '.radio,.checkbox', function(e){
 	else
 		input.prop('checked',true);
 });
-
+*/
 $(document).on('click', '.checkbox_input input', function(e){
 	if($(this).prop('checked')==true){
 		$(this).parent().addClass('checked');

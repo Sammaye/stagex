@@ -109,11 +109,11 @@ glue::controller()->js('list', "
 
 	$(document).on('click', '.response .btn_reply', function(event){
 		event.preventDefault();
-		var el = $(this).parents('.response');
+		var el = $(this).closest('.response');
 
-		el.find('.reply .alert').summarise();
-		el.find('.reply .alert').summarise('reset');	
-		el.find('.reply').css({ 'display': 'block' }).find('textarea').focus();
+		el.children('.response_inner').find('.reply .alert').summarise();
+		el.children('.response_inner').find('.reply .alert').summarise('reset');	
+		el.children('.response_inner').find('.reply').css({ 'display': 'block' }).find('textarea').focus();
 	});
 
 	$(document).on('click', '.response .reply .btn_cancel', function(event){
@@ -123,38 +123,22 @@ glue::controller()->js('list', "
 
 	$(document).on('click', '.response .btn_post_reply', function(event){
 		event.preventDefault();
-		var el = $(this), item = $(this).parents('.response'),
+		var el = $(this), item = $(this).closest('.response'), item_inner = item.children('.response_inner'),
 			mode = $('.video_response_list').data('mode') == null ? '' : $('.video_response_list').data('mode');
 
-		$.post('/videoresponse/add', { 'parent_comment': item.data().id, 'content':  item.find('.reply').find('textarea').val(),
+		$.post('/videoresponse/add', { 'parent_comment': item.data().id, 'content':  item_inner.find('.reply').find('textarea').val(),
 			mode: mode, video_id: '".strval($model->_id)."', type: 'text'}, function(data){
 
-			item.find('.reply .alert').summarise();
-			item.find('.reply .alert').summarise('close');
+			item_inner.find('.reply .alert').summarise();
+			item_inner.find('.reply .alert').summarise('close');
 			if(data.success){
-				item.find('textarea').val('');
-				item.find('.reply').css({ 'display':'none' });
-				item.after($(data.html).addClass('thread_comment'));
+				item_inner.find('textarea').val('');
+				item_inner.find('.reply').css({ 'display':'none' });
+				item_inner.after($(data.html).addClass('thread_comment'));
 			}else{
-				item.find('.reply .alert').summarise('set','error',{message:'<p>Your reply could not be posted because:</p>', list:data.messages});
+				item_inner.find('.reply .alert').summarise('set','error',{message:'<p>Your reply could not be posted because:</p>', list:data.messages});
 			}
 		}, 'json');
-	});
-
-
-
-	$(document).on('click', '.video_response_item .expand_comment_parent', function(event){
-		event.preventDefault();
-		var item = $(this).parents('.video_response_item');
-
-		if(item.find('.thread_parent_viewer').css('display') == 'block'){
-			item.find('.thread_parent_viewer').css({ 'display': 'none' });
-			if(item.find('.reply').css('display') != 'block'){ // Then remove expanded class
-				item.removeClass('expanded');
-			}
-		}else{
-			item.addClass('expanded').find('.thread_parent_viewer').css({ 'display': 'block' });
-		}
 	});
 
 	function get_comments_by_epoch(){
@@ -172,6 +156,55 @@ glue::controller()->js('list', "
 			live_comments_timeout = setTimeout('get_comments_by_epoch()', 60000);
 		});
 	}
+				
+	$(document).on('click', '.video_response_list .video_text_response_item .btn-load-parents', function(e){
+		e.preventDefault();
+		response = $(this).parents('.video_text_response_item');
+		if(response.children('.response_parents').html() == ''){
+			$.get('/videoresponse/loadParents', {id: response.data().id}, null, 'json')
+			.done(function(data){
+				if(data.success){
+					response
+						.addClass('expanded_thread')
+						.find('.response_parents')
+						.html(data.html)
+						.css({display: 'block'});
+			
+					response.children('.response_inner').find('.btn-close-thread').css({display: 'inline'});
+				}
+			});
+		}else{
+			response
+				.addClass('expanded_thread')
+				.find('.response_parents')
+				.css({display: 'block'});
+			response.children('.response_inner').find('.btn-close-thread').css({display: 'inline'});
+		}
+	});
+		
+	$(document).on('click', '.video_response_list .video_text_response_item .btn-load-children', function(e){
+		e.preventDefault();
+		response = $(this).parents('.video_text_response_item');
+		$.get('/videoresponse/loadChildren', {id: response.data().id}, null, 'json')
+		.done(function(data){
+			if(data.success){
+				response
+					.addClass('expanded_thread')
+					.find('.response_children')
+					.html(data.html)
+					.css({display: 'block'});
+		
+				response.children('.response_inner').find('.btn-close-thread').css({display: 'inline'});
+			}
+		});
+	});		
+		
+	$(document).on('click', '.video_response_list .video_text_response_item .btn-close-thread', function(e){
+		e.preventDefault();
+		response = $(this).parents('.video_text_response_item');
+		response.removeClass('expanded_thread').find('.response_parents,.response_children').css({display: 'none'});
+		response.find('.btn-close-thread').css({display: 'none'});
+	});		
 "); // All Response list related stuff gets shoved into here
 
 if(isset($ajaxPagination)&&$ajaxPagination){

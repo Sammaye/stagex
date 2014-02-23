@@ -49,9 +49,10 @@ glue::controller()->js('thread', "
 	$(document).on('click', '.thread_parent .reply .btn_post_reply', function(event){
 		event.preventDefault();
 		var el = $(this);
+		var mode = $('.video_response_list').data('mode') == null ? '' : $('.video_response_list').data('mode');
 
 		$.post('/videoresponse/add', { 'parent_comment': el.parents('.thread_parent').data().id, 'content':  el.parents('.reply').find('textarea').val(),
-			video_id: '".strval($video->_id)."', type: 'text'}, function(data){
+			mode: mode, video_id: '".strval($video->_id)."', type: 'text'}, function(data){
 
 			$('.video_thread_alert.alert').summarise('reset');
 
@@ -108,7 +109,7 @@ glue::controller()->js('thread', "
 	<?php if(count($thread) > 0){ ?>
 		<div class='thread_reply_list'>
 			<div class='thread_reply_amnt text-muted'><?php echo count($thread) ?> replies to <?php echo $thread_parent->author->getUsername() ?></div>
-			<?php echo $this->renderPartial('response/list', array('model' => $video, 'comments' => $thread, 'pageSize' => 1000, 'hideSelector' => true)) ?>
+			<?php echo $this->renderPartial('response/list', array('model' => $video, 'comments' => $thread, 'pageSize' => 1000, 'hideSelector' => true, 'mode' => 'singleThread')) ?>
 		</div>
 	<?php }else{ ?>
 		<div class='comment_list'><div class='list'></div></div>

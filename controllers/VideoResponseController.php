@@ -97,7 +97,7 @@ class VideoResponseController extends Controller
 	{
 		$video = Video::findOne(array('_id' => new \MongoId(glue::http()->param('id'))));
 		if(!glue::auth()->check(array('^' => $video))){
-			return glue::trigger('404');
+			glue::trigger('404');
 		}		
 		echo $this->action_list(true);
 	}
@@ -112,7 +112,7 @@ class VideoResponseController extends Controller
 			!glue::auth()->check(array('viewable' => $comment)) || 
 			!glue::auth()->check(array('viewable' => $comment->video))
 		){
-			return glue::trigger('404');
+			glue::trigger('404');
 		}
 
 		$path = $comment->path;
@@ -127,7 +127,7 @@ class VideoResponseController extends Controller
 		}
 
 		if(!glue::auth()->check(array('viewable' => $thread_parent))){
-			return glue::trigger('404');
+			glue::trigger('404');
 		}
 
 		echo $this->render('response/thread', array('thread_parent' => $thread_parent, 'thread' => $thread, 'video' => $comment->video));
@@ -405,7 +405,7 @@ class VideoResponseController extends Controller
 		Json::success(array('number_comments'=>$comments->count()));
 	}
 	
-	public function action_loadThread()
+	public function action_loadParents()
 	{
 		if(!glue::http()->isAjax()){
 			glue::trigger('404');
@@ -424,10 +424,9 @@ class VideoResponseController extends Controller
 		array_pop($parents);
 		
 		ob_start();
-		?><div><a class="close_thread" href="#">Close thread</a></div>
-		<div class="thread_list">
+		?><div class="thread_list">
 		<?php foreach(
-			VideoResponse::find(array('_id' => array('$in' => $parents)))->sort(array('created' => -1)) as $parent
+			VideoResponse::find(array('_id' => array('$in' => $parents)))->visible()->sort(array('created' => -1)) as $parent
 		){ ?>
 			<?php echo $this->renderPartial('response/_response', array('view' => 'ajaxthread', 'item' => $parent)) ?>
 		<?php } ?>
@@ -438,4 +437,26 @@ class VideoResponseController extends Controller
 		
 		Json::success(array('html' => $html));
 	}
+	
+	public function action_loadChildren()
+	{
+		if(!glue::http()->isAjax()){
+			glue::trigger('404');
+		}
+		if(
+			(($id = glue::http()->param('id')) === null) ||
+			($response = VideoResponse::findOne(array('_id' => new \MongoId($id)))) === null
+		){
+			Json::error(Json::UNKNOWN);
+		}
+		ob_start();
+		?><div class="thread_list">
+			<?php foreach($response->getChildren() as $child){ ?>
+				<?php echo $this->renderPartial('response/_response', array('view' => 'ajaxthread', 'item' => $child)) ?>
+			<?php } ?>
+		</div><?php
+		$html = ob_get_contents();
+		ob_clean();
+		Json::success(array('html' => $html));
+	}	
 }

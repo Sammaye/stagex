@@ -132,10 +132,13 @@ class VideoResponse extends Document
 		return $this->replyVideoId != $this->videoId;
 	}
 
-	public function getThread()
+	public function getChildren()
 	{
 		/** $secondLevel = $this->Db()->find(array("path"=>new MongoRegex("/^".$path.",[^,]*,[^,]*$/")))->sort(array("seq"=>1)); // Second Level **/
-		return self::find(array("path"=>new \MongoRegex("/^".$this->path.",[^,]*$/")))->sort(array("created"=>1)); // First Level
+		return self::find(array(
+			"path"=>new \MongoRegex("/^".$this->path.".*$/"),
+			'_id' => array('$ne' => $this->_id)
+		))->visible()->sort(array("created"=>1)); // First Level
 	}
 
 	public function beforeSave()

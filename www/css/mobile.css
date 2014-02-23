@@ -2547,9 +2547,21 @@ input.date{
     padding:10px;
 }
 
-.video_text_response_item .thread_content{
+.video_text_response_item .response_parents,
+.video_text_response_item .response_children{
     background:#f7f7f7;
-    padding:10px;
+    display:none;
+}
+
+.video_text_response_item .response_parents{
+    border-bottom:1px solid #eee;
+}
+
+.video_text_response_item .response_children{
+    border-top:1px solid #eee;
+}
+
+.video_text_response_item .btn-close-thread{
     display:none;
 }
 

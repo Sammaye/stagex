@@ -128,27 +128,6 @@ $this->js('page', "
 			}
 		});
 	});
-
-	$(document).on('click', '.video_response_list .video_text_response_item .load_comment_thread', function(e){
-		e.preventDefault();
-		response = $(this).parents('.video_text_response_item');
-		$.get('/videoresponse/loadThread', {id: response.data().id}, null, 'json')
-		.done(function(data){
-			if(data.success){
-				response
-					.addClass('expanded_thread')
-					.find('.thread_content')
-					.html(data.html)
-					.css({display: 'block'});
-			}
-		});
-	});
-		
-	$(document).on('click', '.video_response_list .video_text_response_item .close_thread', function(e){
-		e.preventDefault();
-		response = $(this).parents('.video_text_response_item');
-		response.removeClass('expanded_thread').find('.thread_content').css({display: 'none'});
-	});		
 ");
 
 $this->js('edit', "
