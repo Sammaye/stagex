@@ -46,7 +46,7 @@
 		</div></div>			
 	</div>
 	<div class='clearfix feature_list'>
-		<h3>Fully featured mobile ready</h3>
-		<p>Try it out!</p>
+		<h3>A complete mobile ready site</h3>
+		<p>Try it out! It is actually just this site shrunk down, no missing features bar one: mass edit on videos and playlists.</p>
 	</div>
 </div>
