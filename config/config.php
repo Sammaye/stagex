@@ -324,32 +324,32 @@ return array(
 
 		'facebook' => array(
 				'class' => 'glue\\components\\facebook\\Session',
-				'appId' => '455165987850786',
-				'secret' => '6c6336958eec554bfb2326e6824ea427',
+				'appId' => '',
+				'secret' => '',
 				'redirect_uri' => 'http://www.stagex.co.uk/user/fbLogin'
 		),
 
 		'twitter' => array(
 				'class' => 'glue\\components\\twitter\\Session',
-				'consumer_key' => "E1uIs3dzvlrodsj4R3I8w",
-				'secret_key' => "HxbMV2giKXekGI41TXp2A2rJh9P5OroGCSxlEYPogwc",
+				'consumer_key' => "",
+				'secret_key' => "",
 				'callback' => "http://stagex.co.uk/autoshare/auth?network=twt"
 		),
 
 		'google' => array(
 				'class' => 'glue\\components\\google\\Session',
-				'client_id' => '170938211589.apps.googleusercontent.com',
-				'client_secret' => 'lTJpybuvyAD-zWTBI-mnyT1Q',
+				'client_id' => '',
+				'client_secret' => '',
 				'callback_uri' => 'http://stagex-local.co.uk/user/googleLogin'
 		),
 
 		'aws' => array(
 			'class' => 'glue\\components\\aws\\Bootstrap',
-			'key' => 'AKIAICYRUYXAXE3MTUXA',
-			'secret' => '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',
+			'key' => '',
+			'secret' => '',
 			'bucket' => 'videos.stagex.co.uk',
-			'input_queue' => 'https://us-west-2.queue.amazonaws.com/663341881510/stagex-uploadsQueue',
-			'output_queue' => 'https://us-west-2.queue.amazonaws.com/663341881510/stagex-outputsQueue'
+			'input_queue' => 'https://us-west-2.queue.amazonaws.com//stagex-uploadsQueue',
+			'output_queue' => 'https://us-west-2.queue.amazonaws.com//stagex-outputsQueue'
 		),
 
 		'purifier' => array(
@@ -454,7 +454,3 @@ return array(
 		"ListView"				=> "glue\\widgets\\ListView",
 	)
 );
-
-// LinkedIn
-//$consumer_key = "WP7tjwrppK5R7i_dRON8mv8lch5Yt2cXqKTMZll1zM16I1PISLc32Kc-e9EqkLiD",
-//$consumer_secret = "cP4hc4-t9qdqnpCj2l9kTCEmhL9u63hCTdkJ8VBZxKPauHmDe48o1VhcB9lAbeP2",

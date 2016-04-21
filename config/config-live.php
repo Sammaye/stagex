@@ -33,29 +33,29 @@ return array(
 		'facebook' => array(
 			'class' => 'facebook_session',
 			'path' => 'glue/plugins/facebook/facebook_session.php',
-		  	'appId' => '153062384724422',
-		  	'secret' => '36e823e43433b6630e827d9cce49cf5d',
+		  	'appId' => '',
+		  	'secret' => '',
 		),
 
 		'twitter' => array(
 			'class' => 'TwitterSession',
 			'path' => 'glue/plugins/twitter/TwitterSession.php',
-			'consumer_key' => "humOBQFG0kdQXhPcOhCJw",
-			'secret_key' => "SKOMKduZOAYmZaAlbxE9dMtifnUeYLaQKBQJdq0fU",
+			'consumer_key' => "",
+			'secret_key' => "",
 			'callback' => "http://stagex.co.uk/autoshare/auth?network=twt"
 		),
 
 		'google' => array(
 			'class' => 'google_session',
 			'path' => 'glue/plugins/googleapi/google_session.php',
-			'client_id' => '1084037742147.apps.googleusercontent.com',
-			'client_secret' => 'xKZbxkiUoWrTZV5T423zqbj2',
+			'client_id' => '',
+			'client_secret' => '',
 			'callback_uri' => 'http://www.stagex.co.uk/user/google_login'
 		),
 
 		// Yes some MySQL
 		"mysql"=>array(
-			"password" => "s4mi2llAmanMon2",
+			"password" => "",
 		)
 	),
 
